@@ -117,7 +117,9 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             let pid = $('.naComment_parentID', el).text().trim();
             const id  = $('.naComment_id', el).text().trim();   // or data-id or whatever you use
             $('.naComment_msgHTML > a > img',el).remove();
-            $('.naComment_msgHTML:has(p iframe)', el).css({display:'flex',justifyContent:'right'});
+            $('.naComment_msgHTML > p > iframe', el).each(function(idx,el2){
+		    $(el2).parents('.naComment_msgHTML').css({display:'grid',justifyContent:'right'});
+	    });
 
 
             // Normalize root marker (adjust if your root uses something else than '#')
@@ -153,8 +155,9 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
                 //if (currentLevel === 0) $(el).css({display:'block'}); else $(el).css({display:'none'});
 
                 // Apply visual indentation (adjust pixel value to taste)
-                const marginLeft = currentLevel * 24;   // e.g. 24px per level
+                const marginLeft = currentLevel * 48;   // e.g. 24px per level
                 $(el).css('margin-left', marginLeft + 'px');
+                $(el).css('margin-right', marginLeft + 'px');
                 na.comments.settings.themes.default.marginLeft = (20+marginLeft);
                 $('.naComment_subComments', el).css(na.comments.settings.themes.default);
 
