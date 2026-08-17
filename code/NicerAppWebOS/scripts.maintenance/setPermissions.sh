@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_PATH=/var/www/nicer.app-5.10.z/code
+ROOT_PATH=/var/www/NicerAppWebOS-v6.0.z/code
 DOMAIN_ROOTS=( "/var/www/nicer.app-5.10.z/domains/nicer.app" "/var/www/nicer.app-5.10.z/domains/said.by" )
 echo "START OF $ROOT_PATH/NicerAppWebOS/scripts.maintenance/setPermissions.sh"
 

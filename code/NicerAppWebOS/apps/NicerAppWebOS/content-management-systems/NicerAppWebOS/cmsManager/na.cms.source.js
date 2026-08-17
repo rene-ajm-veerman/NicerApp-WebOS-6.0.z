@@ -1363,8 +1363,8 @@ debugger;
         src = (
             na.cms.settings.current.mediaFolderView == 'upload'
             //? '/NicerAppWebOS/3rd-party/plupload-2.3.6/examples/jquery/jquery_ui_widget.php?c='+na.m.changedDateTime_current()+/*'&smID='+siteManager.id+'&iid='+iid+'&dialogID='+did+* /'&codePath='+path
-            ? '/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/jquery_ui_widget.2.3.7.php?codePath='+path
-            : '/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/index.php?codePath='+path+'&photoAlbum_emptyFolderPage=/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/jquery_ui_widget.2.3.7.php'
+            ? '/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/jquery_ui_widget.2.3.9.php?codePath='+path
+            : '/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/index.php?codePath='+path+'&photoAlbum_emptyFolderPage=/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/jquery_ui_widget.2.3.9.php'
         ),
         el = $('#jQueryFileUpload')[0];
         el.onload = na.cms.onresize;

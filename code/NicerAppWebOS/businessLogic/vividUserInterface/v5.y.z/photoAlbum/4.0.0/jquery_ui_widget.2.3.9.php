@@ -18,7 +18,7 @@
 <!-- debug -->
 <script type="text/javascript" src="/NicerAppWebOS/3rd-party/plupload-2.3.7/js/moxie.js"></script>
 <script type="text/javascript" src="/NicerAppWebOS/3rd-party/plupload-2.3.9/js/plupload.dev.js"></script>
-<script type="text/javascript" src="/NicerAppWebOS/3rd-party/plupload-2.3.7/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<script type="text/javascript" src="/NicerAppWebOS/3rd-party/plupload-2.3.9/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>-->
 <!--  -->
 
 </head>

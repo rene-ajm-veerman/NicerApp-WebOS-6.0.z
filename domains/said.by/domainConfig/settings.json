@@ -13,9 +13,15 @@
         }
     ],
     "subdomains" : [
+	    "absolutely",
+	    "beautifully",
+	    "definitely",
+	    "horribly",
         "that.got",
         "this.got",
         "well",
+	"very.well",
+	"not.so.well",
         "maybe",
         "words"
     ],
