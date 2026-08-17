@@ -527,20 +527,27 @@ class naScreenshots
         echo "<div class=\"phpError\"><div class=\"backdropped phpError\">claimNextJob: attempting to claim {$id}</div>";
 
         try {
+	$step = 0;
             // Use the raw CouchDB client directly
             $cdb = $this->db->cdb;   // or whatever the wrapper exposes
             if (method_exists($this->db, 'getRawCdb')) {
                 $cdb = $this->db->getRawCdb();
             }
+	$step = 1;
 
             $cdb->setDatabase($this->table);
+	    $step = 1.1;
             $current = $cdb->get($id);
+	    $step = 1.2;
             $rev = $current->body->_rev ?? null;
+	    $step = 1.3;
 
             if (!$rev) {
                 echo "<div class\"phpError\">claimNextJob: no _rev for {$id}</div>";
+		$step = 1.4;
                 return null;
             }
+		    $step = 2;
 
             $updatedDoc = array_merge($job, [
                 'status'   => 'processing',
@@ -550,14 +557,16 @@ class naScreenshots
                 'attempts' => ($job['attempts'] ?? 0) + 1,
                                       '_rev'     => $rev
             ]);
+	    $step = 3;
 
             $cdb->put($id, $updatedDoc);
             echo "<div class=\"phpError\">claimNextJob: successfully claimed {$id}</div></div>";
+	    $step = 4;
 
             return $updatedDoc;
 
         } catch (Throwable $e) {
-            echo "<div class=\"phpError\"><div class\"backdropped phpError\">claimNextJob EXCEPTION: " . $e->getMessage() . "</div>";
+            echo "<div class=\"phpError\"><div class\"backdropped phpError\">claimNextJob EXCEPTION ($step): " . $e->getMessage() . "</div>";
 	    $t = $e->getTraceAsString();
 	    echo '<pre class="backdropped phpError">'.$t.'</pre></div></div>';
             return null;
@@ -605,7 +614,7 @@ class naScreenshots
                        escapeshellarg($paths['absolute'])
         );
         $cmd = "node " . escapeshellarg($this->nodeScript) . " " . escapeshellarg($job['url']) . " " . escapeshellarg($job['filePath']) . " 2>&1";
-        echo "Starting unix process : $cmd\n";
+        echo "<div class=\"phpError\">Starting unix process : $cmd</div>";
 
         $output     = [];
         $returnCode = 0;
@@ -622,7 +631,7 @@ class naScreenshots
         $output = array(); $result = -1;
         exec ($exec, $output, $result);
         $dbg = [ '$exec' => $exec, '$output' => $output, '$result' => $result ];
-        if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
+        //if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
 
         if ($success) {
             $update = [

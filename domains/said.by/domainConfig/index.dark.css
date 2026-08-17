@@ -65,13 +65,18 @@ text-shadow:0px 0px 7px black, 0px 0px 2px black, 2px 2px 4px black;
   border : 1px solid grey;
 }
 .vdBackground {
-  background : rgba(0,0,0,0.4);
+  /*background : rgba(0,0,0,0.4);*/
   position : absolute;
   top : 0px;
   left : 0px;
   width : 100%;
   height : 100%;
   z-index : -1;
+}
+.vividScrollpane {
+  background : rgba(0,0,0,0.3);
+  padding : 10px;
+  margin : 10px;
 }
 
 #siteSettingsMenu {
@@ -166,8 +171,9 @@ opacity : 0.8;
 }
 .vividDialog > .vividDialogContent {
   z-index : 10;
-  position : relative;
   display : none;
+  width : calc(100% - 40px);
+  height : calc(100% - 40px);
 }
 
 #btnOptions_menu {

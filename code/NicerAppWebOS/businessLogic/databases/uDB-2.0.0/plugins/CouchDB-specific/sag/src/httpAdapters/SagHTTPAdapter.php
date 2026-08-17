@@ -87,8 +87,11 @@ abstract class SagHTTPAdapter {
 
       if(isset($json) && $json !== FALSE) {
         if(!empty($json->error)) {
-          if (!property_exists($json,'reason')) $json->reason='[unknown error]';
-          throw new SagCouchException("{$json->error} ({$json->reason})", $response->headers->_HTTP->status);
+		if (!property_exists($json,'reason')) {
+			$json->reason='[unknown error]';
+		} else {
+          		throw new SagCouchException("{$json->error} ({$json->reason})", $response->headers->_HTTP->status);
+		}
         }
 
         if($this->decodeResp) {

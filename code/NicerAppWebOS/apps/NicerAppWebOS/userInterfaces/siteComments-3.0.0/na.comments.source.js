@@ -84,7 +84,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             data : data,
             success : function (data, ts, xhr) {
                 $('#siteComments .vividDialogContent').html(data).delay(100);
-                $('#siteComments .vdBackground').css({opacity:0.4,height:$('#siteComments .vividDialogContent')[0].scrollHeight});
+                $('#siteComments .vdBackground').css({opacity:0.4,height:'100%'});
 
                 na.comments.onload(function () {
                     na.site.startUIvisuals();
