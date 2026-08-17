@@ -701,7 +701,10 @@ class class_naComments {
                 strpos($t->mode,'ajax')!==false
                 && $h!==true
             ) {
-                $html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'">'.$it['msgHTML'].'</div>'.PHP_EOL;
+		$mh = $it['msgHTML'];
+		$mh = str_replace('<iframe', '<iframe loading="lazy" defer=""', $mh);
+		$mh = str_replace('allowfullscreen>', 'allowfullscreen="">', $mh);
+                $html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'">'.$mh.'</div>'.PHP_EOL;
 
                 // Show small screenshots for any URLs mentioned in this comment
                 $mentionedUrls = $t->extractUrlsFromHtml($it['msgHTML'] ?? '');

@@ -35,6 +35,7 @@
         <p style="padding:8px;border-radius:5px;margin-block-start:0;margin-block-end:0;margin-inline-start:0;margin-inline-end:0;">
         Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.0.z" class="nomod noPushState" target="naGithub">v6.0.z on Github.com</a>,
         and available as <a href="https://nicer.app/downloads" class="nomod noPushState" target="naDownload">full package here</a>, <br/>
+	best applied as large zip files first, followed by a fetch from github for the very latest sources.
         </p>
 
         <p><a href="https://said.by/view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TIjp7ImNtc1ZpZXdNZWRpYSI6eyJjb2RlUGF0aCI6IlwvdmFyXC93d3dcL25pY2VyLmFwcC01LjEwLnpcL2RvbWFpbnNcL3NhaWQuYnlcL3NpdGVEYXRhXC9zYWlkLmJ5XC9Vc2Vyc1wvUmVuZSBBSk0gVmVlcm1hblwvTWVkaWEgQWxidW1zXC9OZXciLCJmaWxlbmFtZSI6IlNjcmVlbnNob3RfMjAyNjA2MTJfMjAxMjQwLnBuZyJ9fX0" class="nomod noPushState" target="naScreenshots-20260623-1016CET-AMS">Screenshot</a> <a href="https://said.by/Rene-AJM-Veerman/about/NicerApp" class="nomod noPushState" target="naScreenshots-collection">collection</a> of <a class="nomod noPushState" target="naDiary-20260623-1008CET-AMS" href="https://nicer.app/view/eyJhaWQiOjAsImZkcyI6NTcxMjAwLCJycCI6IlwvMjAyNiBCZXN0XC8ifQ?idxStart=0&pw=alwaysXMASzzz">this</a>.</p>
