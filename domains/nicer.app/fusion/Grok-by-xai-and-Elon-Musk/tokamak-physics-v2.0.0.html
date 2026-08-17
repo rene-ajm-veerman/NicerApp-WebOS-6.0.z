@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- (C) + (R) 2026 Rene AJM Veerman with assistance by Grok from xai.com -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tokamak Plant – Physics Layers 1-3</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #0a0a12; color: #e0e0ff; font-family: system-ui, -apple-system, sans-serif; }
+    canvas { display: block; }
+
+    #info {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(10, 12, 24, 0.88);
+      border: 1px solid #3a4a8a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      max-width: 280px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 10;
+    }
+    #info h1 { font-size: 14px; margin-bottom: 6px; color: #8ab4ff; font-weight: 600; }
+    #info .mode { color: #7dffb3; font-weight: 600; }
+    #info kbd {
+      background: #1e2a4a; border: 1px solid #4a5a8a; border-radius: 3px;
+      padding: 1px 5px; font-size: 11px; font-family: inherit;
+    }
+
+    #panel {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 300px;
+      background: rgba(10, 12, 24, 0.92);
+      border: 1px solid #3a4a8a;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 12.5px;
+      z-index: 10;
+      max-height: calc(100vh - 24px);
+      overflow-y: auto;
+    }
+    #panel h2 {
+      font-size: 13px;
+      color: #8ab4ff;
+      margin-bottom: 10px;
+      font-weight: 600;
+      border-bottom: 1px solid #2a3a5a;
+      padding-bottom: 6px;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 9px;
+      gap: 8px;
+    }
+    .control-row label { flex: 1; color: #c0c8e0; }
+    .control-row input[type="range"] {
+      width: 110px;
+      accent-color: #4a8cff;
+    }
+    .control-row .val {
+      width: 52px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #a0d0ff;
+      font-size: 12px;
+    }
+
+    .section { margin-top: 14px; }
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6a7aaa;
+      margin-bottom: 7px;
+    }
+
+    .readout {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3px 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .readout .label { color: #9aa8c8; }
+    .readout .value { color: #7dffb3; font-weight: 500; text-align: right; }
+    .readout .value.warn { color: #ffcc66; }
+    .readout .value.hot  { color: #ff8866; }
+
+    #status {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(10, 12, 24, 0.8);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #a0b0d0;
+      z-index: 10;
+    }
+
+    #profileCanvas {
+      width: 100%;
+      height: 90px;
+      background: #0d1220;
+      border-radius: 6px;
+      margin-top: 6px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h1>Tokamak – Physics v1</h1>
+    <div>Mode: <span class="mode" id="modeLabel">Orbit</span></div>
+    <div style="margin-top:6px">
+      <kbd>O</kbd> Orbit &nbsp; <kbd>F</kbd> Fly
+    </div>
+    <div style="margin-top:8px; opacity:0.8; font-size:11.5px">
+      Layers active:<br>
+      1. 0-D power balance<br>
+      2. 1-D radial profiles<br>
+      3. Kinetic marker particles
+    </div>
+  </div>
+
+  <div id="panel">
+    <h2>Plasma Control</h2>
+
+    <div class="control-row">
+      <label>Density n<sub>e</sub> (10<sup>20</sup> m<sup>-3</sup>)</label>
+      <input type="range" id="nSlider" min="0.2" max="2.5" step="0.05" value="1.0">
+      <span class="val" id="nVal">1.00</span>
+    </div>
+    <div class="control-row">
+      <label>Temperature T (keV)</label>
+      <input type="range" id="tSlider" min="2" max="30" step="0.5" value="12">
+      <span class="val" id="tVal">12.0</span>
+    </div>
+    <div class="control-row">
+      <label>Aux. Heating P<sub>aux</sub> (MW)</label>
+      <input type="range" id="pSlider" min="0" max="150" step="1" value="50">
+      <span class="val" id="pVal">50</span>
+    </div>
+    <div class="control-row">
+      <label>Magnetic Field B<sub>0</sub> (T)</label>
+      <input type="range" id="bSlider" min="2" max="12" step="0.1" value="5.3">
+      <span class="val" id="bVal">5.3</span>
+    </div>
+    <div class="control-row">
+      <label>Plasma Current I<sub>p</sub> (MA)</label>
+      <input type="range" id="ipSlider" min="1" max="15" step="0.1" value="5.0">
+      <span class="val" id="ipVal">5.0</span>
+    </div>
+
+    <div class="section">
+      <div class="section-title">0-D Power Balance</div>
+      <div class="readout" id="readout0d">
+        <span class="label">Fusion Power</span><span class="value" id="pfus">—</span>
+        <span class="label">Q-factor</span><span class="value" id="qfac">—</span>
+        <span class="label">Confinement τ<sub>E</sub></span><span class="value" id="taue">—</span>
+        <span class="label">Triple Product</span><span class="value" id="nTtau">—</span>
+        <span class="label">Lawson status</span><span class="value" id="lawson">—</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">1-D Profiles (n, T vs r/a)</div>
+      <canvas id="profileCanvas" width="268" height="90"></canvas>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Kinetic Layer</div>
+      <div class="control-row">
+        <label>Marker particles</label>
+        <input type="range" id="partSlider" min="500" max="6000" step="100" value="2500">
+        <span class="val" id="partVal">2500</span>
+      </div>
+      <div class="control-row">
+        <label>Show particles</label>
+        <input type="checkbox" id="showParts" checked style="width:auto; accent-color:#4a8cff;">
+      </div>
+    </div>
+  </div>
+
+  <div id="status">Physics layers 1–3 active • real DT reactivity + IPB98-style scaling</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.185.1/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.185.1/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { FlyControls } from 'three/addons/controls/FlyControls.js';
+
+    // ============================================================
+    //  GEOMETRY CONSTANTS (educational scale, roughly SPARC-like)
+    // ============================================================
+    const R0 = 5.0;          // major radius [m] (scaled for visuals)
+    const a  = 1.6;          // minor radius [m]
+    const kappa = 1.8;       // elongation (used in volume & scaling)
+    const VOL = 2 * Math.PI**2 * R0 * a*a * kappa;  // plasma volume [m³] approx
+
+    // ============================================================
+    //  PHYSICS HELPERS
+    // ============================================================
+
+    /**
+     * DT reactivity <σv> in m³/s using a practical fit
+     * Valid roughly 2–40 keV. Based on Bosch-Hale style approximations.
+     */
+    function dtReactivity(TkeV) {
+      if (TkeV < 1.5) return 0;
+      // Simple but serviceable fit (order-of-magnitude correct in reactor range)
+      const T = TkeV;
+      // Approximate form used in many educational codes
+      const zeta = 1 - (T*(0.00265 + T*(-0.000051 + T*0.0000014)));
+      const theta = T / (1 - (T*(0.00265 + T*(-0.000051 + T*0.0000014))));
+      const xi = (30.927 + theta*(15.0 + theta*(3.0 + theta))) /
+                (1 + theta*(12.0 + theta*(3.0 + theta*0.5)));
+      const sigmaV = 1.1e-24 * Math.pow(xi, 2) * Math.exp(-20.0 / Math.pow(theta, 1/3));
+      // Clamp to reasonable physical range
+      return Math.min(Math.max(sigmaV, 0), 5e-21);
+    }
+
+    /**
+     * Simplified energy confinement time using a reduced IPB98(y,2)-like scaling
+     * τ_E ∝ I_p^0.93 B^0.15 n^0.41 P^{-0.69} ...
+     * Returns seconds.
+     */
+    function confinementTime(n20, TkeV, PauxMW, B0, IpMA) {
+      // Very simplified but directionally correct scaling
+      const Ptot = Math.max(PauxMW + 0.001, 1);
+      const tau = 0.056 * Math.pow(IpMA, 0.93) * Math.pow(B0, 0.15)
+                * Math.pow(n20, 0.41) * Math.pow(Ptot, -0.69)
+                * Math.pow(R0/3, 1.4) * Math.pow(kappa, 0.7);
+      return Math.max(tau, 0.05);
+    }
+
+    /**
+     * 0-D power balance
+     */
+    function compute0D(n20, TkeV, PauxMW, B0, IpMA) {
+      const n = n20 * 1e20;                 // m⁻³
+      const nD = n * 0.5;
+      const nT = n * 0.5;
+      const sigmav = dtReactivity(TkeV);    // m³/s
+      const Efus = 17.6e6 * 1.602e-19;      // J per reaction (17.6 MeV)
+
+      const Pfus = nD * nT * sigmav * Efus * VOL;   // Watts
+      const PfusMW = Pfus / 1e6;
+
+      const tauE = confinementTime(n20, TkeV, PauxMW, B0, IpMA);
+      const Q = PfusMW / Math.max(PauxMW, 0.01);
+
+      // Triple product n T τ in 10²⁰ m⁻³ keV s
+      const nTtau = n20 * TkeV * tauE;
+
+      // Very rough Lawson-like indicator for DT
+      let lawson = "sub-ignition";
+      if (nTtau > 3) lawson = "approaching";
+      if (nTtau > 5 && Q > 1) lawson = "burning";
+      if (Q > 10) lawson = "high-gain";
+
+      return { PfusMW, Q, tauE, nTtau, lawson, sigmav };
+    }
+
+    /**
+     * Simple 1-D parabolic-like profiles
+     * n(r) = n0 * (1 - ρ²)^αn
+     * T(r) = T0 * (1 - ρ²)^αT
+     */
+    function profileValue(rho, central, alpha) {
+      return central * Math.pow(Math.max(1 - rho*rho, 0), alpha);
+    }
+
+    // ============================================================
+    //  THREE.JS SETUP
+    // ============================================================
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x0a0a12);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0a0a12, 0.011);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
+    camera.position.set(18, 12, 22);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0x404060, 0.55));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+    keyLight.position.set(30, 40, 20);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+    scene.add(new THREE.DirectionalLight(0x6688ff, 0.35).translateX(-20).translateY(10));
+
+    const plasmaGlow = new THREE.PointLight(0x66ccff, 2.2, 28);
+    scene.add(plasmaGlow);
+
+    // Floor
+    const floor = new THREE.Mesh(
+      new THREE.CircleGeometry(42, 64),
+      new THREE.MeshStandardMaterial({ color: 0x1a1a2e, metalness: 0.3, roughness: 0.8 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -6;
+    floor.receiveShadow = true;
+    scene.add(floor);
+    const grid = new THREE.GridHelper(80, 40, 0x2a3a5a, 0x1a2535);
+    grid.position.y = -5.99;
+    scene.add(grid);
+
+    // ---------- Tokamak geometry ----------
+    const tokamak = new THREE.Group();
+    scene.add(tokamak);
+
+    // Vacuum vessel
+    const vessel = new THREE.Mesh(
+      new THREE.TorusGeometry(R0, a + 0.38, 32, 100),
+      new THREE.MeshStandardMaterial({
+        color: 0x3a4a6a, metalness: 0.7, roughness: 0.35,
+        transparent: true, opacity: 0.5, side: THREE.DoubleSide
+      })
+    );
+    vessel.rotation.x = Math.PI / 2;
+    vessel.castShadow = true;
+    tokamak.add(vessel);
+
+    // Plasma core (visual)
+    const plasmaMat = new THREE.MeshStandardMaterial({
+      color: 0x44aaff, emissive: 0x2288ff, emissiveIntensity: 0.8,
+      transparent: true, opacity: 0.32, side: THREE.DoubleSide
+    });
+    const plasma = new THREE.Mesh(
+      new THREE.TorusGeometry(R0, a * 0.82, 24, 80),
+      plasmaMat
+    );
+    plasma.rotation.x = Math.PI / 2;
+    tokamak.add(plasma);
+
+    // TF coils
+    const numTF = 16;
+    for (let i = 0; i < numTF; i++) {
+      const angle = (i / numTF) * Math.PI * 2;
+      const coil = new THREE.Mesh(
+        new THREE.TorusGeometry(a + 0.95, 0.17, 10, 40),
+        new THREE.MeshStandardMaterial({ color: 0xc0c8d8, metalness: 0.85, roughness: 0.25 })
+      );
+      coil.position.set(Math.cos(angle) * R0, 0, Math.sin(angle) * R0);
+      coil.rotation.y = -angle;
+      coil.rotation.x = Math.PI / 2;
+      coil.castShadow = true;
+      tokamak.add(coil);
+    }
+
+    // Central solenoid
+    const cs = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.85, 0.85, 7.2, 32),
+      new THREE.MeshStandardMaterial({ color: 0xb0b8c8, metalness: 0.8, roughness: 0.3 })
+    );
+    cs.castShadow = true;
+    tokamak.add(cs);
+
+    // PF coils
+    [[4.1, 3.1], [3.3, 6.7], [-3.3, 6.7], [-4.1, 3.1]].forEach(([y, r]) => {
+      const pf = new THREE.Mesh(
+        new THREE.TorusGeometry(r, 0.2, 10, 48),
+        new THREE.MeshStandardMaterial({ color: 0xa8b0c0, metalness: 0.8, roughness: 0.3 })
+      );
+      pf.rotation.x = Math.PI / 2;
+      pf.position.y = y;
+      tokamak.add(pf);
+    });
+
+    // Support pillars
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + Math.PI / 8;
+      const pillar = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.22, 0.32, 5.3, 10),
+        new THREE.MeshStandardMaterial({ color: 0x4a5568, metalness: 0.5, roughness: 0.6 })
+      );
+      pillar.position.set(Math.cos(angle) * (R0 + 3.4), -3.1, Math.sin(angle) * (R0 + 3.4));
+      tokamak.add(pillar);
+    }
+
+    // ============================================================
+    //  KINETIC MARKER PARTICLES (Layer 3)
+    // ============================================================
+    let particleCount = 2500;
+    let particleSystem = null;
+    let particleData = null;   // { positions, thetas, phis, vpar, rhos }
+
+    function createParticles(count) {
+      if (particleSystem) {
+        tokamak.remove(particleSystem);
+        particleSystem.geometry.dispose();
+        particleSystem.material.dispose();
+      }
+
+      const positions = new Float32Array(count * 3);
+      const colors    = new Float32Array(count * 3);
+      const thetas = new Float32Array(count);   // toroidal angle
+      const phis   = new Float32Array(count);   // poloidal angle
+      const vpar   = new Float32Array(count);   // parallel velocity sign/speed
+      const rhos   = new Float32Array(count);   // normalized minor radius
+
+      for (let i = 0; i < count; i++) {
+        const rho = Math.sqrt(Math.random()) * 0.92;  // bias toward core
+        const theta = Math.random() * Math.PI * 2;
+        const phi   = Math.random() * Math.PI * 2;
+        rhos[i] = rho;
+        thetas[i] = theta;
+        phis[i] = phi;
+        vpar[i] = (Math.random() - 0.5) * 2.5;  // parallel streaming
+
+        // Initial position on torus
+        const r = R0 + rho * a * Math.cos(phi);
+        positions[i*3]     = r * Math.cos(theta);
+        positions[i*3 + 1] = rho * a * Math.sin(phi) * kappa * 0.7;
+        positions[i*3 + 2] = r * Math.sin(theta);
+
+        // Color by rho (core hotter / brighter)
+        const t = 1 - rho;
+        colors[i*3]     = 0.3 + t * 0.5;
+        colors[i*3 + 1] = 0.5 + t * 0.4;
+        colors[i*3 + 2] = 0.9;
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.085,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      particleSystem = new THREE.Points(geo, mat);
+      tokamak.add(particleSystem);
+
+      particleData = { positions, thetas, phis, vpar, rhos, count };
+    }
+
+    createParticles(particleCount);
+
+    function updateParticles(dt, n20, TkeV) {
+      if (!particleData || !particleSystem.visible) return;
+
+      const { positions, thetas, phis, vpar, rhos, count } = particleData;
+      const posAttr = particleSystem.geometry.attributes.position;
+
+      // Thermal speed scale (visual only)
+      const vScale = 0.8 + Math.sqrt(TkeV) * 0.15;
+
+      for (let i = 0; i < count; i++) {
+        // Stream mainly in toroidal direction (following B)
+        thetas[i] += vpar[i] * vScale * dt * 0.9;
+
+        // Small poloidal drift + banana-ish bounce approximation
+        phis[i] += vpar[i] * 0.15 * dt;
+
+        // Gentle radial diffusion (very mild)
+        rhos[i] += (Math.random() - 0.5) * 0.008 * dt;
+        rhos[i] = Math.max(0.02, Math.min(0.95, rhos[i]));
+
+        const rho = rhos[i];
+        const theta = thetas[i];
+        const phi = phis[i];
+
+        const r = R0 + rho * a * Math.cos(phi);
+        positions[i*3]     = r * Math.cos(theta);
+        positions[i*3 + 1] = rho * a * Math.sin(phi) * kappa * 0.65;
+        positions[i*3 + 2] = r * Math.sin(theta);
+      }
+      posAttr.needsUpdate = true;
+    }
+
+    // ============================================================
+    //  CONTROLS
+    // ============================================================
+    let activeMode = 'orbit';
+
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    orbitControls.enableDamping = true;
+    orbitControls.dampingFactor = 0.06;
+    orbitControls.minDistance = 5;
+    orbitControls.maxDistance = 90;
+    orbitControls.target.set(0, 0, 0);
+
+    const flyControls = new FlyControls(camera, renderer.domElement);
+    flyControls.movementSpeed = 14;
+    flyControls.rollSpeed = Math.PI / 6;
+    flyControls.dragToLook = true;
+    flyControls.enabled = false;
+
+    const modeLabel = document.getElementById('modeLabel');
+    function setMode(mode) {
+      activeMode = mode;
+      if (mode === 'orbit') {
+        flyControls.enabled = false;
+        orbitControls.enabled = true;
+        modeLabel.textContent = 'Orbit';
+      } else {
+        orbitControls.enabled = false;
+        flyControls.enabled = true;
+        modeLabel.textContent = 'Fly';
+      }
+    }
+    window.addEventListener('keydown', e => {
+      if (e.code === 'KeyO') setMode('orbit');
+      if (e.code === 'KeyF') setMode('fly');
+    });
+
+    // ============================================================
+    //  UI BINDINGS + LIVE PHYSICS
+    // ============================================================
+    const nSlider = document.getElementById('nSlider');
+    const tSlider = document.getElementById('tSlider');
+    const pSlider = document.getElementById('pSlider');
+    const bSlider = document.getElementById('bSlider');
+    const ipSlider = document.getElementById('ipSlider');
+    const partSlider = document.getElementById('partSlider');
+    const showParts = document.getElementById('showParts');
+
+    const nVal = document.getElementById('nVal');
+    const tVal = document.getElementById('tVal');
+    const pVal = document.getElementById('pVal');
+    const bVal = document.getElementById('bVal');
+    const ipVal = document.getElementById('ipVal');
+    const partVal = document.getElementById('partVal');
+
+    const pfusEl = document.getElementById('pfus');
+    const qfacEl = document.getElementById('qfac');
+    const taueEl = document.getElementById('taue');
+    const nTtauEl = document.getElementById('nTtau');
+    const lawsonEl = document.getElementById('lawson');
+
+    const profileCanvas = document.getElementById('profileCanvas');
+    const pctx = profileCanvas.getContext('2d');
+
+    function drawProfiles(n20, TkeV) {
+      const w = profileCanvas.width;
+      const h = profileCanvas.height;
+      pctx.clearRect(0, 0, w, h);
+
+      // Background grid
+      pctx.strokeStyle = '#1a2535';
+      pctx.lineWidth = 1;
+      for (let i = 1; i < 4; i++) {
+        const y = (i / 4) * h;
+        pctx.beginPath(); pctx.moveTo(0, y); pctx.lineTo(w, y); pctx.stroke();
+      }
+
+      // Density profile (blue)
+      pctx.beginPath();
+      pctx.strokeStyle = '#4a9fff';
+      pctx.lineWidth = 2;
+      for (let i = 0; i <= 50; i++) {
+        const rho = i / 50;
+        const n = profileValue(rho, n20, 0.8);
+        const x = rho * w;
+        const y = h - (n / 2.6) * (h - 8) - 4;
+        if (i === 0) pctx.moveTo(x, y); else pctx.lineTo(x, y);
+      }
+      pctx.stroke();
+
+      // Temperature profile (orange)
+      pctx.beginPath();
+      pctx.strokeStyle = '#ff9944';
+      pctx.lineWidth = 2;
+      for (let i = 0; i <= 50; i++) {
+        const rho = i / 50;
+        const T = profileValue(rho, TkeV, 1.3);
+        const x = rho * w;
+        const y = h - (T / 32) * (h - 8) - 4;
+        if (i === 0) pctx.moveTo(x, y); else pctx.lineTo(x, y);
+      }
+      pctx.stroke();
+
+      // Labels
+      pctx.fillStyle = '#4a9fff';
+      pctx.font = '10px system-ui';
+      pctx.fillText('n', 6, 14);
+      pctx.fillStyle = '#ff9944';
+      pctx.fillText('T', 22, 14);
+      pctx.fillStyle = '#6a7a9a';
+      pctx.fillText('0', 2, h - 3);
+      pctx.fillText('1', w - 10, h - 3);
+    }
+
+    function updateUI() {
+      const n20   = parseFloat(nSlider.value);
+      const TkeV  = parseFloat(tSlider.value);
+      const Paux  = parseFloat(pSlider.value);
+      const B0    = parseFloat(bSlider.value);
+      const IpMA  = parseFloat(ipSlider.value);
+
+      nVal.textContent  = n20.toFixed(2);
+      tVal.textContent  = TkeV.toFixed(1);
+      pVal.textContent  = Paux.toFixed(0);
+      bVal.textContent  = B0.toFixed(1);
+      ipVal.textContent = IpMA.toFixed(1);
+
+      const res = compute0D(n20, TkeV, Paux, B0, IpMA);
+
+      pfusEl.textContent  = res.PfusMW.toFixed(1) + ' MW';
+      qfacEl.textContent  = res.Q.toFixed(2);
+      qfacEl.className    = 'value' + (res.Q > 1 ? (res.Q > 5 ? ' hot' : ' warn') : '');
+      taueEl.textContent  = res.tauE.toFixed(2) + ' s';
+      nTtauEl.textContent = res.nTtau.toFixed(2) + ' ×10²⁰';
+      lawsonEl.textContent = res.lawson;
+      lawsonEl.className  = 'value' + (res.lawson === 'high-gain' || res.lawson === 'burning' ? ' hot' : '');
+
+      // Visual feedback on plasma
+      const intensity = 0.4 + Math.min(res.PfusMW / 200, 1.2) + (TkeV / 40);
+      plasmaMat.emissiveIntensity = intensity;
+      plasmaGlow.intensity = 1.5 + intensity * 1.8;
+      plasmaMat.opacity = 0.22 + Math.min(n20 / 4, 0.25);
+
+      drawProfiles(n20, TkeV);
+    }
+
+    // Particle count change
+    partSlider.addEventListener('input', () => {
+      particleCount = parseInt(partSlider.value, 10);
+      partVal.textContent = particleCount;
+      createParticles(particleCount);
+    });
+    showParts.addEventListener('change', () => {
+      if (particleSystem) particleSystem.visible = showParts.checked;
+    });
+
+    // All sliders
+    [nSlider, tSlider, pSlider, bSlider, ipSlider].forEach(el => {
+      el.addEventListener('input', updateUI);
+    });
+
+    // ============================================================
+    //  ANIMATION LOOP
+    // ============================================================
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+
+      const n20  = parseFloat(nSlider.value);
+      const TkeV = parseFloat(tSlider.value);
+
+      updateParticles(dt, n20, TkeV);
+
+      // Gentle overall pulse tied to power
+      const t = clock.elapsedTime;
+      plasma.material.emissiveIntensity = (plasmaMat.emissiveIntensity) * (0.92 + 0.08 * Math.sin(t * 2.5));
+
+      if (activeMode === 'orbit') orbitControls.update();
+      else flyControls.update(dt);
+
+      renderer.render(scene, camera);
+    }
+
+    // Init
+    updateUI();
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

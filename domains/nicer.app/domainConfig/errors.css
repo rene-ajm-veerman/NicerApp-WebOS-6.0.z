@@ -1,0 +1,206 @@
+.naDebugData {
+    margin : 5px;
+    background : navy;
+    color : yellow;
+    border-radius : 8px;
+}
+.naDebugData_getPageCSS {
+    margin : 5px;
+    background : green;
+    color : lime;
+    border-radius : 8px;
+}
+.naDebugData_getPageCSS_checkPermissions {
+    margin : 5px;
+    background : orange;
+    color : white;
+    border-radius : 8px;
+}
+.naDebugData_getPageCSS_specific {
+    margin : 5px;
+    background : purple;
+    color : white;
+    border-radius : 8px;
+}
+
+
+
+
+.phpError {
+    margin : 10px;
+    border : 1px solid navy;
+    border-radius : 5px;
+    padding : 10px;
+    background : rgba(0,0,150,0.4);
+    box-shadow : inset 2px 2px 2px 2px rgba(255,255,255,0.7), 2px 2px 2px 2px rgba(0,0,0,0.5);
+}
+
+.phpErrorType_E_NOTICE {
+    background : rgba(0,100,0,0.4) !important;
+}
+.phpErrorType_E_USER_NOTICE {
+    background : rgba(0,150,0,0.4) !important;
+}
+
+.phpErrorType_E_WARNING {
+    background : rgba(100,0,0,0.4) !important;
+}
+.phpErrorType_E_USER_WARNING {
+    background : rgba(150,0,0,0.4) !important;
+}
+
+.phpErrorType_E_ERROR {
+    background : rgba(155,0,0,0.7) !important;
+}
+.phpErrorType_E_USER_ERROR {
+    background : rgba(255,0,0,0.7) !important;
+}
+
+
+
+    .phpErrorDetails {
+        color : white;
+    }
+        .phpErrorLabel {
+            background : rgba(255,255,255,0.7);
+            border-radius : 8px;
+            padding : 5px;
+            color : red;
+            font-weight : bold;
+        }
+
+        .phpErrorTimeSinceScriptStart {
+            font-weight : bold;
+            color : skyblue;
+        }
+
+        .phpErrorTimeLabel, .phpErrorTypeLabel, .phpErrorMsgLabel {
+            font-weight : bold;
+        }
+
+        .phpErrorLocationLabel {
+            font-weight : bold;
+        }
+        .phpErrorLocation {
+            color : white;
+        }
+
+        .phpErrorContextLabel {
+            font-weight : bold;
+        }
+        .phpErrorContext {
+            color : white;
+        }
+
+            .phpDebugBacktraceLabel {
+                color : white;
+                font-weight : bold;
+            }
+            .phpDebugBacktrace {
+                color : lightgreen;
+            }
+
+                .backtraceFunctionLabel, .backtraceClassLabel, .backtraceFunctionArgsLabel, .backtraceFileLabel {
+                    font-weight : bold;
+                    color : lime;
+                }
+
+                .backtraceFunctionArgSeperator {
+                    font-weight : bold;
+                    color : white;
+                }
+
+
+            .phpJSONerror {
+                color : #00FFFF; /* Aqua */
+            }
+
+.naLogEntry {
+    display : inline-block;
+    background : rgba(0,0,50,0.4);
+    padding : 8px;
+    margin : 10px;
+    border-radius : 20px;
+    box-shadow : 4px 4px 3px 2px rgba(0,0,0,0.35), inset 2px 3px 3px 2px rgba(255,255,255,0.35);
+}
+.vividScrollpane > .hmTheme_naColorgradientSchemeGreen > table, .vividScrollpane > .hmTheme_naColorgradientSchemeMagicalBlue > table {
+    border-radius : 10px;
+    padding : 4px;
+    margin : 5px;
+    box-shadow : 4px 4px 3px 2px rgba(0,0,0,0.45), inset 2px 3px 3px 2px rgba(255,255,255,0.35);
+}
+.naLogEntry_read {
+    background : rgba(0,50,0,0.55) !important;
+}
+.naLogEntry_header {
+    padding : 10px;
+    margin : 8px;
+    background : rgba(255,255,255,0.35);
+    color : black;
+    text-shadow : 3px 3px 2px rgba(0, 0, 0, 0.55);
+    border-radius : 8px;
+    box-shadow : 4px 4px 3px 2px rgba(0,0,0,0.45), inset 2px 3px 3px 2px rgba(255,255,255,0.35);
+}
+.naLogHeader_newRequest {
+    background : rgba(0,0,50,0.5);
+    color : orange;
+}
+.naLogEntry_read .naLogEntry_header {
+    opacity : 0.5;
+}
+.naLogHeader_curlOptions {
+    background : rgba(0,0,100,0.7);
+    color : white;
+    padding : 5px;
+    margin : 10px;
+    border-radius : 10px;
+}
+.naLogEntry_read .naLogHeader_curlOptions {
+    background : rgba(0,0,50,0.8);
+    color : green;
+}
+.naLogHeader_title {
+    color : lime;
+    font-weight : bold;
+}
+.naLogHeader_datetime {
+    font-weight : bold;
+    color : white;
+}
+.naLogHeader_url {
+    font-weight : bold;
+    color : yellow;
+}
+
+.naLogCurlOptions {
+    color : white;
+    padding : 5px;
+    margin : 10px;
+    border-radius : 10px;
+    font-size : xx-small;
+}
+
+
+.naLogHeader_curlResponse {
+    color : white;
+    padding : 5px;
+    margin : 10px;
+    border-radius : 10px;
+}
+.naLogEntry_read .naLogHeader_curlResponse {
+    color : green;
+}
+.naLogCurlResponse {
+    color : white;
+    padding : 5px;
+    margin : 10px;
+    border-radius : 10px;
+    font-size : xx-small;
+}
+
+.addLogEntry_data {
+    font-size : xx-small;
+}
+.naLogHeader_newRequest, .backtraceFunctionArg pre {
+    text-wrap : wrap;
+}

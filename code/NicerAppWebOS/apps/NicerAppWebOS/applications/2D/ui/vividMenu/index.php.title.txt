@@ -1,0 +1,1 @@
+vividMenu: PNG-sprite animated menu component on which you can put video fragments

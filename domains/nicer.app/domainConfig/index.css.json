@@ -1,0 +1,11 @@
+[
+    "{$webPath}/NicerAppWebOS/3rd-party/jQuery/tooltipster/dist/css/tooltipster.bundle.css",
+    "{$webPath}/NicerAppWebOS/3rd-party/jQuery/spectrum-master/spectrum.css",
+    "{$webPath}/NicerAppWebOS/3rd-party/tinymce-4/themes/charcoal/content.na.css",
+    "{$domainPath}/index.css",
+    "{$domainPath}/index.dark.css",
+    "{$domainPath}/index.textDecorations.dark.css",
+    "{$domainPath}/vividMenu-7.0.0-defaultColors.css",
+    "{$domainPath}/vividMenu-6.y.z_domain-nicer.app_NicerApp-WebOS-defaultColors.css",
+    "{$domainPath}/errors.css"
+]

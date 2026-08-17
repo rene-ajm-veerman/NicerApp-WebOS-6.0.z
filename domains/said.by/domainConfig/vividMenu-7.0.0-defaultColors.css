@@ -1,0 +1,77 @@
+/* Base submenu - now flexible panels */
+#siteMenu .submenu {
+  position: absolute;
+  left: 100%;                 /* Default: open right */
+  top: 0;
+/*   min-width: 320px;           /* Much wider base * / */
+/*   max-width: 600px;           /* Cap for very deep nesting * / */
+/*   min-height: 200px;          /* Give vertical breathing room * / */
+  padding: 16px;
+  background: rgba(20, 20, 100, 0.47);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+  display: none;
+  opacity: 0;
+  transform: scale(0.94) translateY(-8px);
+  transform-origin: top left;
+  transition:
+    opacity 0.555s ease,
+    transform 0.22s ease,
+    max-height 0.3s ease;
+   overflow: visible;
+  z-index: inherit;
+}
+
+/* Flex layout inside submenus */
+#siteMenu .submenu {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;     /* Top-align wrapped items */
+  gap: 12px;                      /* Space between items */
+}
+
+/* Each menu item inside submenu becomes a flex child */
+#siteMenu .submenu .menu-item {
+  flex: 0 0 auto;                 /* Don't grow, shrink to content */
+  min-width: 100px;               /* Prevent too-narrow items */
+}
+
+/* Optional: make items look like tiles/cards */
+#siteMenu .submenu .menu-item > a,
+#siteMenu .submenu .menu-item > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 7px;
+/*   min-height: 80px; */
+  text-align: center;
+  border-radius: 10px;
+  transition: background 0.7s, transform 0.15s;
+}
+
+#siteMenu .submenu .menu-item:hover > a,
+#siteMenu .submenu .menu-item:hover > span {
+  background: rgba(255, 255, 255, 0.18);
+/*   transform: translateY(-4px); */
+}
+
+/* Icon + label style (great for Apps/Backgrounds) */
+#siteMenu .submenu .menu-item img,
+#siteMenu .submenu .menu-item .icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Pop-out animation when shown */
+#siteMenu .submenu[style*="display: block"] {
+  display: flex !important;       /* Override inline for flex */
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}

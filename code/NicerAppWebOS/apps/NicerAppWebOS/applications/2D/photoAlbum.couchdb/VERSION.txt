@@ -1,0 +1,1 @@
+Version 4.1.0 - stable upload of multiple nested folders filled with pictures in JPG, PNG and GIF format, worth up to 20Gb at least.

@@ -1,0 +1,2 @@
+<meta name="keywords" content="png, html code, transparency, canvas, javascript, spinner, loading, loading icon, ajax, ajax spinner"/>
+<meta name="description" content="A canvas spinner icon for use by AJAX apps, with PNG transparency"/>

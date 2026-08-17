@@ -1,0 +1,32 @@
+BASE LAYER FOR THIS LICENSE IS : https://opensource.org/licenses/MIT
+
+https://nicer.app, https://said.by, https://zoned.at, https://hostilities.cloud, https://hostility.games (for an warsimulator software and series of Real Time Strategy desktop OS games written in the UnRealEngine IDE) to be started possibly a decade or two from now) ("The NicerApp Enterprises platforms software" collection), 
+and the content listed at https://github.com/nicerapp are all 
+Copyrighted (c) and (r), by NicerApp Enterprises (to be patented when money becomes available for that legal activity), 2002-2022 by it's sole Owner, CEO, CTO and CFO, "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+
+ADDITIONAL OVERRIDING CONDITIONS ON TOP OF https://opensource.org/licenses/MIT :
+
+COMMIT LICENSE DETAILS : 
+
+ALL commercial usage of the NicerApp Enterprises platforms software ("The Licensee"), 
+EXCLUDING governmental usage, as well as use by non-profit organisations,
+shall pay 5% (FIVE PERCENT) of the total sales price for all installation, operating cost, and sales made wih the NicerApp Enterprises platforms software, converted to Euros[3], to me, Rene AJM Veerman[0], and notified to me through email delivered to[1].
+
+[0] Bank details to be filled in a little later than today. 
+Tax reports by my bewindvoerster accountant will be sent to me (by print-out mail), my legal mentors (my parents) (by printout mail), the Licensee (by email), my own government (by email), and the Licensee's national government (by email).
+
+[1] Email address to send these reports to is "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>,
+and email subject and attachment formats[2]  including filename formats, for automated processing by NicerApp Enterprises) to be filled in later.
+
+i´m under cyber-attack at the moment due to my multi-polar worldview (not socialist/communist, as some would have you believe) 
+and related peace-activism work under the Pseudonyms and AccountHolder names (nicknames) listed as such :
+	Gavan Hoverswell at facebook.com (main index of my most recent and more important postings)
+	google.com searchbar query : peacegen site:defence.pk
+	google.com searchbar query : peacefan site:usmessageboard.com
+	google.com searchbar query : peacefan site:forums.marokko.nl
+	
+[2] JSON and PDF, spanning identical monthly financial sales statements of all sales made by The Licensee using any of the NicerApp Enterprises platforms' software to achieve those sales.
+Details should at least include product category, product name, product price, and internal sales ID number for that sale by The Licensee. 
+
+[3] PLEASE NOTE : THE COMMIT LICENSE ALLOWS USERS OF THAT LICENSE TO SET ANY PERCENTAGE OF SALES VALUE, AS WELL AS DEFINE THE EXCLUSION LIST THAT RESTRICTS "The Licensee", TO ANYTHING the Owner of the Software deems fit.
+The final currency for payments made to the Owner is also up to the Owner.

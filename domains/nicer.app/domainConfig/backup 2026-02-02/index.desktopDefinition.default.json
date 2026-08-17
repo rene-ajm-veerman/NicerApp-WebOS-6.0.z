@@ -1,0 +1,47 @@
+{
+    "naObjectType" : "jsCodeParamsFor:::na.defaultDesktopDefinitionCode:::aka:::na.d3c",
+    "jsCodeFunction:::na.m.loadAdditonalCode" : {
+        "--- TODO : WARNING" : "These files must be loaded from /domainConfig/index.javascripts.json for now.",
+        "/domainConfig/index.desktopDefinition.code.js" : "codeObject::na.defaultDesktopDefinitionCode::aka::na.d3c"
+    },
+    "jsCodeParamsFor:::na.desktop.parseOptions" : [
+        {
+            "jsCodeParam:::conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarTop" } ],
+            "jsCodeParam:::conditionsMet" : {
+                "#siteToolbarTop" : {
+                    "mode" : 1,
+                    "snapTo" : [
+                        {"element" : "body","edge" : "top" },
+                        {"element" : "body","edge" : "left" }
+                    ],
+                    "growTo" : "maxX"
+                }
+            },
+            "jsCodeParam:::conditionsFailed" : {}
+        }, {
+            "jsCodeParam:::conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteTaskbar" } ],
+            "jsCodeParam:::conditionsMet" : {
+                "#siteTaskbar" : {
+                    "mode" : 1,
+                    "snapTo" : [
+                                {"element" : "body","edge" : "bottom" },
+                                {"element" : "body","edge" : "left" }
+                    ],
+                    "growTo" : "maxX"
+
+                }
+            },
+            "jsCodeParam:::conditionsFailed" : {}
+        },
+        {
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarLeft,,invisible::#siteToolbarRight,#siteToolbarThemeEditor');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tl",
+            "jsCodeFunction:::na.d3c.areDivsVisible('invisible::#siteToolbarLeft,#siteToolbarThemeEditor,#siteToolbarRight');" : "jsCodeParam_conditionsMet:::na.d3c.dv_c",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarLeft,#siteToolbarThemeEditor,#siteToolbarRight');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tl_tte_tr",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarLeft,#siteToolbarRight,,invisible::#siteToolbarThemeEditor');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tl_tr",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarRight,,invisible::#siteToolbarLeft,#siteToolbarThemeEditor');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tr",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarThemeEditor,,invisible::#siteToolbarLeft,#siteToolbarRight');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tte",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarThemeEditor,#siteToolbarRight,,invisible::#siteToolbarLeft');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tte_tr",
+            "jsCodeFunction:::na.d3c.areDivsVisible('visible::#siteToolbarLeft,#siteToolbarThemeEditor,,invisible::#siteToolbarRight');" : "jsCodeParam_conditionsMet:::na.d3c.dv_tl_tte"
+        }
+    ]
+}

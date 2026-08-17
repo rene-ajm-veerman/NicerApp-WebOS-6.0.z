@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Visualizer</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #audioInput { position: absolute; top: 10px; left: 10px; }
+    #error { position: absolute; top: 50px; left: 10px; color: red; }
+  </style>
+</head>
+<body>
+  <input type="file" id="audioInput" accept="audio/*">
+  <div id="error"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/aubiojs@0.0.2/dist/aubio.min.js"></script>
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 50;
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    // Visual elements
+    const particles = [];
+    const numParticles = 100;
+    const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    for (let i = 0; i < numParticles; i++) {
+      const particle = new THREE.Mesh(geometry, material);
+      particle.position.set(
+        (Math.random() - 0.5) * 50,
+        (Math.random() - 0.5) * 50,
+        (Math.random() - 0.5) * 50
+      );
+      scene.add(particle);
+      particles.push(particle);
+    }
+
+    // Central cube for beat visualization
+    const cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+    const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    scene.add(cube);
+
+    // Audio context and Aubio setup
+    let audioContext, analyser, source, aubio, beatDetector, pitchDetector;
+    let frequencyData, beatDetected = false, pitch = 0;
+
+    async function initAudio(file) {
+      try {
+        // Check if Aubio is defined
+        if (typeof Aubio === 'undefined') {
+          document.getElementById('error').innerText = 'Error: Aubio.js failed to load. Please check your internet connection or try a different browser.';
+          return;
+        }
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+        // Load Aubio.js
+        aubio = await Aubio();
+        beatDetector = new aubio.Beat();
+        pitchDetector = new aubio.Pitch();
+
+        const audio = new Audio();
+        audio.src = URL.createObjectURL(file);
+        audio.controls = true;
+        document.body.appendChild(audio);
+        source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        // Process audio for Aubio
+        const scriptProcessor = audioContext.createScriptProcessor(1024, 1, 1);
+        scriptProcessor.onaudioprocess = (e) => {
+          const input = e.inputBuffer.getChannelData(0);
+          try {
+            beatDetected = beatDetector.do(input);
+            pitch = pitchDetector.do(input);
+            analyser.getByteFrequencyData(frequencyData);
+          } catch (err) {
+            document.getElementById('error').innerText = 'Error processing audio: ' + err.message;
+          }
+        };
+        source.connect(scriptProcessor);
+        scriptProcessor.connect(audioContext.destination);
+
+        audio.play();
+      } catch (err) {
+        document.getElementById('error').innerText = 'Error initializing audio: ' + err.message;
+      }
+    }
+
+    // Handle file input
+    document.getElementById('audioInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) initAudio(file);
+    });
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (analyser && frequencyData) {
+        // Beat visualization (cube scaling)
+        cube.scale.setScalar(beatDetected ? 2 : 1);
+
+        // Frequency-based particle movement
+        const bass = frequencyData[10] / 255; // Low frequencies for instruments
+        const mids = frequencyData[100] / 255; // Mid frequencies for vocals
+        particles.forEach((particle, i) => {
+          const angle = i * 0.1 + performance.now() * 0.001;
+          particle.position.y += Math.sin(angle) * bass * 0.1;
+          particle.position.x += Math.cos(angle) * mids * 0.1;
+          particle.material.color.setHSL(pitch / 1000, 0.7, 0.5);
+        });
+
+        // Rotate cube based on pitch (vocals/chorus)
+        cube.rotation.x += pitch * 0.0001;
+        cube.rotation.y += pitch * 0.0001;
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Check if Aubio.js loaded correctly
+    window.addEventListener('load', () => {
+      if (typeof Aubio === 'undefined') {
+        document.getElementById('error').innerText = 'Error: Aubio.js not loaded. Please ensure the CDN is accessible.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+.naIPlog_entry {
+    border : 1px solid silver;
+    border-radius : 10px;
+    margin : 20px;
+    padding : 10px;
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+    width : fit-content;
+    height : fit-content;
+}
+.naIPlog_header {
+    padding : 5px;
+    padding-left : 0px;
+    line-height:2em;
+
+}
+
+div.naIPlog_header {
+    width : fit-content;
+    height : auto;
+}
+div.naIPlog_headerLine   {
+    background : rgba(0,0,0,0.2);
+    border-radius : 10px;
+    width : fit-content;
+    height : fit-content;
+    margin : 5px;
+    display : inline-block;
+    float:left;
+    text-align:center;
+    vertical-align:middle;
+
+}
+div.naIPlog_header div.even {
+    background : rgba(0,0,255,0.2);
+    border-radius : 10px;
+    width : fit-content;
+    height : fit-content;
+    margin : 5px;
+    display:flex;
+    flex-wrap : wrap;
+}
+div.naIPlog_header div.uneven {
+    background : rgba(255,255,255,0.2);
+    border-radius : 10px;
+    width : fit-content;
+    height : fit-content;
+    display:flex;
+    flex-wrap : wrap;
+}
+div.naIPlog_header > div > div {
+    border-radius : 10px;
+    width:fit-content;
+    display : flex;
+    flex-direction : row;
+    justify-items : center;
+    justify-content : center;
+}
+div.naIPlog_header > div > div > div {
+    border-radius : 10px;
+    padding : 5px;
+    margin : 5px;
+    width:fit-content;
+    display : flex;
+    flex-direction : row;
+    justify-items : center;
+    justify-content : center;
+}
+
+.vividPreview {
+    z-index:-1;
+}
+
+.vividClickShield {
+    z-index:-1;
+}
+
+.vividPreview.shown {
+    z-index:9999999998765;
+}
+
+.vividClickShield.shown {
+    z-index:99999999998765;
+}
+.naIPlog_backgroundSetTo {
+    cursor : hand;
+}
+.naIPlog_stacktrace {
+    display : none;
+    color : white !important;
+    margin : 10px;
+    padding : 15px;
+    border-radius : 10px;
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+}
+.naIPlog_stateChange {
+    margin : 10px;
+    margin-left : 50px;
+    padding : 15px;
+    border-radius : 10px;
+    background : rgba(0,0,55,0.250);
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+    color : lime;
+}
+.naIPlog_externalLink {
+    margin : 10px;
+    margin-left : 50px;
+    padding : 5px;
+    border-radius : 10px;
+    background : rgba(255,0,0,0.250);
+    color:gold !important;
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+}
+
+.naIPlog_referrer {
+    margin : 20px;
+    padding : 5px;
+    border-radius : 10px;
+    background : rgba(255,0,0,0.250);
+    color:gold !important;
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+}
+.naIPlog_address, .naIPlog_origin, .naIPlog_url {
+    margin : 20px;
+    padding : 5px;
+    border-radius : 10px;
+    background : rgba(0,0,55,0.250);
+    box-shadow : -2px -2px 3px 1px rgba(255,255,255,0.7), 2px 2px 5px 2px rgba(0,0,0,0.7);
+}
+
+.naIPlog_entry.mp3Change_start {
+    margin-left : 50px;
+    background : rgba(0,255,0,0.555);
+    color : white;
+}
+.naIPlog_entry.mp3Change_ended {
+    margin-left : 50px;
+    background : rgba(0,100,0,0.555);
+    color : yellow;
+}
+.naIPlog_entry.mp3Change_pausing {
+    margin-left : 50px;
+    background : rgba(0,50,0,0.555);
+    color : yellow;
+}
+.naIPlog_entry.mp3Change_unpausing {
+    margin-left : 50px;
+    background : rgba(0,50,0,0.555);
+    color : yellow;
+}
+.naIPlog_entry.mp3Change_onseeked {
+    margin-left : 50px;
+    background : rgba(0,100,0,0.555);
+    color : silver;
+}
+
+
+.naStatus_fullyBooted {
+    margin-left : 50px;
+    background : rgba(0,0,100,0.555);
+    color : #0FF !important;
+    font-weight : bold;
+}
+.naStatus_fullyBooted .naIPlog_stacktrace {
+    background : rgba(0,0,0,0.555);
+    color : #0FF !important;
+    text-shadow : 0px 0px 2px rgba(255,255,255,0.8);
+}
+
+.naStatus_backgroundChange {
+    margin-left : 50px;
+    background : rgba(0,0,255,0.555);
+    color : yellow;
+}
+.naStatus_backgroundChange .naIPlog_stacktrace {
+    background : rgba(0,0,0,0.555);
+    color : #0FF !important;
+    text-shadow : 0px 0px 2px rgba(255,255,255,0.8);
+}

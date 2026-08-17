@@ -1,0 +1,20 @@
+{
+    "Rene AJM Veerman" : {
+        "groups" : [
+            "Owners",
+            "Chief Officers",
+            "Guests"
+        ],
+        "email" : "rene.veerman.netherlands@gmail.com",
+        "password" : "t8fdUGif3klj41.0az-0",
+        "realname" : "nicer.app Owner"
+    },
+    "Guest" : {
+        "groups" : [
+            "Guests"
+        ],
+        "email" : "[NO EMAIL]",
+        "password" : "Guest",
+        "realname" : "nicer.app Guest user"
+    }
+}

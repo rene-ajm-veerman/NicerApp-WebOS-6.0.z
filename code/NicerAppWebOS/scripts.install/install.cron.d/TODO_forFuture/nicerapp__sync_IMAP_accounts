@@ -1,0 +1,1 @@
+*/5 * * * * root /usr/bin/env bash -c 'source /etc/cron.d/nicerapp__init_globals.sh && source /etc/cron.d/nicerapp__create_siteLogsFolder.sh && nice -n -10 php $NA_APPS_PATH/applications/2D/webmail.v1.0.0/crontabEntry_sync_IMAP_data.php > $NA_LOGS_PATH/$dateHourMinutesSeconds-nicerapp__sync_IMAP_data.php.html 2>&1'

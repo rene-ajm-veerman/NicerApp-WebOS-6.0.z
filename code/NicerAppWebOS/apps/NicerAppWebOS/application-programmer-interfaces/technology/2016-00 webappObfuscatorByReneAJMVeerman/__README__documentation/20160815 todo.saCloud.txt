@@ -1,0 +1,19 @@
+TODO 2015
+    - account for sourcecode version evolution
+
+    - integrity checks on all scripts executed not at nieuwe leliestr (checksums of own file sent back and verified)
+
+
+Cache folders
+    .../obfuscate_sa-pw-EA8zj30.z-3_KLp2/webappObfuscator__cache
+    .../obfuscate_sa-pw-EA8zj30.z-3_KLp2/webappObfuscator__output
+    
+    .../webappObfuscator__output/html/siteTemplate.html
+    .../webappObfuscator__output/html/frontpage.html
+
+    .../webappObfuscator__output/javascript/siteTemplate.js
+    .../webappObfuscator__output/javascript/apps/....
+    .../webappObfuscator__output/javascript/siteFramework-pw-e8xj2.K8-2jTx_zE37/....
+    .../
+    
+    

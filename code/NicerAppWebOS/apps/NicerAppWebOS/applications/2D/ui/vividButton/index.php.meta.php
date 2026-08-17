@@ -1,0 +1,2 @@
+<meta name="keywords" content="png, component, button, web button, html button, javascript button, video button, animated button, website buttons, buttons, buttons website, templates"/>
+<meta name="description" content="A free and opensource web button component built with HTML, Javascript and PNG transparent images (as a sprite image)"/>

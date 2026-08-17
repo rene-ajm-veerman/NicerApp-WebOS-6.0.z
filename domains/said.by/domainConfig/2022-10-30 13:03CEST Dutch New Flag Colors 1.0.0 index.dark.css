@@ -1,0 +1,607 @@
+html, body, table, td {
+    color : white;
+}
+
+.contentSectionTitle3 {
+    background : rgba(0,0,0,0.35);
+    box-shadow : inset 0px 0px 4px 2px rgba(0, 0, 0, 0.7), 2px 2px 2px 2px rgba(0,0,0,0.7);
+    padding : 5px !important;
+    margin-bottom : 15px !important;
+    border-radius : 8px;
+    font-size : 120%;
+}
+
+.app_2D_webshop__bookSubTitle {
+    color : lime;
+    font-size : 85%;
+}
+
+
+.explanationContainer {
+    border : 1px solid black;
+    box-shadow : inset 2px 2px 2px 2px rgba(0, 0, 0, 0.5), 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+    background : linear-gradient(90deg, rgba(2,0,36,0.4) 0%, rgba(184,184,184,0.5) 35%, rgba(0,212,255,0.4) 100%);
+    border-radius : 10px;
+}
+
+.jstree-wholerow {
+    background : none;
+    margin : 0 !important;
+}
+.jstree-wholerow-hovered {
+    background : linear-gradient(to bottom, rgba(200,255,200,.4) 0%, rgba(200,255,200,0.8) 100%) !important;
+}
+.jstree-wholerow-clicked {
+    background : linear-gradient(to bottom, rgba(100,100,255,.4) 0%, rgba(100,100,255,0.8) 100%) !important;
+}
+.vakata-context, .vakata-context ul {
+    z-index : 5000;
+    border-radius : 15px;
+    border : 2px ridge white !important;
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.7), 4px 4px 2px 2px rgba(0,0,0,0.7) !important;
+    background : url('/siteMedia/backgrounds/tiled/grey/117802292-seamless-texture-of-paving-stones-gray-tile-background-.jpg') repeat !important;
+    background-size : 130px !important;
+    opacity : 0.88;
+}
+.vakata-context a {
+    color : blue !important;
+    font-weight : bold;
+    font-size : 200%;
+}
+.vakata-context li > a:hover, .vakata-context-hover {
+    background : linear-gradient(to bottom, rgba(150,150,255,.4) 0%, rgba(150,150,255,0.7) 100%) !important;
+}
+.vakata-contextmenu-sep, .vakata-context-separator {
+    display : none !important;
+}
+#btnOptions_menu {
+    color : yellow;
+    font-weight : bold;
+    border : 3px ridge rgba(255,255,255,0.7);
+    box-shadow : 5px 5px 3px 3px rgba(0,0,0,0.7), inset 5px 5px 3px 3px rgba(0,0,0,0.7);
+}
+#btnOptions_menu__background {
+    background : url('/siteMedia/backgrounds/tiled/grey/pale_blue_background_111.jpg') repeat;
+    opacity : 0.85;
+}
+#btnOptions_menu span, #btnOptions_menu p, #btnOptions_menu__backgroundTimeSettingsChanged_save__containerDiv span, #changeBackgroundsAutomatically_label {
+    text-shadow : 4px 4px 3px rgba(0,0,0,0.7), 0px 0px 4px rgba(0,0,0,0.8);
+}
+.label_specificityOrThemeChange {
+    width : 70px;
+    margin-left : 10px;
+}
+#specificityChange_specificityName, #themeChange_themeName {
+    width : 150px;
+    border : 2px ridge white;
+    border-radius : 10px;
+    background : rgba(0,55,0,0.3);
+    color : lime;
+    font-weight : bold;
+    text-shadow : 4px 4px 3px rgba(0,0,0,0.7), 0px 0px 4px rgba(0,0,0,0.8);
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.55), 2px 2px 1px 1px rgba(0,0,0,0.8);
+}   
+#changeBackgroundsAutomatically, #backgroundChange_hours, #backgroundChange_minutes, #textBackgroundOpacity {
+    border : 2px ridge white;
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.55), 2px 2px 1px 1px rgba(0,0,0,0.8);
+}
+#backgroundChange_hours, #backgroundChange_minutes {
+    background : rgba(255,255,255,0.55);
+}
+#textBackgroundOpacity {
+    background : rgba(0,0,0,0.55);
+}
+.borderSettings_label, .boxShadowSettings_label, .textSettings_label, .textShadowSettings_label, .themePermissions_label {
+    background : rgba(0,0,0,0.55);
+    border-radius : 5px;
+    box-shadow : 2px 2px 1px 1px rgba(0,0,0,0.7);
+    text-shadow : 2px 2px 1px rgba(0,0,0,0.7);
+}
+#borderSettings select, #textSettings select {
+    border : 2px ridge white;
+    border-radius : 10px;
+    background : rgba(55,55,255,0.3);
+    color : cyan;
+    font-weight : bold;
+    text-shadow : 4px 4px 3px rgba(0,0,0,0.7), 0px 0px 4px rgba(0,0,0,0.8);
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.55), 2px 2px 1px 1px rgba(0,0,0,0.8);
+}   
+.boxShadow_containerDiv, .textShadow_containerDiv {
+    background : rgba(50, 50, 150, 0.4);
+    border-radius : 10px;
+    box-shadow : inset 2px 2px 1px 1px rgba(0, 0, 0, 0.7), 3px 3px 2px 2px rgba(0,0,0,0.7);
+}
+
+#siteLoginLogout {
+    color : white;
+    background : none;
+}
+#siteLoginLogout .vdBackground {
+    content : "";
+    background : rgba(0,0,0,0.75);
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    border-radius : 15px;
+    box-shadow : inset 2px 2px 1px 1px rgba(255,255,255,0.5), 2px 2px 2px 2px rgba(0,0,0,0.7);
+}
+
+#siteYoutubePlayer {
+    color : white;
+    background : none;
+}
+#siteYoutubePlayer .vdBackground {
+    content : "";
+    /*background : url('/siteMedia/backgrounds/tiled/red/318801228_12f7b6a8a2.jpg') repeat;
+    border-radius : 15px;
+    opacity : 0.7;*/
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+
+#siteYoutubeSearch {
+    color : white;
+    background : none;
+}
+#siteYoutubeSearch .vdBackground {
+    content : "";
+    /*background : url('/siteMedia/backgrounds/tiled/red/318801228_12f7b6a8a2.jpg') repeat;
+    border-radius : 15px;
+    opacity : 0.7;*/
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+
+#siteComments {
+    color : white;
+    background : none;
+}
+#siteComments .vdBackground {
+    content : "";
+    /*background : url('/siteMedia/backgrounds/tiled/blue/seamless-texture-blue-watercolor.jpg') repeat;
+    border-radius : 15px;
+    opacity : 0.7;*/
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+#siteToolbarRight {
+    color : white;
+    background : none;
+    text-shadow : 2px 2px 2px rgba(0,0,0,0.45);
+}
+#siteToolbarRight .vdBackground {
+    content : "";
+    /*background : url('/siteMedia/backgrounds/tiled/blue/seamless-texture-blue-watercolor.jpg') repeat;
+    border-radius : 15px;
+    opacity : 0.7;*/
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+
+
+#siteStatusbar {
+    color : white;
+    background : none;
+    padding-left : 10px;
+    font-weight : bold;
+}
+
+
+#siteStatusbar .vdBackground {
+    content : "";
+    /*background : url('/siteMedia/backgrounds/tiled/green/cloth 003C.png') repeat;
+    border-radius : 15px;
+    opacity : 0.7;*/
+    z-index : -1;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+
+a {
+    color : white;
+    text-decoration : none;
+    font-weight : bold;
+}
+a:visited {
+    color : rgba(0,200,0,1);
+}
+a:hover {
+    color : rgba(150,255,150,1);
+}
+
+h1, h2, h3 {
+    padding-top : 5px;
+    padding-bottom : 5px;
+    margin-top : 10px;
+    margin-bottom : 10px;
+    margin-block-start : 10px;
+    margin-block-end : 10px;
+    margin-inline-start : 10px;
+    margin-inline-end : 10px;
+}
+h1 {
+    background : rgba(0,255,0,0.55);
+}
+h2 {
+    background : rgba(0,0,75,0.55);
+}
+span, h1, h2, h3 {
+    display : inline;
+}
+li > div > div, li > div, li > span:not(.vt), .backdropped, h1, h2, h3 {
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left : 14px;
+    padding-right : 14px;
+    box-shadow : 0px 0px 6px 3px rgba(0,0,0, 0.55), inset 0px 0px 6px 3px rgba(0,0,0,0.7);
+}
+p {
+    padding-top : 7px;
+    padding-bottom : 7px;
+    padding-left : 14px;
+    padding-right : 14px;
+    margin-left : 30px;
+    margin-right : 10px;
+    box-shadow : 0px 0px 4px 2px rgba(0,0,0, 0.50), inset 0px 0px 6px 3px rgba(0,0,0,0.7);
+}
+span:before, h1:before, h2:before, h3:before {
+    content : %20%20;
+    word-spacing : initial;
+}
+span:after, h1:after, h2:after, h3:after {
+    display : block;
+    content : %20%20;
+    word-spacing : initial;
+}
+span {
+    padding-top : 5px;
+    padding-bottom : 5px;
+}
+span.mce-txt {
+    padding : 0px !important;
+    margin : 0px !important;
+}
+span.boxShadow_bg, span.boxShadow_label {
+    padding-left : 0px !important;
+    padding-right : 0px !important;
+    padding-top : 0px !important;
+    padding-bottom : 0px !important;
+    margin-top : 0px !important;
+    margin-bottom : 0px !important;
+}
+ul.index > li {
+    margin : 10px;
+    padding : 5px;
+}
+#siteContent > .vividDialogContent > ul > li > span {
+    padding : 7px !important;
+    margin : 5px !important;
+    border-radius : 10px !important;
+}
+
+.todoList div {
+    margin : 14px;
+}
+.todoList div {
+    border-radius : 10px !important;
+    font-size : 1.1rem;
+}
+.todoList div a {
+    padding-top : 5px !important;
+    padding-bottom : 5px !important;
+}
+
+
+.select.mainBar_forThemeEditor {
+    order:2;
+    vertical-align:middle;
+    background: rgb(2,0,36);
+    background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);
+    padding : 5px;
+    margin-left : 7px;
+    border : 2px ridge white;
+    border-radius : 8px;
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.75), 3px 3px 2px 2px rgba(0,0,0,0.75);
+    color : white;
+    font-weight : bold;
+}
+
+.vividScrollpane {
+    overflow : auto;
+}
+.vividButton_icon_50x50_siteTop:focus-visible, .vividScrollpane:focus-visible{
+    outline : 0;
+}
+.vividScrollpane:active{
+    box-shadow : none;
+    border-radius : none;
+    border : none;
+}
+.vividScrollpane::-webkit-scrollbar {
+  width: 1rem;
+}
+.vividScrollpane::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background : rgba(0,0,0,0.5);
+}
+.vividScrollpane::-webkit-scrollbar-button:vertical:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 10px 0px 0px;
+  background : url('/siteMedia/vividDialog/frame_e02_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:vertical:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 0px 10px 10px;
+  background : url('/siteMedia/vividDialog/frame_e03_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:horizontal:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 0px 0px 10px;
+  background : url('/siteMedia/vividDialog/frame_e06_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:horizontal:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 10px 10px 0px;
+  background : url('/siteMedia/vividDialog/frame_e07_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-thumb {
+  background : url('/siteMedia/backgrounds/tiled/blue/blue174.jpg') repeat;
+  border-radius : 20px;
+}
+
+/*
+.vividDialog {
+}
+.vividDialog[theme="dark"] {
+    border : 3px ridge lime;
+    background : rgba(0,0,0,0.5);
+    color : white;
+    box-shadow : 7px 7px 5px rgba(0,0,0,0.7), inset -2px -2px 2px rgba(0,0,0,0.8), inset 2px 2px 2px rgba(0,0,0,0.8);
+    border-radius : 15px;
+}
+
+
+.vividDialogContent::-webkit-scrollbar {
+  width: 1rem;
+}
+.vividDialogContent::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background : rgba(0,0,0,0.5);
+}
+.vividDialogContent::-webkit-scrollbar-button:vertical:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 10px 0px 0px;
+  background : url('/siteMedia/vividDialog/frame_e02_001.png') center;
+}
+.vividDialogContent::-webkit-scrollbar-button:vertical:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 0px 10px 10px;
+  background : url('/siteMedia/vividDialog/frame_e03_001.png') center;
+}
+.vividDialogContent::-webkit-scrollbar-button:horizontal:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 0px 0px 10px;
+  background : url('/siteMedia/vividDialog/frame_e06_001.png') center;
+}
+.vividDialogContent::-webkit-scrollbar-button:horizontal:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 10px 10px 0px;
+  background : url('/siteMedia/vividDialog/frame_e07_001.png') center;
+}
+.vividDialogContent::-webkit-scrollbar-thumb {
+  background : url('/siteMedia/backgrounds/tiled/blue/blue174.jpg') repeat;
+  border-radius : 20px;
+}*/
+
+@keyframes anim_vividButton_default_animation {
+    0% {
+        border : 2px solid white;
+        box-shadow : inset 0px 0px 3px 3px rgba(100,100,255,0.5), 0px 0px 2px 2px rgba(255,255,255,0.3);
+        /* box-shadow : 0; would need to get handled properly too, of course */
+    }
+    100% {
+        border : 2px solid white;
+        box-shadow : inset 0px 0px 3px 3px rgba(255,255,255,0.8), 0px 0px 4px 4px rgba(255,255,255,0.7);
+    }
+}
+.vividButton:hover {
+    animation : anim_vividButton_default_animation 1s ease 0s infinite alternate-reverse forwards;
+}
+.vividButton[theme="dark"]:hover {
+    animation : anim_vividButton_default_animation 1s ease 0s infinite alternate-reverse forwards;
+}
+.vividButtonSelected[theme="dark"]:hover {
+    animation : anim_vividButton_default_animation 1s ease 0s infinite alternate-reverse forwards;
+}
+.vividButton {
+    color : white;
+    border : 2px ridge rgba(255,255,255,0.7);
+    border-radius : 14px;
+    padding : 4px;
+    margin : 3px;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButton[theme="dark"] {
+    color : white;
+    border : 2px ridge rgba(255,255,255,0.75);
+    border-radius : 14px;
+    padding : 4px;
+    margin : 3px;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    padding : 3px;
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButtonSelected {
+    border : 2px ridge rgba(0,255,0,0.75);
+    border-radius : 14px;
+    padding : 4px;
+    margin : 3px;
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButtonSelected[theme="dark"] {
+    border : 2px ridge rgba(0,255,0,0.75);
+    border-radius : 14px;
+    padding : 4px;
+    margin : 3px;
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButton[theme="dark"] a, .vividButtonSelected[theme="dark"] a {
+  color : lime;
+  text-decoration : none;
+}
+.vividButton[theme="dark"]:before {
+    content: "";
+    position: absolute;
+    pointer-events: all;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;   
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    border-radius : 20px;
+    z-index: -1;
+    transition: opacity 0.5s linear;
+    opacity: 0;
+}    
+.vividButton[theme="dark"]:hover:before {
+    opacity: 1;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,50,0.4)  25%, rgba(40,40,80,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+}
+.vividButtonSelected[theme="dark"]:before {
+    content: "";
+    position: absolute;
+    pointer-events: all;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;   
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    border-radius : 20px;
+    z-index: -1;
+    transition: opacity 0.5s linear;
+    opacity: 1;
+}    
+.vividButtonSelected[theme="dark"]:hover:before {
+    opacity: 1;
+    background-image: -o-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,100,0,0.4)  25%, rgba(40,255,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+}
+
+
+#siteLogin {
+    box-shadow : inset 2px 2px 2px 2px rgba(0,0,0,0.6), 4px 4px 3px 3px rgba(0,0,0,0.7);
+}
+
+#siteLoginForm label {
+    font-size : 200%;
+    font-weight : bold;
+}
+#siteLoginForm input {
+    font-size : 200%;
+    font-weight : bold;
+}
+#siteLoginForm input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  transform: scale(2);
+  padding: 10px;
+}
+
+
+
+
+
+
+.license {
+    padding : 8px;
+    border-radius : 5px;
+    margin : 4px;
+    color : rgba(227,230,255,1);
+    background : rgba(0,0,0,0.4);
+    box-shadow : inset 0px 0px 3px 2px rgba(0,0,0,0.5), 2px 2px 3px 2px rgba(0,0,0,0.7);
+    font-weight : bold;
+    width : fit-content;
+}

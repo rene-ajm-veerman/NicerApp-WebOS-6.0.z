@@ -1,0 +1,14 @@
+2025-11-30-zo_00-23-42_CET root@falcon:/var/www/nicer.app-5.10.z/domains/said.by  2048 # curl -v --resolve said.by:443:104.21.12.122 https://said.by/me
+* Added said.by:443:104.21.12.122 to DNS cache
+* Hostname said.by was found in DNS cache
+*   Trying 104.21.12.122:443...
+* Connected to said.by (104.21.12.122) port 443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+* TLSv1.3 (IN), TLS alert, handshake failure (552):
+* OpenSSL/3.0.13: error:0A000410:SSL routines::sslv3 alert handshake failure
+* Closing connection
+curl: (35) OpenSSL/3.0.13: error:0A000410:SSL routines::sslv3 alert handshake failure
+

@@ -1,0 +1,14 @@
+{
+    "Owners" : {
+        "realname" : "nicer.app Owners"
+    },
+    "Chief Officers" : {
+        "realname" : "nicer.app Chief Officers"
+    },
+    "Moderators" : {
+        "realname" : "nicer.app Moderators"
+    },
+    "Guests" : {
+        "realname" : "nicer.app Guests"
+    }
+}

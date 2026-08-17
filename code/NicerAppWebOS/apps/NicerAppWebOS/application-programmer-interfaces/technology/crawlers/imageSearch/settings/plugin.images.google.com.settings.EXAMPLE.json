@@ -1,0 +1,39 @@
+{
+    "service" : "images.google.com",
+    "jsonRequestParameters" : {
+        "docs" : [
+            "https://stackoverflow.com/questions/34035422/google-image-search-says-api-no-longer-available",
+            "https://developers.google.com/custom-search/v1/reference/rest/v1/cse/list"
+        ],
+        "installationInstructions" : [
+            "save a copy of this file as 'plugin.images.google.com.settings.json' in the same folder as where you found this file, then edit that file to set your own settings"
+        ],
+        
+        "key" : "//GET YOURSELF ONE AT : https://console.developers.google.com/",
+        "cx" : "//Follow guidelines in post 'Creating cx and modifying it to search for images' at https://stackoverflow.com/questions/34035422/google-image-search-says-api-no-longer-available",
+        
+        "searchType" : "image",
+        "imgSize" : "HUGE",
+        "imgType" : "photo",
+        "filter" : "1",
+        
+        "rights" : "(cc_publicdomain%7Ccc_attribute%7Ccc_sharealike%7Ccc_noncommercial%7Ccc_nonderived)",
+        
+        "searchterms" : {
+            "wallpaper" : 1, "nature" : 1, "scenic" : 1, "sunrise" : 1, "sunset" : 1, "space" : 1, "comic" : 1, "cityscape" : 1, "skyline" : 1, "river" : 1, "forest" : 1, "gathering" : 1
+        },
+        "mustInclude" : {
+            "HD" : 0, "4K" : 1,"8K" : 0
+        },
+        "num" : 10,
+        "dateRestrict" : "d1",
+        
+        "restrictions" : {
+            "period" : "month",
+            "numberOfResultsPerTransaction" : 10,
+            "maxResultsPerSearchterm" : 100,
+            "maxTransactionsPerDay" : 100,
+            "maxTransactionsPerSecond" : 1
+        }
+    }
+}

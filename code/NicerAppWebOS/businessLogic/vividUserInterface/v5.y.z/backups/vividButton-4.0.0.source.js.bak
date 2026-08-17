@@ -1,0 +1,364 @@
+if (!na) var na = nicerapp = {};
+if (!na.ui) na.ui = {};
+
+if (!na.ui.vividButton) 
+na.ui.vividButton = na.ui.vb = {
+    globals : {
+        themes : {}
+    },
+    
+    settings : {
+        buttons : {}
+    },
+    
+    init : function (buttonHTMLid) {
+        let el = $('#'+buttonHTMLid)[0];
+        if ( ! $(el).is('.vividButton4')) return false;
+        
+        var
+        buttonHTMLclass = $(el).attr('buttonClass');
+        theme = na.ui.vb.globals.themes['.'+buttonHTMLclass];
+        
+        
+        if (!theme) {
+            na.site.fail ('Configuration error : na.ui.vividButton.globals.themes["'+buttonHTMLclass+'"] not found.');
+            debugger;
+            return false;
+        }
+        
+        na.ui.vb.settings.buttons['#'+buttonHTMLid] = {
+            el : el,
+            class : buttonHTMLclass,
+            theme : theme,
+            state : theme.startupState,
+            circumstance : 'normal',
+            to : { circumstance : 'hover' }
+        };
+        let b = na.ui.vb.settings.buttons['#'+buttonHTMLid];
+        
+        $(el).addClass(theme.startupState);
+        
+
+        na.ui.vb.calculateAnimSteps(b);
+        na.ui.vb.redraw(b);
+
+        let 
+        c = b.theme.states[b.state].circumstances,
+        l = b.theme.states[b.state].circumstances[b.circumstance].layers,
+        ato = l['.roundIcon_background'].animTo['hover'];
+        $('.roundIcon_background', b.el)[0].style.background = ato.steps[0];
+
+        let layer = eval(l['.roundIcon_svg'].layerID);
+        if (typeof layer.startupCode=='string') eval (layer.startupCode);
+        
+        $(el).hover (function() { 
+            na.ui.vb.hoverOver (b);
+        }, function() {
+            na.ui.vb.hoverOut (b);
+        });
+        
+        $(el).click(function() { na.ui.vb.onclick(event) });
+    },
+    
+    hoverOver : function (b) {
+        b.circumstance = 'normal';
+        b.to.circumstance = 'hover';
+        
+        clearTimeout (na.ui.vb.settings.timeoutSetHoverClass);
+        na.ui.vb.settings.timeoutSetHoverClass = setTimeout(function(){
+            if (na.ui.vb.settings.hoverOutFiredRecently) {
+                var l2 = b.theme.layers['.roundIcon_svg'];
+                eval (l2.onmouseout);
+            } else {
+                $(b.el).addClass('hover');
+            }
+        }, 1000);
+        //$(b.el).addClass('hover');
+
+        var 
+        c = b.theme.states[b.state].circumstances,
+        scl = b.theme.states[b.state].circumstances[b.circumstance].layers['.roundIcon_background'],
+        l = eval(scl.layerID),
+        ato = scl.animTo[b.to.circumstance];
+        if (!ato) debugger;
+
+        ato.step = 0;
+        l.animDirection = 'increase';
+        if (!$(b.el).is('.disabled') && !$(b.el).is('.selected') ) na.ui.vb.anim_increaseGradient(b, l, ato);
+
+        var l2 = eval(b.theme.layers['.roundIcon_svg']);
+        if (!$(b.el).is('.disabled') && !$(b.el).is('.paused')) eval (l2.onmouseover);
+    },
+    
+    hoverOut : function (b) {
+        b.circumstance = 'hover';
+        b.to.circumstance = 'normal';
+
+        na.ui.vb.settings.hoverOutFiredRecently = true;
+        clearTimeout (na.ui.vb.settings.timeoutSetHoverOut);
+        na.ui.vb.settings.timeoutSetHoverOut = setTimeout(function(){
+            na.ui.vb.settings.hoverOutFiredRecently = false;
+        }, 1000);
+        
+        var 
+        c = b.theme.states[b.state].circumstances,
+        scl = b.theme.states[b.state].circumstances[b.circumstance].layers['.roundIcon_background'],
+        l = eval(scl.layerID),
+        ato = scl.animTo[b.to.circumstance];
+        if (!ato) debugger;
+        
+        ato.step = 0;
+        l.animDirection = 'decrease';
+        if (
+            (
+                !$(b.el).is('.disabled') 
+               // && !$(b.el).is('.hover')
+                && !$(b.el).is('.recentlyClicked')
+                && !$(b.el).is('.'+b.theme.selectedState) 
+                && $(b.el).is('.'+b.theme.startupState)
+            )
+            
+        ) na.ui.vb.anim_decreaseGradient(b, l, ato);
+        
+debugger;
+        var l2 = b.theme.layers['.roundIcon_svg'];
+        if (
+            (
+                !$(b.el).is('.disabled')
+                || $(b.el).is('.'+b.theme.startupState)
+            )
+            && $(b.el).is('.hover')
+        ) eval (l2.onmouseout);
+        
+        $(b.el).removeClass('hover').removeClass('recentlyClicked');
+    },
+    
+    onclick : function (evt) {
+        var b = na.ui.vb.settings.buttons['#'+$(evt.currentTarget)[0].id];
+        var selected = (b.state == b.theme.selectedState);
+
+        b.state = selected?b.theme.startupState:b.theme.selectedState;
+        selected = (b.state == b.theme.selectedState);
+        
+        if ( $(b.el).is('.featureIsActive') ) $(b.el).removeClass('featureIsActive'); else $(b.el).addClass('featureIsActive');
+        
+        var
+        buttonHTMLclass = $(b.el).attr('buttonClass'),
+        theme = na.ui.vb.globals.themes['.'+buttonHTMLclass];
+
+        $(b.el).removeClass(theme.startupState).removeClass(theme.selectedState).addClass(b.state);
+        
+        //$('.roundIcon_background', b.el)[0].style.background = ato.steps[0];
+            let 
+            c = b.theme.states[b.theme.selectedState].circumstances,
+            l = b.theme.states[b.theme.selectedState].circumstances['hover'].layers,
+            layer = eval(l['.roundIcon_svg'].layerID),
+            ato = l['.roundIcon_background'].animTo['normal'];
+        
+        if (selected) {
+            $(b.el).addClass('selected'); 
+            eval(layer.onclick);
+
+            b.circumstance = 'normal';
+            b.to.circumstance = 'hover';
+            if (selected) na.ui.vb.hoverOver(b); //else na.ui.vb.hoverOut(b);
+
+        } else {
+            $(b.el).removeClass('selected');
+        
+            
+            ato.step = 0;
+            l.animDirection = 'decrease';
+            if (!$(b.el).is('.disabled') && !$(b.el).is(b.theme.selectedState) ) na.ui.vb.anim_decreaseGradient(b, l, ato);
+        }
+
+        $(b.el).addClass('recentlyClicked');
+        clearTimeout (na.ui.vb.settings.timeoutRecentlyClicked);
+        na.ui.vb.settings.timeoutRecentlyClicked = setTimeout(function() {
+            $(b.el).removeClass('recentlyClicked');
+        }, 3000);
+            
+            
+
+        l = b.theme.layers['.roundIcon_svg'];
+        eval (l.onclick);
+        
+    },
+    
+    anim_increaseGradient : function (b, l, ato) {
+        if (typeof ato.step=='undefined') ato.step = -1;
+        ato.step++;
+        b.circumstance = b.to.circumstance;
+        if (ato.step < ato.animSteps - 1 && l.animDirection=='increase') setTimeout (function () {
+            $('.roundIcon_background', b.el)[0].style.background = ato.steps[ato.step];
+            na.ui.vb.anim_increaseGradient (b, l, ato);
+        }, ato.animInterval); 
+    },
+    
+    anim_decreaseGradient : function (b, l, ato) {
+        if (typeof ato.step=='undefined') ato.step = -1;
+        ato.step++;
+        b.circumstance = b.to.circumstance;
+        if (ato.step < ato.animSteps - 1 && l.animDirection=='decrease') setTimeout (function () {
+            $('.roundIcon_background', b.el)[0].style.background = ato.steps[ato.step];
+            na.ui.vb.anim_decreaseGradient (b, l, ato);
+        }, ato.animInterval); 
+    },
+    
+    calculateAnimSteps : function (b) {
+        for (var stateName in b.theme.states) {
+            var state = b.theme.states[stateName];
+            
+            for (var circumstanceName in state.circumstances) {
+                var circumstance = state.circumstances[circumstanceName];
+                
+                for (layerName in circumstance.layers) {
+                    var 
+                    stateLayer = circumstance.layers[layerName],
+                    layer = eval (stateLayer.layerID);
+                    
+                    for (var stateLayer_animTo_stateName in stateLayer.animTo) {
+                        var 
+                        stateLayerAnimTo = stateLayer.animTo[stateLayer_animTo_stateName];
+                    
+                        switch (layerName) {
+                            case '.roundIcon_background' :
+                                switch (layer.animType) {
+                                    case 'css : radial-gradient' :
+                                        
+                                        for (var animTo_stateName in stateLayer.animTo) {
+                                            var 
+                                            a = stateLayer.animTo[animTo_stateName],
+                                            stops = layer['linear-color-stops'],
+                                            toCircumstance = b.theme.states[stateName].circumstances[animTo_stateName],
+                                            toLayer = eval(toCircumstance.layers[layerName].layerID),
+                                            toStops = toLayer['linear-color-stops'],
+                                            v = { colorSteps : [] };
+                                             
+                                            if (!a.animSteps) a.animSteps = Math.round(a.animDuration / a.animInterval);
+                                            
+                                            for (var i=0; i<a.animSteps; i++) {
+                                                var 
+                                                stepCSS = 'radial-gradient(' + layer.shape + ' ' + layer.size + ' at ' + layer.position + ', ';
+                                                
+                                                for (var j=0; j<stops.length; j++) {
+                                                    var 
+                                                    s1a = stops[j].length[0],
+                                                    s1b = stops[j].length[1],
+                                                    s2a = toStops[j].length[0],
+                                                    s2b = toStops[j].length[1],
+                                                    cgTheme = {
+                                                        themeName: 'vividButton4_cgTheme',
+                                                        cssGeneration: {
+                                                            colorLevels: {
+                                                                // This sets "stops" for color gradients. 
+                                                                //	   0 = outer level of display, 
+                                                                //	 100 = deepest level of display.
+                                                                0: { color: stops[j].color },
+                                                                100: { color: toStops[j].color }
+                                                                //Rules:
+                                                                // 1: only css COLOR properties allowed here.
+                                                                // 		color names allowed, for a list see http://www.w3schools.com/css/css_colornames.asp
+                                                                // 2: properties used anywhere in a list like this must be present in both 0: and 100:
+                                                            }
+                                                        }
+                                                    };
+                                                    if (!v.colorSteps[j]) v.colorSteps.push(na.cg.generateList_basic (cgTheme, a.animSteps));
+
+                                                    v.color = v.colorSteps[j][i].color;
+                                                    v.stopA = Math.round( s1a + ( ( s2a - s1a ) / a.animSteps * i ) );
+                                                    v.stopB = Math.round( s1b + ( ( s2b - s1b ) / a.animSteps * i ) );
+                                                    
+                                                    if (j!==0) stepCSS += ', ';
+                                                    stepCSS += v.color + ' ' + v.stopA + '% ' + v.stopB + '%';
+                                                    
+                                                };
+                                                
+                                                stepCSS += ')';
+                                                a.steps.push (stepCSS);
+                                            }
+                                        }
+                                        break;
+                                    default :
+                                        alert ('na.ui.vividButton.calculateAnimSteps() : invalid layer.animType : '+layer.animType);
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    },
+    
+    redraw : function (b) {
+        var 
+        cs = b.theme.states[b.state],
+        ts = b.theme.states[b.to.state?b.to.state:b.state],
+        
+        cc = cs.circumstances[b.circumstance],
+        tc = ts.circumstances[b.to.circumstance?b.to.circumstance:b.circumstance],
+        
+        cl = cc.layers,
+        tl = tc.layers,
+        
+        ccState = b.class+'--state-'+b.state,
+        ccCircumstance = ccState+'--circumstance-'+b.circumstance,
+        
+        tcState = b.class+'--state-'+(b.to.state?b.to.state:b.state),
+        tcCircumstance = tcState+'--circumstance-'+(b.to.circumstance?b.to.circumstance:b.circumstance),
+        
+        html = '<div class="vividButton_currentState">';
+        
+        //debugger;
+        
+        for (var layerClass in cl) {
+            var 
+            htmlInner = '',
+            style = '',
+            scl = cl[layerClass],
+            l = eval(scl.layerID);
+            
+            if (l.img_src) style += 'background-image:url('+l.img_src+');';
+            
+            if (layerClass=='.roundIcon_svg') htmlInner += l.renderedTemplate;
+            
+            /*
+            if (typeof l.css=='object') {
+                $(layerClass, b.el).css(l.css);
+                $(layerClass + ' svg', b.el).css(l.css);
+            }*/
+            
+            html += '<div class="'+b.class+' '+ccState+' '+ccCircumstance+' '+layerClass.replace('.','')+'" '+(style!==''?'style="'+style+'"':'')+'>'+htmlInner+'</div>';
+        }
+        html += '</div>';
+        /*
+        html += '<div class="vividButton_toState">';
+        for (var layerClass in tl) {
+            var l = tl[layerClass], style='', htmlInner='';
+            
+            if (l.img_src) style += 'background-image:url('+l.img_src+');';
+            
+            if (layerClass=='.roundIcon_svg') htmlInner += l.renderedTemplate;
+                
+            html += '<div class="'+b.class+' '+tcState+' '+tcCircumstance+' '+layerClass.replace('.','')+'" '+(style!==''?'style="'+style+'"':'')+'>'+htmlInner+'</div>';
+        }
+        html += '</div>';*/
+        
+        $(b.el).html(html).attr('buttonClass', b.theme.selfAttrButtonClass);
+    },
+
+/*    
+    startAnimations : function (b) {
+        b.timeoutAnimations = setTimeout(function() {
+            na.ui.vb.doAnimationStep (b);
+        }, b.animInterval);
+    },
+    
+    doAnimationStep : function (b) {
+            
+    }*/
+};
+na.ui.vb.g = na.ui.vb.globals;
+na.ui.vb.s = na.ui.vb.settings;
+na.ui.vb.s.b = na.ui.vb.s.buttons;

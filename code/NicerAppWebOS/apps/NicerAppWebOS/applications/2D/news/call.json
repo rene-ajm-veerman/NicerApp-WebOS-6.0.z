@@ -1,0 +1,50 @@
+nicer_app___app_2d_news__rss_items
+{
+    "selector": {
+        "pd": {
+            "$gt": -36878448372,
+            "$lt": -36878444772
+        },
+        "p": {
+            "$regex": "^\/"
+        }
+    },
+    "limit": 250,
+    "use_index": "_design\/f8296ee26307f4441eaf3723ab3c982e996830a1",
+    "fields": [
+        "_id",
+        "_rev",
+        "t",
+        "de",
+        "m",
+        "am",
+        "pd",
+        "pubDate",
+        "da",
+        "dd",
+        "c",
+        "cc"
+    ]
+}
+{
+    "headers": {
+        "_HTTP": {
+            "raw": "HTTP\/1.1 200 OK",
+            "version": "1.1",
+            "status": "200"
+        },
+        "cache-control": "must-revalidate",
+        "content-type": "application\/json",
+        "date": "Fri, 15 May 2026 03:33:48 GMT",
+        "server": "CouchDB\/3.5.1 (Erlang OTP\/26)",
+        "transfer-encoding": "chunked",
+        "x-couch-request-id": "41dc3755bf",
+        "x-couchdb-body-time": "0"
+    },
+    "body": {
+        "docs": [],
+        "bookmark": "nil"
+    },
+    "status": "200"
+}
+0.0032

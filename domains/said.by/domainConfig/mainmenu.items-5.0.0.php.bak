@@ -1,0 +1,265 @@
+<?php 
+    global $naWebOS;
+    global $na_apps_structure;
+    $na_apps_structure = array(
+        'backupAndRestore_backup' => [
+            'app.2D.backupAndRestore.v1.0.0' => [
+                'page' => 'createBackup'
+            ]
+        ],
+        'backupAndRestore_restore' => [
+            'app.2D.backupAndRestore.v1.0.0' => [
+                'page' => 'restoreBackup'
+            ]
+        ],
+        
+    
+        'newsHeadlines_englishNews' => array(
+            //'#siteContent' => 'nicerapp/news/newsApp.siteContent.php?section=English%20News',
+            //'news' => array ('section' => 'English_News')
+            'app.2D.news' => array (
+                'section' => 'English_News',
+                'seoValue' => 'news'
+            )
+        ),
+        'newsHeadlines_englishNews_worldHeadlines' => array(
+            //'#siteContent' => 'nicerapp/news/newsApp.siteContent.php?section=English%20News%20World%20Headlines',
+            //'news' => array ('section' => 'English_News__World_Headlines')
+            'app.2D.news' => array (
+                'section' => 'English_News__World_Headlines',
+                'seoValue' => 'news-world-headlines'
+            )
+        ),
+        'newsHeadlines_nederlandsNieuws' => array (
+            'app.2D.news' => array (
+                'section' => 'Nederlands_Nieuws',
+                'seoValue' => 'nieuws'
+            )
+        ),
+        'newsHeadlines_nederlandsNieuws_wereldNieuws' => array (
+            'app.2D.news' => array (
+                'section' => 'Nederlands_Nieuws__Wereld',
+                'seoValue' => 'nieuws-internationale-headlines'
+            )
+        ),
+        'newsHeadlines_deutscheNachrichten' => array (
+            'app.2D.news' => array (
+                'section' => 'Deutsche_nachrichten',
+                'seoValue' => 'Deutsche-nachrichten'
+            )
+        ),
+        'newsHeadlines_arabic' => array (
+            'app.2D.news' => array (
+                'section' => 'Arabic',
+                'seoValue' => 'Arabic-news-English'
+            )
+        ),
+        'tarot' => [
+            'app.2D.cardgame.tarot' => [
+                "deck" => "Original Rider Waite",
+                "reading" => "3-Cards",
+                'seoValue' => [ 'tarot', 'cardgame-tarot' ]
+            ]
+        ],
+        'analytics' => array (
+            'app.2D.analytics' => array()
+        ),
+        '3Dcube' => array (
+            'app.3D.demo.cube' => array()
+        ),
+        '3Dmodels' => array (
+            'app.3D.demo.modelLoading' => array()
+        ),
+        'backgroundsBrowser' => array (
+            'app.3D.fileExplorer' => array(
+				//'inputJSONurl' => $_REQUEST['inputJSONurl'],
+				//'thumbnails' => './thumbs/$filename.$ext'
+			)
+        ),
+        /* i promise to make work of this after the webmail, drive, forums and timeline features, which are needed for a complete CMS product.
+        'crimeboard' => array (
+            'app.3D.fileExplorer' => array(
+				'inputJSONurl' => $_REQUEST['inputJSONurl'],
+				'extensions' => array (
+					'app.3D.fileExplorer.extensionApp.gracefulFlightBetweenNodes' => array(),
+					'app.3D.fileExplorer.extensionApp.crimeboard' => array(),
+					'app.3D.fileExplorer.extensionApp.photoAlbum' => array(
+						'JSONkeys' => array(
+							$_REQUEST['criminal__mugshots'], // keeps it language independent inside the content requested via $REQUEST['inputJSONurl']
+							$_REQUEST['criminal__rapsheetSummary'] // same as above here
+						)
+					)
+				)
+			)
+        ),*/
+        'music' => array (
+            'app.2D.musicPlayer' => array (
+                'set' => 'index',
+                'seoValue' => 'music'
+            )
+        ),
+        'cms' => array (
+            'meta' => array (
+                'mustBeLoggedIn' => true
+            ),
+            'cms' => array (
+                'page' => 'index'
+            )
+        ),
+        'naThemeViewer' => array (
+            'naThemeViewer' => array (
+                'page' => 'index'
+            )
+        ),
+        'verticalMenuDemo' => array (
+            'EXAMPLE_vertical_vividMenu' => array (
+                'page' => 'index'
+            )
+        ),
+        
+        'imageSearch_google' => array (
+            'api.crawler.imageSearch' => array (
+                'page' => 'index'
+            )
+        ),
+        
+        'imageDescriber_clarifai' => [
+            'api.imageDescribers' => [
+                'page' => 'index'
+            ]
+        ],
+        
+        'naturalLanguageEngine' => [
+            'api.humanLanguages' => [
+                'page' => 'index'
+            ]
+        ],
+        
+        'app.2D.webmail.v1.0.0' => [
+            'app.2D.webmail.v1.0.0' => [
+                'page' => 'index'
+            ]
+        ],
+        
+        'app.2D.timeline' => [
+            'app.2D.timeline' => [
+                'page' => 'index'
+            ]
+        ],
+        
+        'app.2D.forums__configure_admin' => [
+            'app.2D.forums' => [
+                'page' => 'configure_admin'
+            ]
+        ],
+		
+        'app.2D.forums__configure_user' => [
+            'app.2D.forums' => [
+                'page' => 'configure_user'
+            ]
+        ],
+		
+        'app.2D.forums__view_index' => [
+            'app.2D.forums' => [
+                'page' => 'view_index'
+            ]
+        ],
+		
+        'app.2D.forums__view_forum' => [
+            'app.2D.forums' => [
+                'page' => 'view_forum'
+            ]
+        ],
+		
+        'app.2D.forums__view_thread' => [
+            'app.2D.forums' => [
+                'page' => 'view_thread'
+            ]
+        ],
+        
+        'foldersIndexPages__view_index' => [
+            'app.2D.commerceIndexPages' => [
+                'page' => 'view_index'
+            ]
+        ],
+		
+		'app.2D.webshop - books by Gavan Hoverswell - medicine - psychiatry' => [
+			'app.2D.webshop' => [
+				'page' => 'bookSalesPage',
+				'author' => 'Gavan Hoverswell',
+				'authorCategory' => 'books',
+				'copyright (c) and all rights reserved (r) 2022' => 'Rene AJM Veerman',
+				
+				'category' => 'medicine',
+				'bookTitle' => 'what every citizen should know about psychiatry',
+                'bookSubTitle' => 'how to overcome and defeat the gross humanrights abuses in early 21st-century psychiatry'
+			]
+		],
+		
+		'app.2D.webshop - books by Gavan Hoverswell - medicine - manual - telepathy' => [
+			'app.2D.webshop' => [
+				'page' => 'bookSalesPage',
+				'author' => 'Gavan Hoverswell',
+				'authorCategory' => 'books',
+				'copyright (c) and all rights reserved (r) 2022' => 'Rene AJM Veerman',
+				
+				'bookCategory' => 'medicine, manual',
+                'bookTitle' => 'telepathy manual'
+			]
+		],
+		
+		'app.2D.photoAlbum.disk - weed marijuana - anti cancer' => [
+			'app.2D.photoAlbum.disk' => [
+				'page' => 'photoIndexPage',
+				'folderToDisplay' => 'weed marijuana - anti cancer'
+			]
+		],
+		
+		'app.2D.photoAlbum.disk - math - snowflake math chart example' => [
+			'app.2D.photoAlbum.disk' => [
+				'page' => 'photoIndexPage',
+				'folderToDisplay' => 'math - snowflake math chart example'
+			]
+		],
+
+		'app.2D.forms - for financial support for victims of psychiatry' => [
+			'app.2D.forms' => [
+				'page' => 'frontpage',
+				'formType' => 'forms_for financial support for victims of psychiatry'
+			]
+		]
+		
+        );
+    global $naURLs;
+    /* old, obsolete, simpler but more cryptic and entirely SEO incompatible way of doing things :
+    $naURLs = array();
+    foreach ($na_apps_structure as $viewID => $viewSettings) {
+        $naURLs[$viewID] = '/apps/'.base64_encode_url(json_encode($viewSettings));
+    };
+    */
+    
+    $naURLs = array();
+    foreach ($na_apps_structure as $viewID => $viewStructure) {
+        foreach ($viewStructure as $viewFolderName => $viewSettings) {
+
+            if (array_key_exists('seoValue', $viewSettings)) {
+                if (is_array($viewSettings['seoValue'])) {
+                    foreach ($viewSettings['seoValue'] as $seovIdx => $seoValue) {
+                        $url = '/'.$seoValue;
+                        $json = json_encode ($viewStructure);
+                        $naURLs[$viewID] = $url; // will get modified into /apps-content/.* links by .../.htaccess and fed from that .htaccess to .../ajax_get_content.php
+                    }
+                } else {
+                    $url = '/'.$viewSettings['seoValue'];
+                    $json = json_encode ($viewStructure);
+                    $naURLs[$viewID] = $url;
+                }
+            } else {
+                $naURLs[$viewID] = '/apps/'.base64_encode_url(json_encode($viewSettings)); // will get modified into /apps-content/.* links by na.site.transformLinks() in JS.
+            }
+            
+        }
+    }
+    
+    
+?>

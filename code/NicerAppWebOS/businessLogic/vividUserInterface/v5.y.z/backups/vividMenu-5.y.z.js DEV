@@ -1,0 +1,694 @@
+class naVividMenu {
+    constructor(el, callback7) {
+        var t = this;
+        t.el = el;
+        t.t = $(el).attr('theme');
+        t.type = $(el).attr('type') || 'horizontal';
+        t.debugMe = false;
+        t.items = [];
+        t.children = {};
+        t.childPanels = {};
+        t.shownChildren = {};
+        t.shownMenuItems = {};
+        t.timeout_hideAll = [];
+        t.timeout_hideSubMenu = {};
+
+        na.site.settings.menus['#'+t.el.id] = this;
+        t.initItems(t);
+        t.showSubMenu(t, t.el, true);
+        if (typeof callback7=='function') callback7(t.el);
+    }
+
+    initItems(t) {
+        $('.vividMenu_item', t.el).remove();
+        //console.log (t.el.id+'-'+t.el.innerHTML);
+        var
+        html = '';
+
+        $(t.el).find('li').each(function(idx,li) {
+            //debugger;
+            $(li).attr('id', t.el.id+'__li__'+idx);
+            //var el = $('#'+t.el.id+'__'+idx)[0];
+            li.level = $(li).parents('ul').length;
+            html += '<div id="'+t.el.id+'__'+idx+'" class="vividButton vividButton_text vividMenu_item" theme="'+t.t+'">'+$(li).children('a')[0].outerHTML+'</div>'
+            t.items[idx] = {
+                idx : idx,
+                label : $('a',li)[0].innerText,
+                li : li,
+                parent : jQuery(li).parents('ul > li')[0],
+                parentDiv : null,
+                level : jQuery(li).parents('ul').length,
+                path : ''
+            };
+            //console.log ('initItems : '+idx+' - '+li.innerText+' - '+(t.items[idx].parent?t.items[idx].parent.id:''));
+            var
+            it = t.items[idx],
+            itp = null;
+            if (it.parent) {
+                var
+                itp_idx = parseInt(it.parent.id.replace(/.*__/,'')),
+                itp = t.items[itp_idx];
+            }
+
+            //debugger;
+            if (it.level === 1) {
+                if (!t.children[t.el.id]) t.children[t.el.id] = {};
+                t.children[t.el.id][it.idx] = it;
+                it.levelIdx = Object.keys(t.children[t.el.id]).length - 1;
+            } else if (
+                itp && itp.li
+                //&& itp.li.id.replace(/.*__/,'') == idx
+            ) {
+                if (!t.children[itp.idx]) t.children[itp.idx] = {};
+                t.children[itp.idx][it.idx] = it;
+                it.levelIdx = Object.keys(t.children[itp.idx]).length - 1;
+            }
+        });
+
+
+        $(t.el).append(html);
+
+        $(t.el).find('li').each(function(i,li) {
+            var
+            el = $('#'+t.el.id+'__'+i)[0],
+            it = t.items[i];
+
+            el.idx = i;
+            it.b = new naVividButton(el,null,t.el,true);
+
+            it.b.el.menu = t;
+            it.b.el.it = it;
+            it.b.el.idx = it.idx;
+            it.b.el.subMenuIdx = i;
+            it.b.el.level = it.level;
+            $(it.b.el).css({ zIndex : 2000 + it.level });
+            if (it.level !== 1) $(it.b.el).css({ display : 'none' });
+
+            var
+            itp = null;
+            if (it.parent) {
+                var
+                itp_idx = parseInt(it.parent.id.replace(/.*__/,'')),
+                itp = t.items[itp_idx];
+            }
+            if (
+                itp && itp.li
+                //&& itp.li.id.replace(/.*__/,'') == idx
+            ) {
+                it.parentDiv = itp.b.el;
+                it.parentIdx = itp.idx;
+            }
+
+            $(it.b.el).bind('mouseover', function(event) {
+                var
+                t = na.site.settings.menus['#'+event.currentTarget.id.replace(/__.*/,'')],
+                it = t.items[parseInt(event.currentTarget.id.replace(/.*__/,''))];
+                if (t.debugMe) na.m.log (20, 'bind("mouseover") : showing '+it.b.el.id, false);
+                /*
+                setTimeout (function (t) {
+                    for (var i=0; i < t.timeout_hideAll.length; i++)
+                        clearTimeout (t.timeout_hideAll[i]);
+                    t.timeout_hideAll = [];
+                    if (t.debugMe) na.m.log (20, 'bind("mouseover") : clearTimeouts hideAll', false);
+                }, 100, t);
+                */
+                //clearTimeout (t.timeout_showSubMenu);
+                //t.timeout_showSubMenu = setTimeout (function (t, el) {
+                    t.showSubMenu(t, it.b.el);
+                //}, 50, t, it.b.el);
+            });
+
+            $(it.b.el).bind('mouseout', function(event) {
+                var
+                t = na.site.settings.menus['#'+event.currentTarget.id.replace(/__.*/,'')],
+                it = t.items[parseInt(event.currentTarget.id.replace(/.*__/,''))];
+
+                t.timeout_hideSubMenu[el.id] = setTimeout (function(t, el, children) {
+                    if (t.debugMe) na.m.log (20, 'bind("mouseout") : hiding2 '+it.b.el.id, false);
+                    t.hideSubMenu(t, el, children);
+                    delete t.timeout_hideSubMenu[el.id];
+                }, 250, t, it.b.el, t.children[it.idx]);
+            });
+
+            $(it.b.el).bind('click', function() {
+                t.onclick(it);
+            });
+        });
+
+    }
+
+    showSubMenu (t, el) {
+        var
+        vbCheckerID = t.el.id+'_vbChecker',
+        dim = t.getDimensions(t, el, true),
+        html = '<div id="'+t.el.id+'_vbChecker" class="vividButton vividButton_text vividMenu_item" theme="'+t.t+'" style="opacity:0.0001;position:absolute;">abc XYZ</div>';
+        if (!$('#'+vbCheckerID)[0]) $(document.body).append(html);
+
+        t.timeShow = new Date().getTime();
+        t.shownChildren[el.id] = el;
+        t.currentEl = el;
+
+        if (el.idx) {
+            var
+            elIdx = parseInt(el.idx),
+            it = t.items[elIdx],
+            panelID = t.el.id+'__panel_'+elIdx,
+            html = '<div id="'+panelID+'" class="vividMenu_subMenuPanel">&nbsp;</div>';
+            t.childPanels[elIdx] = $(t.el).append(html);
+            t.showPanel (t, $('#'+panelID), it, dim);
+        }
+
+        if (el !== t.el) {
+            for (var elIdx in t.children[el.idx]) {
+                var
+                elIdx = parseInt(elIdx),
+                childItem = t.children[el.idx][elIdx];
+                t.showMenuItem (t, childItem, dim);
+
+
+
+            }
+        } else {
+            for (var elIdx in t.children[t.el.id]) {
+                var
+                elIdx = parseInt(elIdx),
+                childItem = t.children[t.el.id][elIdx];
+                t.showMenuItem (t, childItem, dim);
+            }
+        }
+
+        for (var i=0; i < t.timeout_hideAll.length; i++) {
+            clearTimeout (t.timeout_hideAll[i]);
+            if (t.debugMe) na.m.log (22, 'showSubMenu : clearTimeout hideAll : '+t.timeout_hideAll[i], false);
+        };
+        t.timeout_hideAll = [];
+    }
+
+    hideSubMenu (t, el, children) {
+        var
+        inParents = false,
+        parents = {};
+
+        t.hideEl = el;
+
+        if (t.currentEl)
+        $('#'+t.el.id+'__li__'+t.currentEl.idx).parents('ul > li').each(function(idx,li) {
+            var
+            liIdx = parseInt(li.id.replace(/.*__/,'')),
+            it = t.items[liIdx],
+            el2 = t.hideEl;
+            if (el2 === it.b.el) inParents = true;
+            /*if (it.level!==1)*/ parents[liIdx] = li;
+        });
+
+        var shown = '';
+        for (var elX in t.shownChildren) {
+            if (shown!=='') shown += ', ';
+            shown += '#'+elX;
+        }
+        if (t.debugMe) na.m.log (24, 'hideSubMenu : t.shownChildren = '+shown, false);
+
+        var
+        myKids = t.children[t.currentEl.idx],
+        gottaHide = {};
+        for (var elID in t.shownChildren) {
+            if (elID!==t.el.id) {
+                var
+                elIdx = parseInt(elID.replace(/.*__/,'')),
+                elKids = t.children[elIdx];
+
+                gottaHide[elIdx] = elIdx;
+
+                if (myKids)
+                for (var kidIdx in elKids) {
+                    if ( !(kidIdx in myKids) ) gottaHide[kidIdx] = kidIdx;
+                }
+            }
+        }
+        if (t.debugMe) debugger;
+        for (var elIdx in parents) {
+            var elKids = t.children[elIdx];
+            delete gottaHide[elIdx];
+            for (var kidIdx in elKids) delete gottaHide[kidIdx];
+        }
+        if (t.debugMe) debugger;
+        var hideThese = '';
+        for (var elIdx in gottaHide) {
+            var it = t.items[elIdx];
+            if (it.level > 1) {
+                if (hideThese!=='') hideThese += ', ';
+                hideThese += '#'+t.el.id+'__'+elIdx;
+            }
+        }
+        $(hideThese).stop(true,true).fadeOut('normal');
+
+
+        if ( !inParents ) {
+            var
+            panelID = t.el.id+'__panel_'+el.idx,
+            kids = [];
+            for (var elID in children)
+                if (!(elID in t.shownChildren) && t.items[parseInt(elID)].level!==1)
+                    kids.push (t.items[parseInt(elID)].b.el);
+
+            $('#'+panelID).stop(true,true).fadeOut('normal');
+
+            if (t.debugMe)
+            $(kids).each (function(idx, button) {
+                na.m.log(24, 'hideSubMenu : hiding #'+button.id, false);
+            });
+            $(kids).stop(true,true).fadeOut('normal');
+        }
+
+        //if (Object.keys(t.shownChildren).length === 0)
+        if (t.debugMe) debugger;
+        if (!inParents /*&& el !== t.currentEl*/ && t.timeShow < t.timeHide)
+        t.timeout_hideAll.push (setTimeout(function (t) {
+            if (t.debugMe) debugger;
+            var hiding = [];
+            $('.vividMenu_item', t.el).each(function(idx,button) {
+                var it = t.items[idx];
+                if (it.level!==1) hiding.push (button);
+            });
+            $(hiding).stop(true,true).fadeOut('fast');
+            t.shownChildren = {};
+            $('.vividMenu_subMenuPanel').stop(true,true).fadeOut('fast');
+        }, 400, t));
+        if (t.debugMe) na.m.log (24, 'hideSubMenu : setTimeout hideAll set(500ms) : '+t.timeout_hideAll[t.timeout_hideAll.length-1], false);
+
+        //delete t.shownChildren[el.id];
+        t.timeHide = new Date().getTime();
+    }
+
+    showMenuItem (t, it, dim /* dimensions */) {
+        var
+        offsetX = 0,
+        offsetY = 0,
+        itp = null,
+        i = it.levelIdx;
+        if (it.parentDiv) {
+            var
+            itp_idx = parseInt(it.parentDiv.id.replace(/.*__/,'')),
+            itp = t.items[itp_idx],
+            offsetX = $(it.parentDiv).offset().left - $(t.el).offset().left,
+            offsetY = $(it.parentDiv).offset().top - $(t.el).offset().top;
+
+            var
+            numKids = Object.keys(t.children[itp_idx]).length,
+            numVer = Math.ceil(Math.sqrt(numKids)),
+            column = 0,
+            lidx = it.level === 1 ? it.levelIdx : it.levelIdx + 1;
+            while (lidx > numVer) {
+                column++;
+                lidx -= numVer;
+            }
+            if (it.label=='HD Video') debugger;
+            if (it.label=='Tiled') debugger;
+            if (it.level==2) debugger;
+        } else {
+            var
+            offsetX = $(it.b.el).offset().left - $(t.el).offset().left,
+            offsetY = $(it.b.el).offset().top - $(t.el).offset().top,
+            numVer = 0,
+            column = 0;
+        }
+
+
+        var
+        j = it.level===1 ? it.levelIdx : it.levelIdx + 1,
+        k = j - ((column) * numVer),
+        left =
+            dim.horDirection=='west' || column > 0
+                ? offsetX - ($(it.b.el).width()*k) - (dim.bws.left+(dim.bws.right*2)*k) - (na.d.g.margin*k)
+                : dim.horDirection=='east' || column > 0
+                    ? offsetX + ($(it.b.el).width()*k) + (dim.bws.right+(dim.bws.left*2)*k) + (na.d.g.margin*k)
+                    : offsetX,
+        /*left = dim.space2left > dim.space2right
+            ? offsetX - ( (($(it.b.el).width()*j) - (dim.bws.left+(dim.bws.right*2)*j) - (na.d.g.margin*j)) * (column+1) )
+            : offsetX + ( (($(it.b.el).width()*j) + (dim.bws.right+(dim.bws.left*2)*j) + (na.d.g.margin*j)) * (column+1) ),*/
+        top = dim.verDirection=='south'
+            ? offsetY + ($(it.b.el).height()*k) + (dim.bws.top+(dim.bws.bottom*2)*k) + (na.d.g.margin*k)
+            : dim.verDirection=='north'
+                ? offsetY - ($(it.b.el).height()*k) - (dim.bws.bottom+(dim.bws.top*2)*k) - (na.d.g.margin*k)
+                : offsetY;
+        /*top = dim.space2bottom > dim.space2top
+            ? offsetY + ($(it.b.el).height()*k) + (dim.bws.top+(dim.bws.bottom*2)*k) + (na.d.g.margin*k)
+            : offsetY - ($(it.b.el).height()*k) - (dim.bws.bottom+(dim.bws.top*2)*k) - (na.d.g.margin*k);*/
+
+        if (it.level > 2) {
+            if (dim.space2left > dim.space2right)
+                left -= $(it.b.el).width()*0.5
+            else
+                left += $(it.b.el).width()*0.5;
+            top -= $(it.b.el).height()/3
+        }
+        $(it.b.el).css ({ left : left, top : top }).stop(true,true).fadeIn('normal');
+    }
+
+    showPanel (t, panel, it, dim /* dimensions */) {
+        var
+        dim = t.getDimensions(t, it.b.el, true),
+        dim2 = t.getDimensions(t, it.b.el, false),
+        offsetX = 0,
+        offsetY = 0,
+        itp = null,
+        i = it.levelIdx;
+        if (it.parentDiv) {
+            var
+            itp_idx = parseInt(it.parentDiv.id.replace(/.*__/,'')),
+            itp = t.items[itp_idx],
+            offsetX = $(it.parentDiv).offset().left - $(t.el).offset().left,
+            offsetY = $(it.parentDiv).offset().top - $(t.el).offset().top;
+        } else {
+            var
+            offsetX = $(it.b.el).offset().left - $(t.el).offset().left,
+            offsetY = $(it.b.el).offset().top - $(t.el).offset().top;
+        }
+        var
+        j = it.level===1 ? it.levelIdx : it.levelIdx + 1,
+        left =
+            dim.horDirection=='west'
+                ? offsetX - ($(it.b.el).width()*j) - (dim.bws.left+(dim.bws.right*2)*j) - (na.d.g.margin*j)
+                : dim.horDirection=='east'
+                    ? offsetX + ($(it.b.el).width()*j) + (dim.bws.right+(dim.bws.left*2)*j) + (na.d.g.margin*j)
+                    : offsetX,
+        top = dim.verDirection=='south'
+            ? offsetY + ($(it.b.el).height()*j) + (dim.bws.top+(dim.bws.bottom*2)*j) + (na.d.g.margin*j)
+            : dim.verDirection=='north'
+                ? offsetY - ($(it.b.el).height()*j) - (dim.bws.bottom+(dim.bws.top*2)*j) - (na.d.g.margin*j)
+                : offsetY,
+        w = dim2.horDirection=='west'
+            ? dim2.space2left
+            : dim2.horDirection=='east'
+                ? dim2.space2right
+                : 0,
+        h = dim2.verDirection=='south'
+            ? dim2.space2bottom
+            : dim2.verDirection=='north'
+                ? dim2.space2top
+                : 0;
+
+        if (it.level > 2) {
+            left += $(it.b.el).width()*0.5
+            top -= $(it.b.el).height()/3
+        }
+        panel.css ({ position:'absolute', left : left, top : top, width : w, height : h, zIndex : it.b.el.style.zIndex-1, display:'block'});//, borderRadius : 7, background : 'rgba(0,0,100,0.64)', border : '2px solid lime'});//stop(true,true).fadeIn('normal');
+    }
+
+
+    getDimensions (t, el, restrict) {
+        var
+        t = this,
+        vbCheckerID = t.el.id+'_vbChecker',
+        bws = na.m.borderWidths($('#'+vbCheckerID)[0]),
+        dim = { // dimensions
+            space2right : $(window).width() - $(el).offset().left - $(el).width() - bws.left - bws.right,
+            space2left : $(el).offset().left,
+            space2top : $(el).offset().top - bws.top,
+            space2bottom : $(window).height() - $(el).offset().top - $(el).height() - bws.top - bws.bottom,
+        };
+        dim.bws = bws;
+        //if ($('a',el)[0].innerText=='Background') debugger;
+
+        var
+        avoid1 = $(el).attr('avoid'),
+        oEl = $(el).offset(),
+        oElH = el.outerHeight,
+        oElW = el.outerWidth,
+        closest = {
+            left : null,
+            right : null,
+            top : null,
+            bottom : null
+        },
+        closestGap = {
+            left : null,
+            right : null,
+            top : null,
+            bottom : null
+        };
+        if (typeof avoid1 == 'string' && avoid1 !== '') {
+            var avoid2 = JSON.parse(avoid1);
+            for (var i=0; i < avoid2.length; i++) {
+                var
+                avoid3 = avoid2[i],
+                avoidEl = $(avoid3),
+                o = avoidEl.offset(),
+                oh = avoidEl.outerHeight(),
+                ow = avoidEl.outerWidth();
+
+                // TODO : (LOW-PRIORITY) evaluate y-axis as well when evaluating x-axis, and vice-versa.
+
+
+                // evaluate dim.space2left
+                if (o.left < oEl.left) {
+                    if (!closest.left) {
+                        closest.left = avoidEl;
+                        closestGap.left = oEl.left - ( $(closest.left).offset().left + closest.left.outerWidth() );
+                    } else {
+                        var
+                        gapClosest = oEl.left - ( $(closest.left).offset().left + closest.left.outerWidth() ),
+                        gapCurrent = oEl.left - ( o.left + ow );
+                        if (gapCurrent < gapClosest) {
+                            closest.left = avoidEl;
+                            closestGap.left = gapCurrent;
+                        }
+                    }
+                }
+
+                // evaluate dim.space2right
+                if (oEl.right < o.right) {
+                    if (!closest.right) {
+                        closest.right = avoidEl;
+                        closestGap.right = $(closest.right).offset().right - (oEl.right + oElW);
+
+                    } else {
+                        var
+                        gapClosest = $(closest.right).offset().right - (oEl.right + oElW),
+                        gapCurrent = o.right - (oEl.right + oElW);
+                        if (gapCurrent < gapClosest) {
+                            closest.right = avoidEl;
+                            closestGap.right = gapCurrent;
+                        }
+                    }
+                }
+            } // for i < avoid2.length
+
+            if (closestGap.left) dim.space2left = closestGap.left;
+            if (closestGap.right) dim.space2right = closestGap.right;
+            if (closestGap.top) dim.space2top = closestGap.top;
+            if (closestGap.bottom) dim.space2bottom = closestGap.bottom;
+        }
+
+        if (typeof el.idx == 'number') {
+            var
+            it = t.items[el.idx],
+            parentLI = $('#'+t.el.idx+'__li__'+el.idx).parents('ul > li')[0];
+
+            if (parentLI) {
+                var
+                parentIdx = parseInt(parentLI.id.replace(/.*__/,'')),
+                itp = t.items[parentIdx];
+            }
+        }
+
+        dim.horDirection = dim.space2right > dim.space2left ? 'east' : 'west';
+        dim.verDirection = dim.space2top > dim.space2bottom ? 'north' : 'south';
+
+        /*
+        if (!el.idx) dim.verDirection = null;
+
+        if (
+            (it && it.level === 1)
+            //|| (!el.idx)
+        ) {
+            dim.horDirection = null;
+        }
+
+        if (it && itp) dim.horDirection = null;
+        */
+
+        if (restrict) {
+            if (
+                el !== t.el
+                || (el.it
+                    && el.it.level
+                    && el.it.level > 1
+                )
+            ) dim.horDirection = null;
+            if (el === t.el) dim.verDirection = null;
+        }
+
+        return dim;
+    }
+
+
+
+    hideMenuItem (t, it, i, dim) {
+        t.timeout_hideSubMenu[it.idx] = setTimeout (function() {
+            $(it.b.el).stop(true,true).fadeOut('normal');
+            var excl = {};
+            $('.vividMenu_item', t.el).each(function(idx,item) {
+                var it = t.items[item.idx];
+                $(t.el.id+'__li__'+item.idx).parents('ul > li').each(function (idx2, li) {
+                    var liID = li.id.replace(/.*__/,'');
+                    excl[liID] = li;
+                });
+            });
+            $('.vividMenu_item', t.el).each(function(idx,item) {
+                if (!(item.idx in excl) && !item.level===1)
+                    $(item).stop(true,true).fadeOut('normal');
+            });
+        }, 800);
+        /*
+        $(it).parents('ul > li').each (function (idx, li) {
+            var div = $('#'+li.id.replace('li__',t.el.id+'_'))[0];
+            var it = t.items[parseInt(li.id.replace('li__',''))];
+            t.showSubMenu (t, it, it.levelIdx, true);
+        });*/
+    }
+
+    updateItemStates(t) {
+        $(this.el).find('li > a').each(function(idx,li) {
+            let
+            isc = $(li).attr('vividMenu_isSelected_condition');
+
+            if (isc) {
+                var
+                menuItem = t.items[idx].b.el,
+                r = eval(isc);
+
+                if (r)
+                    $(menuItem).addClass('vividButtonSelected').removeClass('vividButton');
+                else
+                    $(menuItem).removeClass('vividButtonSelected').addClass('vividButton')
+            }
+        });
+    }
+
+    onmouseover(it) {
+        var
+        t = this,
+        opLevMax = 1,
+        opLevMin = 0.2;
+        if (it.p) it.p.it.travelledIntoChild = true;
+        if (it.level===1) for (var i=0; i<t.items.length; i++) {
+            var it2 = t.items[i];
+            if (it2.li.openChildren) it2.li.openChildren.each(function(idx,cli){
+                $(cli.it.b.el).stop(true,true).fadeOut('fast');
+            });
+        }
+        if (t.timeoutMouseout) clearTimeout (t.timeoutMouseout);
+        if (t.timeoutMouseover) clearTimeout (t.timeoutMouseover);
+        t.timeoutMouseover = setTimeout (function() {
+            $(it.p).find('li').each(function(idx,pcli){
+                //if (pcli!==it.li) {
+                    if (pcli.openChildren) pcli.openChildren.each(function(idx2,li) {
+                        $(li.it.b.el).stop(true,true).fadeOut('fast');
+                        if (li.openChildren) li.openChildren.each(function(idx3,li2){
+                            $(li2.it.b.el).stop(true,true).fadeOut('fast');
+                        });
+                    });
+                //}
+            });
+            it.li.openChildren = $(it.li).children('ul').children('li');
+            var hasChildren = false;
+            it.li.openChildren.each(function(idx,li) {
+                var
+                opLev = opLevMin + (
+                    ( (opLevMax-opLevMin) / ((li.it.level-it.level)) )
+                );
+                if (li.it.level!==it.level) {
+                    if ($(li.it.b.el).css('display')==='none') $(li.it.b.el).css({display:'flex',opacity:0});
+                    $(li.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                    hasChildren = true;
+                }
+            });
+
+            $(it.li).parents('ul').each(function(idx,pul) {
+                //debugger;
+                if (idx<$(it.li).parents('ul').length-1) $(pul).children('li').each(function(idx2,cli){
+                    var
+                    opLevFactor =
+                        (opLevMax-opLevMin) / (cli.it.level + idx)*10//(cli.it.level /*>*/<= $(it.li).parents('ul').length ? cli.it.level * 2 : (((opLevMax-opLevMin)*10*(idx+2))-2)*5),
+                    opLev =
+                        opLevMax - (
+                            (opLevMax-opLevMin) / ((opLevFactor + cli.it.level) / 4)
+                        );
+
+
+                    //if (cli.it.label=='Dark mode'||cli.it.label=='Anime') debugger;
+                    if (opLev >= 0 && opLev <= 1) {
+                        if ($(cli.it.b.el).css('display')==='none') $(cli.it.b.el).css({display:'flex',opacity:0});
+                        $(cli.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                    }
+                });
+
+                if (idx===0 && !hasChildren) $(pul).children('li').each(function(idx,cli){
+                    if ($(cli.it.b.el).css('display')==='none') $(cli.it.b.el).css({display:'flex',opacity:0});
+                    $(cli.it.b.el).stop(true,true).delay(20).animate({opacity:1},'fast');
+                });
+            });
+
+            $(it.path).stop(true,true).animate ({opacity:1},'fast');
+            $('#'+it.b.el.id).stop(true,true).delay(20).animate ({opacity:1},'fast');
+            var opLev = null, opLev2 = null;
+            if (it.travelledIntoChild && it.parent) {
+                $(it.p).children('ul').children('li').each(function(idx3,li3) {
+                    opLev = opLevMin + (
+                        ( (opLevMax-opLevMin) / ((li3.it.level-it.p.it.level+1)) )
+                    );
+                    if (li3.it.level===it.level) {
+                        if ($(li3.it.b.el).css('display')==='none') $(li3.it.b.el).css({display:'flex',opacity:0});
+                        $(li3.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                        hasChildren = true;
+                    }
+                });
+                t.items[it.parent].li.openChildren.each(function(idx,el){
+                    if ($(el.it.b.el).css('display')==='none') $(el.it.b.el).css({display:'flex',opacity:0});
+                    opLev2 = (
+                        el === it.li
+                        ? 1
+                        : opLev
+                    );
+                    $(el.it.b.el).stop(true,true).delay(20).animate ({opacity:opLev2},'fast');
+                });
+                $(it.li).children('ul').children('li').each(function(idx2,el2){
+                    if ($(el2.it.b.el).css('display')==='none') $(el2.it.b.el).css({display:'flex',opacity:0});
+                    $(el2.it.b.el).stop(true,true).delay(20).animate ({opacity:1},'fast');
+                });
+                delete it.travelledIntoChild;
+            }
+        }, 100);
+    }
+
+    onmouseout(it) {
+        var
+        t = this;
+        if (t.timeoutMouseout) clearTimeout (t.timeoutMouseout);
+        t.timeoutMouseout = setTimeout (function() {
+            for (var i=0; i<t.items.length; i++) {
+                var it2 = t.items[i];
+                if (it2.li.openChildren) it2.li.openChildren.each(function(idx,li) {
+                    $(li.it.b.el).stop(true,true).fadeOut('slow');
+                });
+                if (it2.level===1) {
+                    $(it2.b.el).animate({opacity:1},'fast');
+                }
+            }
+        }, 1000);
+    }
+
+    onclick(it) {
+        var a = $(it.b.el).children('a');
+        if (
+            typeof a.attr('windowName') == 'string'
+            && a.attr('windowName')!==''
+        ) {
+            window.open(a.attr('href'),a.attr('windowName')).focus();
+        } else {
+            var href = a.attr('href');
+            if (href.match(/javascript:/)) eval(href.replace('javascript:','')); else window.location.href = href;
+        }
+    }
+}

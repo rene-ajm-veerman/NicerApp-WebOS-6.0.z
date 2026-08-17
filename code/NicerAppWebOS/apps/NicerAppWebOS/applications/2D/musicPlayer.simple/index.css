@@ -1,0 +1,144 @@
+/* body {
+	font-family : Georgia;
+	padding:0px;
+	margin:0px;
+}
+*/
+
+.saComment {
+	color : white;
+	padding : 5px;
+}
+
+.saComment_from {
+	color : cyan;
+	font-weight : bold;
+}
+
+.saComment_when {
+	color : yellow;
+	font-size : 10px;
+}
+
+.saComment_remove {
+	background : url(siteImages/remove_40.png) no-repeat;
+	background-size : 100% 100%;
+}
+
+#playlist { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+#playlist li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+#playlist li div { position: absolute; margin-left: -1.3em; }
+
+h1::after, h2::after, h3::after { white-space : inherit};
+
+#infoWindow_help, #infoWindow_tools, #infoWindow_info {
+	font-family : "Tahoma", "Geneva";
+	font-size : 13px;
+	color : white;
+	font-weight : bold;
+}	
+
+#infoWindow_comments td {
+	color : white;
+}
+
+.vividTheme__lava_001 td {
+	color : lime;
+	font-family : "Lucida Sans Unicode", "Lucida Grande";
+	font-size : 10px;
+}
+
+.vividTheme__lava_002 td {
+	color : lime;
+	font-family : "Lucida Sans Unicode", "Lucida Grande";
+	font-size : 12px;
+	font-weight: bold;
+}
+
+#app__musicPlayer__playlist td {
+	color : white;
+	font-family : "Tahoma", "Geneva";
+	font-size : 12px;
+}
+
+#mp3s { border : 0 }
+#mp3s .vividDialogContent { border : 0; }
+#mp3s .vividButton { margin-top : 8px; }
+
+.mp3_info_label {
+	color : lime;
+}
+
+.audioPlayerUI {
+    position : absolute;
+    display : flex;
+    flex-direction : column;
+    flex-wrap : wrap;
+    justify-content : center;
+    left : 5px;
+    width : calc(100% - 20px);
+    height : 100%;
+}
+
+.audioPlayerButtons {
+    display : flex;
+    order : 1;
+    flex-direction : row;
+    justify-content : space-around;
+    height : var(--vividButton-height);
+    min-height : var(--vividButton-height);
+    max-height : var(--vividButton-height);
+    width : 100%;
+}
+
+.audioPlayerControls {
+    display : flex;
+    order : 2;
+    flex-direction : row;
+    justify-content : space-around;
+}
+
+.audioVolumeBar, .audioSeekBar {
+    width : calc(50% - 5px);
+    height : 1em;
+    border-radius : 8px;
+}
+
+.audioVolumeBar {
+    background : url('/siteMedia/backgrounds/tiled/blue/seamless-texture-blue-watercolor.jpg');
+}
+.audioVolumeBar_setting {
+    background : url('/siteMedia/backgrounds/tiled/green/5492.jpg');
+}
+
+.audioSeekBar {
+    background : url('/siteMedia/backgrounds/tiled/orange/467781133_4f4354223e.jpg');
+}
+.audioSeekBar_setting {
+    background : url('/siteMedia/backgrounds/tiled/blue/fabric_seamless_blue_woven_texture2.jpg');
+}
+
+.audioPlayerControlsLabels {
+    display : flex;
+    order : 3;
+    flex-direction : row;
+    justify-content : space-around;
+    width : 100%;
+}
+
+.audioVolumeBarLabel {
+    display : flex;
+    order : 4;
+    flex-direction : row;
+    justify-content : space-between;
+    width : 130px;
+}
+
+.audioSeekBarLabel {
+    display : flex;
+    order : 4;
+    flex-direction : row;
+    justify-content : space-between;
+    width : 130px;
+}
+

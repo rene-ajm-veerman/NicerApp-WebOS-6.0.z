@@ -1,0 +1,15 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/blogEditor" : {
+                "#siteToolbarLeft" : {
+                    "page" : "index"
+                },
+                "#siteContent" : {
+                    "page" : "index"
+                }
+            }
+        },
+        "seoValue" : [ "me" ]
+    }
+]

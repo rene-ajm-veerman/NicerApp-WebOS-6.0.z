@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NicerApp Vivid Desktop – Grid Layout v0.11.0</title>
+
+  <style>
+    :root {
+      --outerGap: 32px;
+      --innerGap: 32px;
+      --bg-dark: #0f0f14;
+      --panel-bg: #1a1a22;
+      --border: #444;
+      --text: #d0d0e0;
+      --accent: #5a7eff;
+      --titlebar-bg: #222;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #vividDesktop {
+      position: fixed;
+      inset: var(--outerGap);
+      display: grid;
+      grid-template-columns: 320px 280px 1fr 280px 360px;
+      grid-template-rows: auto 1fr auto auto;
+      gap: var(--innerGap);
+      height: calc(100% - 2 * var(--outerGap));
+      width: calc(100% - 2 * var(--outerGap));
+      background: transparent;
+      transition: grid-template-columns 0.45s ease-in-out, grid-template-rows 0.45s ease-in-out;
+    }
+
+    #vividDesktop.slid-theme    { grid-template-columns: 2em    280px 1fr 280px 360px; }
+    #vividDesktop.slid-left     { grid-template-columns: 320px 2em    1fr 280px 360px; }
+    #vividDesktop.slid-theme.slid-left     { grid-template-columns: 2em 2em    1fr 280px 360px; }
+    #vividDesktop.slid-right    { grid-template-columns: 320px 280px 1fr 2em    360px; }
+    #vividDesktop.slid-comments    { grid-template-columns: 320px 280px 1fr 200px    2em }
+    #vividDesktop.slid-right.slid-comments    { grid-template-columns: 320px 280px 1fr 2em    2em }
+    #vividDesktop.slid-right.slid-left    { grid-template-columns: 320px 2em 1fr 2em    360px; }
+    #vividDesktop.slid-right.slid-theme.slid-left    { grid-template-columns: 2em 2em 1fr 2em    360px; }
+    #vividDesktop.slid-comments.slid-right.slid-left    { grid-template-columns: 320px 2em 1fr 2em    2em }
+    #vividDesktop.slid-comments.slid-right.slid-theme.slid-left    { grid-template-columns: 2em 2em 1fr 2em    0; }
+
+    /* Full-width spans */
+    #siteToolbarTop    { grid-column: 1 / 6; grid-row: 1; }
+    #vividDesktop.slid-top #siteToolbarTop { height : 0.5em;overflow:visible; }
+    #siteToolbarBottom { grid-column: 1 / 6; grid-row: 3; }
+    #vividDesktop.slid-bottom #siteToolbarBottom { height : 0.5em;overflow:visible; }
+    #vividDesktop.slid-top.slid-bottom #siteToolbarTop .content-area { height : 0.5em;overflow:visible; }
+    #vividDesktop.slid-top.slid-bottom #siteToolbarBottom { height : 0.5em;overflow:visible; }
+    #siteTaskbar       { grid-column: 1 / 6; grid-row: 4; }
+
+    /* Side panels */
+    #siteThemeEditor   { grid-column: 1; grid-row: 2; }
+    #siteToolbarLeft   { grid-column: 2; grid-row: 2; }
+    #siteContent       { grid-column: 3; grid-row: 2; }
+    #siteToolbarRight  { grid-column: 4; grid-row: 2; }
+    #siteComments      { grid-column: 5; grid-row: 2; }
+
+    /* Slide-out states for columns (left/right) */
+    /*#vividDesktop.slid-theme    { grid-template-columns: 0    280px 1fr 280px 360px; }
+    #vividDesktop.slid-left     { grid-template-columns: 320px 0    1fr 280px 360px; }
+    #vividDesktop.slid-right    { grid-template-columns: 320px 280px 1fr 0    360px; }
+    #vividDesktop.slid-comments { grid-template-columns: 320px 280px 1fr 280px 0   ; }
+    */
+
+    .vividDialog,
+    .site-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titlebar {
+      height: 38px;
+      background: var(--titlebar-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+      cursor: move;
+    }
+
+    .title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slide-btn {
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .slide-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* Horizontal arrows for sides */
+    .slide-btn[data-slide-target="theme"]::after,
+    .slide-btn[data-slide-target="left"]::after,
+    .slide-btn[data-slide-target="right"]::after,
+    .slide-btn[data-slide-target="comments"]::after {
+      content: '<';
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+    }
+    .slide-btn[data-slide-target="right"]::after,
+    .slide-btn[data-slide-target="comments"]::after {
+      content: '>';
+    }
+
+    .vividDialog.slid-out .title { opacity : 0.0001; }
+
+    .vividDialog.slid-out .slide-btn[data-slide-target="theme"]::after,
+    .vividDialog.slid-out .slide-btn[data-slide-target="left"]::after,
+    .vividDialog.slid-out .slide-btn[data-slide-target="right"]::after,
+    .vividDialog.slid-out .slide-btn[data-slide-target="comments"]::after {
+      content: '>';
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+    }
+    .vividDialog.slid-out .slide-btn[data-slide-target="right"]::after,
+    .vividDialog.slid-out .slide-btn[data-slide-target="comments"]::after {
+      content: '<';
+    }
+
+    /* Vertical arrows for top/bottom/taskbar */
+    .slide-btn[data-slide-target="top"]::after {
+      content: '^';  /* up to hide north */
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+
+    }
+    .vividDialog.slid-out .slide-btn[data-slide-target="top"]::after {
+      content: 'v';  /* down to show */
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+    }
+
+    .slide-btn[data-slide-target="bottom"]::after,
+    .slide-btn[data-slide-target="taskbar"]::after {
+      content: 'v';  /* down to hide south */
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+    }
+    .vividDialog.slid-out .slide-btn[data-slide-target="bottom"]::after,
+    .vividDialog.slid-out .slide-btn[data-slide-target="taskbar"]::after {
+      content: '^';  /* up to show */
+      font-weight : bolder;
+      font-size : 14px;
+      background : orange;
+      color : white;
+      padding : 4px;
+      margin : 10px;
+      border-radius : 9px;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .vividDialog.slid-out .content-area,
+    .vividDialog.slid-out .title > * {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+
+    #siteTaskbar .content-area {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+    }
+
+    /* Debug label */
+    .gap-label {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+  .resizable {
+  position: relative;
+  min-width: 180px;
+  min-height: 120px;
+  overflow: hidden;
+}
+
+.resize-handle {
+  position: absolute;
+  z-index: 20;
+  background: transparent;
+  transition: background 0.12s;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+  background: rgba(255, 140, 0, 0.35);   /* orange-ish when active/hover */
+}
+
+/* Edges */
+.resize-handle.n, .resize-handle.s { left: 0; right: 0; height: 6px; }
+.resize-handle.e, .resize-handle.w { top: 0; bottom: 0; width: 6px; }
+
+/* Corners – larger hit area */
+.resize-handle.ne, .resize-handle.nw,
+.resize-handle.se, .resize-handle.sw { width: 14px; height: 14px; }
+
+/* Positioning */
+.resize-handle.n  { top: -3px; cursor: ns-resize; }
+.resize-handle.s  { bottom: -3px; cursor: ns-resize; }
+.resize-handle.e  { right: -3px; cursor: ew-resize; }
+.resize-handle.w  { left: -3px; cursor: ew-resize; }
+
+.resize-handle.ne { top: -4px; right: -4px; cursor: nesw-resize; }
+.resize-handle.nw { top: -4px; left: -4px; cursor: nwse-resize; }
+.resize-handle.se { bottom: -4px; right: -4px; cursor: nwse-resize; }
+.resize-handle.sw { bottom: -4px; left: -4px; cursor: nesw-resize; }
+  </style>
+</head>
+<body>
+
+  <div id="vividDesktop">
+
+    <!-- Top -->
+    <div id="siteToolbarTop" class="vividDialog site-panel resizable">
+      <div class="titlebar">
+        <div class="title">Navigation • Search • Quick Actions</div>
+        <button class="slide-btn" data-slide-target="top" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Top toolbar content goes here…</div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Theme Editor -->
+    <div id="siteThemeEditor" class="vividDialog site-panel resizable">
+      <div class="titlebar">
+        <div class="title">Theme Editor</div>
+        <button class="slide-btn" data-slide-target="theme" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">
+        <p>Customize colors, fonts, spacing, shadows, etc.</p>
+        <div style="margin: 16px 0;">
+          <button style="background:#5a7eff; color:white; padding:8px 16px; border:none; border-radius:4px;">Apply Dark Theme</button>
+          <button style="background:#444; color:white; padding:8px 16px; border:none; border-radius:4px; margin-left:12px;">Preview Light</button>
+        </div>
+      </div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Left Toolbar -->
+    <div id="siteToolbarLeft" class="vividDialog site-panel resizable">
+      <div class="titlebar">
+        <div class="title">Tools • Apps • Bookmarks</div>
+        <button class="slide-btn" data-slide-target="left" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Left sidebar – menu items, app launcher, etc.</div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Main Content -->
+    <div id="siteContent" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Main Workspace</div>
+      </div>
+      <div class="content-area">
+        <h2>NicerApp Desktop v0.11.0</h2>
+        <p>Central area — drag & drop widgets, open documents, run applications here.</p>
+      </div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Right Toolbar -->
+    <div id="siteToolbarRight" class="vividDialog site-panel resizable">
+      <div class="titlebar">
+        <div class="title">Properties • Layers • Preview</div>
+        <button class="slide-btn" data-slide-target="right" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Right sidebar – inspector, details, previews…</div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Comments -->
+    <div id="siteComments" class="vividDialog" resizable>
+      <div class="titlebar">
+        <div class="title">Comments • Discussion • Notes</div>
+        <button class="slide-btn" data-slide-target="comments" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">
+        <p>Threaded comments, annotations, chat…</p>
+        <div style="margin-top:20px; opacity:0.6;">(Comment system loading...)</div>
+      </div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <!-- Bottom -->
+    <div id="siteToolbarBottom" class="vividDialog site-panel resizable">
+      <div class="titlebar">
+        <div class="title">Status • Extra Controls</div>
+        <button class="slide-btn" data-slide-target="bottom" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Bottom toolbar – progress, messages, additional tools</div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+    <div id="siteTaskbar" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Taskbar</div>
+        <button class="slide-btn" data-slide-target="taskbar" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">
+        Pinned applications • System tray • Clock • Notifications
+      </div>
+      <!-- example inside one panel -->
+      <div class="resize-handle top"    data-dir="n"></div>
+      <div class="resize-handle bottom" data-dir="s"></div>
+      <div class="resize-handle left"   data-dir="w"></div>
+      <div class="resize-handle right"  data-dir="e"></div>
+      <div class="resize-handle ne"     data-dir="ne"></div> <!-- corner -->
+      <div class="resize-handle nw"     data-dir="nw"></div> <!-- corner -->
+      <div class="resize-handle se"     data-dir="se"></div> <!-- corner -->
+      <div class="resize-handle sw"     data-dir="sw"></div> <!-- corner -->
+    </div>
+
+  </div>
+
+  <div class="gap-label">OuterGap: var(--outerGap) • InnerGap: var(--innerGap)</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('NicerApp Desktop v0.11.0 – full slide-out enabled');
+
+      const desktop = document.getElementById('vividDesktop');
+
+      document.querySelectorAll('.slide-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.slideTarget;
+          if (!target) return;
+
+          const className = `slid-${target}`;
+          desktop.classList.toggle(className);
+          debugger;
+
+          const panel = btn.closest('.vividDialog');
+          if (panel) {
+            panel.classList.toggle('slid-out');
+          }
+        });
+      });
+
+      // Show real gap values
+      const root = getComputedStyle(document.documentElement);
+      const outer = root.getPropertyValue('--outerGap').trim();
+      const inner = root.getPropertyValue('--innerGap').trim();
+      document.querySelector('.gap-label').textContent = `OuterGap: ${outer} • InnerGap: ${inner}`;
+
+// Resizing variables – declared in outer scope
+  let isResizing    = false;
+  let currentHandle = null;
+  let currentPanel  = null;   // ← this is the fix: keep reference to the panel being resized
+  let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+  // Attach pointerdown to all resize handles
+  document.querySelectorAll('.resizable .resize-handle').forEach(handle => {
+    handle.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return; // only left click
+      e.preventDefault();
+      e.stopPropagation();
+
+      currentPanel  = handle.closest('.resizable'); // ← store the panel here
+      if (!currentPanel) return;
+
+      isResizing    = true;
+      currentHandle = handle;
+      startX        = e.clientX;
+      startY        = e.clientY;
+      startWidth    = currentPanel.offsetWidth;
+      startHeight   = currentPanel.offsetHeight;
+      startLeft     = currentPanel.offsetLeft;
+      startTop      = currentPanel.offsetTop;
+
+      document.body.style.cursor      = window.getComputedStyle(handle).cursor;
+      document.body.style.userSelect  = 'none';
+      document.documentElement.classList.add('resizing-active'); // optional: global cursor hint
+    });
+  });
+
+  // Global move handler
+  document.addEventListener('pointermove', (e) => {
+    if (!isResizing || !currentHandle || !currentPanel) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const dir = currentHandle.dataset.dir;
+
+    let newWidth  = startWidth;
+    let newHeight = startHeight;
+    let newLeft   = startLeft;
+    let newTop    = startTop;
+
+    // East / West
+    if (dir.includes('e')) newWidth  += dx;
+    if (dir.includes('w')) {
+      newWidth  -= dx;
+      newLeft   += dx;
+    }
+
+    // South / North
+    if (dir.includes('s')) newHeight += dy;
+    if (dir.includes('n')) {
+      newHeight -= dy;
+      newTop    += dy;
+    }
+
+    // Enforce minimum dimensions
+    const minW = 180;
+    const minH = 120;
+
+    if (newWidth < minW) {
+      newWidth = minW;
+      if (dir.includes('w')) newLeft = startLeft + (startWidth - minW);
+    }
+    if (newHeight < minH) {
+      newHeight = minH;
+      if (dir.includes('n')) newTop = startTop + (startHeight - minH);
+    }
+
+    // Apply changes
+    currentPanel.style.width  = newWidth  + 'px';
+    currentPanel.style.height = newHeight + 'px';
+    currentPanel.style.left   = newLeft   + 'px';
+    currentPanel.style.top    = newTop    + 'px';
+  });
+
+  // End resize on pointerup (anywhere)
+  document.addEventListener('pointerup', (e) => {
+    if (!isResizing) return;
+
+    isResizing      = false;
+    currentHandle   = null;
+    currentPanel    = null;   // clear reference
+    document.body.style.cursor     = '';
+    document.body.style.userSelect = '';
+    document.documentElement.classList.remove('resizing-active');
+
+    // Optional: clamp / snap / save size here
+  });
+
+  // Optional: visual feedback when hovering resizable area
+  document.querySelectorAll('.resizable').forEach(el => {
+    el.addEventListener('mouseenter', () => el.classList.add('resize-hover'));
+    el.addEventListener('mouseleave',  () => el.classList.remove('resize-hover'));
+  });
+    });
+  </script>
+</body>
+</html>

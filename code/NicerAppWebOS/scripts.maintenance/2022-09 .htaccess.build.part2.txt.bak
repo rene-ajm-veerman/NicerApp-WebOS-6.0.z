@@ -1,0 +1,107 @@
+# do not touch without a clue about apache2 rewriterules.
+# read the manual; https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+ServerSignature Off
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    #initialization of rewrite engine;
+    RewriteEngine on
+    RewriteBase /
+    # redirect www.nicer.app to nicer.app
+        RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+        RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+
+
+    # /*--Front page--*/
+    #RewriteCond %{REQUEST_FILENAME} !-d
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^$ NicerAppWebOS/index.php?apps=/ [L]
+
+    # front page's data when requested with $.ajax aka na.site.loadContent()
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    #RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?apps=/ [L]
+
+
+
+    # /*--Heart of the blogging features--*/
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&dataID=$2 [L]
+        # it's not a facebook post, and it's not a forum thread either. not even a nested forum thread.
+        # it's just data ranging from tweet sized to gigabytes sized,
+        # that's gotta get edited very efficiently
+        # and displayed fast and correctly each time,
+        # in a very, eh, diverse range of circumstances.
+        #
+        # NicerApp again works in a very simple way,
+        # with one 'dataID' pointing to all content and data related to a 'post',
+        # as structured (recently or not) by it's author and the 'commenters' to that 'post'.
+        # (to speak in facebook terminology, for lack of a better set of analogies).
+        #       i could start speaking in my own marketing choice terminology about my products and services,
+        #       but i'd really like to avoid that and help create an industry standard of at least
+        #       what to call things that one posts or says online.
+        #
+        # a dataID is formed inside the server (at random) upon creation of the 'post',
+        # (or photo-album, or entire 3D world filled with people and data, or whatever),
+        # trying low counts of random characters first each time,
+        # and then slowly increasing the number of characters used to create a new dataID
+        # when what's being tried is again already found in the database on the server.
+        #
+        # a dataID points to a JSON record containing not just theme settings for new viewers
+        # to that post's data, along with possibly also *other* dataIDs,
+        # which often leads NicerApp to possibly pull in content from there as well[1],
+        # to arrive at a final 2D and/or 3D view in the browser.
+        #
+        # a dataID is stored in a database table[2] with the table name '{$myDomainName}___dataIDs'
+        # that stores JSON records / recursive arrays / data objects / etc with each record having an
+        # 'id' field containing a value that's got to match the dataID
+        # to produce anything besides an error message on the screen.
+        #
+        # the forementioned (recursively-)structured index data ('what does this dataID point to?')
+        # is listed in a field value for a field with name 'viewParameters_initial',
+        #
+        # the theme settings are listed in a field with name 'viewParameters_author_chosen_theme',
+        #
+        # along with a vpID pointing to a record in the '{$myDomainName}___viewProcessors' table,
+        # with an 'id' value set to the vpID, and a record contents
+        # that is structured like a piece of JSON directly derived from
+        # .../domainConfig/nicer.app/mainmenu.items.php:$na_apps_structure[...]['apps-current']['NicerApp-WebOS__pageSettings'],
+        #
+        # to load up the right settings and display the requested content
+        # via the right computer code when a person wants to view the data in some way.
+        #
+        # the record contents for vpIDs is also listed in the /*--all other pages--*/ section of this file you're reading now,
+        # as encode_base64_url(json_encode(vpRecord)) encoded data.
+        #
+        # [1] (in a very efficient way, with amazingly fast binary-tree calculations
+        #       happening basically inside the server's CPU,
+        #       because the database is running on the same hardware as the webserver).
+        #
+        # [2] this is true for all couchdb, filesystemDB and SQL database business logic within NicerApp.
+
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/index.php?username=$1&dataID=$2 [L]
+
+
+
+    # /*--all other pages--*/
+    # all other pages' data that got requested with (javascript) $.ajax aka na.site.loadContent()
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    #RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^apps-content/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?apps=$1 [L]
+
+    # all pages that got requested via a bookmark or as links elsewhere on the web (requiring the full NicerApp WebOS HTML, CSS and JS to be sent along with the content)
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    #RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteRule ^apps/(.*)$ NicerAppWebOS/index.php?apps=$1 [L]
+</IfModule>
+

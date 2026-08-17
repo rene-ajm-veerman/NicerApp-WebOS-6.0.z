@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bustling City Park ThreeJS Scene with Realistic Humans</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js",
+					"three/addons/": "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/"
+				}
+			}
+	</script>
+
+	<script type="module">
+
+			import * as THREE from 'three';
+			import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Sky blue background
+
+        // Camera setup: Hovering over the road, pointing half to lake and background
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, -10);
+        camera.lookAt(0, 0, 50);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(50, 100, 50);
+        scene.add(directionalLight);
+
+        // Ground: Lawn and road
+        const groundGeometry = new THREE.PlaneGeometry(200, 200);
+        const lawnMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+        const lawn = new THREE.Mesh(groundGeometry, lawnMaterial);
+        lawn.rotation.x = -Math.PI / 2;
+        lawn.position.set(0, 0, 30);
+        scene.add(lawn);
+
+        const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 });
+        const road = new THREE.Mesh(groundGeometry, roadMaterial);
+        road.rotation.x = -Math.PI / 2;
+        road.position.set(0, 0.01, -30);
+        scene.add(road);
+
+        // Lake: Nonlinear shores
+        const lakeShape = new THREE.Shape();
+        lakeShape.moveTo(0, 0);
+        lakeShape.bezierCurveTo(10, 20, 30, 20, 40, 0);
+        lakeShape.bezierCurveTo(50, -20, 30, -40, 10, -30);
+        lakeShape.bezierCurveTo(-10, -40, -30, -20, -20, 0);
+        lakeShape.bezierCurveTo(-30, 20, -10, 40, 0, 0);
+        const lakeGeometry = new THREE.ShapeGeometry(lakeShape);
+        const lakeMaterial = new THREE.MeshLambertMaterial({ color: 0x1E90FF, side: THREE.DoubleSide });
+        const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+        lake.rotation.x = -Math.PI / 2;
+        lake.scale.set(2, 2, 2);
+        lake.position.set(0, 0.1, 60);
+        scene.add(lake);
+
+        // Trees and reeds
+        function createTree(position) {
+            const trunkGeometry = new THREE.CylinderGeometry(1, 1, 5, 32);
+            const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.copy(position);
+
+            const foliageGeometry = new THREE.ConeGeometry(4, 8, 32);
+            const foliageMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+            foliage.position.set(position.x, position.y + 6, position.z);
+            scene.add(trunk);
+            scene.add(foliage);
+        }
+
+        for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2;
+            const x = 40 * Math.cos(angle) + (Math.random() - 0.5) * 10;
+            const z = 60 + 40 * Math.sin(angle) + (Math.random() - 0.5) * 10;
+            createTree(new THREE.Vector3(x, 0, z));
+        }
+
+        function createReed(position) {
+            const reedGeometry = new THREE.CylinderGeometry(0.2, 0.2, 3, 32);
+            const reedMaterial = new THREE.MeshLambertMaterial({ color: 0x556B2F });
+            const reed = new THREE.Mesh(reedGeometry, reedMaterial);
+            reed.position.copy(position);
+            scene.add(reed);
+        }
+
+        for (let i = 0; i < 50; i++) {
+            const angle = (i / 50) * Math.PI * 2;
+            const x = 35 * Math.cos(angle) + (Math.random() - 0.5) * 5;
+            const z = 60 + 35 * Math.sin(angle) + (Math.random() - 0.5) * 5;
+            createReed(new THREE.Vector3(x, 0, z));
+        }
+
+        // Background highrises
+        function createBuilding(position, height, width, depth) {
+            const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+            const buildingMaterial = new THREE.MeshLambertMaterial({ color: 0xA9A9A9 });
+            const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            building.position.copy(position);
+            scene.add(building);
+
+            // Green balconies
+            for (let floor = 1; floor < height / 5; floor++) {
+                const balconyGeometry = new THREE.BoxGeometry(width + 2, 0.5, depth + 2);
+                const balconyMaterial = new THREE.MeshLambertMaterial({ color: 0x32CD32 });
+                const balcony = new THREE.Mesh(balconyGeometry, balconyMaterial);
+                balcony.position.set(position.x, position.y + floor * 5, position.z);
+                scene.add(balcony);
+            }
+        }
+
+        for (let i = 0; i < 10; i++) {
+            const x = (i - 5) * 20 + (Math.random() - 0.5) * 10;
+            const height = 50 + Math.random() * 50;
+            createBuilding(new THREE.Vector3(x, height / 2, 150), height, 10, 10);
+        }
+
+        function createBridge(startPos, endPos) {
+            const direction = new THREE.Vector3().subVectors(endPos, startPos);
+            const length = direction.length();
+            const bridgeGeometry = new THREE.BoxGeometry(length, 2, 5);
+            const bridgeMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 });
+            const bridge = new THREE.Mesh(bridgeGeometry, bridgeMaterial);
+            bridge.position.copy(startPos.clone().add(endPos).multiplyScalar(0.5));
+            bridge.lookAt(endPos);
+            scene.add(bridge);
+        }
+
+        createBridge(new THREE.Vector3(-20, 30, 150), new THREE.Vector3(0, 30, 150));
+        createBridge(new THREE.Vector3(20, 40, 150), new THREE.Vector3(40, 40, 150));
+
+        // Load GLTF model for humans
+        const loader = new GLTFLoader();
+        loader.load('https://threejs.org/examples/models/gltf/Soldier.glb', (gltf) => {
+            const modelTemplate = gltf.scene;
+            modelTemplate.scale.set(2, 2, 2); // Scale up if needed
+            const animations = gltf.animations;
+
+            // Function to create a person instance
+            function createPerson(position, animationName, isKid = false) {
+                const model = modelTemplate.clone();
+                if (isKid) model.scale.multiplyScalar(0.5); // Smaller for kids
+                model.position.copy(position);
+                scene.add(model);
+
+                const mixer = new THREE.AnimationMixer(model);
+                const clip = THREE.AnimationClip.findByName(animations, animationName);
+                if (clip) {
+                    const action = mixer.clipAction(clip);
+                    action.play();
+                }
+
+                return { model, mixer, position: position.clone(), animationName };
+            }
+
+            // People on lawn: mix of adults and kids, playing (idle animation with some movement)
+            const people = [];
+            for (let i = 0; i < 20; i++) {
+                const x = (Math.random() - 0.5) * 50;
+                const z = 20 + Math.random() * 20;
+                const isKid = i % 2 === 0; // Alternate kids and adults
+                people.push(createPerson(new THREE.Vector3(x, 0, z), 'Idle', isKid));
+            }
+
+            // Inline skaters on road: using 'Run' animation, moving in circle
+            const skaters = [];
+            const circleRadius = 10;
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                const x = circleRadius * Math.cos(angle);
+                const z = -20 + circleRadius * Math.sin(angle);
+                skaters.push(createPerson(new THREE.Vector3(x, 0, z), 'Run'));
+            }
+
+            // Firetwirlers: using 'Walk' animation, moving in circle, with fire particles
+            const twirlers = [];
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2 + Math.PI / 5;
+                const x = circleRadius * Math.cos(angle);
+                const z = -20 + circleRadius * Math.sin(angle);
+                const person = createPerson(new THREE.Vector3(x, 0, z), 'Walk');
+
+                // Add fire particles
+                const fireGeometry = new THREE.BufferGeometry();
+                const fireVertices = [];
+                for (let j = 0; j < 100; j++) {
+                    fireVertices.push((Math.random() - 0.5) * 0.5, Math.random() * 2 + 2, (Math.random() - 0.5) * 0.5); // Offset to hand height
+                }
+                fireGeometry.setAttribute('position', new THREE.Float32BufferAttribute(fireVertices, 3));
+                const fireMaterial = new THREE.PointsMaterial({ color: 0xFF4500, size: 0.1, blending: THREE.AdditiveBlending });
+                person.fire = new THREE.Points(fireGeometry, fireMaterial);
+                person.model.add(person.fire); // Attach to model
+
+                twirlers.push(person);
+            }
+
+            // All mixers for update
+            const allMixers = [...people, ...skaters, ...twirlers].map(p => p.mixer);
+
+            // Clock for delta time
+            const clock = new THREE.Clock();
+
+            // Update animation function
+            function updateAnimations() {
+                const delta = clock.getDelta();
+                allMixers.forEach(mixer => mixer.update(delta));
+            }
+
+            // Animate people on lawn (slight random movement)
+            function animateLawnPeople(time) {
+                people.forEach((person, i) => {
+                    person.model.position.x = person.position.x + Math.sin(time + i) * 0.1;
+                    person.model.position.z = person.position.z + Math.cos(time + i) * 0.1;
+                });
+            }
+
+            // Animate skaters and twirlers in bagua circle (circle walking, facing tangent direction)
+            function animateCircleMovers(time, group, speed, offset) {
+                group.forEach((person, i) => {
+                    const angle = time * speed + (i / group.length) * Math.PI * 2 + offset;
+                    const newX = circleRadius * Math.cos(angle);
+                    const newZ = -20 + circleRadius * Math.sin(angle);
+
+                    // Calculate direction (tangent: -sin, cos for clockwise)
+                    const dx = -Math.sin(angle);
+                    const dz = Math.cos(angle);
+                    const lookAtPos = new THREE.Vector3(newX + dx, person.model.position.y, newZ + dz);
+                    person.model.lookAt(lookAtPos);
+
+                    person.model.position.x = newX;
+                    person.model.position.z = newZ;
+
+                    if (person.fire) {
+                        person.fire.rotation.y += 0.05; // Spin fire
+                    }
+                });
+            }
+
+            // Animation loop
+            let time = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.01;
+
+                updateAnimations();
+                animateLawnPeople(time);
+                animateCircleMovers(time, skaters, 0.5, 0); // Skaters faster
+                animateCircleMovers(time, twirlers, -0.3, Math.PI / 5); // Twirlers opposite direction, slower
+
+                renderer.render(scene, camera);
+            }
+            animate();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

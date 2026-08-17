@@ -1,0 +1,13 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/cardgame.tarot" : {
+                "#siteContent" : {
+                    "deck" : "Original Rider Waite",
+                    "reading" : "3-Cards"
+                }
+            }
+        },
+        "seoValue" : [ "tarot", "cardgame-tarot" ]
+    }
+]

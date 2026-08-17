@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GLB Viewer – Der Ackerbau</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: transparent;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #ccc;
+      font-family: system-ui, sans-serif;
+      font-size: 1.2rem;
+      pointer-events: none;
+      background: rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="loading">Loading model…</div>
+  </div>
+
+  <!-- Import map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":                "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js",
+      "three/addons/":        "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const container = document.getElementById('container');
+    const loading   = document.getElementById('loading');
+
+    // Scene
+    const scene = new THREE.Scene();
+    scene.background = null;
+
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100);
+    camera.position.set(0, 0.4, 2.8);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    container.appendChild(renderer.domElement);
+
+    // Controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 0.6;
+    controls.maxDistance = 12;
+    controls.autoRotate = false;
+
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambient);
+
+    // Front-top light → pointing toward upper part / "head" area
+    const frontLight = new THREE.DirectionalLight(0xfff8f0, 2.2);
+    frontLight.position.set(2.5, 4.5, 3.0);
+    frontLight.target.position.set(0, 0.8, 0);
+    scene.add(frontLight);
+    scene.add(frontLight.target);
+
+    // Back-bottom light → pointing upward toward mid/chest level
+    const backLight = new THREE.DirectionalLight(0xe8f0ff, 1.4);
+    backLight.position.set(-1.8, -2.2, -2.5);
+    backLight.target.position.set(0, 0.4, 0);
+    scene.add(backLight);
+    scene.add(backLight.target);
+
+    // Model container for rotation
+    const modelGroup = new THREE.Group();
+    scene.add(modelGroup);
+
+    let model = null;
+
+    const loader = new GLTFLoader();
+    const url = 'https://nicer.app/NicerAppWebOS/businessLogos/models/der_ackerbau.glb';
+
+    loader.load(url,
+      (gltf) => {
+        model = gltf.scene;
+        modelGroup.add(model);
+
+        // Auto-center + uniform scale
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size   = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const f = 0.7 / maxDim;               // ← adjust this scale factor if needed (try 1.2–2.5)
+        model.scale.setScalar(f);
+        model.position.sub(center.multiplyScalar(f));
+
+        // Small starting rotation (optional)
+        model.rotation.y = Math.PI * 0.12;
+
+        loading.style.display = 'none';
+      },
+      undefined,
+      (err) => {
+        console.error('GLTF load failed:', err);
+        loading.textContent = 'Failed to load model';
+      }
+    );
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    // Animation loop with auto-rotation
+    let lastTime = 0;
+    const rotationSpeed = 0.4;   // radians per second – tune as desired
+
+    function animate(time = 0) {
+      requestAnimationFrame(animate);
+
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (modelGroup) {
+        modelGroup.rotation.y += rotationSpeed * dt;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+
+Non-authoritative answer:
+Name:	said.by
+Address: 45.83.241.21
+

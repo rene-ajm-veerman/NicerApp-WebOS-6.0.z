@@ -1,0 +1,52 @@
+body {
+  	font-family : Verdana, Arial, Helvetica;
+ 	margin : 0px;
+	padding : 0px;
+	color : white;
+}
+
+.hmText {margin-left : 50px; }
+
+h1 { font-size : 22px; }
+
+table.hmVersion td {
+  vertical-align:top;
+  color : white;
+}
+
+table.hm td {
+  vertical-align:top;
+}
+
+
+pre { 
+ font-size : 110%;
+}
+
+span.hmVersion {
+  color : lime;
+}
+span.hmReleaseDate {
+  color : cyan;
+  font-size : 70%;
+}
+
+.jsonViewer_status a {
+  color : lime;
+}
+.jsonViewer_status {
+  background : #000040;
+  color : white;
+  border : 1px solid navy;
+}
+.jsonViewer_status th {
+  text-align:left;
+}
+.jsonViewer_status td {
+  vertical-align : top;
+}
+
+.vividTheme__menu_004 a {
+	color : yellow;
+	font-weight : bold;
+}

@@ -1,0 +1,6 @@
+version 0.1.0:
+    * made install.php
+version 1.0.0:
+    * can now read IMAP account data
+version 1.1.0:
+    * can now send out HTML emails

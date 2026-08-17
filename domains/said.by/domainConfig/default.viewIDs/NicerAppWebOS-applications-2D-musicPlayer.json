@@ -1,0 +1,51 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "index" }
+            }
+        },
+        "seoValue" : [ "music" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "Sabaton - Recent Hits (2022)" }
+            }
+        },
+        "seoValue" : [ "music-Sabaton" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "DJ_Firesnake" }
+            }
+        },
+        "seoValue" : [ "music-DJ-FireSnake", "music-djFireSnake" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "Deep_House" }
+            }
+        },
+        "seoValue" : [ "music-Deep-House" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "Beautiful_Chill_Mixes" }
+            }
+        },
+        "seoValue" : [ "music-Beautiful-Chill-Mixes" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer" : {
+                "#siteContent" : { "set" : "Black_Horse__Mongolian_Traditional_Classical_Music_Art" }
+            }
+        },
+        "seoValue" : [ "music-Black-Horse" ]
+    }
+]
+

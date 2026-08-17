@@ -1,0 +1,596 @@
+html, body {
+    height : 100%;
+}
+body {
+    overflow : auto;
+}
+body[theme="dark"] {
+    background : black url('dark-rock-wall-seamless-texture-free4.jpg') repeat;
+    /* http://www.textures4photoshop.com/tex/stone-and-rock/dark-rock-wall-seamless-texture-free.aspx */
+}
+body[theme="light"] {
+    background : white url('gray_background_for_websites.jpg') repeat;
+    /* http://www.textures4photoshop.com/tex/stone-and-rock/dark-rock-wall-seamless-texture-free.aspx */
+}
+.flex-container {
+    height : auto;
+    padding : 0;
+    margin : 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    z-index : 1;
+    margin-bottom : 4rem;
+}
+.row {
+    width : auto;
+    margin : 20px;
+    background : rgba(0,0,0,0.5);
+    border : 1px solid black;
+    border-radius : 33px;
+    box-shadow : 0px 0px 4px 2px rgba(102,255,102,0.5), 2px 2px 1px rgba(0,0,0,0.5);
+    z-index : 2;
+}
+.flex-item {
+    margin : 18px;
+    padding : 15px;
+    z-index : 3;
+}
+.flex-title {
+    padding : 10px;
+    border : 1px solid black;
+    border-radius : 18px;
+    background : rgba(0,0,0,0.5);
+    box-shadow : 0px 0px 4px 2px rgba(255,255,255,0.5), 2px 2px 1px rgba(0,0,0,0.5);
+    text-align : center;
+}
+h1, h2, .H2, h3 {
+    color : white;
+    text-shadow : 0px 0px 5px rgba(255,255,102,0.8), 3px 3px 2px rgba(0,0,0,0.4);
+    font-family: 'PT Sans', sans-serif;
+    text-align : center;
+}
+h3 {
+    color : lime;
+}
+h3.pricing {
+    color : lightgreen;
+}
+
+#btnThemeSwitch {
+    margin : 1rem;
+}
+
+#btnLogin, #btnRegister {
+}
+
+.content {
+    text-align : center;
+}
+
+#shortened {
+    width : 100%;
+}
+.shortened {
+    display : none;
+}
+.to {
+    margin : 1rem;
+    padding : .5rem;
+    border : 1px solid black;
+    background : rgba(0,0,50,0.5);
+    border-radius : 5px;
+    text-align:center;
+}
+.to span {
+    font-weight : bold;
+    color : lime;
+}
+.to span.destinationAddress {
+    color : #CCC;
+}
+
+.displayedRedirected .info {
+    color : yellow;
+}
+.displayedRedirected {
+    margin : 1rem;
+    padding : .5rem;
+    border : 1px solid black;
+    background : rgba(0,0,50,0.5);
+    border-radius : 5px;
+}
+.displayedRedirected .label, .displayCount, .redirectionCount {
+    color : white;
+}
+.displayCounts, .redirectionCounts {
+    color : #DDD;
+}
+
+div.offers {
+    width : auto;
+    font-family: 'Karla', sans-serif;
+    color : rgba(0,204,255,1);
+    z-index : 1;
+}
+
+div.offer {
+    z-index:1500000;
+}
+
+div.offerBefore {
+    position:absolute;
+    z-index:-1;
+}    
+
+td.offer {
+    z-index : 3;
+}
+div.offer .buttonHolder, div.offerHover .buttonHolder {
+    text-align : center;
+    vertical-align : middle;
+}
+    
+div.offer, div.offer .buttonHolder {
+    min-width : 700px;
+    padding : 5px;
+    font-weight : bold;
+}
+div.offerHover {
+    min-width : 700px;
+    padding : 5px;
+    font-weight : bold;
+}
+
+button.pricing {
+    margin-bottom : 30px;
+}
+
+div.offerBefore {
+    margin-left : -10px;
+    width : calc(100% + 10px);
+}
+
+div.conditions span:nth-child(1) {
+    /*float : left;*/
+    display : table-cell;
+    width : 230px;
+    height : 2em;
+}
+div.conditions span:nth-child(2) {
+    /*float : right;*/
+    display : table-cell;
+    width : calc(100% - 230px);
+    height : 2em;
+}
+
+td.offer > div.offerBefore {
+    border : 1px solid rgba(0,0,0,0); 
+    box-shadow : inset -2px -2px 1px 1px rgba(0,0,0,0), inset 2px 2px 1px 1px rgba(0,0,0,0), 2px 2px 1px 1px rgba(0,0,0,0);
+}
+
+div.offerHover.anim > div.offerBefore {
+    background : url("cloth 001B.png") repeat;
+    color : black;
+    animation-name : anim_pricingBlock_toHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+    position:absolute;
+    z-index:-1;
+    border-radius : 15px;
+    /*padding-right : 30px;*/
+}
+div.offer.anim > div.offerBefore {
+    background : url("cloth 001B.png") repeat;
+    color : black;
+    animation-name : anim_pricingBlock_fromHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+    position:absolute;
+    z-index:-1;
+    border-radius : 15px;
+    /*padding-right : 30px;*/
+}
+@keyframes anim_pricingBlock_toHover {
+    from { opacity : 0; border : 1px solid rgba(0,0,0,0); 
+        box-shadow : inset -2px -2px 1px 1px rgba(0,0,0,0), inset 2px 2px 1px 1px rgba(0,0,0,0), 2px 2px 1px 1px rgba(0,0,0,0);
+    }
+    to { opacity : 1; border : 1px solid rgba(0,0,0,1); 
+        box-shadow : inset -2px -2px 1px 1px rgba(0,0,0,0.7), inset 2px 2px 1px 1px rgba(0,0,0,0.7), 2px 2px 1px 1px rgba(0,0,0,0.5);
+    }
+}
+@keyframes anim_pricingBlock_fromHover {
+    from { opacity : 1; border : 1px solid rgba(0,0,0,1);
+        box-shadow : inset -2px -2px 1px 1px rgba(0,0,0,0.7), inset 2px 2px 1px 1px rgba(0,0,0,0.7), 2px 2px 1px 1px rgba(0,0,0,0.5);
+    }
+    to { opacity : 0; border : 1px solid rgba(0,0,0,0); 
+        box-shadow : inset -2px -2px 1px 1px rgba(0,0,0,0), inset 2px 2px 1px 1px rgba(0,0,0,0), 2px 2px 1px 1px rgba(0,0,0,0);
+    }
+}
+
+table.content tr td:nth-child(2) {
+    color : rgba(0,225,255,1);
+}
+
+div.offerHover.anim div.conditions {
+    min-width : 700px;
+    width : auto;
+    font-family: 'Karla', sans-serif;
+    color : rgba(0,204,255,1);
+    animation-name : anim_pricingLeft_toHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}
+div.offer.anim div.conditions {
+    min-width : 700px;
+    width : auto;
+    font-family: 'Karla', sans-serif;
+    color : rgba(0,204,255,1);
+    animation-name : anim_pricingLeft_fromHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}
+@keyframes anim_pricingLeft_toHover {
+    from { color : rgba(0,204,255,1);  }
+    to { color : black;  }
+}
+@keyframes anim_pricingLeft_fromHover {
+    from { color : black; }
+    to { color : rgba(0,204,255,1); }
+}
+div.offerHover div.conditions span:nth-child(2), div.offer div.conditions span:nth-child(2) {
+    color : rgba(0,240,255,1);
+}
+div.offerHover div.conditions span, div.offer div.conditions span {
+    font-weight : bold;
+}
+div.offerHover.anim div.conditions span:nth-child(2) {
+    animation-name : anim_pricingRight_toHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}
+div.offer.anim div.conditions span:nth-child(2) {
+    animation-name : anim_pricingRight_fromHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}
+@keyframes anim_pricingRight_toHover {
+    from { color : rgba(0,240,255,1); }
+    to { color : black; }
+}
+@keyframes anim_pricingRight_fromHover {
+    from { color : black; }
+    to { color : rgba(0,240,255,1); }
+}
+
+.offerHover.anim h3.pricing {
+    animation-name : anim_pricingBottomLine_toHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}    
+.offer.anim h3.pricing {
+    animation-name : anim_pricingBottomLine_fromHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}    
+@keyframes anim_pricingBottomLine_toHover {
+    from { color : lightgreen; }
+    to { color : navy; }
+}
+@keyframes anim_pricingBottomLine_fromHover {
+    from { color : navy; }
+    to { color : lightgreen; }
+}
+
+.offerHover.anim div.offerTitle h3 {
+    animation-name : anim_pricingTitle_toHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}    
+.offer.anim div.offerTitle h3 {
+    animation-name : anim_pricingTitle_fromHover;
+    animation-duration : 2s;
+    animation-iteration-count : 1;
+    animation-direction : normal;
+    animation-timing-function : ease-in-out;
+    animation-fill-mode: forwards;
+}    
+@keyframes anim_pricingTitle_toHover {
+    from { color : lime; }
+    to { color : navy; }
+}
+@keyframes anim_pricingTitle_fromHover {
+    from { color : navy; }
+    to { color : lime; }
+}
+
+.pricingCategory {
+    font-size : 150%;
+}
+a {
+    color : rgba(0,240,255,1);
+}
+a:hover {
+    color : rgba(0,255,240,1);
+}  
+a:visited {
+    color : rgba(0,255,200,1);
+} 
+
+.siteMainTooltipsterTheme .tooltipster-box {
+    width : 120%;
+    border-radius : 7px;
+    border : 1px solid yellow;
+    box-shadow : 2px 2px 1px rgba(0,0,0,0.7), 0px 0px 7px rgba(50,255,50,0.7);
+    background : url('seamless_texture_of_ice.jpg') repeat;
+    opacity : 1;
+    color : black;
+}
+.siteMainTooltipsterTheme .tooltipster-content {
+    color : black;
+    font-family : Architects Daughter;
+    font-size : 15px;
+    padding : 8px 10px;
+   /* animation : siteMainTooltipsterThemeAnim 2s infinite;*/
+    border-radius : 7px;
+}
+/*
+@keyframes siteMainTooltipsterThemeAnim {
+    0% {
+        background : rgba(50,50,255,0)
+    }
+    50% {
+        background : rgba(50,50,255,0.33)
+    }
+    100% { 
+        background : rgba(50,50,255,0)
+    }
+}
+
+@keyframes siteMainTooltipsterThemeAnim2a {
+    0% {
+        border-bottom-color : rgba(255,255,255,0)
+    }
+    50% {
+        border-bottom-color : rgba(50,50,255,0.7)
+    }
+    100% { 
+        border-bottom-color : rgba(255,255,255,0)
+    }
+}
+@keyframes siteMainTooltipsterThemeAnim2b {
+    0% {
+        border-left-color : rgba(255,255,255,0)
+    }
+    50% {
+        border-left-color : rgba(50,50,255,0.7)
+    }
+    100% { 
+        border-left-color : rgba(255,255,255,0)
+    }
+}
+@keyframes siteMainTooltipsterThemeAnim2c {
+    0% {
+        border-right-color : rgba(255,255,255,0)
+    }
+    50% {
+        border-right-color : rgba(50,50,255,0.7)
+    }
+    100% { 
+        border-right-color : rgba(255,255,255,0)
+    }
+}
+@keyframes siteMainTooltipsterThemeAnim2d {
+    0% {
+        border-top-color : rgba(255,255,255,0)
+    }
+    50% {
+        border-top-color : rgba(50,50,255,0.7)
+    }
+    100% { 
+        border-top-color : rgba(255,255,255,0)
+    }
+}
+*/
+
+
+.siteMainTooltipsterTheme.tooltipster-sidetip .tooltipster-arrow-background {
+	/*border: 10px solid transparent;*/
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-bottom .tooltipster-arrow-background {
+	border-bottom-color: white;
+    /*animation : siteMainTooltipsterThemeAnim2a 2s infinite;*/
+	left: 0;
+	top: 3px;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-left .tooltipster-arrow-background {
+	border-left-color: white;
+    /*animation : siteMainTooltipsterThemeAnim2b 2s infinite;*/
+	left: -3px;
+	top: 0;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-right .tooltipster-arrow-background {
+	border-right-color: white;
+    /*animation : siteMainTooltipsterThemeAnim2c 2s infinite;*/
+	left: 3px;
+	top: 0;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-top .tooltipster-arrow-background {
+	border-top-color: white;
+    /*animation : siteMainTooltipsterThemeAnim2d 2s infinite;*/
+	left: 0;
+	top: -3px;
+}
+
+/* .tooltipster-arrow-border */
+
+.siteMainTooltipsterTheme.tooltipster-sidetip .tooltipster-arrow-border {
+	/*border: 10px solid transparent;*/
+	left: 0;
+	top: 0;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-bottom .tooltipster-arrow-border {
+	border-bottom-color: yellow;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-left .tooltipster-arrow-border {
+	border-left-color: yellow;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-right .tooltipster-arrow-border {
+	border-right-color: yellow;
+}
+
+.siteMainTooltipsterTheme.tooltipster-sidetip.tooltipster-top .tooltipster-arrow-border {
+	border-top-color: yellow;
+}
+
+button.login {
+    margin : 0.5rem;
+    border-radius : 8px;
+    line-height : 1rem;
+    font-size : 1rem;
+    font-weight : bold;
+	background-image: linear-gradient(-180deg, rgba(0,0,255,0.3) 0%, rgba(0,0,200,0.7) 100%);
+	box-shadow: 1rem 1rem 1.25rem 0 rgba(0,0,0,0.50),
+                0 -0.1rem 0.5rem rgba(0, 0, 80, 1) inset,
+				0 0.33rem 0.2rem rgba(255,255,255, 0.4) inset,
+				0 0.1rem 0.2rem 0 rgba(0, 0, 80, 1) inset;
+}
+button.login span {
+    color : white;
+}
+
+button.nav {
+    border-radius : 8px;
+    line-height : 1rem;
+    font-size : 1rem;
+    font-weight : bold;
+	background-image: linear-gradient(-180deg, rgba(252,161,3,0.7) 0%, rgba(252,194,3,0.35) 100%);
+	box-shadow: 1rem 1rem 1.25rem 0 rgba(0,0,0,0.50),
+                0 -0.1rem 0.5rem rgba(201, 128, 0, 1) inset,
+				0 0.33rem 0.2rem rgba(255,255,255, 0.4) inset,
+				0 0.1rem 0.2rem 0 rgba(201, 128, 0, 1) inset;
+}
+button.nav span {
+    color : cyan;
+}
+button.nav a {
+    text-decoration : none;
+}
+    
+
+button {
+	cursor: pointer;
+	position: relative;
+	padding: 1rem 1rem;
+    margin : 0.5rem;
+	border-radius: 1.75rem;
+	line-height: 1.75rem;
+	font-size: 1.5rem;
+	font-weight: 555;
+	
+	border: 1px solid #012880;
+    outline : 0;
+	background-image: linear-gradient(-180deg, #00FF00 0%, #00AA00 100%);
+	box-shadow: 1rem 1rem 1.25rem 0 rgba(0,0,0,0.50),
+							0 -0.25rem 1.5rem rgba(0, 80, 0, 1) inset,
+							0 0.75rem 0.5rem rgba(255,255,255, 0.4) inset,
+							0 0.25rem 0.5rem 0 rgba(0, 80, 0, 1) inset;
+}
+button span {
+	color: transparent;
+	background-image: linear-gradient(0deg, skyblue 25%, cyan 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	filter: drop-shadow(0 2px 2px hsla(290, 100%, 20%, 1));
+}
+/*
+button::before {
+	content: "";
+	display: block;
+	height: 0.35rem;
+	position: absolute;
+	top: 0.75rem;
+	left: 50%;
+	transform: translateX(-50%);
+	width: calc(100% - 2rem);
+	background: #fff;
+	border-radius: 100%;
+	
+	opacity: 0.35;
+    filter : blur(2px);
+	background-image: linear-gradient(-270deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0.3) 80%, rgba(255,255,255,0.00) 100%);
+}
+button:hover::before {
+    animation : anim_buttonWhiteLines 2s infinite;
+}*/
+button::after {
+	content: "";
+	display: block;
+	height: 0.25rem;
+	position: absolute;
+	bottom: 0.75rem;
+	left: 50%;
+	transform: translateX(-50%);
+	width: calc(100% - 2rem);
+	background: #fff;
+	border-radius: 100%;
+	
+	filter: blur(1px);
+	opacity: 0.5;
+	background-image: linear-gradient(-270deg, rgba(255,255,255,0.00) 0%, #FFFFFF 20%, #FFFFFF 80%, rgba(255,255,255,0.00) 100%);
+}
+button:hover::after {
+    animation : anim_buttonWhiteLines 1s infinite;
+}
+@keyframes anim_buttonWhiteLines {
+    0% {
+        opacity : 0.35;
+        filter : blur(2px);
+    }
+    50% {
+        opacity : 0.7;
+        filter : blur(0px);
+    }
+    100% {
+        opacity : 0.35;
+        filter : blur(2px);
+    }
+}

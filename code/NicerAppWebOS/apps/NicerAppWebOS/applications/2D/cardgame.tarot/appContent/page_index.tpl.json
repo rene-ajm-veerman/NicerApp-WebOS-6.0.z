@@ -1,0 +1,8 @@
+{  
+   "saObjectType":"saPageSettings",
+   "divs":{  
+     "#siteAds":{  
+		  "content":"{$SA_SITE_HD}/NicerAppWebOS/apps/NicerAppWebOS/app.2D.cardgame.tarot/appContent/tarotSite/content/ads/default.html"
+	   }
+   }
+}

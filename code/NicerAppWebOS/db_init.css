@@ -1,0 +1,53 @@
+.listDatabases_connectionSettings {
+    color : blue;
+    padding : 10px;
+}
+.dbConnectionType {
+    background : navy;
+    color : white;
+    padding : 5px;
+    margin : 5px;
+    border-radius : 5px;
+}
+.dbConnectionAddress {
+    background : navy;
+    color : yellow;
+    padding : 5px;
+    margin : 5px;
+    border-radius : 5px;
+}
+
+.dbTableName {
+    margin-left : 40px;
+    padding : 5px;
+}
+.dbOutsideJurisdictionOfThisCall {
+    color : grey;
+    padding : 3px;
+    border-radius : 5px;
+}
+.dbUnaffected {
+    color : green;
+    padding : 3px;
+    border-radius : 5px;
+}
+.dbToBeCreated {
+    color : lime;
+    background : navy;
+    padding : 3px;
+    border-radius : 5px;
+}
+.dbToBeDeleted {
+    color : yellow;
+    background : black;
+    padding : 3px;
+    border-radius : 5px;
+}
+.dbAffected {
+    color : yellow; /* yellow coz the table in question has data in it that's about to get deleted to re-initialize this table */
+    background : green;
+    padding : 3px;
+    border-radius : 5px;
+}
+
+

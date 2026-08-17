@@ -1,0 +1,123 @@
+        .naFilePath {
+            background : rgba(255,255,255,0.4);
+            color : black;
+            width : fit-content;
+            margin : 30px; border : 3px ridge (50,50,50,0.751);
+            padding : 10px;
+            border-radius : 10px;
+            font-size : large;
+            border : 3px ridge grey;
+        }
+        .naImgEvidence {
+            width : fit-content;
+        }
+        .naImgEvidence img {
+            width : 350px;
+        }
+
+        .naDiaryWebPage {
+            font-family : Montserrat, 'Roboto Condensed', sans-serif;
+            margin : 50px;
+            padding : 10px;
+            border-radius : 10px;
+            background : rgba(255,255,255,0.1);
+            width : fit-content;
+        }
+        .naDiaryWebPage > div > p, .naDiaryWebPage > p {
+            padding : 10px;
+            margin : 10px;
+            border-radius : 10px;
+            background : rgba(255,255,255,0.4);
+            color : black;
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.7), 3px 3px 6px 1px rgba(0,0,0,0.8);
+        }
+        .naDiaryDayHeader {
+            width : fit-content;
+            background : rgba(0,0,100,0.55);
+            color : white;
+            margin : 30px; border : 3px ridge (50,50,50,0.751);
+            padding : 10px;
+            border-radius : 10px;
+            font-size : large;
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.631), 3px 3px 5px 3px rgba(0,0,0,0.7);
+        }
+        .naDiaryDay {
+            width : fit-content;
+            padding : 10px;
+            margin-top : 14px;
+            margin-bottom : 14px;
+            background : rgba(255,255,255,0.4);
+            border-radius : 10px;
+            border : 3px ridge (50,50,50,0.751);
+        }
+        .naDiaryDayShifted {
+            width : fit-content;
+            margin-left : 30px;
+            border : 3px ridge (50,50,50,0.751);
+        }
+        .naDiaryDaySegmentHeader {
+            width : fit-content;
+            margin : 30px; border : 3px ridge (50,50,50,0.751);
+            padding : 10px;
+            border-radius : 10px;
+            background : rgba(0,0,255,0.55) !important;
+            color : ivory !important;
+            font-size : large;
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.31);
+        }
+        .naDiaryDaySegment {
+            width : fit-content;
+            font-size : large;
+            margin : 30px; border : 3px ridge (50,50,50,0.751);
+            margin-left : 50px;
+            margin-top : 14px;
+            margin-bottom : 14px;
+            padding : 10px;
+            border-radius : 10px;
+            background : rgba(255,255,255,0.4);
+            color : black;
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.631);
+        }
+        .naDiaryDaySegment li, .naDiaryEntry li {
+            width : fit-content;
+            font-size : large;
+            padding : 7px;
+            margin : 3px;
+            margin-top : 14px;
+            margin-bottom : 14px;
+            border-radius : 10px;
+            background : rgba(255,255,255,0.4);
+            box-shadow : 0px 0px 5px 2px rgba(0,0,0,0.631);
+            color : darkred;
+            text-shadow : 0px 0px 4px #050;
+            border : 3px ridge (50,50,50,0.751);
+        }
+        .naDiaryDaySegment p, .naDiaryDaySegment p:hover {
+            background : none;
+        }
+
+        .naDiaryEntryHeader {
+            width : fit-content;
+            background : rgba(220,220,220,0.4);
+            color : rgba(0,50,0,1);
+            font-size : large;
+            margin : 30px; border : 3px ridge (50,50,50,0.751);
+            margin-left : 0px;
+            padding : 10px;
+            border-radius : 10px;
+            border : 3px ridge (50,50,50,0.751);
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.631), 3px 3px 5px 3px rgba(0,0,0,0.7);
+        }
+        .naDiaryEntry {
+            width : fit-content;
+            font-size : large;
+            line-height:1.5em;
+            margin : 50px;
+            margin-left : 50px;
+            margin-top : 14px;
+            margin-bottom : 14px;
+            padding : 16px;
+            border-radius:15px;
+            border : 3px ridge (50,50,50,0.751);
+            box-shadow:0px 0px 5px 2px rgba(0,0,0,0.631), 4px 4px 15px 5px rgba(0,0,0,0.7);
+        }

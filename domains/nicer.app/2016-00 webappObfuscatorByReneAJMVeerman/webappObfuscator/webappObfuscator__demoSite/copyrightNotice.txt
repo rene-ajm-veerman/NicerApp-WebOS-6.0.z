@@ -1,0 +1,6 @@
+/*
+	Be sure to enter proper legal language into this file. Example at sources of http://seductiveapps.com
+	
+	and eh... GPL SUCKS. LGPL not so much.. but those are just 2 of my opinions...
+
+*/

@@ -1,0 +1,149 @@
+".btn_audioVideo_muteUnmute" : {
+    "selfAttrButtonClass" : "btn_audioVideo_muteUnmute",
+    "startupState" : "unmuted",
+    "selectedState" : "muted",
+    "circumstances" : {
+        "normal" : {
+            "layers" : {
+                ".roundIcon_background" : { 
+                    "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']",
+                    "animType" : "css : radial-gradient",
+                    "shape" : "circle",
+                    "position" : "center",
+                    "size" : "closest-side",
+                    "linear-color-stops" : [
+                            { "color" : "rgba(0,255,0,0.3)", "length" : [0, 92] },
+                            { "color" : "rgba(0,255,0,0.7)", "length" : [100, 100] }
+                    ]
+                }
+            }
+        },
+        "hover" : {
+            "layers" : {
+                ".roundIcon_background" : { 
+                    "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                    "animType" : "css : radial-gradient",
+                    "shape" : "circle",
+                    "position" : "center",
+                    "size" : "closest-side",
+                    "linear-color-stops" : [
+                            { "color" : "rgba(0,255,0,0.3)", "length" : [0, 0] },
+                            { "color" : "rgba(0,0,0,0.7)", "length" : [1, 100] }
+                    ]
+                }
+            }
+        }
+    },
+    "layers" : {
+        ".roundIcon_svg" : {
+            "layerID" : "b.theme.layers['.roundIcon_svg']",
+            "animType" : "svg",
+            "src" : "/NicerAppWebOS/logic.userInterface/naVividButton4/btn.audioVideo.muteUnmute.svg",
+            "startupCode" : "",
+            "css" : {},
+            "onclick" : ""
+        }
+    },
+    "states" : {
+        "unmuted" : {
+            "circumstances" : {
+                "normal" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']", 
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                },
+                "hover" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }                            
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "muted" : {
+            "circumstances" : {
+                "normal" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']", 
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                },
+                "hover" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }                            
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

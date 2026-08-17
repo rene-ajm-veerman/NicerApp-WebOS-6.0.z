@@ -1,0 +1,1 @@
+*/8 * * * * cd /var/www/nicer.app-5.10.z/domains/nicer.app/NicerAppWebOS/scripts.maintenance && ./venv/bin/python3 ./ollama.image-to-text.AI.py >> /var/www/nicer.app-5.10.z/domains/nicer.app/NicerAppWebOS/scripts.maintenance/ollama.image-to-text.AI.log 2>&1

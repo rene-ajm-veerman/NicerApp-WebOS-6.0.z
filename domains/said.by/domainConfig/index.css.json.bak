@@ -1,0 +1,9 @@
+[
+    "/NicerAppWebOS/3rd-party/jQuery/tooltipster/dist/css/tooltipster.bundle.css",
+    "/NicerAppWebOS/3rd-party/jQuery/spectrum/dist/spectrum.css",
+    "/NicerAppWebOS/3rd-party/tinymce-4/themes/charcoal/content.na.css",
+    "/NicerAppWebOS/3rd-party/tinymce-4/themes/charcoal/editor.na.css",
+    "/domainConfig/{$domain}/index.css",
+    "/domainConfig/{$domain}/index.dark.css",
+    "/NicerAppWebOS/errors.css"
+]

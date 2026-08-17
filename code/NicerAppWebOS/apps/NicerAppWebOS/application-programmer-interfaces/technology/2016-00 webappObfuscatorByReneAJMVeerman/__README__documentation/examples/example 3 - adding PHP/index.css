@@ -1,0 +1,63 @@
+.siteDiv {
+    position : absolute;
+    border : 1px solid navy;
+}
+
+
+/*
+ * CODE COMMENT (does not get processed or used by HTML or CSS)
+ * 
+*/
+
+/* --- LAYOUT */
+
+.siteHeaderFooter {
+    left : 2%;
+    width : 96%;
+    height : 5%;
+}
+
+#siteHeader { 
+    top : 2%;
+}
+
+.siteSidebar { 
+    top : 9%;
+    height : 80%; 
+}
+
+#siteLeftbar {
+    left : 2%;
+    width : 10%;
+}
+
+#siteRightbar {
+    right : 2%;
+    width : 10%;
+}
+
+#siteContent {
+    top : 9%;
+    height : 80%; 
+    left : 14%;
+    width : 72%;
+}
+
+#siteFooter {
+    bottom : 2%
+}
+
+
+/* --- COLORS and any other style settings */
+
+.siteHeaderFooter {
+    background : navy;
+}
+
+#siteHeader {
+    color : white;
+}
+
+#siteFooter {
+    color : yellow;
+}

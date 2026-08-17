@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+MIT License
+
+Copyright (c) 2025–2026 [Rene A.J.M. Veerman / rene.veerman.netherlands@gmail.com / nicer.app]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grid-based Desktop with Draggable & Resizable Windows</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .desktop-surface {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(to right,  rgba(80,90,110,0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(80,90,110,0.07) 1px, transparent 1px);
+      background-size: 5% 6.25%; /* visual grid — adjust freely */
+    }
+
+    .vividDialog {
+      position: absolute;
+      min-width:  280px;
+      min-height: 180px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      box-shadow: 0 20px 70px #000c, 0 4px 20px #0006;
+      overflow: hidden;
+      user-select: none;
+      resize: none; /* we handle resizing manually */
+    }
+
+    .vividDialog .titlebar {
+      height: 38px;
+      background: linear-gradient(#21262d, #161b22);
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: move;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .vividDialog .title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .vividDialog .content {
+      padding: 16px;
+      height: calc(100% - 38px);
+      overflow: auto;
+      background: #0d1117;
+    }
+
+    /* Visual feedback when interacting */
+    .vividDialog.is-dragging,
+    .vividDialog.is-resizing {
+      box-shadow: 0 30px 90px #000e, 0 8px 30px #0008;
+      z-index: 1000;
+    }
+
+    .vividDialog.is-resizing::after,
+    .vividDialog.is-dragging::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border: 2px solid #58a6ff;
+      border-radius: 11px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+
+    #auto-layout-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 2000;
+    padding: 12px 20px;
+    background: #238636;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: all 0.18s ease;
+    }
+
+    #auto-layout-btn:hover {
+    background: #2ea043;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    #auto-layout-btn:active {
+    transform: translateY(1px);
+    }
+
+    #close-all-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 180px;          /* adjust spacing from auto-layout button */
+    z-index: 2000;
+    padding: 12px 20px;
+    background: #c94a4a;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: all 0.18s ease;
+    }
+
+    #close-all-btn:hover {
+    background: #d95b5b;
+    transform: translateY(-2px);
+    }
+
+    #open-defaults-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 340px;          /* further left */
+    z-index: 2000;
+    padding: 12px 20px;
+    background: #0366d6;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: all 0.18s ease;
+    }
+
+    #open-defaults-btn:hover {
+    background: #1a75ff;
+    transform: translateY(-2px);
+    }
+
+#siteTaskbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  /* ... your existing styles ... */
+  z-index: 2000;
+}
+
+.desktop-surface {
+  position: relative;
+  width: 100vw;
+  height: calc(100vh - 56px);
+  margin-top: 56px;                /* below taskbar */
+  padding: 0;                      /* no extra padding here */
+  overflow: hidden;
+  /* your grid background etc. */
+}
+
+.vividDialog {
+  position: absolute;
+  box-sizing: border-box;
+  /* your other vividDialog styles */
+}
+
+    #siteTaskbar button {
+    padding: 8px 16px;
+    background: #30363d;
+    color: #c9d1d9;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    }
+
+    #siteTaskbar button:hover {
+    background: #444c56;
+    }
+
+    .gap-control {
+    margin-left: auto;          /* push to right side */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    }
+
+    .gap-control input[type="range"] {
+    width: 120px;
+    accent-color: #58a6ff;      /* slider color */
+    }
+
+    /* Adjust desktop area to start below taskbar */
+    .desktop-surface {
+    position: relative;
+    width: 100vw;
+    height: calc(100vh - 56px);   /* ← match #siteTaskbar height */
+    margin-top: 56px;             /* ← important: push content down */
+    overflow: hidden;
+    background: #0d1117;          /* or your grid background */
+    }
+
+    /* vividDialog – make sure they respect the new top offset */
+    .vividDialog {
+    position: absolute;
+    /* ... your existing styles ... */
+    min-width: 320px;
+    min-height: 240px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="siteTaskbar">
+  <button id="auto-layout-btn" title="Auto-arrange windows">🔄 Auto-layout</button>
+  <button id="close-all-btn" title="Close all open windows">🗑️ Close All</button>
+  <button id="open-defaults-btn" title="Open default set of windows">📂 Open Defaults</button>
+
+  <div class="gap-control">
+    Gap:
+    <input
+    type="range"
+    id="gap-slider"
+    min="0"
+    max="80"
+    value="32"
+    step="4"
+    oninput="updateGapAndRefresh(this.value)"
+    >
+    <span id="gap-value">32 px</span>
+  </div>
+</div>
+
+<div class="desktop-surface" id="desktop"></div>
+
+<script>
+// Configurable settings
+const CONFIG = {
+  autoLayoutGapPx: 32,          // ← change this number (pixels between windows)
+  autoLayoutMarginPx: 40,       // outer margin from browser edges
+  minWindowWidthCells: 6,       // safety minimum in grid cells
+  minWindowHeightCells: 5
+};
+
+// Human-readable initial / auto-layout template
+// Units are "grid cells" (not pixels)
+// Each entry = { name, col, row, widthInCells, heightInCells }
+const INITIAL_WINDOW_LAYOUT = [
+  { name: "siteToolbarThemeEditor",   col: 1, row: 1, width: 1, height: 7 },
+  { name: "siteToolbarLeft",          col: 2, row: 1, width: 1, height: 7 },
+  { name: "siteToolbarTop",           col: 3, row: 1, width: 4, height: 1 },
+  { name: "siteContent",              col: 3, row: 2, width: 4, height: 4 },
+  { name: "siteToolbarRight",         col: 5, row: 1, width: 1, height: 7 },
+  { name: "siteComments",             col: 6, row: 1, width: 1, height: 7 },
+  { name: "siteToolbarBottom",        col: 3, row: 7, width: 4, height: 1 },
+  { name: "siteTaskbar",              col: 1, row: 8, width: 8, height: 1 }
+];
+
+
+// ────────────────────────────────────────────────
+// Data Model & Manager
+// ────────────────────────────────────────────────
+
+class DesktopManager {
+  constructor(options = {}) {
+    this.storageKey = options.storageKey || "my-desktop-state";
+    this.gridCellWidth  = options.gridCellWidth  || 90;
+    this.gridCellHeight = options.gridCellHeight || 70;
+
+    this.root = this._createDefaultRoot();
+  }
+
+  _createDefaultRoot() {
+    return {
+      id: "desktop-root",
+      type: "folder",
+      name: "Desktop",
+      children: []
+    };
+  }
+
+  createWindow(title, x = 140, y = 100, width = 640, height = 480) {
+    return {
+      id: crypto.randomUUID?.() || Date.now() + "-" + Math.random().toString(36).slice(2),
+      type: "window",
+      name: title,
+      x, y, width, height,
+      minimized: false,
+      maximized: false,
+      closed: false
+    };
+  }
+
+  load() {
+    try {
+      const json = localStorage.getItem(this.storageKey);
+      if (json) {
+        this.root = JSON.parse(json);
+        if (this.root.id !== "desktop-root") throw new Error("Invalid root");
+      }
+    } catch (err) {
+      console.warn("Load failed → using default", err);
+      this.root = this._createDefaultRoot();
+    }
+  }
+
+  save() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.root, null, 2));
+    } catch (err) {
+      console.warn("Save failed", err);
+    }
+  }
+
+  findNode(id, node = this.root) {
+    if (node.id === id) return node;
+    if (node.children) {
+      for (const child of node.children) {
+        const found = this.findNode(id, child);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  addWindow(title) {
+    const win = this.createWindow(title);
+    this.root.children.push(win);
+    this.save();
+    return win;
+  }
+}
+
+// ────────────────────────────────────────────────
+// Drag + Resize with grid snap
+// ────────────────────────────────────────────────
+
+function makeDraggableResizable(el, { gridCellWidth, gridCellHeight, onEnd }) {
+  let isDragging = false;
+  let isResizing = false;
+  let startX, startY, startLeft, startTop, startWidth, startHeight;
+  let resizeDir = '';
+
+  const titlebar = el.querySelector('.titlebar');
+
+  // Titlebar → move
+  titlebar?.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    startDrag(e, false);
+  });
+
+  // Edges/corners → resize
+  el.addEventListener('mousedown', e => {
+    if (e.target.closest('.titlebar')) return;
+
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const edge = 10;
+
+    resizeDir = '';
+    if      (y < edge)               resizeDir += 'n';
+    else if (y > rect.height - edge) resizeDir += 's';
+    if      (x < edge)               resizeDir += 'w';
+    else if (x > rect.width - edge)  resizeDir += 'e';
+
+    if (resizeDir) {
+      e.preventDefault();
+      startDrag(e, true);
+    }
+  });
+
+  function startDrag(e, resizing) {
+    isDragging = !resizing;
+    isResizing = resizing;
+
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft   = el.offsetLeft;
+    startTop    = el.offsetTop;
+    startWidth  = el.offsetWidth;
+    startHeight = el.offsetHeight;
+
+    el.classList.add(resizing ? 'is-resizing' : 'is-dragging');
+
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('mouseup',   onUp);
+  }
+
+  function onMove(e) {
+    e.preventDefault();
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (isDragging) {
+      el.style.left = (startLeft + dx) + 'px';
+      el.style.top  = (startTop  + dy) + 'px';
+    }
+    else if (isResizing) {
+      let l = startLeft;
+      let t = startTop;
+      let w = startWidth;
+      let h = startHeight;
+
+      if (resizeDir.includes('e')) w += dx;
+      if (resizeDir.includes('s')) h += dy;
+      if (resizeDir.includes('w')) { l += dx; w -= dx; }
+      if (resizeDir.includes('n')) { t += dy; h -= dy; }
+
+      w = Math.max(280, w);
+      h = Math.max(180, h);
+
+      el.style.left   = l + 'px';
+      el.style.top    = t + 'px';
+      el.style.width  = w + 'px';
+      el.style.height = h + 'px';
+    }
+  }
+
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+
+    // Snap to grid
+    const rect = el.getBoundingClientRect();
+    const col = Math.round(rect.left   / gridCellWidth);
+    const row = Math.round(rect.top    / gridCellHeight);
+    const cw  = Math.max(3, Math.round(rect.width  / gridCellWidth));  // min ~3 cells
+    const rh  = Math.max(3, Math.round(rect.height / gridCellHeight));
+
+    const snappedLeft   = col * gridCellWidth;
+    const snappedTop    = row * gridCellHeight;
+    const snappedWidth  = cw  * gridCellWidth;
+    const snappedHeight = rh  * gridCellHeight;
+
+    el.style.left   = snappedLeft   + 'px';
+    el.style.top    = snappedTop    + 'px';
+    el.style.width  = snappedWidth  + 'px';
+    el.style.height = snappedHeight + 'px';
+
+    el.classList.remove('is-dragging', 'is-resizing');
+
+    onEnd?.({
+      id: el.dataset.id,
+      x: snappedLeft,
+      y: snappedTop,
+      width: snappedWidth,
+      height: snappedHeight
+    });
+
+    isDragging = isResizing = false;
+    resizeDir = '';
+  }
+}
+
+
+// ────────────────────────────────────────────────
+// Render windows from model
+// ────────────────────────────────────────────────
+
+function renderWindows(dm) {
+  const surface = document.getElementById('desktop');
+  surface.innerHTML = ''; // clear & re-render (simple approach)
+    let count = 0;
+
+  function renderNode(node) {
+    if (node.type === 'window' && !node.closed) {
+      const div = document.createElement('div');
+      div.className = 'vividDialog';
+      div.dataset.id = node.id;
+
+      div.style.left   = node.x + 'px';
+      div.style.top    = node.y + 'px';
+      div.style.width  = node.width  + 'px';
+      div.style.height = node.height + 'px';
+
+      div.innerHTML = `
+        <div class="titlebar">
+          <div class="title">${node.name || 'Window'}</div>
+        </div>
+        <div class="content">
+          <p>This is window <strong>${node.name}</strong></p>
+          <p>id: ${node.id}</p>
+          <p>Drag titlebar • Resize from edges</p>
+        </div>
+      `;
+      count++
+      console.log(`Appended window #${count}: ${node.name} id=${node.id}`);
+
+      surface.appendChild(div);
+
+      makeDraggableResizable(div, {
+        gridCellWidth:  dm.gridCellWidth,
+        gridCellHeight: dm.gridCellHeight,
+        onEnd(data) {
+          const win = dm.findNode(data.id);
+          if (win) {
+            win.x      = data.x;
+            win.y      = data.y;
+            win.width  = data.width;
+            win.height = data.height;
+            dm.save();
+          }
+        }
+      });
+    }
+
+    if (node.children) {
+      node.children.forEach(renderNode);
+    }
+  }
+
+  renderNode(dm.root);
+  console.log(`Total appended: ${count}`);
+}
+
+// Auto-layout: simple cascading / tiled arrangement
+function autoLayoutWindows() {
+  const windows = dm.root.children.filter(n => n.type === 'window' && !n.closed);
+  if (windows.length === 0) return;
+
+  const surface = document.getElementById('desktop');
+  const surfaceRect = surface.getBoundingClientRect();
+
+
+  // Configurable – feel free to tweak
+  const margin    = 40;
+  const cellWidth  = dm.gridCellWidth  * 6;   // ~6 grid cells wide
+  const cellHeight = dm.gridCellHeight * 5;   // ~5 grid cells tall
+  const cols = Math.floor((surfaceRect.width - margin*2) / (cellWidth + margin));
+
+  let col = 0;
+  let row = 0;
+
+  windows.forEach((win, index) => {
+    // Cascade / tile
+    const x = margin + col * (cellWidth + margin);
+    const y = margin + row * (cellHeight + margin);
+
+    win.x      = x;
+    win.y      = y;
+    win.width  = cellWidth;
+    win.height = cellHeight;
+
+    // Optional: bring to front by increasing z-index (add z to model if needed)
+    // win.z = index + 10;
+
+    col++;
+    if (col >= cols) {
+      col = 0;
+      row++;
+    }
+  });
+
+  dm.save();
+  renderWindows(dm);  // re-render with new positions/sizes
+}
+
+function applyLayoutTemplate(template) {
+  const surface = document.getElementById('desktop');
+  if (!surface) return;
+
+  const rect = surface.getBoundingClientRect();
+
+  const taskbarHeight = 56;                           // must match CSS height
+  const outerGap = CONFIG.autoLayoutGapPx || 32;      // same value used everywhere
+
+  // Available space after uniform outerGap on all four sides
+  // (top is already handled by margin-top on .desktop-surface)
+  const availW = rect.width + outerGap;//  - outerGap * 2;
+  const availH = rect.height - outerGap * 2;
+
+  // Discover the grid size from template
+  let maxCol = 0;
+  let maxRow = 0;
+  template.forEach(spec => {
+    maxCol = Math.max(maxCol, spec.col + spec.width - 1);
+    maxRow = Math.max(maxRow, spec.row + spec.height - 1);
+  });
+  const gridCols = maxCol + 1;
+  const gridRows = maxRow + 1;
+
+  // Calculate cell size so gaps are exactly outerGap between windows
+  const totalHorizontalGaps = (gridCols - 1) * outerGap;
+  const totalVerticalGaps   = (gridRows - 1) * outerGap;
+
+  const cellWidth  = (availW - totalHorizontalGaps) / gridCols;
+  const cellHeight = (availH - totalVerticalGaps)   / gridRows;
+
+// Updated snippet for cellWidth:
+//const totalHorizontalGaps = (gridCols + 1) * outerGap;
+const remaining = availW - totalHorizontalGaps;
+//const cellWidth = Math.floor(remaining / gridCols);   // integer pixels
+
+// Keep the rest (positions, sizes, clamping) exactly as before
+
+  template.forEach((spec, index) => {
+    let win = dm.root.children.find(w =>
+      w.type === 'window' &&
+      !w.closed &&
+      w.name === spec.name
+    );
+
+    if (!win) {
+      win = dm.createWindow(spec.name);
+      dm.root.children.push(win);
+    }
+
+    // Position: outerGap from left/top + grid offsets
+    win.x = outerGap + (spec.col) * (cellWidth + outerGap);
+    win.y = outerGap + (spec.row - 1) * (cellHeight + outerGap);
+
+    // Size: span cells + include internal gaps if multi-cell span
+    win.width  = spec.width  * cellWidth  + (spec.width  - 1) * outerGap;
+    win.height = spec.height * cellHeight + (spec.height - 1) * outerGap;
+
+    // Enforce minimum usable size
+    //win.width  = Math.max(320, win.width);
+    //win.height = Math.max(240, win.height);
+
+    // Safety clamp: keep fully inside the padded area
+    //win.x = Math.max(outerGap, Math.min(rect.width - win.width - outerGap, win.x));
+    //win.y = Math.max(outerGap, Math.min(rect.height - win.height - outerGap, win.y));
+
+    win.z = 10 + index;
+  });
+
+  dm.save();
+  // renderWindows(dm) is called by the button / resize / slider handlers
+}
+
+function updateGapAndRefresh(newValue) {
+  CONFIG.autoLayoutGapPx = Number(newValue);
+  document.getElementById('gap-value').textContent = newValue + ' px';
+
+  // Immediately re-apply layout if we have windows from the default template
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT);
+  renderWindows(dm);
+}
+
+// Wire up the button
+document.getElementById('auto-layout-btn').addEventListener('click', autoLayoutWindows);
+
+// ────────────────────────────────────────────────
+// Init
+// ────────────────────────────────────────────────
+
+const dm = new DesktopManager({
+  gridCellWidth:  90,
+  gridCellHeight: 70
+});
+
+dm.load();
+
+// If no windows exist yet → apply initial layout
+const hasWindows = dm.root.children.some(n => n.type === 'window' && !n.closed);
+if (!hasWindows) {
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT, true);
+}
+
+renderWindows(dm);
+
+function autoLayoutWindows() {
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT, true);
+  renderWindows(dm);
+}
+
+// Wire up the button (unchanged)
+document.getElementById('auto-layout-btn').addEventListener('click', autoLayoutWindows);
+
+// Close all windows (marks them closed, keeps in model)
+function closeAllWindows() {
+  dm.root.children.forEach(node => {
+    if (node.type === 'window') {
+      node.closed = true;
+    }
+  });
+  dm.save();
+  renderWindows(dm);  // removes them from view
+}
+
+// Open / restore default layout (creates missing ones, repositions existing)
+function openDefaultWindows() {
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT, true);  // with gaps
+  renderWindows(dm);
+}
+
+// Event listeners
+document.getElementById('close-all-btn')?.addEventListener('click', closeAllWindows);
+document.getElementById('open-defaults-btn').addEventListener('click', () => {
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT, true);
+  renderWindows(dm);
+});
+document.getElementById('open-defaults-btn').addEventListener('click', () => {
+  console.log("Open Defaults clicked!");
+  console.log("Before apply:", dm.root.children.filter(w => w.type === 'window' && !w.closed).length);
+  applyLayoutTemplate(INITIAL_WINDOW_LAYOUT, true);
+  console.log("After apply:", dm.root.children.filter(w => w.type === 'window' && !w.closed).length);
+  renderWindows(dm);
+  console.log("Render called");
+});
+// Quick way to add test windows
+setTimeout(() => {
+  if (dm.root.children.length === 0) {
+    dm.addWindow("Document 1");
+    dm.addWindow("Image Viewer");
+    dm.addWindow("Terminal");
+    renderWindows(dm);
+  }
+}, 300);
+
+// Optional: add new window on double-click (example)
+document.addEventListener('dblclick', e => {
+  if (e.target === document.getElementById('desktop')) {
+    const win = dm.addWindow(`New Window ${dm.root.children.length + 1}`);
+    renderWindows(dm);
+  }
+});
+
+// Pure JS version with debounce
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+window.addEventListener('resize', debounce(() => {
+  const hasDefaultWindows = dm.root.children.some(w =>
+    w.type === 'window' && !w.closed && INITIAL_WINDOW_LAYOUT.some(s => s.name === w.name)
+  );
+
+  if (hasDefaultWindows) {
+    console.log("Window resized → re-applying layout");
+    applyLayoutTemplate(INITIAL_WINDOW_LAYOUT);
+    renderWindows(dm);
+  }
+}, 250));
+
+</script>
+</body>
+</html>

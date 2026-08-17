@@ -1,0 +1,19 @@
+#tabsDemo {
+	height : 350px;
+}
+
+.vividTabs .vividTheme__trees_001 {
+	top : 7px;
+}
+
+.vividTheme__trees_001 td {
+	color : yellow;
+	font-size : 14px;
+	font-weight : bold;
+}
+
+.vividTheme__wood_001 .tabPage {
+	height : 100%;
+	color : white;
+	font-weight:bold;
+}

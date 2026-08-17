@@ -1,0 +1,1 @@
+"convert.exe" "C:\data1A\htdocs\localhost\__obfuscate_thisWebsite__pw-cidjEhsl2_492/artwork/1288.jpg" -resize 200x200 "C:\data1A\htdocs\localhost\__obfuscate_thisWebsite__pw-cidjEhsl2_492/artwork/lowres/1288.jpg"

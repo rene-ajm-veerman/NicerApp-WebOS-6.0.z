@@ -1,0 +1,13 @@
+{
+    "databases" : {
+        "couchdb" : {
+            "host" : "127.0.0.1",
+            "port" : "5984",
+            "useSSL" : false,
+            "httpAdapter" : "HTTP_CURL",
+            "dbName" : "analytics",
+            "username" : "said_by___Guest",
+            "password" : "Guest"
+        }
+    }
+}

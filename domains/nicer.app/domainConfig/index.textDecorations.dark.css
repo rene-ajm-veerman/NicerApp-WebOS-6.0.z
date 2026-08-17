@@ -1,0 +1,348 @@
+body, p { color : white; }
+blockquote, div > span:not(.newsApp__item__date, .newsApp__item__copy), p > span, li > span, div > p:(.backdropped) {
+  background : rgba(0,0,0,0.45) !important;
+}
+
+li {
+  margin-block-start : 20px;
+  margin-block-end : 20px;
+}
+li > div {
+  display : inline-block;
+  padding : 10px;
+  border-radius : 8px;
+  line-height : 1.5em;
+}
+a.backdropped {
+  padding : 5px;
+  margin : 5px;
+  border-radius : 20px;
+  vertical-align : inherit;
+  line-height : calc(1em + 10px);
+  display : inline-block;
+  text-wrap : nowrap;
+}
+a {
+  color : skyblue;
+}
+a:visited { color : rgba(100,250,100,1); }
+a:hover { color: #0095DD; pointer-events: all;}
+a.contentSectionTitle3_a {
+  justify-content : left;
+  align-items : center;
+  width : fit-content;
+  padding : 5px;
+  border-radius : 20px;
+}
+h1, h2, h3, h4, h5, h6, h7, h8, h9, h10 {
+  margin-block-start : 14px;
+  margin-block-end : 20px !important;
+  padding-block-start : 10px;
+  padding-block-end : 10px;
+  justify-content : left;
+  align-items : center;
+  display : block;
+  width : fit-content;
+  background : rgba(0,0,0,0.4);
+  margin : 14px;
+  padding : 10px;
+  border-radius : 20px;
+  box-shadow : 0px 0px 3px 1px rgba(0,0,0,0.7), 3px 3px 5px 2px rgba(0,0,0,0.8);
+  text-shadow : 2px 2px 3px rgba(0,0,0,0.93);
+  border : 1px solid rgba(100,100,100,0.66);
+}
+li:not(.jstree-node), span:is(.backdropped), p:is(.backdropped) {
+  width : fit-content;
+  border : 1px solid rgba(100,100,100,0.66);
+  background : rgba(0,0,0,0.555);
+  margin : 14px;
+  padding : 6px;
+  border-radius : 20px;
+  box-shadow : 0px 0px 3px 1px rgba(0,0,0,0.7), 3px 3px 5px 2px rgba(0,0,0,0.8);
+}
+
+
+/* doesn't work :
+li:not(.jstree-node)::marker {
+  border : 1px solid yellow;
+  background : rgba(0,0,100,0.555);
+  color:lime;
+  width:2rem;
+  height:2rem;
+  margin : 14px;
+  padding : 6px;
+  border-radius : 20px;
+  box-shadow : 0px 0px 3px 1px rgba(0,0,0,0.7), 3px 3px 5px 2px rgba(0,0,0,0.8);
+}
+*/
+/* does work : */
+ol.todoList {
+  list-style: none;
+  counter-reset: my-awesome-counter;
+  display:grid;
+  grid-auto-columns:max-content;
+}
+li.todoList {
+  counter-increment: my-awesome-counter;
+  margin: 0.25rem;
+}
+li.todoList::before {
+  border : 1px solid yellow;
+  content: counter(my-awesome-counter);
+  background : rgba(0,0,100,0.555);
+  box-shadow : 0px 0px 3px 1px rgba(0,0,0,0.7), 3px 3px 5px 2px rgba(0,0,0,0.8);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  margin : 14px;
+  padding : 6px;
+  display: inline-block;
+  line-height: 2rem;
+  color: white;
+  text-align: center;
+  margin-right: 0.5rem;
+}
+
+
+
+
+
+h3, h2 {
+  margin-left : 30px;
+}
+h3 a, h2 a {
+  margin : 5px;
+  color : yellow;
+  text-shadow : 0 0 8px black, 0 0 4px yellow, 2px 2px 3px black;
+}
+h3 a:hover, h2 a:hover {
+  margin : 5px;
+  color : white;
+  text-shadow : 0 0 8px black, 0 0 4px yellow, 2px 2px 3px black;
+}
+h3 a:visited, h2 a:visited {
+  margin : 5px;
+  color : yellow;
+  text-shadow : 0 0 8px black, 0 0 4px yellow, 2px 2px 3px black;
+}
+
+
+.contentSectionTitle1_span, .animatedText_orangeYellow, .naPageTitle { color : yellow; }
+
+h2.contentSectionTitle2 {
+  justify-content : left; align-items : center; width : fit-content; padding : 8px;
+  border-radius : 8px;
+  margin-block-start : 0;
+  margin-block-end : 10px;
+  margin-inline-start : 0;
+  margin-inline-end : 0;
+}
+.contentSectionTitle2_span, .animatedText_blue, .naExternalLink { color : #0077FF; }
+
+h3.contentSectionTitle3 {
+  justify-content : left; align-items : center; width:fit-content; padding : 8px;
+  border-radius : 8px;
+  margin-block-start : 0;
+  margin-block-end : 10px;
+  margin-inline-start : 0;
+  margin-inline-end : 0;
+}
+.contentSectionTitle3_span, .animatedText_green, .naInternalLink { color : #00FF77; }
+
+.vividButton a, .vividButton.selected a, .vividButtonSelected a {
+  color : lime;
+  text-decoration : none;
+}
+
+
+/*-- BEGIN /wiki/.*/
+.mw-parser-output p { color : yellow !important;}
+.mw-parser-output span { color : lime !important;}
+.vector-toc-text span { color : lime !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.751); font-weight:bold; background : none !important; box-shadow: none !important; }
+#siteSub { color : white !important; }
+.vector-menu-content a {
+  background: none !important;
+}
+.vector-header-start a {
+  background: none !important;
+}
+.mw-content-text h1, .mw-content-text h2, .mw-content-text h3, .mw-body h1, .mw-body h2 {
+  padding : 8px;
+  margin : 8px;
+  border-radius : 10px;
+}
+.mw-body p {
+  padding : 8px !important;
+}
+.vector-page-titlebar::after  {
+  background : none !important;
+}
+.vector-page-toolbar-container {
+  box-shadow : none !important;
+}
+/*-- END /wiki/.*/
+
+/*
+@keyframes move-bg {
+  to {
+    background-position: var(--bg-size) 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .boujee-text {
+    animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  }
+  @keyframes move-bg {
+    to {
+      background-position: var(--bg-size) 0;
+    }
+  }
+}
+.contentSectionTitle1_span, .animatedText_orangeYellow, .naPageTitle {
+  --bg-size: 400%;
+  --color-one-orangeYellow: orange;
+  --color-two-orangeYellow: yellow;
+  background: linear-gradient(
+                315deg,
+                var(--color-one-orangeYellow),
+                var(--color-two-orangeYellow),
+                var(--color-one-orangeYellow)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 3px 3px 2px rgba(0,0,0,0.4), 0px 0px 3px rgba(255,255,255,0.35);
+  font-weight : bold;
+  position : relative;
+}
+.contentSectionTitle2_span, .animatedText_blue, .naExternalLink {
+  --bg-size: 400%;
+  --color-one-blue: #005070;
+  --color-two-blue: #0077FF;
+  background: linear-gradient(
+                315deg,
+                var(--color-one-blue),
+                var(--color-two-blue),
+                var(--color-one-blue)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 0px 0px 2px rgba(255,255,255,0.3), 3px 3px 2px rgba(0,0,0,0.5);
+  position : relative;
+}
+.contentSectionTitle3_span, .animatedText_green, .naInternalLink {
+  --bg-size: 400%;
+  --color-one-green: #007050;
+  --color-two-green: #00FF77;
+  background: linear-gradient(
+                315deg,
+                var(--color-one-green),
+                var(--color-two-green),
+                var(--color-one-green)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 0px 0px 3px rgba(255,255,255,0.4), 3px 3px 3px rgba(0,0,0,0.8);
+  position : relative;
+}
+
+.contentSectionTitle3_a {
+  text-decoration : none;
+}
+.contentSectionTitle3_a h3 {
+    color : transparent;
+}
+.contentSectionTitle3_a span {
+  --bg-size: 400%;
+  --color-n-lime : lime;
+  --color-np1-cyan : cyan;
+  background: linear-gradient(
+                135deg,
+                var(--color-n-lime),
+                var(--color-np1-cyan),
+                var(--color-n-lime)
+              ) 0 0 / var(--bg-size) 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: move-bg 5s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 2px 2px 2px rgba(0,0,0,0.55);
+  position : relative;
+}
+.contentSectionTitle3_a:visited span {
+  --bg-size: 400%;
+  --color-one-grey : #BBB;
+  --color-two-white : #FFFFFF;
+  background: linear-gradient(
+                315deg,
+                var(--color-one-grey),
+                var(--color-two-white),
+                var(--color-one-grey)
+              ) 0 0 / var(--bg-size) 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: move-bg 5s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 2px 2px 2px rgba(0,0,0,0.55);
+  position : relative;
+}
+.contentSectionTitle3_a:hover span {
+  --bg-size: 400%;
+  --color-one-lime : lime;
+  --color-two-yellow : yellow;
+  background: linear-gradient(
+                90deg,
+                var(--color-one-lime),
+                var(--color-two-yellow),
+                var(--color-one-lime)
+              ) 0 0 / var(--bg-size) 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: move-bg 5s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 2px 2px 2px rgba(0,0,0,0.55);
+  position : relative;
+}
+
+
+
+.contentSection1_span, .animatedText_ivory, .naText {
+  --bg-size: 400%;
+  --color-one-ivory: ivory;
+  --color-two-ivory: pink;
+  background: linear-gradient(
+                315deg,
+                var(--color-one-ivory),
+                var(--color-two-ivory),
+                var(--color-one-ivory)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 0px 0px 3px rgba(255,255,255,0.4), 3px 3px 3px rgba(0,0,0,0.8);
+  position : relative;
+}
+*/
+
+.preDirsList {
+  color : lime;
+  background : rgba(0,0,78,0.555);
+  border-radius : 5px;
+  margin : 5px;
+  padding : 5px;
+}
+.preFilesList {
+  color : white;
+  background : rgba(0,0,250,0.555);
+  border-radius : 5px;
+  margin : 5px;
+  padding : 5px;
+}
+
+

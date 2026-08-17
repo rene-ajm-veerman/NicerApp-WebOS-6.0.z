@@ -1,0 +1,65 @@
+https://www.facebook.com/ReneVeermanSeductiveApps/posts/2023661574566552
+
+hey facebook staff and managers {same goes for all other social media and forum software builders}!
+i have 3 ideas for you for free.
+i give these ideas and code ( https://github.com/seductiveapps/seductiveapps/tree/master/seductiveapps/ui/comments ) away for free because i need (for business reasons) facebook and google plus to be able to evolve in a direction i highly appreciate and can thus stay business partners with.
+
+
+idea 1 :
+
+how about you allow people to specify a 
+&fromDateTime= and &toDateTime= 
+or
+&fromLocalDateTime= and &toLocalDateTime=
+
+let's take https://www.w3schools.com/js/js_date_formats.asp as the formats to support please.
+
+combined with
+&order=lastFirst (the currently default newest-at-the-top facebook feature) or &order=lastLast (oldest at the top, flowing downward)
+
+on someone's profile facebook website address,
+
+that way, someone could share links of everything that happened on a person's timeline and which hasn't been hidden / deleted yet,
+even the person him/her-self could do this.
+
+tell your manager-psychologists team i think this is a very good idea to do soon on platforms like facebook (i believe google plus could use this too, as would a lot of other social media and forum platforms).
+
+idea 2 :
+list local time for sender, and local time for receiver in all facebook timestamp displays in the browser.
+right now it just says 'N minutes ago', '2d ago', we users of fb need this to be a lot more accurate.
+
+as soon as i have my desktop PC back in working order (hopefully within a week), i will make it my first priority to re-enable the comments engine using tinyMCE-3 from tinymce.moxiecode.com
+
+it has all this timestamp display code necessary. i'm hereby donating it.
+you also already strip it out of https://github.com/seductiveapps/seductiveapps/tree/master/seductiveapps/ui/comments
+
+idea 3 :
+i would really like facebook to make my posts available for crawling + caching.
+we need something that gives us the raw post's Edit-Post-button+interface content-data based on a simple facebook.com url that we can crawl.
+
+i really think this will lead to more business for facebook, especially if you start supplying the data in well-described JSON[1] and add things like ads (of all sorts, banner-ads vertical and horizontal, square ads, video ads of the same dimensional varieties) and in the future perhaps even links to other facebook content that matchs with what is said in the comment that you now have the code for.
+
+note : i am still working on a way to store huge amounts of JSON data in just the right textfiles of the right size. the key here is to make a simple JSON query string format that gets parsed and executed on a JSON datastructure (including searching the data of course, which makes the query string format *not* easy to build, and thus delayed).
+but the fact is even an HTML comment does not take up much space.
+and the non-HTML comment data can be stored in a parallel JSON file.
+one. per. day. or per hour. or per 10 minutes in the case of large live views. :)
+
+[1] 
+{ "about1" : "// what this JSON is about" }
+{ "about2" : "# what this JSON is about" }
+{ "=fb_internalSetting" : "someValue" }
+{ "=require_1" : ".../path/to/file.json" }
+{ "=require_2" : "/path/to/file.json" }
+{ "=include_001" : ".../path/to/file.json" }
+{ "=include_002" : "path/to/file.json" }
+{ "string1" : "text data or HTML or XML, or CSS, or whatever can be described in ASCII or in escaped-UNICODE ( see https://github.com/seductiveapps/seductiveapps/blob/master/seductiveapps/ui/jsonViewer/build.up.testdata.php )" }
+{ "number1" : 1 }
+{ "floatingPointNumber" : 1.0123456789 }
+{ "booleanTrue" : true }
+{ "booleanFalse" : false }
+
+require and include will work like require() and include() do in PHP.
+
+see also 
+https://jsonformatter.curiousconcept.com/
+https://www.w3schools.com/js/js_json_objects.asp

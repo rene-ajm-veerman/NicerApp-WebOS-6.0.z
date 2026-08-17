@@ -1,0 +1,113 @@
+PHP Warning:  Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 123
+
+Warning: Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 123
+PHP Warning:  Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 391
+PHP Warning:  Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 395
+PHP Warning:  Undefined array key "HTTP_USER_AGENT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 396
+PHP Warning:  Undefined array key "SERVER_SIGNATURE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 397
+PHP Warning:  Undefined array key "SERVER_SOFTWARE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 398
+PHP Warning:  Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 399
+PHP Warning:  Undefined array key "SERVER_ADDR" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 400
+PHP Warning:  Undefined array key "SERVER_PORT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 401
+PHP Warning:  Undefined array key "SERVER_PROTOCOL" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 402
+PHP Warning:  Undefined array key "GATEWAY_INTERFACE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 403
+\033[42;1;4m/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news/crontabEntry_manageDatabase.php : Fetching news for 585 RSS pages, 76 menu-items.\033[37;49m
+
+PHP Warning:  Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 123
+PHP Warning:  Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 391
+PHP Warning:  Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 395
+PHP Warning:  Undefined array key "HTTP_USER_AGENT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 396
+PHP Warning:  Undefined array key "SERVER_SIGNATURE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 397
+PHP Warning:  Undefined array key "SERVER_SOFTWARE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 398
+PHP Warning:  Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 399
+PHP Warning:  Undefined array key "SERVER_ADDR" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 400
+PHP Warning:  Undefined array key "SERVER_PORT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 401
+PHP Warning:  Undefined array key "SERVER_PROTOCOL" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 402
+PHP Warning:  Undefined array key "GATEWAY_INTERFACE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 403
+newsapp3_class->fetch() : Rewriting menu files took 0.0355 seconds.
+
+newsapp3_class->fetch() : Fetching news for 585 RSS pages, 76 menu-items, took 1 minutes, 0.076700000000002 seconds; 0 new items.
+
+Fetching RSS data for 585 RSS pages, 76 menu-items, 11247 new news-items, took 0 minutes, 0 seconds.
+
+\e[1;32mDuplicates : 10987, New items : 260\e[0m
+
+\e[42;1;4m /NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news/crontabEntry_manageDatabase.php : Done.\e[0m 
+
+
+Warning: Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 391
+
+Warning: Undefined array key "HTTP_HOST" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 395
+
+Warning: Undefined array key "HTTP_USER_AGENT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 396
+
+Warning: Undefined array key "SERVER_SIGNATURE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 397
+
+Warning: Undefined array key "SERVER_SOFTWARE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 398
+
+Warning: Undefined array key "SERVER_NAME" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 399
+
+Warning: Undefined array key "SERVER_ADDR" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 400
+
+Warning: Undefined array key "SERVER_PORT" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 401
+
+Warning: Undefined array key "SERVER_PROTOCOL" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 402
+
+Warning: Undefined array key "GATEWAY_INTERFACE" in /var/www/nicer.app-5.10.z/code/NicerAppWebOS/boot.php on line 403
+\033[42;1;4m/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news/crontabEntry_manageDatabase.php : Fetching news for 585 RSS pages, 76 menu-items.\033[37;49m
+newsapp3_class->fetch() : Rewriting menu files took 0.0355 seconds.
+newsapp3_class->fetch() : Fetching news for 585 RSS pages, 76 menu-items, took 1 minutes, 0.076700000000002 seconds; 0 new items.
+CURL operation (path=/Deutsche nachrichten/Sport, url=http://boerse.ard.de/index~rss.xml) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Wereld, url=http://feeds.nos.nl/nosjournaal?format=xml) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Wereld, url=http://feeds.nos.nl/nos-nieuwsin60seconden?format=xml) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Wereld, url=http://feeds.nos.nl/MHOOM?format=xml) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Wereld, url=https://www.bright.nl/rss?tag=rss) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Sport, url=http://feeds.nos.nl/ldlsportforum?format=xml) 0 bytes retrieved
+CURL operation (path=/Nederlands Nieuws/Tech en Wetenschap, url=http://feeds.nos.nl/nosop3-tech-podcast?format=xml) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=https://beijingtoday.com.cn/feed/) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=https://www.dailytelegraph.com.au/news/world/rss) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=http://www.dailytelegraph.com.au/news/breaking-news/rss) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=http://www.dailytelegraph.com.au/news/national/rss) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=https://www.rt.com/rss/news/) 0 bytes retrieved
+CURL operation (path=/English News/World Headlines, url=https://sputniknews.com/export/rss2/world/index.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/USA, url=http://feeds.reuters.com/Reuters/domesticNews) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/USA, url=https://rightwirereport.com/feed/) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://feeds.smh.com.au/rssheadlines/top.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://feeds.theage.com.au/rssheadlines/top.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://www.heraldsun.com.au/rss) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://www.huffingtonpost.com.au/rss/index.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://feeds.brisbanetimes.com.au/rssheadlines/top.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://feeds.watoday.com.au/rssheadlines/top.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://www.ntnews.com.au/news/rss) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://www.townsvillebulletin.com.au/news/rss) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=https://pixelkey.biz/tasmaniantimes/feed/) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Australia, url=http://www.theconservative.com.au/feed/rss) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Countries/Russia, url=https://www.rt.com/rss/) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Europe, url=http://beta.euractiv.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Europe, url=https://xml.euobserver.com/rss.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Europe, url=http://news.ofthe.eu/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://asiancorrespondent.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://www.atimes.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://www.asiatoday.com/event/rss.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://www.asiantribune.com/index.php?q=rss.xml) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://sea-globe.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=https://www.weirdasianews.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Regions/Asia, url=http://www.vona.tv/feed) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Business, url=http://investvine.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Business, url=http://tyre-asia.com/feed) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Business, url=http://www.intermet.asia/1/feed) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Business, url=http://www.dailytelegraph.com.au/business/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Business, url=http://www.dailytelegraph.com.au/business/breaking-news/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Careers, url=http://www.singingbasics.com/feed/) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Entertainment, url=http://www.dailytelegraph.com.au/entertainment/sydney-confidential/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Entertainment, url=http://www.dailytelegraph.com.au/entertainment/celebrity/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Entertainment, url=http://www.dailytelegraph.com.au/entertainment/music/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Lifestyle, url=http://www.dailytelegraph.com.au/lifestyle/rss) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Sports, url=http://soccernet.espn.com/rss/news) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Sports, url=http://hosted.ap.org/lineups/SPORTSHEADS-rss_2.0.xml?SITE=VABRM&SECTION=HOME) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Stock Trading, url=http://blog.commodityandderivativeadv.com/feed/) 0 bytes retrieved
+CURL operation (path=/English News/Topics/Technology, url=http://feeds.pcworld.com/pcworld/latestnews) 0 bytes retrieved
+Fetching RSS data for 585 RSS pages, 76 menu-items, 11247 new news-items, took 0 minutes, 0 seconds.
+Total records fetched : 11247
+\e[1;32mDuplicates : 10987, New items : 260\e[0m
+\e[42;1;4m /NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news/crontabEntry_manageDatabase.php : Done.\e[0m 

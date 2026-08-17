@@ -1,0 +1,72 @@
+.woError { border : 2px solid red; border-radius : 5px; padding : 5px; background : yellow; color : red; }
+.woStacktrace { font-size : 90%; font-weight : bold; }
+.woStacktrace__codePath { color : purple; }
+.woStacktrace__item { }
+.woStacktrace__file { color : navy; }
+.woStacktrace__function { color : #002300; }
+.woStacktrace__line { color : blue;  }
+.woStacktrace__args { color : navy; font-weight : normal; }
+.woStacktrace__arg { color : blue; }
+.woStacktrace__argSeperator { color : purple; background : white; font-weight : bold; font-size : 100%; }
+
+.webappObfuscator__configInfo { color : grey; }
+
+.webappObfuscator__init {  }
+.webappObfuscator__usingCache { color : green; }
+.webappObfuscator__writeCache { color : green; font-weight : bold; }
+.webappObfuscator__calculating { color : blue; } 
+.webappObfuscator__error { color : #F55;}
+
+.webappObfuscator__phpFile { color : white; background : green; font-size : 80%; }
+.webappObfuscator__filesizeHumanReadable { color : white; background : blue; }
+.webappObfuscator__url { color : white; background : green; }
+
+.webappObfuscator__deleteCache { color : green }
+
+.webappObfuscator__prepareForObfuscation { color : green }
+
+.webappObfuscator__fetchResources { color : blue; }
+.webappObfuscator__fetchResources__sleeping { font-weight : bold; font-size : 90%; }
+.webappObfuscator__fetchResources__unicodeTables { }
+
+
+
+#webappObfuscator__process__start { color : green; }
+.webappObfuscator__process__writeOutput { }
+.webappObfuscator__outputFilename { margin-left : 20px; color : green; }
+.webappObfuscator__process {  }
+.webappObfuscator__arrayKey { color : yellow; background : blue; font-weight : bold; }
+.webappObfuscator__arrayValue { color : lime; background : blue; }
+.webappObfuscator__sourcePathPart { color : lime; background : blue; }
+.webappObfuscator__sourcePathSlash { color : yellow; background : blue; }
+.webappObfuscator__process__detail__scanningNextPath { color : orange; }
+.webappObfuscator__process__detail { font-weight : bold; }
+.webappObfuscator__process__node {  }
+.webappObfuscator__process__regx {  }
+
+
+.webappObfuscator__findTokens__sourceToProcess {  }
+.webappObfuscator__findTokens__counts { color : purple; }
+.webappObfuscator__findTokens__tokensFound {  }
+.webappObfuscator__findTokens__tokensFound_key { color : green; }
+.webappObfuscator__findTokens__tokensFound_value { color : #002300; }
+.webappObfuscator__findTokens__tokensFound_where { color : purple; }
+
+.webappObfuscator__hr__gatherTokens { }
+
+.webappObfuscator__inefficient { font-weight : bold }
+.webappObfuscator__being-utterly-lame { color : red; background : yellow; }
+
+#webappObfuscator__finished { color : white; background : green; }
+
+.vividTheme__tabs_black .tabPage {
+	top : 5%; left : 5%; width : 90%; height : 90%;
+}
+
+#tabs.jQueryUI .tabPage {
+	height : 400px;
+}
+
+#tabs.jQueryUI .tabContent {
+	height : 400px;
+}

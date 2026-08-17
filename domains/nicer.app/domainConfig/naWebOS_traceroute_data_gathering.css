@@ -1,0 +1,23 @@
+.naWebOS-debug-outer-DIV {
+    margin : 10px;
+    padding : 5px;
+    border-radius : 10px;
+    color : white;
+    background : rgba(0,0,255,0.5);
+
+}
+
+.naWebOS-debug-info {
+    margin : 10px;
+    padding : 5px;
+    border-radius : 10px;
+    color : white;
+    background : blue;
+    font-size : 125%;
+    font-weight : bold;
+    text-shadow : 0px 0px 2px rgba(200, 240, 50);
+    box-shadow : 0px 0px 8px 5px rgba(0,0,0,0.4), 3px 3px, 2px, 2px, rgba(0,0,0,0.7);
+}
+
+.naWebOS-field-name { color : darkgreen; }
+.naWebOS-field-value { color : navy; }

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bustling City Park ThreeJS Scene</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js",
+					"three/addons/": "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/"
+				}
+			}
+	</script>
+
+	<script type="module">
+
+			import * as THREE from 'three';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Sky blue background
+
+        // Camera setup: Hovering over the road, pointing half to lake and background
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, -10); // Hovering over road (z negative is towards viewer)
+        camera.lookAt(0, 0, 50); // Looking towards lake and background
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(50, 100, 50);
+        scene.add(directionalLight);
+
+        // Ground: Lawn and road
+        const groundGeometry = new THREE.PlaneGeometry(200, 200);
+        const lawnMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 }); // Green lawn
+        const lawn = new THREE.Mesh(groundGeometry, lawnMaterial);
+        lawn.rotation.x = -Math.PI / 2;
+        lawn.position.set(0, 0, 30); // Lawn between road and lake
+        scene.add(lawn);
+
+        const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 }); // Asphalt road
+        const road = new THREE.Mesh(groundGeometry, roadMaterial);
+        road.rotation.x = -Math.PI / 2;
+        road.position.set(0, 0.01, -30); // Road in foreground
+        scene.add(road);
+
+        // Lake: Nonlinear shores using ShapeGeometry
+        const lakeShape = new THREE.Shape();
+        lakeShape.moveTo(0, 0);
+        lakeShape.bezierCurveTo(10, 20, 30, 20, 40, 0);
+        lakeShape.bezierCurveTo(50, -20, 30, -40, 10, -30);
+        lakeShape.bezierCurveTo(-10, -40, -30, -20, -20, 0);
+        lakeShape.bezierCurveTo(-30, 20, -10, 40, 0, 0);
+        const lakeGeometry = new THREE.ShapeGeometry(lakeShape);
+        const lakeMaterial = new THREE.MeshLambertMaterial({ color: 0x1E90FF, side: THREE.DoubleSide }); // Blue water
+        const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+        lake.rotation.x = -Math.PI / 2;
+        lake.scale.set(2, 2, 2); // Scale up
+        lake.position.set(0, 0.1, 60); // Center stage
+        scene.add(lake);
+
+        // Trees and reeds around lake
+        function createTree(position) {
+            const trunkGeometry = new THREE.CylinderGeometry(1, 1, 5, 32);
+            const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.copy(position);
+
+            const foliageGeometry = new THREE.ConeGeometry(4, 8, 32);
+            const foliageMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+            foliage.position.set(position.x, position.y + 6, position.z);
+            scene.add(trunk);
+            scene.add(foliage);
+        }
+
+        // Place trees around lake
+        for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2;
+            const x = 40 * Math.cos(angle) + (Math.random() - 0.5) * 10;
+            const z = 60 + 40 * Math.sin(angle) + (Math.random() - 0.5) * 10;
+            createTree(new THREE.Vector3(x, 0, z));
+        }
+
+        // Reeds: Simple cylinders
+        function createReed(position) {
+            const reedGeometry = new THREE.CylinderGeometry(0.2, 0.2, 3, 32);
+            const reedMaterial = new THREE.MeshLambertMaterial({ color: 0x556B2F });
+            const reed = new THREE.Mesh(reedGeometry, reedMaterial);
+            reed.position.copy(position);
+            scene.add(reed);
+        }
+
+        for (let i = 0; i < 50; i++) {
+            const angle = (i / 50) * Math.PI * 2;
+            const x = 35 * Math.cos(angle) + (Math.random() - 0.5) * 5;
+            const z = 60 + 35 * Math.sin(angle) + (Math.random() - 0.5) * 5;
+            createReed(new THREE.Vector3(x, 0, z));
+        }
+
+        // Background highrises
+        function createBuilding(position, height, width, depth) {
+            const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+            const buildingMaterial = new THREE.MeshLambertMaterial({ color: 0xA9A9A9 });
+            const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            building.position.copy(position);
+            scene.add(building);
+
+            // Green balconies
+            for (let floor = 1; floor < height / 5; floor++) {
+                const balconyGeometry = new THREE.BoxGeometry(width + 2, 0.5, depth + 2);
+                const balconyMaterial = new THREE.MeshLambertMaterial({ color: 0x32CD32 });
+                const balcony = new THREE.Mesh(balconyGeometry, balconyMaterial);
+                balcony.position.set(position.x, position.y + floor * 5, position.z);
+                scene.add(balcony);
+            }
+        }
+
+        // Create multiple buildings
+        for (let i = 0; i < 10; i++) {
+            const x = (i - 5) * 20 + (Math.random() - 0.5) * 10;
+            const height = 50 + Math.random() * 50;
+            createBuilding(new THREE.Vector3(x, height / 2, 150), height, 10, 10);
+        }
+
+        // Bridges between some buildings
+        function createBridge(startPos, endPos) {
+            const direction = new THREE.Vector3().subVectors(endPos, startPos);
+            const length = direction.length();
+            const bridgeGeometry = new THREE.BoxGeometry(length, 2, 5);
+            const bridgeMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 });
+            const bridge = new THREE.Mesh(bridgeGeometry, bridgeMaterial);
+            bridge.position.copy(startPos.clone().add(endPos).multiplyScalar(0.5));
+            bridge.lookAt(endPos);
+            scene.add(bridge);
+        }
+
+        // Add a few bridges
+        createBridge(new THREE.Vector3(-20, 30, 150), new THREE.Vector3(0, 30, 150));
+        createBridge(new THREE.Vector3(20, 40, 150), new THREE.Vector3(40, 40, 150));
+
+        // People on lawn: Simple representations (spheres for heads, boxes for bodies)
+        const people = [];
+        function createPerson(position) {
+            const bodyGeometry = new THREE.BoxGeometry(1, 2, 1);
+            const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0xFF4500 });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.copy(position);
+
+            const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const headMaterial = new THREE.MeshLambertMaterial({ color: 0xFFD700 });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.set(position.x, position.y + 1.5, position.z);
+
+            scene.add(body);
+            scene.add(head);
+            return { body, head, position: position.clone() };
+        }
+
+        // Add people on lawn
+        for (let i = 0; i < 20; i++) {
+            const x = (Math.random() - 0.5) * 50;
+            const z = 20 + Math.random() * 20; // On lawn
+            people.push(createPerson(new THREE.Vector3(x, 1, z)));
+        }
+
+        // Inline skaters and firetwirlers on road
+        const skaters = [];
+        const twirlers = [];
+        function createSkater(position) {
+            const person = createPerson(position);
+            person.type = 'skater';
+            return person;
+        }
+        function createTwirler(position) {
+            const person = createPerson(position);
+            person.type = 'twirler';
+            // Add fire: Simple particle system for fire
+            const fireGeometry = new THREE.BufferGeometry();
+            const fireVertices = [];
+            for (let i = 0; i < 100; i++) {
+                fireVertices.push((Math.random() - 0.5) * 0.5, Math.random() * 2, (Math.random() - 0.5) * 0.5);
+            }
+            fireGeometry.setAttribute('position', new THREE.Float32BufferAttribute(fireVertices, 3));
+            const fireMaterial = new THREE.PointsMaterial({ color: 0xFF4500, size: 0.1, blending: THREE.AdditiveBlending });
+            person.fire = new THREE.Points(fireGeometry, fireMaterial);
+            person.fire.position.set(position.x, position.y + 2, position.z);
+            scene.add(person.fire);
+            return person;
+        }
+
+        // Place skaters and twirlers in a circle on the road
+        const circleRadius = 10;
+        for (let i = 0; i < 5; i++) {
+            const angle = (i / 5) * Math.PI * 2;
+            const x = circleRadius * Math.cos(angle);
+            const z = -20 + circleRadius * Math.sin(angle); // On road
+            skaters.push(createSkater(new THREE.Vector3(x, 1, z)));
+        }
+        for (let i = 0; i < 5; i++) {
+            const angle = (i / 5) * Math.PI * 2 + Math.PI / 5;
+            const x = circleRadius * Math.cos(angle);
+            const z = -20 + circleRadius * Math.sin(angle);
+            twirlers.push(createTwirler(new THREE.Vector3(x, 1, z)));
+        }
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Animate people on lawn (simple bobbing)
+            people.forEach(person => {
+                person.body.position.y = 1 + Math.sin(time + person.position.x) * 0.1;
+                person.head.position.y = 2.5 + Math.sin(time + person.position.x) * 0.1;
+            });
+
+            // Animate skaters and twirlers in bagua circle step (circular movement)
+            skaters.forEach((skater, i) => {
+                const angle = time + (i / 5) * Math.PI * 2;
+                skater.body.position.x = circleRadius * Math.cos(angle);
+                skater.body.position.z = -20 + circleRadius * Math.sin(angle);
+                skater.head.position.x = skater.body.position.x;
+                skater.head.position.z = skater.body.position.z;
+            });
+            twirlers.forEach((twirler, i) => {
+                const angle = -time + (i / 5) * Math.PI * 2; // Opposite direction for interaction
+                twirler.body.position.x = circleRadius * Math.cos(angle);
+                twirler.body.position.z = -20 + circleRadius * Math.sin(angle);
+                twirler.head.position.x = twirler.body.position.x;
+                twirler.head.position.z = twirler.body.position.z;
+                twirler.fire.position.x = twirler.body.position.x;
+                twirler.fire.position.z = twirler.body.position.z;
+                twirler.fire.rotation.y += 0.05; // Spin fire
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

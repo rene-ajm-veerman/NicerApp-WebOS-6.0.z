@@ -1,0 +1,46 @@
+nicer_app___app__app_2d_news__rss_items
+{
+    "selector": {
+        "pd": {
+            "$gt": 1656768566,
+            "$lt": 1656775766
+        },
+        "p": {
+            "$regex": "^\/English News\/Topics\/Business.*"
+        }
+    },
+    "fields": [
+        "_id",
+        "_rev",
+        "t",
+        "de",
+        "m",
+        "am",
+        "pd",
+        "da",
+        "dd",
+        "c",
+        "cc"
+    ]
+}
+{
+    "headers": {
+        "_HTTP": {
+            "raw": "HTTP\/1.1 200 OK",
+            "version": "1.1",
+            "status": "200"
+        },
+        "cache-control": "must-revalidate",
+        "content-type": "application\/json",
+        "date": "Thu, 21 Jul 2022 15:34:01 GMT",
+        "server": "CouchDB\/3.2.2 (Erlang OTP\/24)",
+        "transfer-encoding": "chunked",
+        "x-couch-request-id": "9d6c3157be",
+        "x-couchdb-body-time": "0"
+    },
+    "body": {
+        "docs": [],
+        "bookmark": "nil"
+    },
+    "status": "200"
+}

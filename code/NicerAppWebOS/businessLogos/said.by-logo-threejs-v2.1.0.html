@@ -1,0 +1,337 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Park – Realistic People + OrbitControls</title>
+<style>
+  body { margin:0; overflow:hidden; }
+  canvas { display:block; }
+  #info { position:absolute; top:10px; left:10px; color:#fff; background:rgba(0,0,0,.5);
+          padding:8px 12px; border-radius:5px; font-family:Arial,Helvetica,sans-serif; }
+</style>
+</head>
+<body>
+<div id="info">Click‑drag to look • Scroll to zoom • Right‑drag to pan</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+/* -------------------------------------------------------------
+   BASIC SCENE SETUP
+   ------------------------------------------------------------- */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 10;
+controls.maxDistance = 50;
+controls.maxPolarAngle = Math.PI/2.2;
+
+/* -------------------------------------------------------------
+   LIGHTING
+   ------------------------------------------------------------- */
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const dir = new THREE.DirectionalLight(0xffffff,0.8);
+dir.position.set(10,20,10);
+scene.add(dir);
+
+/* -------------------------------------------------------------
+   GROUND + LAKE (same as before)
+   ------------------------------------------------------------- */
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(100,100),
+  new THREE.MeshLambertMaterial({color:0x228B22})
+);
+ground.rotation.x = -Math.PI/2;
+scene.add(ground);
+
+const lake = new THREE.Mesh(
+  new THREE.PlaneGeometry(30,20),
+  new THREE.MeshLambertMaterial({color:0x1E90FF, side:THREE.DoubleSide})
+);
+lake.rotation.x = -Math.PI/2;
+lake.position.set(-20,0.01,0);
+scene.add(lake);
+
+/* -------------------------------------------------------------
+   SIMPLE PERSON BUILDER
+   ------------------------------------------------------------- */
+function createPerson() {
+  const person = new THREE.Group();
+
+  // ---------- TORSO ----------
+  const torso = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.35,0.4,1.6,12),
+    new THREE.MeshLambertMaterial({color:0x4444ff})
+  );
+  torso.position.y = 0.8;
+  person.add(torso);
+
+  // ---------- HEAD ----------
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28,12,12),
+    new THREE.MeshLambertMaterial({color:0xffdab9})
+  );
+  head.position.y = 1.8;
+  person.add(head);
+
+  // ---------- ARMS ----------
+  const armGeo = new THREE.CylinderGeometry(0.12,0.12,0.9,8);
+  const armMat = new THREE.MeshLambertMaterial({color:0x4444ff});
+  const leftUpper = new THREE.Mesh(armGeo,armMat);
+  leftUpper.position.set(-0.45,1.2,0);
+  leftUpper.rotation.z = Math.PI/4;
+  person.add(leftUpper);
+
+  const rightUpper = leftUpper.clone();
+  rightUpper.position.x = 0.45;
+  rightUpper.rotation.z = -Math.PI/4;
+  person.add(rightUpper);
+
+  // lower arms (pivot at elbow)
+  const lowerGeo = new THREE.CylinderGeometry(0.1,0.1,0.8,8);
+  const leftLower = new THREE.Mesh(lowerGeo,armMat);
+  leftLower.position.set(0, -0.65,0);
+  leftUpper.add(leftLower);
+
+  const rightLower = leftLower.clone();
+  rightUpper.add(rightLower);
+
+  // ---------- HANDS (simple sphere + fingers) ----------
+  function addHand(parent, offsetY) {
+    const hand = new THREE.Mesh(
+      new THREE.SphereGeometry(0.13,8,8),
+      new THREE.MeshLambertMaterial({color:0xffdab9})
+    );
+    hand.position.y = offsetY;
+    parent.add(hand);
+
+    // fingers (5 tiny cylinders)
+    const fingerGeo = new THREE.CylinderGeometry(0.02,0.02,0.2,6);
+    const fingerMat = new THREE.MeshLambertMaterial({color:0xffdab9});
+    for (let i=0;i<5;i++) {
+      const f = new THREE.Mesh(fingerGeo,fingerMat);
+      f.position.set((i-2)*0.04, -0.12, 0);
+      f.rotation.x = Math.PI/2;
+      hand.add(f);
+    }
+  }
+  addHand(leftLower, -0.45);
+  addHand(rightLower, -0.45);
+
+  // ---------- LEGS ----------
+  const legGeo = new THREE.CylinderGeometry(0.15,0.15,1.2,8);
+  const legMat = new THREE.MeshLambertMaterial({color:0x222222});
+  const leftLeg = new THREE.Mesh(legGeo,legMat);
+  leftLeg.position.set(-0.2,0,0);
+  person.add(leftLeg);
+
+  const rightLeg = leftLeg.clone();
+  rightLeg.position.x = 0.2;
+  person.add(rightLeg);
+
+  // lower legs (pivot at knee)
+  const lowerLegGeo = new THREE.CylinderGeometry(0.12,0.12,1.1,8);
+  const leftLowerLeg = new THREE.Mesh(lowerLegGeo,legMat);
+  leftLowerLeg.position.set(0,-0.75,0);
+  leftLeg.add(leftLowerLeg);
+
+  const rightLowerLeg = leftLowerLeg.clone();
+  rightLeg.add(rightLowerLeg);
+
+  // ---------- FEET ----------
+  const footGeo = new THREE.BoxGeometry(0.2,0.08,0.35);
+  const footMat = new THREE.MeshLambertMaterial({color:0x111111});
+  const leftFoot = new THREE.Mesh(footGeo,footMat);
+  leftFoot.position.set(0,-0.6,0.08);
+  leftLowerLeg.add(leftFoot);
+
+  const rightFoot = leftFoot.clone();
+  rightLowerLeg.add(rightFoot);
+
+  // store references for animation
+  person.joints = {
+    leftUpperArm: leftUpper,
+    rightUpperArm: rightUpper,
+    leftLowerArm: leftLower,
+    rightLowerArm: rightLower,
+    leftUpperLeg: leftLeg,
+    rightUpperLeg: rightLeg,
+    leftLowerLeg: leftLowerLeg,
+    rightLowerLeg: rightLowerLeg
+  };
+
+  return person;
+}
+
+/* -------------------------------------------------------------
+   ANIMATION STATES
+   ------------------------------------------------------------- */
+function idleAnim(person, t) {
+  const s = Math.sin(t*2);
+  person.joints.leftUpperArm.rotation.z = Math.PI/4 + s*0.15;
+  person.joints.rightUpperArm.rotation.z = -Math.PI/4 - s*0.15;
+  // tiny head bob
+  person.children[1].position.y = 1.8 + Math.abs(s)*0.03;
+}
+
+function walkAnim(person, t) {
+  const step = Math.sin(t*5)*0.6;
+  const swing = Math.sin(t*5)*0.4;
+
+  // legs
+  person.joints.leftUpperLeg.rotation.x = step;
+  person.joints.rightUpperLeg.rotation.x = -step;
+  person.joints.leftLowerLeg.rotation.x = Math.max(0, -step*1.2);
+  person.joints.rightLowerLeg.rotation.x = Math.max(0, step*1.2);
+
+  // arms opposite to legs
+  person.joints.leftUpperArm.rotation.z = Math.PI/4 - swing;
+  person.joints.rightUpperArm.rotation.z = -Math.PI/4 + swing;
+}
+
+function sitAnim(person, t) {
+  // bend knees, lower torso
+  person.position.y = 0.4;
+  person.joints.leftUpperLeg.rotation.x = 1.2;
+  person.joints.rightUpperLeg.rotation.x = 1.2;
+  person.joints.leftLowerLeg.rotation.x = -2.0;
+  person.joints.rightLowerLeg.rotation.x = -2.0;
+
+  // arms resting on knees
+  person.joints.leftUpperArm.rotation.z = 0.8;
+  person.joints.rightUpperArm.rotation.z = -0.8;
+  person.joints.leftLowerArm.rotation.x = -1.2;
+  person.joints.rightLowerArm.rotation.x = -1.2;
+}
+
+/* -------------------------------------------------------------
+   POPULATE SCENE
+   ------------------------------------------------------------- */
+const people = [];
+const behaviors = []; // 0=walk, 1=idle, 2=sit
+
+// 30 socializing people (random walk/idle)
+for (let i=0;i<30;i++) {
+  const p = createPerson();
+  const gx = (i%5)*2 -4 + Math.random()*0.8;
+  const gz = Math.floor(i/5)*3 -10 + Math.random()*0.8;
+  p.position.set(gx,0,gz);
+  scene.add(p);
+  people.push(p);
+  behaviors.push(Math.random()<0.6?0:1);
+}
+
+// 100 seated guests (all sit)
+for (let r=0;r<10;r++) for (let c=0;c<10;c++) {
+  const p = createPerson();
+  p.scale.setScalar(0.7);
+  p.position.set(15+c*1.1,0,-10+r*1.1);
+  scene.add(p);
+  people.push(p);
+  behaviors.push(2);
+}
+
+// speaker (idle)
+const speaker = createPerson();
+speaker.scale.setScalar(1.1);
+speaker.position.set(20,1,0); // on stage
+speaker.children[0].material = new THREE.MeshLambertMaterial({color:0xff69b4}); // dress
+scene.add(speaker);
+people.push(speaker);
+behaviors.push(1);
+
+/* -------------------------------------------------------------
+   STAGE (unchanged)
+   ------------------------------------------------------------- */
+const stage = new THREE.Mesh(
+  new THREE.BoxGeometry(10,0.5,15),
+  new THREE.MeshLambertMaterial({color:0xa0522d})
+);
+stage.position.set(20,0.25,0);
+scene.add(stage);
+
+/* -------------------------------------------------------------
+   CAMERA CIRCULAR PATH + LOOK AT CENTER
+   ------------------------------------------------------------- */
+const orbitRadius = 25;
+const flyHeight = 2.5;
+const center = new THREE.Vector3(0,0,0);
+let angle = 0;
+
+function updateCamera() {
+  camera.position.x = center.x + orbitRadius * Math.cos(angle);
+  camera.position.y = center.y + flyHeight;
+  camera.position.z = center.z + orbitRadius * Math.sin(angle);
+  camera.lookAt(center);
+  controls.target.copy(center);
+}
+updateCamera();
+
+/* -------------------------------------------------------------
+   ANIMATION LOOP
+   ------------------------------------------------------------- */
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const elapsed = clock.elapsedTime;
+
+  // advance circular flight
+  angle += 0.2 * dt;
+  updateCamera();
+  controls.update();
+
+  // animate each person
+  people.forEach((p,i)=>{
+    const beh = behaviors[i];
+    if (beh===0) { // walk
+      walkAnim(p, elapsed + i);
+      // tiny circular walk inside own group
+      const walkR = 0.8;
+      const walkA = elapsed*1.2 + i;
+      p.position.x = p.userData.baseX + walkR*Math.cos(walkA);
+      p.position.z = p.userData.baseZ + walkR*Math.sin(walkA);
+      p.rotation.y = walkA + Math.PI; // face direction
+    } else if (beh===1) {
+      idleAnim(p, elapsed + i);
+    } else if (beh===2) {
+      sitAnim(p, elapsed);
+    }
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* -------------------------------------------------------------
+   RESIZE
+   ------------------------------------------------------------- */
+window.addEventListener('resize',()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+/* -------------------------------------------------------------
+   Store base positions for walkers (after first frame)
+   ------------------------------------------------------------- */
+requestAnimationFrame(()=>{
+  people.forEach(p=>{ if(!p.userData.baseX){
+    p.userData.baseX = p.position.x;
+    p.userData.baseZ = p.position.z;
+  }});
+});
+</script>
+</body>
+</html>

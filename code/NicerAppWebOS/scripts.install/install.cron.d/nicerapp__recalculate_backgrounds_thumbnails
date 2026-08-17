@@ -1,0 +1,1 @@
+0 2 * * * root /usr/bin/env bash -c 'source /etc/cron.d/nicerapp__init_globals.sh && nice -n -10 php $NA_ROOT_PATH/NicerAppWebOS/scripts.maintenance/recalculate_backgrounds_thumbs.php > $NA_LOGS_PATH/$dateMinutesSeconds-nicerapp__recalculate_backgrounds_thumbnails.txt 2>&1'

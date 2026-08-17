@@ -1,0 +1,297 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Photorealistic Park with Lake - Three.js</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #info { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; font-family: Arial; }
+  </style>
+</head>
+<body>
+<div id="info">
+  WASD + Mouse = Move & Look<br>
+  Right-click drag = Orbit / Zoom<br>
+  Space = Jump
+</div>
+
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js",
+					"three/addons/": "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/"
+				}
+			}
+	</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/GLTFLoader.js';
+import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/RGBELoader.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.FogExp2(0x87CEEB, 0.0005);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 1.7, 15);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+// HDRI Environment
+new RGBELoader()
+  .load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/venice_sunset_4k.hdr', function(texture) {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = texture;
+    scene.background = texture;
+  });
+
+// Ground + Road + Lake + Lawn
+const groundSize = 300;
+const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize);
+groundGeo.rotateX(-Math.PI / 2);
+
+// Asphalt Road (foreground)
+const roadWidth = 20;
+const roadGeo = new THREE.PlaneGeometry(roadWidth, groundSize);
+roadGeo.rotateX(-Math.PI / 2);
+const roadMat = new THREE.MeshStandardMaterial({
+  color: 0x222222,
+  roughness: 0.8,
+  metalness: 0.1
+});
+const road = new THREE.Mesh(roadGeo, roadMat);
+road.position.y = 0.01;
+scene.add(road);
+
+// Lawn between road and lake
+const lawnGeo = new THREE.PlaneGeometry(60, groundSize);
+lawnGeo.rotateX(-Math.PI / 2);
+const lawnMat = new THREE.MeshStandardMaterial({
+  color: 0x3d8c40,
+  roughness: 0.9,
+});
+const lawn = new THREE.Mesh(lawnGeo, lawnMat);
+lawn.position.z = -30;
+lawn.position.y = 0.02;
+scene.add(lawn);
+
+// Natural-shaped lake
+const lakeShape = new THREE.Shape();
+lakeShape.moveTo(-30, -20);
+lakeShape.bezierCurveTo(-40, -40, 20, -50, 35, -25);
+lakeShape.bezierCurveTo(40, 0, 30, 20, 15, 25);
+lakeShape.bezierCurveTo(0, 30, -25, 20, -30, 0);
+lakeShape.closePath();
+
+const lakeGeo = new THREE.ShapeGeometry(lakeShape);
+lakeGeo.rotateX(-Math.PI / 2);
+const lakeMat = new THREE.MeshStandardMaterial({
+  color: 0x2266aa,
+  roughness: 0.1,
+  metalness: 0.8,
+  envMapIntensity: 1.0,
+  side: THREE.DoubleSide,
+  transparent: true,
+  opacity: 0.9
+});
+const lake = new THREE.Mesh(lakeGeo, lakeMat);
+lake.position.set(0, 0.05, -40);
+scene.add(lake);
+
+// High-rises with green balconies (procedural)
+function createBuilding(x, height) {
+  const building = new THREE.Group();
+  const floors = Math.floor(height / 4);
+  for (let i = 0; i < floors; i++) {
+    const floor = new THREE.Mesh(
+      new THREE.BoxGeometry(15, 4, 20),
+      new THREE.MeshStandardMaterial({
+        color: i % 3 === 0 ? 0xd0d0d0 : 0xb0b0b0,
+        roughness: 0.7,
+        metalness: 0.3
+      })
+    );
+    floor.position.y = i * 4 + 2;
+    building.add(floor);
+
+    // Green balconies every few floors
+    if (i > 1 && i % 2 === 0) {
+      const balcony = new THREE.Mesh(
+        new THREE.BoxGeometry(16, 0.5, 8),
+        new THREE.MeshStandardMaterial({ color: 0x3d8c40 })
+      );
+      balcony.position.set(0, i * 4 + 2.3, 12);
+      building.add(balcony);
+    }
+  }
+  building.position.set(x, height / 2, -120);
+  scene.add(building);
+}
+
+[-60, -30, 0, 30, 60].forEach((x, i) => {
+  createBuilding(x, 60 + i * 20);
+});
+
+// Lights
+const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+const sun = new THREE.DirectionalLight(0xfff0e0, 3);
+sun.position.set(50, 100, 50);
+scene.add(sun);
+
+// Controls
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+orbitControls.enablePan = false;
+orbitControls.maxPolarAngle = Math.PI / 2.2;
+
+// First-person controls
+let move = { forward: false, backward: false, left: false, right: false, jump: false };
+const velocity = new THREE.Vector3();
+const direction = new THREE.Vector3();
+let canJump = true;
+
+document.addEventListener('keydown', e => {
+  switch (e.code) {
+    case 'KeyW': move.forward = true; break;
+    case 'KeyS': move.backward = true; break;
+    case 'KeyA': move.left = true; break;
+    case 'KeyD': move.right = true; break;
+    case 'Space': if (canJump) move.jump = true; break;
+  }
+});
+document.addEventListener('keyup', e => {
+  switch (e.code) {
+    case 'KeyW': move.forward = false; break;
+    case 'KeyS': move.backward = false; break;
+    case 'KeyA': move.left = false; break;
+    case 'KeyD': move.right = false; break;
+  }
+});
+
+// Lock pointer on click
+renderer.domElement.addEventListener('click', () => renderer.domElement.requestPointerLock());
+
+// Load animated characters
+const gltfLoader = new GLTFLoader();
+let skaterMixers = [];
+let peopleMixers = [];
+
+// Inline skaters on the road
+function addSkater(x, z, rotY = 0) {
+  gltfLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Skater.glb', gltf => {
+    const skater = gltf.scene;
+    skater.scale.set(0.015, 0.015, 0.015);
+    skater.position.set(x, 0, z);
+    skater.rotation.y = rotY;
+    scene.add(skater);
+
+    const mixer = new THREE.AnimationMixer(skater);
+    const action = mixer.clipAction(gltf.animations[0]);
+    action.play();
+    skaterMixers.push({ mixer, object: skater, speed: 8 + Math.random() * 4 });
+  });
+}
+
+// People on lawn (idle/talking animations)
+function addPerson(x, z) {
+  const urls = [
+    'https://threejs.org/examples/models/gltf/Xbot.glb',
+    'https://github.com/aegoff/Babylonjs-Meshes/raw/main/ybot.glb'
+  ];
+  gltfLoader.load(urls[Math.floor(Math.random() * urls.length)], gltf => {
+    const person = gltf.scene;
+    person.scale.set(1.5, 1.5, 1.5);
+    person.position.set(x, 0, z);
+    person.rotation.y = Math.random() * Math.PI * 2;
+    scene.add(person);
+
+    const mixer = new THREE.AnimationMixer(person);
+    const idle = gltf.animations.find(a => a.name.includes('Idle'));
+    if (idle) {
+      mixer.clipAction(idle).play();
+    }
+    peopleMixers.push(mixer);
+  });
+}
+
+// Populate
+for (let i = 0; i < 8; i++) {
+  const z = -150 + i * 40;
+  addSkater(-5, z, 0);
+  addSkater(5, z + 20, Math.PI);
+}
+for (let i = 0; i < 30; i++) {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 15 + Math.random() * 30;
+  addPerson(Math.cos(angle) * dist, -20 + Math.sin(angle) * dist * 0.6);
+}
+
+// Animation loop
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+
+  // First-person movement
+  if (document.pointerLockElement === renderer.domElement) {
+    direction.z = Number(move.forward) - Number(move.backward);
+    direction.x = Number(move.right) - Number(move.left);
+    direction.normalize();
+
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
+
+    if (move.forward || move.backward) velocity.z -= direction.z * 40.0 * delta;
+    if (move.left || move.right) velocity.x -= direction.x * 40.0 * delta;
+
+    if (move.jump && canJump) {
+      velocity.y = 10;
+      canJump = false;
+      move.jump = false;
+    }
+    velocity.y -= 25.0 * delta; // gravity
+
+    camera.translateX(velocity.x * delta);
+    camera.translateZ(velocity.z * delta);
+    camera.position.y += velocity.y * delta;
+
+    if (camera.position.y < 1.7) {
+      camera.position.y = 1.7;
+      velocity.y = 0;
+      canJump = true;
+    }
+  }
+
+  // Animate skaters (loop along road)
+  skaterMixers.forEach(s => {
+    s.mixer.update(delta);
+    s.object.position.z += s.speed * delta * (s.object.rotation.y === 0 ? 1 : -1);
+    if (s.object.position.z > 100) s.object.position.z = -200;
+    if (s.object.position.z < -200) s.object.position.z = 100;
+  });
+
+  peopleMixers.forEach(m => m.update(delta));
+
+  orbitControls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

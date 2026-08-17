@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Company Logo</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create the innermost sphere (center of rotation)
+        const innerSphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const innerSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+        const innerSphere = new THREE.Mesh(innerSphereGeometry, innerSphereMaterial);
+        scene.add(innerSphere);
+        innerSphere.position.set(0, 0, 0); // Center at origin
+
+        // Create outer spheres
+        const spheres = [];
+        const sphereRadii = [1, 2, 3];
+        sphereRadii.forEach(radius => {
+            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.set(0, 0, 0); // All spheres share the same center
+            scene.add(sphere);
+            spheres.push(sphere);
+        });
+
+        // Create cubes on 8 axes: N, W, S, E, NZ, SZ, NE-Z, SE-Z
+        const cubes = [];
+        const cubeDistance = 4; // Distance from origin
+        const cubePositions = [
+            new THREE.Vector3(0, cubeDistance, 0), // N
+            new THREE.Vector3(-cubeDistance, 0, 0), // W
+            new THREE.Vector3(0, -cubeDistance, 0), // S
+            new THREE.Vector3(cubeDistance, 0, 0), // E
+            new THREE.Vector3(0, 0, cubeDistance), // NZ
+            new THREE.Vector3(0, 0, -cubeDistance), // SZ
+            new THREE.Vector3(cubeDistance, cubeDistance, cubeDistance), // NE-Z
+            new THREE.Vector3(cubeDistance, -cubeDistance, cubeDistance) // SE-Z
+        ];
+        cubePositions.forEach(pos => {
+            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.copy(pos);
+            scene.add(cube);
+            cubes.push(cube);
+        });
+
+        // Create arrowheads on 8 axes: NW, NE, SE, SW, SWZ, NWZ, N-Z, S-Z
+        const arrowheads = [];
+        const arrowDistance = 4; // Distance from origin
+        const arrowPositions = [
+            new THREE.Vector3(-arrowDistance, arrowDistance, 0), // NW
+            new THREE.Vector3(arrowDistance, arrowDistance, 0), // NE
+            new THREE.Vector3(arrowDistance, -arrowDistance, 0), // SE
+            new THREE.Vector3(-arrowDistance, -arrowDistance, 0), // SW
+            new THREE.Vector3(-arrowDistance, -arrowDistance, -arrowDistance), // SWZ
+            new THREE.Vector3(-arrowDistance, arrowDistance, -arrowDistance), // NWZ
+            new THREE.Vector3(0, arrowDistance, -arrowDistance), // N-Z
+            new THREE.Vector3(0, -arrowDistance, -arrowDistance) // S-Z
+        ];
+        arrowPositions.forEach(pos => {
+            const dir = pos.clone().normalize(); // Point outward from origin
+            const arrow = new THREE.ArrowHelper(dir, pos, 1, 0xffff00);
+            scene.add(arrow);
+            arrowheads.push(arrow);
+        });
+
+        camera.position.z = 10;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate spheres around the origin
+            spheres.forEach((sphere, index) => {
+                sphere.rotation.x += 0.01 * (index + 1) * 0.5;
+                sphere.rotation.y += 0.01 * (index + 1) * 0.5;
+            });
+
+            // Rotate cubes around the origin
+            cubes.forEach(cube => {
+                cube.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.01); // Orbit around X
+                cube.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.01); // Orbit around Y
+                cube.rotation.x += 0.01; // Local rotation
+                cube.rotation.y += 0.01;
+            });
+
+            // Rotate arrowheads around the origin and update direction to point outward
+            arrowheads.forEach(arrow => {
+                arrow.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.01); // Orbit around X
+                arrow.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.01); // Orbit around Y
+                const dir = arrow.position.clone().normalize(); // Point outward
+                arrow.setDirection(dir);
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

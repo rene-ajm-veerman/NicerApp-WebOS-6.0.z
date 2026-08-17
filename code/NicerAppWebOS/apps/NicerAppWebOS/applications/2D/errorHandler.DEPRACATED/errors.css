@@ -1,0 +1,69 @@
+.phpError {
+    margin : 10px;
+    border : 1px solid navy;
+    border-radius : 5px;
+    padding : 10px;
+    background : rgba(0,0,150,1);
+    box-shadow : inset 2px 2px 2px 2px rgba(255,255,255,0.7), 2px 2px 2px 2px rgba(0,0,0,0.5);
+}
+
+    .phpErrorDetails {
+        color : white;
+    }
+        .phpErrorLabel {
+            background : rgba(255,255,255,0.7);
+            border-radius : 8px;
+            padding : 5px;
+            color : red;
+            font-weight : bold;
+        }
+    
+        .phpErrorTimeSinceScriptStart {
+            font-weight : bold;
+            color : skyblue;
+        }
+
+        .phpErrorTimeLabel, .phpErrorTypeLabel, .phpErrorMsgLabel {
+            font-weight : bold;
+        }
+
+        .phpErrorLocationLabel {
+            font-weight : bold;
+        }
+        .phpErrorLocation {
+            color : white;
+        }
+
+        .phpErrorContextLabel {
+            font-weight : bold;
+        }
+        .phpErrorContext {
+            color : white;
+        }
+    
+            .phpDebugBacktraceLabel { 
+                color : white;
+                font-weight : bold;
+            }
+            .phpDebugBacktrace {
+                color : lightgreen;
+            }
+            
+                .backtraceFunctionLabel, .backtraceClassLabel, .backtraceFunctionArgsLabel, .backtraceFileLabel {
+                    font-weight : bold;
+                    color : lime;
+                }
+    
+                .backtraceFunctionArgSeperator {
+                    font-weight : bold;
+                    color : white;
+                }
+    
+    
+            .phpJSONerror {
+                color : #00FFFF; /* Aqua */
+            }
+    
+    
+    
+    

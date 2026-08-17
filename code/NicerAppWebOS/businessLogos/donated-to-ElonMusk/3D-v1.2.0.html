@@ -1,0 +1,332 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NicerEnterprises 3D Company Logo</title>
+    <!- -
+        2025-07-23 04:00am CEST to 2025-07-24 02:26am CEST:
+            Thanks go to https://x.com/elonmusk and his https://x.ai SuperGrok engine
+            with which I was able to create this initial logo in under 24 hours.
+    - ->
+    <style>
+        body {
+            margin: 0; overflow: hidden;
+            border : none;
+            background:url('milky-way-3840x2160-15490.jpg') no-repeat center center fixed;
+            background: transparent;
+            background-size: cover;
+        }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load Earth texture for the outermost sphere
+        const textureLoader = new THREE.TextureLoader();
+        const earthTexture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg');
+
+        // Create the innermost sphere (center of rotation)
+        const innerSphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const innerSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+        const innerSphere = new THREE.Mesh(innerSphereGeometry, innerSphereMaterial);
+        scene.add(innerSphere);
+        innerSphere.position.set(0, 0, 0); // Center at origin
+
+        // Create spheres (red innermost, green middle, blue outermost with Earth texture)
+        const redSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.8 })
+        );
+        const greenSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1.5, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.6 })
+        );
+        const blueSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(2, 32, 32),
+            new THREE.MeshBasicMaterial({
+                map: earthTexture,
+                transparent: true,
+                opacity: 0.7
+            })
+        );
+        scene.add(redSphere, greenSphere, blueSphere);
+        const spheres = [redSphere, greenSphere, blueSphere];
+
+
+        // Create cubes on 8 axes: N, W, S, E, NZ, SZ, NE-Z, SE-Z
+        const cubes = [];
+        const cubeDistance = 2.5; // Distance from origin
+        const cubePositions = [
+            new THREE.Vector3(0, cubeDistance, 0), // N
+            new THREE.Vector3(-cubeDistance, 0, 0), // W
+            new THREE.Vector3(0, -cubeDistance, 0), // S
+            new THREE.Vector3(cubeDistance, 0, 0), // E
+            new THREE.Vector3(0, 0, cubeDistance), // NZ
+            new THREE.Vector3(0, 0, -cubeDistance), // SZ
+            new THREE.Vector3(cubeDistance, cubeDistance, cubeDistance), // NE-Z
+            new THREE.Vector3(cubeDistance, -cubeDistance, cubeDistance) // SE-Z
+        ];
+        cubePositions.forEach(pos => {
+            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const material = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity : 0.55 });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.copy(pos);
+            scene.add(cube);
+            cubes.push(cube);
+        });
+
+        // Create arrowheads on 8 axes: NW, NE, SE, SW, SWZ, NWZ, N-Z, S-Z
+        const arrowheads = [];
+        const arrowDistance = 2.5; // Distance from origin
+        const arrowPositions = [
+            new THREE.Vector3(-arrowDistance, arrowDistance, 0), // NW
+            new THREE.Vector3(arrowDistance, arrowDistance, 0), // NE
+            new THREE.Vector3(arrowDistance, -arrowDistance, 0), // SE
+            new THREE.Vector3(-arrowDistance, -arrowDistance, 0), // SW
+            new THREE.Vector3(-arrowDistance, -arrowDistance, -arrowDistance), // SWZ
+            new THREE.Vector3(-arrowDistance, arrowDistance, -arrowDistance), // NWZ
+            new THREE.Vector3(0, arrowDistance, -arrowDistance), // N-Z
+            new THREE.Vector3(0, -arrowDistance, -arrowDistance) // S-Z
+        ];
+        arrowPositions.forEach(pos => {
+            const dir = pos.clone().normalize(); // Point outward from origin
+            const arrow = new THREE.ArrowHelper(dir, pos, 1, 0xffff00);
+            scene.add(arrow);
+            arrowheads.push(arrow);
+        });
+
+        camera.position.z = 10;
+
+       // Position camera
+        const initialCameraPos = new THREE.Vector3(0, 0, 5);
+        camera.position.copy(initialCameraPos);
+        camera.lookAt(0, 0, 0);
+
+        // Zoom controls
+        const minDistance = 6.7; // Ensures 1000px margin for outer elements at 4K
+        const maxDistance = 15; // Updated to allow zooming out farther
+        let zoomLevel = initialCameraPos.length();
+        window.addEventListener('wheel', (event) => {
+            const zoomSpeed = 0.1;
+            zoomLevel += event.deltaY * zoomSpeed * 0.01;
+            zoomLevel = Math.max(maxDistance, Math.min(minDistance, zoomLevel));
+            const direction = initialCameraPos.clone().normalize();
+            camera.position.copy(direction.multiplyScalar(zoomLevel));
+            camera.lookAt(0, 0, 0);
+        });
+
+        // Animation loop
+        let angle = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate spheres around the origin
+            spheres.forEach((sphere, index) => {
+                sphere.rotation.x += 0.01 * (index + 1) * 0.5;
+                sphere.rotation.y += 0.01 * (index + 1) * 0.5;
+            });
+
+            // Rotate cubes around the origin
+            cubes.forEach(cube => {
+                cube.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.01); // Orbit around X
+                cube.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.01); // Orbit around Y
+                cube.rotation.x += 0.01; // Local rotation
+                cube.rotation.y += 0.01;
+            });
+
+            // Rotate arrowheads around the origin and update direction to point outward
+            arrowheads.forEach(arrow => {
+                arrow.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.01); // Orbit around X
+                arrow.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.01); // Orbit around Y
+                const dir = arrow.position.clone().normalize(); // Point outward
+                arrow.setDirection(dir);
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Spheres with Arrows and Cubes</title>
+    <style>
+        body { margin: 0; background: transparent; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load textures
+        const textureLoader = new THREE.TextureLoader();
+        const earthTexture = textureLoader.load('http://planetpixelemporium.com/earth/earthmap1k.jpg');
+        const nebulaTexture = textureLoader.load('https://cc0textures.com/_files/space/nebula-01.jpg');
+
+        // Set scene background to nebula texture
+        scene.background = nebulaTexture;
+
+        // Create spheres (red innermost, green middle, blue outermost with Earth texture)
+        const redSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.8 })
+        );
+        const greenSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1.5, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.6 })
+        );
+        const blueSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(2, 32, 32),
+            new THREE.MeshBasicMaterial({ map: earthTexture, transparent: true, opacity: 0.4 })
+        );
+        scene.add(redSphere, greenSphere, blueSphere);
+
+        // Create arrows (with arrowheads) emanating from [0,0,0]
+        const arrowHelper = (dir) => {
+            const arrow = new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), 2, 0xffff00, 0.5, 0.3);
+            scene.add(arrow);
+            return arrow;
+        };
+        const arrowDirections = [
+            new THREE.Vector3(1, 1, 0).normalize(), // NE
+            new THREE.Vector3(-1, 1, 0).normalize(), // NW
+            new THREE.Vector3(1, -1, 0).normalize(), // SE
+            new THREE.Vector3(-1, -1, 0).normalize(), // SW
+            new THREE.Vector3(1, 1, 1).normalize(), // NEZ+
+            new THREE.Vector3(-1, 1, 1).normalize(), // NWZ+
+            new THREE.Vector3(1, -1, 1).normalize(), // SEZ+
+            new THREE.Vector3(-1, -1, 1).normalize() // SWZ+
+        ];
+        const arrows = arrowDirections.map(dir => arrowHelper(dir));
+
+        // Create cubes for N, E, S, W (XY plane) and Z-axis equivalents
+        const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const cubeDistance = 1.5
+        const cubePositions = [
+            new THREE.Vector3(0, cubeDistance, 0), // N
+            new THREE.Vector3(cubeDistance, 0, 0), // E
+            new THREE.Vector3(0, -cubeDistance, 0), // S
+            new THREE.Vector3(-cubeDistance, 0, 0), // W
+            new THREE.Vector3(0, cubeDistance, cubeDistance), // NZ+
+            new THREE.Vector3(cubeDistance, 0, cubeDistance), // EZ+
+            new THREE.Vector3(0, -cubeDistance, cubeDistance), // SZ+
+            new THREE.Vector3(-cubeDistance, 0, cubeDistance) // WZ+
+        ];
+        const cubes = cubePositions.map(pos => {
+            const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.position.copy(pos);
+            scene.add(cube);
+            return { cube, origin: pos.clone() };
+        });
+
+        // Create arrowheads on 8 axes: NW, NE, SE, SW, SWZ, NWZ, N-Z, S-Z
+        const arrowheads = [];
+        const arrowDistance = 1.5; // Distance from origin
+        const arrowPositions = [
+            new THREE.Vector3(-arrowDistance, arrowDistance, 0), // NW
+            new THREE.Vector3(arrowDistance, arrowDistance, 0), // NE
+            new THREE.Vector3(arrowDistance, -arrowDistance, 0), // SE
+            new THREE.Vector3(-arrowDistance, -arrowDistance, 0), // SW
+            new THREE.Vector3(-arrowDistance, -arrowDistance, -arrowDistance), // SWZ
+            new THREE.Vector3(-arrowDistance, arrowDistance, -arrowDistance), // NWZ
+            new THREE.Vector3(0, arrowDistance, -arrowDistance), // N-Z
+            new THREE.Vector3(0, -arrowDistance, -arrowDistance) // S-Z
+        ];
+        arrowPositions.forEach(pos => {
+            const dir = pos.clone().normalize(); // Point outward from origin
+            const arrow = new THREE.ArrowHelper(dir, pos, 1, 0xffff00);
+            scene.add(arrow);
+            arrowheads.push(arrow);
+        });
+
+
+
+        // Position camera
+        const initialCameraPos = new THREE.Vector3(5, 5, 5);
+        camera.position.copy(initialCameraPos);
+        camera.lookAt(0, 0, 0);
+
+        // Zoom controls
+        const minDistance = 8.5; // Farthest zoom level
+        const maxDistance = 1.5; // Closest zoom level
+        let zoomLevel = initialCameraPos.length();
+        window.addEventListener('wheel', (event) => {
+            const zoomSpeed = 0.1;
+            zoomLevel += event.deltaY * zoomSpeed * 0.01;
+            zoomLevel = Math.max(maxDistance, Math.min(minDistance, zoomLevel));
+            const direction = initialCameraPos.clone().normalize();
+            camera.position.copy(direction.multiplyScalar(zoomLevel));
+            camera.lookAt(0, 0, 0);
+        });
+
+        // Animation loop
+        let angle = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            // Rotate spheres
+            redSphere.rotation.y += 0.01;
+            greenSphere.rotation.y += 0.008;
+            blueSphere.rotation.y += 0.006;
+
+            // Rotate cubes around the center (Y-axis rotation)
+            angle += 0.01;
+            cubes.forEach(({ cube, origin }) => {
+                const radius = origin.length();
+                const cosTheta = Math.cos(angle);
+                const sinTheta = Math.sin(angle);
+                let newX = origin.x * cosTheta - origin.z * sinTheta;
+                let newZ = origin.x * sinTheta + origin.z * cosTheta;
+                cube.position.set(newX, origin.y, newZ);
+            });
+
+            // Rotate arrowheads around the origin and update direction to point outward
+            arrowheads.forEach(arrow => {
+                arrow.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.01); // Orbit around X
+                arrow.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.01); // Orbit around Y
+                arrow.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), 0.01); // Orbit around Y
+                const dir = arrow.position.clone().normalize(); // Point outward
+                arrow.setDirection(dir);
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

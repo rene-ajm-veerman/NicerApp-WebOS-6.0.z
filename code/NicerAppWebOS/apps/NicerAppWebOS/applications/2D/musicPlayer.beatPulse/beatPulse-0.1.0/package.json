@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "aubiojs": "^0.2.1",
+    "numpy": "^0.0.1",
+    "pytest": "^1.0.0"
+  }
+}

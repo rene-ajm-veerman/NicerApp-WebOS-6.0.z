@@ -1,0 +1,50 @@
+{
+	"saObjectType" : "saGenericDataStorageFolder",
+	"saFolderWithNameABCXYZ" : {
+        "#  comment1" : "comment1",
+        "// comment2" : "comment2",
+        "// an ending / character is not needed for __file and __folder values",
+        "__include" : {
+            "keyname1asComment" : {
+                "__file" : "__file:../path/to/someFile.json",
+                "__insertWhenPHP" : "PHP eval() code which must return true for the file to be included in PHP RAM memory. when this filter is not included, the file is always included.",
+                "__insertWhenJS" : "Javascript eval() code which must return true for the file to be included in the browser's RAM memory. when this filter is not included, the file is always included.",
+                "__insertionJSONpath" : "/saFolderWithNameABCXYZ/__data/keyname1"
+            },
+            "keyname2asComment" : {
+                "__file" : "__file:/path/to/someOtherFile.json",
+                "__insertionJSONpath" : "/saFolderWithNameABCXYZ/__data/keyname2"
+            },
+            "keyname3asComment" : {
+                "__files" : {
+                    "folder" : "__folder:/path/to/someFolder",
+                    "folderRecursive" : "__folder:/path/to/someFolder",
+                    "// note" : "only either folder or folderRecursive is possible in a __files definition",
+                    
+                    "filenameFilterPHPpreg" : "/(foo|bar)/",
+                    "filenameFilterPHPsubstr" : "foo",
+                    "fileCreatedAtDateTime__begin" : "Javascript Date().toJSON() output",
+                    "fileCreatedAtDateTime__end" : "Javascript Date().toJSON() output",
+                    "fileLastWrittenToDateTime__begin" : "Javascript Date().toJSON() output",
+                    "fileLastWrittenToDateTime__end" : "Javascript Date().toJSON() output"
+                }
+            }
+        },
+        "__require" : {
+            "keyname3asComment" : {
+                "__file" : "__file:../someOtherPath/to/someFile.json",
+                "__insertionJSONpath" : "/saFolderWithNameABCXYZ/__data/keyname3/"
+            },
+            "keyname4asComment" : {
+                "__file" : "__file:/someOtherPath/to/someOtherFile.json",
+                "__insertionJSONpath" : "/saFolderWithNameABCXYZ/__data/keyname4/"
+            }
+        },
+        "__data" : {
+            "keynameN" : {
+                "existingSubFolderStructure" : 
+                    "consisting of JSON "folders" keynames like "keynameN here", JSON "files" (keynames like existingSubFolderStructure here, with a specific value rather than a javascript object or array like keynameN lists), and JSON "file-contents" (values that are not javascript objects or arrays) or (as a value string) references to files elsewhere on disk (__file and __files)."
+            }
+        }
+	}
+}

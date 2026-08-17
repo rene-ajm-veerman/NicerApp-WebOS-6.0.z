@@ -1,0 +1,5 @@
+and we need a way to drag-and-resize the sizes and re-arrange the positions of individual dialogs.
+
+for now though, we'll make do with simple buttons at the top, like a tabs component, to draw in and move out, invididual dialogs. this saves the user having to go through the menu, which i find cumbersome. 
+in fact, i got a tabs component that uses the vividButton, and it shouldn't be hard to make that fully transparent and with (hint! : drawn circular icons instead of the vividButtons i've used so far).
+this will lead into a vividButton-3 version : one that can use a mix (inputFiles:[]) of sprite images, and/or JSON, webGL or canvas code files.

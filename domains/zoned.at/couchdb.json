@@ -1,0 +1,11 @@
+{
+    "http" : "https://",
+    "domain" : "127.0.0.1",
+    "port" : "5984",
+    "useSSL" : false,
+    "httpAdapter" : "HTTP_CURL",
+    "username" : "Guest",
+    "password" : "Guest",
+    "adminUsername" : "admin",
+    "adminPassword" : "texass.t33"
+}

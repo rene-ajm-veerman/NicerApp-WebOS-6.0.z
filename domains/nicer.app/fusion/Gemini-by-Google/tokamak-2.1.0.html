@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- (C) + (R) 2026 Rene AJM Veerman with assistance by Gemini from Google.com -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokamak Fusion Physics Simulator</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: monospace;
+            color: #00ffcc;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #00ffcc;
+            border-radius: 5px;
+            pointer-events: none;
+            width: 270px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15);
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #00ffcc;
+            border-radius: 5px;
+            width: 280px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15);
+        }
+        .control-group {
+            margin-bottom: 12px;
+        }
+        .control-group label {
+            display: block;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        .control-group input {
+            width: 100%;
+            accent-color: #00ffcc;
+            cursor: pointer;
+        }
+        h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #00ffcc;
+            margin: 8px 0;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+        .metric-label {
+            color: #88ffea;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="simCanvas"></canvas>
+
+<div id="hud">
+    <h3>⚛️ REAL-TIME TELEMETRY</h3>
+    <hr>
+    <div class="metric-row"><span class="metric-label">Major Radius (R₀):</span> <span id="valR0">6.20</span> m</div>
+    <div class="metric-row"><span class="metric-label">Minor Radius (a):</span> <span id="valA">2.00</span> m</div>
+    <div class="metric-row"><span class="metric-label">Elongation (κ):</span> <span id="valKappa">1.70</span></div>
+    <div class="metric-row"><span class="metric-label">Plasma Volume:</span> <span><span id="valVolume">0</span> m³</span></div>
+    <hr>
+    <div class="metric-row"><span class="metric-label">Target Temp:</span> <span id="valTargetT">15.0</span> keV</div>
+    <div class="metric-row"><span class="metric-label">Live Core Temp:</span> <strong><span id="valTemp">0</span> keV</strong></div>
+    <div class="metric-row"><span class="metric-label">Target Density:</span> <span id="valTargetN">1.00</span> ×10²⁰</div>
+    <div class="metric-row"><span class="metric-label">Live Density:</span> <strong><span id="valDensity">0</span> ×10²⁰</strong></div>
+    <div class="metric-row"><span class="metric-label">Aux Heating:</span> <span id="valPheat">50</span> MW</div>
+    <hr>
+    <div class="metric-row" style="font-size: 1.1em;"><span style="color:#ffcc00; font-weight:bold;">Power (P_fus):</span> <strong><span id="valP_fus" style="color:#ffcc00;">0</span> MW</strong></div>
+    <div class="metric-row" style="font-size: 1.1em;"><span class="metric-label" style="font-weight:bold;">Gain Factor (Q):</span> <strong><span id="valQ">0</span></strong></div>
+    <span id="statusBanner" style="font-size:11px; display:block; font-weight:bold; text-align:center; margin-top:8px; padding: 4px; border-radius: 3px; background: rgba(255,255,255,0.05);"></span>
+</div>
+
+<div id="controls">
+    <h3>⚙️ REACTOR CONTROLS</h3>
+    <hr>
+    <div class="control-group">
+        <label>Major Radius (R₀): <span id="lblR0">6.2</span>m</label>
+        <input type="range" id="paramR0" min="2.0" max="10.0" step="0.1" value="6.2">
+    </div>
+    <div class="control-group">
+        <label>Minor Radius (a): <span id="lblA">2.0</span>m</label>
+        <input type="range" id="paramA" min="0.5" max="3.5" step="0.05" value="2.0">
+    </div>
+    <div class="control-group">
+        <label>Elongation (κ): <span id="lblKappa">1.7</span></label>
+        <input type="range" id="paramKappa" min="1.0" max="2.2" step="0.05" value="1.7">
+    </div>
+    <hr>
+    <div class="control-group">
+        <label>Temperature: <span id="lblT">15.0</span> keV</label>
+        <input type="range" id="paramT" min="1.0" max="35.0" step="0.5" value="15.0">
+    </div>
+    <div class="control-group">
+        <label>Density (n): <span id="lblN">1.0</span> ×10²⁰ m⁻³</label>
+        <input type="range" id="paramN" min="0.1" max="3.0" step="0.05" value="1.0">
+    </div>
+    <div class="control-group">
+        <label>Heating Power: <span id="lblPheat">50</span> MW</label>
+        <input type="range" id="paramPheat" min="10" max="150" step="1" value="50">
+    </div>
+</div>
+
+<script>
+const state = {
+    R0: 6.20, a: 2.00, kappa: 1.70,
+    T: 15.0, n: 1.0, P_heat: 50.0,
+    rotX: 0.6, rotY: 0.5
+};
+
+const inputs = {
+    R0: document.getElementById('paramR0'),
+    a: document.getElementById('paramA'),
+    kappa: document.getElementById('paramKappa'),
+    T: document.getElementById('paramT'),
+    n: document.getElementById('paramN'),
+    P_heat: document.getElementById('paramPheat')
+};
+
+const labels = {
+    R0: document.getElementById('lblR0'),
+    a: document.getElementById('lblA'),
+    kappa: document.getElementById('lblKappa'),
+    T: document.getElementById('lblT'),
+    n: document.getElementById('lblN'),
+    P_heat: document.getElementById('lblPheat')
+};
+
+Object.keys(inputs).forEach(key => {
+    inputs[key].addEventListener('input', (e) => {
+        state[key] = parseFloat(e.target.value);
+        labels[key].innerText = state[key].toFixed(key === 'P_heat' ? 0 : (key === 'n' ? 2 : 1));
+    });
+});
+
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function calculatePhysics(T_live, n_live) {
+    const volume = 2 * Math.PI * Math.PI * state.R0 * (state.a * state.a) * state.kappa;
+    const reactivity = 1.1e-24 * (T_live * T_live);
+    const trueDensity = n_live * 1e20;
+    const energyPerReaction = 2.82e-12;
+
+    const totalPowerWatts = 0.25 * (trueDensity * trueDensity) * reactivity * energyPerReaction * volume;
+    const P_fus = totalPowerWatts / 1e6;
+    const Q = P_fus / state.P_heat;
+
+    return { volume, P_fus, Q };
+}
+
+function project3D(x, y, z, width, height) {
+    let cosY = Math.cos(state.rotY), sinY = Math.sin(state.rotY);
+    let x1 = x * cosY - z * sinY;
+    let z1 = x * sinY + z * cosY;
+
+    let cosX = Math.cos(state.rotX), sinX = Math.sin(state.rotX);
+    let y2 = y * cosX - z1 * sinX;
+    let z2 = y * sinX + z1 * cosX;
+
+    const perspective = 400 / (400 + z2);
+    return {
+        x: width / 2 + x1 * 30 * perspective,
+        y: height / 2 - y2 * 30 * perspective,
+        depth: z2
+    };
+}
+
+function render(time) {
+    requestAnimationFrame(render);
+
+    const elapsed = time * 0.001;
+    state.rotY = elapsed * 0.15;
+
+    const T_live = state.T + Math.sin(elapsed * 5.0) * 0.18;
+    const n_live = state.n + Math.cos(elapsed * 3.5) * 0.009;
+
+    const metrics = calculatePhysics(T_live, n_live);
+
+    document.getElementById('valR0').innerText = state.R0.toFixed(2);
+    document.getElementById('valA').innerText = state.a.toFixed(2);
+    document.getElementById('valKappa').innerText = state.kappa.toFixed(2);
+    document.getElementById('valTargetT').innerText = state.T.toFixed(1);
+    document.getElementById('valTargetN').innerText = state.n.toFixed(2);
+    document.getElementById('valPheat').innerText = state.P_heat.toFixed(0);
+
+    document.getElementById('valVolume').innerText = metrics.volume.toFixed(1);
+    document.getElementById('valTemp').innerText = T_live.toFixed(2);
+    document.getElementById('valDensity').innerText = n_live.toFixed(3);
+    document.getElementById('valP_fus').innerText = metrics.P_fus.toFixed(2);
+
+    const qEl = document.getElementById('valQ');
+    const sbEl = document.getElementById('statusBanner');
+
+    qEl.innerText = metrics.Q.toFixed(3);
+
+    if (metrics.Q >= 10.0) {
+        qEl.style.color = '#00ff00';
+        sbEl.innerText = '🔥 Ignition Achieved!';
+        sbEl.style.color = '#00ff00';
+    } else if (metrics.Q >= 1.0) {
+        qEl.style.color = '#7cff7c';
+        sbEl.innerText = '✅ Net Energy Breakeven';
+        sbEl.style.color = '#7cff7c';
+    } else {
+        qEl.style.color = '#ff3333';
+        sbEl.innerText = '❌ Sub-Breakeven';
+        sbEl.style.color = '#ff3333';
+    }
+
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const safetyR0 = Math.max(state.R0, state.a + 0.1);
+
+    const points = [];
+    const toroidalTurns = 24;
+    const poloidalTurns = 12;
+
+    for (let t = 0; t < toroidalTurns; t++) {
+        const phi = (t / toroidalTurns) * Math.PI * 2;
+        for (let p = 0; p < poloidalTurns; p++) {
+            const theta = (p / poloidalTurns) * Math.PI * 2;
+
+            const r = safetyR0 + state.a * Math.cos(theta);
+            const x = r * Math.cos(phi);
+            const z = r * Math.sin(phi);
+            const y = state.a * Math.sin(theta) * state.kappa;
+
+            const proj = project3D(x, y, z, canvas.width, canvas.height);
+            points.push(proj);
+        }
+    }
+
+    const powerRatio = Math.min(metrics.P_fus / 600.0, 1.0);
+    ctx.lineWidth = 1;
+
+    const coreHue = Math.floor(15 - (powerRatio * 35));
+ctx.strokeStyle = hsla(${coreHue}, 100%, 60%, ${0.15 + (powerRatio * 0.25)});for (let t = 0; t < toroidalTurns; t++) {ctx.beginPath();for (let p = 0; p < poloidalTurns; p++) {const idx = t * poloidalTurns + p;if (p === 0) ctx.moveTo(points[idx].x, points[idx].y);else ctx.lineTo(points[idx].x, points[idx].y);}ctx.closePath();ctx.stroke();}ctx.lineWidth = 2;ctx.strokeStyle = '#00ffff';ctx.beginPath();const magneticSegments = 300;const hTorusTurns = 16;const hPolTurns = 4;for (let i = 0; i <= magneticSegments; i++) {const phi = (i / magneticSegments) * Math.PI * 2 * hTorusTurns + (elapsed * 0.2);const theta = (i / magneticSegments) * Math.PI * 2 * hPolTurns * hTorusTurns;const r = safetyR0 + state.a * Math.cos(theta);const x = r * Math.cos(phi);const z = r * Math.sin(phi);const y = state.a * Math.sin(theta) * state.kappa;const proj = project3D(x, y, z, canvas.width, canvas.height);if (i === 0) ctx.moveTo(proj.x, proj.y);else ctx.lineTo(proj.x, proj.y);}ctx.stroke();}requestAnimationFrame(render);
+

@@ -1,0 +1,642 @@
+Traceback (most recent call last):
+  File "/var/www/nicer.app-5.10.z/code/NicerAppWebOS/scripts.maintenance/./ollama.image-to-text.AI.py", line 3, in <module>
+    import ollama
+ModuleNotFoundError: No module named 'ollama'
+Traceback (most recent call last):
+  File "/var/www/nicer.app-5.10.z/code/NicerAppWebOS/scripts.maintenance/./ollama.image-to-text.AI.py", line 3, in <module>
+    import ollama
+ModuleNotFoundError: No module named 'ollama'
+Traceback (most recent call last):
+  File "/var/www/nicer.app-5.10.z/code/NicerAppWebOS/scripts.maintenance/./ollama.image-to-text.AI.py", line 4, in <module>
+    import ollama
+ModuleNotFoundError: No module named 'ollama'
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,650 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,650 images
+4927 images left to process
+
+[   1/4927] 8269428198_c74189ff17_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4927] 8258204888_fcbd076678_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4927] 8266696748_206082306a_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4927] 8268348779_f53fcffab3_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4927] 8268351377_ac437e9a8f_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4927] 8269418596_46a426dc48_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4927] 8269412992_78c5f56e63_b.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4927] Dolphin_with_young.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4927] pexels-jeremy-bishop-7866304.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4927] 4600853-polar-bear-bear-breath-air-bubbles-submerged-water.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,660 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,660 images
+4917 images left to process
+
+[   1/4917] Shark.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4917] pexels-emma-li-5503788.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4917] 4600501-hai-surfer-wave-fantasy-sea-fish-ocean-nature.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4917] pexels-hung-tran-3699434.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4917] 4600919-animal-sharks-aquarium-fish-ocean-sea-swimming.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4917] Penguin.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4917] Shark_with_young.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4917] pexels-francesco-ungaro-3189106.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4917] seals_on_coastal_rock.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4917] clownfish.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,670 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,670 images
+4907 images left to process
+
+[   1/4907] pexels-jeremy-bishop-2397651.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4907] 4600980-hai-sharks-sea-ocean-water-underwater.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4907] 4600424-turtle-coast-amphibian-animal-reptile.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4907] pexels-jeremy-bishop-2422915.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4907] 4600908-animal-turtle-aquatic-diving-marine-life-ocean.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4907] pexels-pixabay-64219.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4907] Underwater_World_Ocean_Fish_coral_reef_7200x4800.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4907] animal-close-up-ocean-68744.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4907] Fish_Underwater_world_Animals_6039x3578.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4907] animal-cute-dolphins-225869.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,680 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,680 images
+4897 images left to process
+
+[   1/4897] 4K-Skull-Sea-Turtle-Underwater-World-Wallpaper-3840x2160.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4897] 4600577-dolphins-underwater-animals-life-marine-aquatic.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4897] manta_ray_fish_4k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4897] 4600874-dolphins-water-smooth-calm-ocean-sea-mammal.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4897] art_peacocks.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4897] art_bunny_in_high_grass.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4897] macaw_lowpoly_art_4k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4897] art_dolphins.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4897] lubuntu_hummingbird.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4897] art_butterflies.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,690 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,690 images
+4887 images left to process
+
+[   1/4887] lakeside_sunset_landscape_5k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4887] 4600401-animal-gorilla-ape-primate-herbivore-silver-back.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4887] painting_Elephant_walking_in_forest_under_Godrays.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4887] 279.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4887] nature_rain_jungle_animals_leaves_frogs_water_drops_macro_depth_of_field_Red_Eyed_Tree_Frog_amphibians_1920x1080.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4887] frog.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4887] animal-close-up-color-927497.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4887] simba_in_the_lion_king_4k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4887] polar_bears.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4887] larutadelsorigens_savage-wallpaper_475896.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json
+Scanning folders under: /var/www/nicer.app-5.10.z/domains/nicer.app/siteMedia/backgrounds/Landscape
+Found 18577 total images
+Main file:   wallpaper_descriptions_multi_prompts-Landscape.json
+Batch files: [PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b1.json'), PosixPath('wallpaper_descriptions_multi_prompts-Landscape..b2.json')]
+
+Loaded main file: 13,710 images already processed
+→ Created backup: wallpaper_descriptions_multi_prompts-Landscape.main_backup_before_merge.json
+From wallpaper_descriptions_multi_prompts-Landscape..b1.json: added 0 new images
+From wallpaper_descriptions_multi_prompts-Landscape..b2.json: added 0 new images
+
+Total new images added from batches: 0
+Final total in results: 13,710 images
+4867 images left to process
+
+[   1/4867] 4600515-leopard-snow-leopards-animal-big-cat-cat-zoo.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   2/4867] 4600163-persian-leopard-leopard-snow-leopard-snow-winter.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   3/4867] Tiger_2.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   4/4867] white_tiger_in_the_jungle_5k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   5/4867] tiger_oil_paint_4k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   6/4867] Tiger.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   7/4867] white-tiger-4k-3840x2160.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   8/4867] young_tigress_4k_5k.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[   9/4867] Tiger_3.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+[  10/4867] siberian_tiger.jpg
+  - llava-llama3 / detailed ... done
+  - llava-llama3 / keywords ... done
+  - llava:7b / detailed ... done
+  - llava:7b / keywords ... done
+  - bakllava / detailed ... done
+  - bakllava / keywords ... done
+  - moondream / detailed ... done
+  - moondream / keywords ... done
+→ Successfully saved merged file: wallpaper_descriptions_multi_prompts-Landscape.json

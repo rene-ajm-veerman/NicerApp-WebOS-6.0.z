@@ -1,0 +1,11 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/app.3D.fileExplorer" : {
+                "#siteContent" : { },
+                "#siteToolbarRight" : { }
+                }
+        },
+        "seoValue" : [ "demo-3D-fileExplorer" ]
+    }
+]

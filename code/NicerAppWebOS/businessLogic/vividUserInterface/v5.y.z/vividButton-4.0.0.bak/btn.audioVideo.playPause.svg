@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 104 104" style="width:50px;height:50px" id="svgPlayPause">
+	<circle id="circle" fill="rgba(0,0,0,0)" cx="51" cy="51" r="50" stroke-dasharray="314" stroke-dashoffset="0" style="stroke-width:2px;stroke:rgba(0,0,0,0);" />
+	<line id="line1" x1="38" y1="30" x2="38" y2="70" style="stroke-width:7px;stroke:skyblue;stroke-linecap: round;" />
+	<path id="line2" d="M 66 30 L 66 50 L 66 70" rx="10" ry="10" style="stroke-width:7px;stroke:skyblue;fill:skyblue;stroke-linejoin: round;stroke-linecap: round;">
+	</path>
+		<animate
+		xlink:href="#line2"
+			attributeName="d"
+			dur="300ms"
+			from="M 66 30 L 66 50 L 66 70"
+			to="M 38 30 L 70 50 L 38 70"
+			begin="indefinite"
+			fill="freeze"
+			id="from_pause_to_play"
+		/>
+	<animate
+		xlink:href="#line2"
+		attributeName="d"
+		dur="300ms"
+		from="M 38 30 L 70 50 L 38 70"
+		to="M 66 30 L 66 50 L 66 70"
+		fill="freeze"
+		id="from_play_to_pause"
+		begin="indefinite"
+	/>
+</svg>

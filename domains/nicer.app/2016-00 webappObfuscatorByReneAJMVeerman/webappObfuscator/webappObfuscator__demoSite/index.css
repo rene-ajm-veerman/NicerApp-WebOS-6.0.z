@@ -1,0 +1,46 @@
+.dfo__menu {
+	position : absolute;
+}
+
+.dfo__menu ul {
+	margin : 0px;
+	margin-top : 5px;
+	height : 100%;
+}
+
+.dfo__menu li {
+	display: inline;
+	list-style-type: none;
+	padding : 0px;
+	padding-right: 20px;
+}
+
+#dfo__menu {
+	top : 1%;
+	height : 5%;
+	left : 20%;
+	width : 60%;
+	border : 1px solid navy;
+}
+
+.dfo_dialog {
+	position : absolute;
+	border : 1px solid purple;
+	top : 2%;
+}
+
+#dfo__leftSidebar {
+	left : 5%;
+	width : 10%;
+}
+
+#dfo__rightSidebar {
+	right : 5%;
+	width : 10%;
+}
+
+#dfo__content {
+	left : 20%;
+	width : 60%;
+	top : 7%;
+}

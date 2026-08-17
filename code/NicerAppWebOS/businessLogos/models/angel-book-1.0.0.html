@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GLB Viewer – Angel Book (4K Texture)</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: transparent;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Loading overlay with progress bar */
+    #loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      color: #ddd;
+      font-family: system-ui, sans-serif;
+      font-size: 1.1rem;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .progress-container {
+      width: 280px;
+      height: 8px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #a8d0ff, #6ca8ff);
+      border-radius: 4px;
+      transition: width 0.15s ease-out;
+    }
+
+    .progress-text {
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="loading">
+      <div class="progress-text">Loading model… <span id="percent">0</span>%</div>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":                "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js",
+      "three/addons/":        "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  const container = document.getElementById('container');
+  const loading   = document.getElementById('loading');
+  const percentEl = document.getElementById('percent');
+  const progressBar = document.getElementById('progress-bar');
+
+  // Scene
+  const scene = new THREE.Scene();
+  scene.background = null;
+
+  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 0.4, 3.2);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(devicePixelRatio);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  container.appendChild(renderer.domElement);
+
+  // Controls – now with auto-rotate
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 0.8;
+  controls.maxDistance = 15;
+  controls.autoRotate = true;                // ← enabled!
+  controls.autoRotateSpeed = 0.8;            // ← tune speed here (degrees/sec)
+
+  // Lights (unchanged)
+  const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+  scene.add(ambient);
+
+  const frontLight = new THREE.DirectionalLight(0xfff8f0, 2.3);
+  frontLight.position.set(3.0, 5.0, 3.5);
+  frontLight.target.position.set(0, 0.9, 0);
+  scene.add(frontLight);
+  scene.add(frontLight.target);
+
+  const backLight = new THREE.DirectionalLight(0xe8f0ff, 1.5);
+  backLight.position.set(-2.2, -2.5, -3.0);
+  backLight.target.position.set(0, 0.5, 0);
+  scene.add(backLight);
+  scene.add(backLight.target);
+
+  // Model – no group needed for rotation anymore
+  let model = null;
+
+  const loader = new GLTFLoader();
+  const url = 'https://nicer.app/NicerAppWebOS/businessLogos/models/angel-book-8Ktexture.glb';
+
+  loader.load(
+    url,
+    (gltf) => {
+      model = gltf.scene;
+      scene.add(model);  // ← directly to scene
+
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size   = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const f = 1 / maxDim;
+      model.scale.setScalar(f);
+      model.position.sub(center.multiplyScalar(f));
+
+      // Optional small initial offset
+      model.rotation.y = Math.PI * 0.1;
+
+      loading.classList.add('hidden');
+      setTimeout(() => { loading.style.display = 'none'; }, 450);
+    },
+    (xhr) => {
+      if (xhr.lengthComputable) {
+        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+        percentEl.textContent = percent;
+        progressBar.style.width = percent + '%';
+      }
+    },
+    (err) => {
+      console.error('GLTF load failed:', err);
+      percentEl.textContent = 'Error';
+      progressBar.style.background = '#ff6b6b';
+    }
+  );
+
+  // Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  // Animation – controls now rotate the camera
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+</script></body>
+</html>

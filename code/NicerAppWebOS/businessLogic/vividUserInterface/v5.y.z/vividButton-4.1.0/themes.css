@@ -1,0 +1,142 @@
+:root {
+    /*---
+     * -- vb = vividButton
+     */
+    --vb-icon-widthHeight : 50px;
+    --vb-iconImg-topLeft : 3px;
+    --vb-iconImg-widthHeight : 44px;
+}
+
+/*
+.flexBreak {
+    flex-basis : 100%;
+    height : 0;
+    min-width : 100%;
+}*/
+
+.vividButton4 {
+    display : inline-flex;
+    flex-direction : column;
+    justify-content : space-around;
+    align-items : center;
+    top : 0px;
+    left : 0px;
+    width : var(--vb-icon-widthHeight);
+    min-width : var(--vb-icon-widthHeight);
+    max-width : var(--vb-icon-widthHeight);
+    height : var(--vb-icon-widthHeight);
+    min-height : var(--vb-icon-widthHeight);
+    max-height : var(--vb-icon-widthHeight);
+}
+
+.vividButton_currentState {
+    z-index : 2240;
+    display : inline-flex;
+    flex-direction : column;
+    justify-content : space-around;
+    align-items : center;
+    top : 0px;
+    left : 0px;
+    width : var(--vb-icon-widthHeight);
+    min-width : var(--vb-icon-widthHeight);
+    max-width : var(--vb-icon-widthHeight);
+    height : var(--vb-icon-widthHeight);
+    min-height : var(--vb-icon-widthHeight);
+    max-height : var(--vb-icon-widthHeight);
+}    
+
+.vividButton_toState {
+    z-index : 2230;
+    display : inline-flex;
+    flex-direction : column;
+    justify-content : center;
+    align-items : center;
+    top : 0px;
+    left : 0px;
+    width : var(--vb-icon-widthHeight);
+    min-width : var(--vb-icon-widthHeight);
+    max-width : var(--vb-icon-widthHeight);
+    height : var(--vb-icon-widthHeight);
+    min-height : var(--vb-icon-widthHeight);
+    max-height : var(--vb-icon-widthHeight);
+    opacity : 0;
+}    
+
+
+.icon_background {
+    display : inline-flex;
+    top : var(--vb-iconImg-topLeft);
+    left : var(--vb-iconImg-topLeft);
+    width : var(--vb-iconImg-widthHeight);
+    min-width : var(--vb-iconImg-widthHeight);
+    max-width : var(--vb-iconImg-widthHeight);
+    height : var(--vb-iconImg-widthHeight);
+    min-height : var(--vb-iconImg-widthHeight);
+    max-height : var(--vb-iconImg-widthHeight);
+    background : rgba(0,0,0,0.7);
+    border-radius : 10px;
+    transform : translateY(20px);
+}
+
+.circleIcon_background {
+    display : inline-flex;
+    order : 1;
+    /*transform : translateY(22px);*/
+    top : var(--vb-iconImg-topLeft);
+    left : var(--vb-iconImg-topLeft);
+    width : var(--vb-iconImg-widthHeight);
+    min-width : var(--vb-iconImg-widthHeight);
+    max-width : var(--vb-iconImg-widthHeight);
+    height : var(--vb-iconImg-widthHeight);
+    min-height : var(--vb-iconImg-widthHeight);
+    max-height : var(--vb-iconImg-widthHeight);
+    transform : translateY(20px);
+    border-radius : 100px;
+    z-index : 4150;
+}
+
+.circleIcon_img {
+    display : inline-flex;
+    order : 1;
+    top : var(--vb-iconImg-topLeft);
+    left : var(--vb-iconImg-topLeft);
+    width : var(--vb-iconImg-widthHeight);
+    min-width : var(--vb-iconImg-widthHeight);
+    max-width : var(--vb-iconImg-widthHeight);
+    height : var(--vb-iconImg-widthHeight);
+    min-height : var(--vb-iconImg-widthHeight);
+    max-height : var(--vb-iconImg-widthHeight);
+    transform : translateY(-20px);
+    z-index : 4190;
+} 
+
+.circleIcon_svg {
+    display : inline-flex;
+    order : 1;
+    top : var(--vb-iconImg-topLeft);
+    left : var(--vb-iconImg-topLeft);
+    width : var(--vb-iconImg-widthHeight);
+    min-width : var(--vb-iconImg-widthHeight);
+    max-width : var(--vb-iconImg-widthHeight);
+    height : var(--vb-iconImg-widthHeight);
+    min-height : var(--vb-iconImg-widthHeight);
+    max-height : var(--vb-iconImg-widthHeight);
+    transform : translateY(-26px);
+    z-index : 4180;
+}
+.circleIcon_svg {
+    z-index : 4180;
+}
+
+.vividButton_currentState .circleIcon__svg {
+    transition : 1s;
+    fill : white;
+    opacity : 0.5;
+    z-index : 3000;
+}
+
+.vividButton_currentState:hover .circleIcon__svg {
+    fill : lime;
+    opacity : 1;
+    z-index : 3000;
+}

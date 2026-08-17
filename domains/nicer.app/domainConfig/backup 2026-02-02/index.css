@@ -1,0 +1,481 @@
+body {
+  margin : 0;
+  padding : 0;
+  overflow : hidden;
+  font-family: Montserrat, 'Roboto Condensed', sans-serif;
+}
+
+@media (any-pointer: coarse) {
+    body {
+        font-size : x-large;
+    }
+    .divFor_neCompanyLogo {
+    }
+}
+@media (any-pointer: fine) {
+    body:not(.na_themes_dropdown__themes) {
+        font-size : inherit;
+    }
+    .divFor_neCompanyLogo {
+    }
+}
+
+
+pre, p {
+    display : block;
+    position : relative;
+    width : fit-content;
+
+    vertical-align : inherit;
+    text-wrap : initial;
+    word-break : auto-phrase;
+    line-break : after;
+
+    page-break-after: always; /* CSS 2.1 syntax */
+    break-after: always; /* CSS 3 syntax */
+    wrap-after: flex; /* New proposed syntax */
+
+    margin : 10px;
+    padding : 10px;
+    border-radius : 10px;
+}
+
+.flexLinebreak {
+  width : 100%;
+}
+.linkContainer {
+    display : flex;
+    justify-content : left;
+    align-items : center;
+    width : 80%;
+    left : 10%;
+    margin : 20px;
+}
+.linkContainer a {
+    margin-right : 10px;
+}
+
+#siteBackground {
+  position : absolute;
+  width : 100%;
+  height : 100%;
+  margin : 0;
+  padding : 0;
+}
+#siteTaskbar {
+  overflow : visible;
+}
+.vividDialog > canvas.naBorder {
+    z-index : 7000;
+}
+.vividDialog > canvas.naBackground {
+    z-index : 7100;
+}
+
+#siteRegistration, #siteLogin {
+    width : 700px;
+    left : calc(50% - 350px);
+}
+
+.vividDialog {
+  position : absolute;
+  z-index : 800000;
+}
+.vividDialog > .vividDialogContent {
+    position : absolute;
+    top : 0px;
+    left : 0px;
+    width : 100%;
+    height : 100%;
+}
+.vividDialog > video {
+  display : none;
+}
+.vividDialog > canvas {
+  position : absolute;
+  width : 100%;
+  height : 100%;
+}
+
+.vividDialogPopup {
+    z-index : 2000100;
+}
+.naStartMenu {
+    z-index : 900000;
+}
+
+
+.vividButton, .vividMenu {
+    position : absolute;
+}
+.vividButton_container_50x50, .vividButton, .vividMenu {
+    z-index : 910000;
+}
+.vividButton, .vividButtonSelected {
+    position : absolute;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    text-align : center;
+    font-size: clamp(1rem, 0.91rem + 0.4802vw, 2.0625rem);
+    height : auto;
+    width : auto;
+    margin : 5px;
+    padding : 5px;
+}
+.vividMenu_subMenuPanel {
+    position : absolute;
+}
+
+
+.vividButton {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    text-align : center;
+}
+.vividButton_container_50x50 {
+    height : auto;
+    margin : 4px;
+}
+.vividButton_icon_50x50_sdsdt img {
+    position : absolute;
+    top : 0px;
+    left : 0px;
+    width : 35px;
+    height : 35px;
+}
+.vividButton_icon_50x50 {
+    display : inline-block;
+    position : relative;
+    z-index : 1100;
+    width : 50px;
+    height : 50px;
+}
+
+.vividButton_icon_50x50_siteTop {
+    display : inline-block;
+    position : absolute;
+    width : 50px;
+    height : 50px;
+    z-index : 1200;
+}
+.vividButton_icon_50x50_siteTop img {
+    position: absolute;
+    top : 3px;
+    left : 3px;
+    width : 44px;
+    height : 44px;
+}
+.vividButton_icon_50x50_siteTop .vividButton_icon_imgTile_50x50, .vividButton_icon_50x50 .vividButton_icon_imgTile_50x50, .vividButton_icon_50x50.nateNav .vividButton_icon_imgTile_50x50 {
+    box-shadow : 2px 2px 2px 2px rgba(0,0,0,0.7);
+    border-radius : 5px;
+}
+.vividButton_icon_50x50_siteTop .vividButton_icon_imgButtonIcon_50x50 {
+    top : 8px;
+    left : 8px;
+    width : 36px;
+    height : 36px;
+}
+.vividButton_icon_50x50.nateNav {
+    z-index : 1100;
+    width : 48px;
+    height : 48px;
+
+}
+.vividButton_icon_50x50.nateNav img {
+    position : absolute;
+    top : 2px;
+    left : 2px;
+    width : 44px;
+    height : 44px;
+}
+.vividButton_icon_50x50 {
+    width : 50px;
+    height : 50px;
+}
+.vividButton_icon_50x50 img {
+    outline : 0;
+}
+/*
+.vividButton_icon_50x50 img {
+    top : 3px;
+    left : 3px;
+    width : 44px;
+    height : 44px;
+}
+*/
+.vividButton_icon_borderCSS_50x50 {
+    position : absolute;
+    top : 0px;
+    left : 0px;
+    width : 50px;
+    height : 50px;
+    z-index : 2002;
+    border-radius : 8px;
+}
+.vividButton_icon_imgBorder_50x50 {
+    position : relative;
+    z-index : 2012;
+    top : 1px;
+    left : 1px;
+    width : 46px;
+    height : 46px;
+}
+.vividButton_icon_imgTile_50x50 {
+    position : absolute;
+    top : 1px;
+    left : 1px;
+    width : 46px;
+    height : 46px;
+    z-index : 2010;
+    box-shadow : 2px 2px 2px 2px rgba(0,0,0,0.7);
+    border-radius : 10px;
+}
+.vividButton_icon_imgButtonIconBG_50x50 {
+    position : absolute;
+    top : 1px;
+    left : 1px;
+    width : 48px;
+    height : 48px;
+    /*opacity : 0.4;*/
+    z-index : 2015;
+}
+.vividButton_icon_50x50_siteTop .vividButton_icon_imgButtonIconBG_50x50 {
+    opacity : 0.4;
+}
+.vividButton_icon_imgButtonIcon_50x50 {
+    width : 42px;
+    top : 4px;
+    left : 4px;
+    position : absolute;
+    z-index : 2020;
+}
+.vividButton_icon_borderCSS_50x50.relative {
+    position : relative;
+    top : 0px;
+    left : 0px;
+    width : 50px;
+    height : 50px;
+    z-index : 2002;
+    border-radius : 10px;
+}
+.vividButton_icon_imgBorder_50x50.relative {
+    position : relative;
+    z-index : 2012;
+    left : calc(2px + 2px);
+    top : calc(-50px + 2px);
+    width : 44px;
+    height : 44px;
+}
+.vividButton_icon_imgTile_50x50.relative {
+    position : relative;
+    left : calc(2px + 1px);
+    top : calc(-100px + 2px );
+    width : 46px;
+    height : 46px;
+    z-index : 2010;
+    box-shadow : 2px 2px 2px 2px rgba(0,0,0,0.7);
+    border-radius : 10px;
+}
+.vividButton_icon_imgButtonIconBG_50x50.relative {
+    position : relative;
+    left : calc(2px + 2px + 2px);
+    top : calc(-150px + 1px + 2px);
+    width : 42px;
+    height : 42px;
+    opacity : 0.4;
+    z-index : 2015;
+}
+.vividButton_icon_imgButtonIcon_50x50.relative {
+    width : 32px;
+    height : 32px;
+    left : calc(8px + 1px + 2px);
+    top : calc(-200px + 8px + 2px + 2px);
+    position : relative;
+    z-index : 2020;
+}
+
+
+
+
+.vividButton_icon_100x100 {
+    display : inline-block;
+    flex-grow : 1;
+    padding-top : 5px;
+    width : 100px;
+    height : 100px;
+}
+.vividButton_icon_borderCSS_100x100.relative {
+    position : relative;
+    top : -2px;
+    left : -2px;
+    width : 96px;
+    height : 96px;
+    z-index : 2011;
+    border-radius : 16px;
+}
+.vividButton_icon_imgBorder_100x100.relative {
+    position : relative;
+    z-index : 2014;
+    top : calc(-100px + 6px);
+    width : 88px;
+    height : 88px;
+}
+.vividButton_icon_imgTile_100x100.relative {
+    position : relative;
+    top : calc(-200px + 6px + 6px + 2px);
+    width : 88px;
+    height : 88px;
+    z-index : 2012;
+    box-shadow : 4px 4px 4px 4px rgba(0,0,0,0.7);
+    border-radius : 10px;
+}
+.vividButton_icon_imgButtonIconBG_100x100.relative {
+    position : relative;
+    left : 2px;
+    top : calc(-300px + 6px + 6px + 2px + 8px);
+    width : 84px;
+    height : 84px;
+    opacity : 0.4;
+    z-index : 2015;
+}
+.vividButton_icon_imgButtonIcon_100x100.relative {
+    width : 64px;
+    height : 64px;
+    left : calc(10px + 2px);
+    top : calc(-400px + 6px + 6px + 3px + 2px + 8px + 18px);
+    position : relative;
+    z-index : 2020;
+}
+.vividButton_icon_50x50_text, .vividButton_icon_100x100_text.relative {
+    flex-grow:2;
+    display:table;
+    border-radius : 10px;
+    width : calc(100% + 10px);
+    height : 50px;
+    margin-left : 15px;
+    background : rgba(0,0,0,0.4);
+    box-shadow : 4px 4px 4px 4px rgba (0,0,0,0.7), inset 2px 2px 2px 2px rgba(0,0,0,0.5);
+}
+.vividButton_icon_50x50_text div, .vividButton_icon_100x100_text.relative div {
+    display : table-cell;
+    vertical-align : middle;
+    font-weight : bold;
+    padding-left : 15px;
+    padding-right : 15px;
+    color : white;
+}
+
+.vividButton_icon_100x100 {
+    display : inline-block;
+    flex-grow : 1;
+    overflow:hidden;
+    padding-top : 5px;
+    width : 100px;
+    height : 100px;
+}
+.vividButton_icon_borderCSS_100x100.grouped {
+    display : flex;
+    position : relative;
+    top : -2px;
+    left : -2px;
+    width : 96px;
+    height : 96px;
+    z-index : 2011;
+    border-radius : 16px;
+}
+.vividButton_icon_imgBorder_100x100.grouped {
+    display : flex;
+    position : relative;
+    z-index : 2014;
+    top : calc(-100px + 6px);
+    width : 88px;
+    height : 88px;
+}
+.vividButton_icon_imgTile_100x100.grouped {
+    position : relative;
+    display : flex;
+    top : calc(-200px + 6px + 6px + 2px);
+    width : 88px;
+    height : 88px;
+    z-index : 2012;
+    box-shadow : 4px 4px 4px 4px rgba(0,0,0,0.7);
+    border-radius : 10px;
+}
+.vividButton_icon_imgButtonIconBG_100x100.grouped {
+    position : relative;
+    left : 2px;
+    top : calc(-300px + 6px + 6px + 2px + 8px);
+    display : flex;
+    width : 84px;
+    height : 84px;
+    opacity : 0.4;
+    z-index : 2015;
+}
+.vividButton_icon_imgButtonIcon_100x100.grouped {
+    width : 64px;
+    height : 64px;
+    left : calc(10px + 2px);
+    top : calc(-400px + 6px + 6px + 3px + 2px + 8px + 18px);
+    position : relative;
+    display : flex;
+    z-index : 2020;
+}
+.vividButton_icon_100x100_text.grouped {
+    flex-grow:2;
+    display:table;
+    border-radius : 10px;
+    width : calc(100% + 10px);
+    height : 50px;
+    background : rgba(0,0,0,0.4);
+    box-shadow : 4px 4px 4px 4px rgba (0,0,0,0.7), inset 2px 2px 2px 2px rgba(0,0,0,0.5);
+}
+.vividButton_icon_100x100_text.grouped div {
+    display : table-cell;
+    vertical-align : middle;
+    font-weight : bold;
+    padding-left : 5px;
+    padding-right : 5px;
+}
+
+
+
+.naAudioPlayerUI {
+    display : flex;
+    order : 2;
+    flex-direction : column;
+    justify-content : space-around;
+    width : 100%;
+}
+.audioPlayerButtons {
+    display : flex;
+    order : 2;
+    flex-direction : row;
+    justify-content : space-around;
+    width : 100%;
+}
+.naAudioPlayerPlaylist {
+    width : calc(100% - 20px);
+    height : calc((100% - 210px) / 3);
+    margin : 5px;
+}
+.naFolderFilesList {
+    width : calc(100% - 20px);
+    height : calc(((100% - 210px) / 3)*2);
+    margin : 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

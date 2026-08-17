@@ -1,0 +1,116 @@
+table.hm { 
+ width : 100%;
+}
+table, th, td { 
+	text-align: left;
+	vertical-align : top;
+	font-family: Verdana, Arial, Helvetica;
+	font-size : 11px;
+}
+
+div.jsonViewer.hmPreInit {
+  background : goldenrod;
+  color : darkred;
+  font-weight : bold;
+  border : 3px solid darkred;
+  margin : 5px;
+}
+div.hmPItitle {
+  background : green;
+  color : lime;
+  border : 1px solid white;
+  padding : 5px;
+}
+div.hmPItitle > a {
+  color : yellow;
+}
+div.hmPreInitStatus {
+  padding : 5px;
+  padding-left : 40px;
+}
+.hmPIshortMsg {
+  font-weight : normal;
+}
+  
+
+.debugTraceFile, 
+a:link>span.debugTraceLine  { 
+  font-size : 70%;
+  text-decoration : overline;
+}
+a .debugTraceFile {
+  color : cyan;
+}
+a .debugTraceLine {
+  color : white;
+}
+
+.hmSizes { 
+  font-size : 90%;
+}
+/*
+.hmByteSize {
+  color : goldenrod;
+}
+.hmByteSize > a {
+  color : goldenrod;
+  text-decoration : none;
+}
+  */
+
+.hmPrecision {
+  font-size : 80%;
+}
+
+.hmJSON { 
+  color : yellow;
+  background : navy;
+  border : 1px solid white;
+  font-size : 110%;
+}
+.hmJSON a { 
+  color : lime;
+}
+
+a.hmNavS, a.hmTool { font-size : 90%; color : lime; }
+a.hmNavS:visited, a.hmTool:visited { color : cyan; }
+a.hmNavP, a.hmNavSl, a.hmNavS, a.hmTool { color : #00FFCC }
+a.hmNavP:hover, a.hmNavSl:hover, a.hmNavS:hover, a.hmTool:hover { color : lime; }
+
+#hm_contextMenu td { font-weight : bold; color:white;}
+
+.hm_btn_viewKey, .hm_btn_viewValue, 
+.hm_btn_viewKeyMode, .hm_btn_viewValueMode,
+.hm_btn_keyAutoFormat, .hm_btn_valueAutoFormat {
+	color : cyan;
+}
+
+.hm_btn_viewKey.selected, .hm_btn_viewValue.selected, 
+.hm_btn_viewKeyMode.selected, .hm_btn_viewValueMode.selected,
+.hm_btn_keyAutoFormat.selected, .hm_btn_valueAutoFormat.selected {
+	color : lime;
+}
+
+.hm_btn_viewKey:hover, .hm_btn_viewValue:hover, 
+.hm_btn_viewKeyMode:hover, .hm_btn_viewValueMode:hover,
+.hm_btn_keyAutoFormat:hover, .hm_btn_valueAutoFormat:hover {
+	color : yellow;
+}
+
+.hmLegend1 > table > tbody > tr > td {
+  font-size : 120%;
+  font-weight : bold;
+}
+.hmLegend2 table {
+  font-size : 85%;
+  font-weight:normal;
+}
+.hmArrayKeyLegend {
+dont-size : 80%;
+}
+
+.hmFooter table, 
+.hmFooter table > tbody > tr > td > a,
+.hmFooter table > tbody > tr > td > span > a { 
+  color : white;
+}

@@ -1,0 +1,71 @@
+2025-11-30-zo_00-22-09_CET root@falcon:/var/www/nicer.app-5.10.z/domains/said.by/bug1  2043 # curl -v https://said.by/me > "step2 - curl after resolvectl flush-caches.html"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host said.by:443 was resolved.
+* IPv6: (none)
+* IPv4: 45.83.241.21
+*   Trying 45.83.241.21:443...
+* Connected to said.by (45.83.241.21) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [112 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [2022 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [116 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [37 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-ECDSA-AES128-GCM-SHA256 / X25519 / id-ecPublicKey
+* ALPN: server accepted http/1.1
+* Server certificate:
+*  subject: CN=said.by
+*  start date: Nov  1 12:31:15 2025 GMT
+*  expire date: Jan 30 12:31:14 2026 GMT
+*  subjectAltName: host "said.by" matched cert's "said.by"
+*  issuer: C=US; O=Let's Encrypt; CN=E7
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* using HTTP/1.x
+} [5 bytes data]
+> GET /me HTTP/1.1
+> Host: said.by
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+{ [5 bytes data]
+< HTTP/1.1 200 OK
+< Server: nginx/1.24.0 (Ubuntu)
+< Date: Sat, 29 Nov 2025 23:22:47 GMT
+< Content-Type: text/html; charset=UTF-8
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: PHPSESSID=6s5rvao0n45rk3o0tbldtdieo6; path=/
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< Set-Cookie: cdb_said.by__loginName=said_by___Guest; expires=Sat, 06 Dec 2025 23:22:47 GMT; Max-Age=604800; path=/
+< Vary: Accept-Encoding
+< Access-Control-Allow-Credentials: true
+< Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With
+< 
+{ [7755 bytes data]
+100  316k    0  316k    0     0  4846k      0 --:--:-- --:--:-- --:--:-- 4870k
+* Connection #0 to host said.by left intact
+

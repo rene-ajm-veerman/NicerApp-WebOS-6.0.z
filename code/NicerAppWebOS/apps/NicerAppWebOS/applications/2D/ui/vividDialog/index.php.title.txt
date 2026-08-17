@@ -1,0 +1,1 @@
+vividDialog: pretty dialogs that support animations

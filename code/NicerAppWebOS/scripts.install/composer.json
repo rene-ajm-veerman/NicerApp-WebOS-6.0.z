@@ -1,0 +1,8 @@
+{
+    "require": {
+        "adodb/adodb-php": "^5.22",
+        "defuse/php-encryption": "^2.4",
+        "league/oauth2-instagram": "^3.1",
+        "league/oauth2-linkedin": "^5.1"
+    }
+}

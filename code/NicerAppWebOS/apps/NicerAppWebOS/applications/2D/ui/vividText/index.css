@@ -1,0 +1,29 @@
+.ex {
+	text-align:center;
+	vertical-align : middle;
+	height : 1.5em;
+}
+
+.vividDialog {
+	color : yellow;
+}
+
+.vividDialog td {
+	color : AAA;
+}
+
+a {
+	color : white;
+	text-decoration : none;
+}
+
+a:hover {
+	color : yellow;
+	text-decoration : underline;
+}
+
+a.selected {
+	color : lime;
+	text-decoration : none;
+	font-weight : bold;
+}

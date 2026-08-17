@@ -1,0 +1,12 @@
+{
+    "databases" : {
+        "couchdb" : {
+            "host" : "127.0.0.1",
+            "port" : "5984",
+            "useSSL" : false,
+            "httpAdapter" : "HTTP_CURL",
+            "username" : "admin",
+            "password" : "c8cl2J#,sL30s[-sj8JHlao)NpxUziOl]"
+        }
+    }
+}

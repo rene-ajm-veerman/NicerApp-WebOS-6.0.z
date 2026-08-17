@@ -1,0 +1,15 @@
+#prevent people from seeing what's in your webfolders (can be overridden by a .htaccess folder in any folder saying "Options +Indexes")
+Options All -Indexes 
+
+# EVERYTHING in this file is case-sensitive!
+
+RewriteEngine On
+RewriteBase /opensourcedBySeductiveApps.com/tools/webappObfuscator/webappObfuscator__demoSite/
+	# MUST both start and end with a / character!!
+	# BEGINS AT / RELATIVE FROM the apache DocumentRoot foler!
+
+RewriteRule ^appOne$ index.php?app=appOne [QSA,L]
+RewriteRule ^appOne/(.*)$ index.php?app=appOne&htaURL=$1 [QSA,L]
+
+RewriteRule ^appTwo$ index.php?app=appTwo [QSA,L]
+RewriteRule ^appTwo/(.*)$ index.php?app=appTwo&htaURL=$1 [QSA,L]

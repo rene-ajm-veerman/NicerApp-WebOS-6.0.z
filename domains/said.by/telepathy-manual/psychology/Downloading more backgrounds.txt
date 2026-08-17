@@ -1,0 +1,6 @@
+see https://tinyurl.com/NicerAppWebOS-bgs-favs-3 and 'Downloading more backgrounds.png' in this folder.
+
+download the zip file into .../NicerAppWebOS/siteMedia/backgrounds, unzip it right there.
+
+then delete all files matching .../NicerAppWebOS/siteCache/*.json
+and the website will find the new backgrounds when viewed again in the browser.

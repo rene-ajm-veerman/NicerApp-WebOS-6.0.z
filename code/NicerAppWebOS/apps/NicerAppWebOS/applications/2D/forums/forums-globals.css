@@ -1,0 +1,108 @@
+.naForums_header {
+    width : calc(100%-4px);
+    height : 2rem;
+    font-size : 150%;
+    font-weight : bold;
+    text-align : center;
+}
+
+.naForums_forumCategory {
+    padding : 10px;
+    margin : 10px;
+    font-size : 110%;
+    font-weight : bold;
+}
+.naForums_forumCategoryName {
+    top : calc(-10px);
+    display : inline-block;
+    position : relative;
+    width : calc(100% - 20px);
+}
+.naForums_forumCategoryName_input {
+    top : calc(-10px);
+    display : inline-block;
+    position : relative;
+    padding : 10px;
+    border : none;
+    border : 1px solid #ccc;
+    border-radius : 7px;
+    width : calc(100% - 20px);
+}
+.naForums_forumCategory_bottomSpacer {
+    height : 1em;
+}
+.naForums_forumButtonSpacer {
+    width : 25px;
+    top : calc(-10px);
+    display : inline-block;
+    position : relative;
+}
+
+.naForums_forum {
+    padding : 10px;
+    margin : 10px;
+    margin-left : 40px;
+    font-weight : bold;
+}
+.naForums_forumName {
+    top : -10px;
+    display : inline-block;
+    position : relative;
+    width : calc(100% - 40px);
+}
+.naForums_forumName_input {
+    top : calc(-10px);
+    display : inline-block;
+    position : relative;
+    padding : 10px;
+    border : none;
+    border : 1px solid #ccc;
+    border-radius : 7px;
+    width : calc(100% - 40px);
+}
+
+
+
+.naForums_buttonBar .vividButton_icon_50x50_buttonBar {
+    display : flex;
+    align-items : center;
+}
+.naForums_buttonBar .vividButton_icon_50x50_text {
+    display : table-cell;
+}
+
+.naForums_inputBar.vividButton_icon_50x50_inputBar {
+    height : 50px;
+    display : flex;
+    align-items : center;
+}
+.naForums_inputBar.vividButton_icon_50x50_inputBar input {
+    height : 1em;
+}
+.naForums_inputBar.vividButton_icon_50x50_inputBar .vividButton_icon_50x50_text.relative {
+    height : 1.8em;
+    left : 10px;
+    padding : 5px;
+}
+    
+    
+.naForums_buttonBar.vividButton_icon_100x100_buttonBar {
+    height : 100px;
+    padding-top : 5px;
+    display:flex;
+    align-items:center;
+}
+
+.naForumCategory_inputBar {
+    margin-left : 10px;
+}
+.naForum_inputBar {
+    margin-left : 50px;
+}
+.naForums_inputBar input {
+    opacity : 0.5;
+    padding : 5px;
+    border : none;
+    border : 1px solid #ccc;
+    border-radius : 5px;
+}    

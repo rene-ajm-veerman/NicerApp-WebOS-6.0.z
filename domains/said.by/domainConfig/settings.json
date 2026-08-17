@@ -1,0 +1,25 @@
+{
+    "phpServers" : [
+        {
+            "rootPath" : "/var/www/NicerAppWebOS-v6.0.z/domains/said.by/",
+            "relativePathUnderRootPath" : "/",
+            "debug" : {
+                "ajax_backgrounds.php" : false,
+                "ajax_backgrounds_recursive.php" : false
+            },
+            "log" : {
+                "dbActivity" : false
+            }
+        }
+    ],
+    "subdomains" : [
+        "that.got",
+        "this.got",
+        "well",
+        "maybe",
+        "words"
+    ],
+    "useSimpleArtStyle" : false,
+    "primaryDatabaseEngine" : "couchdb",
+    "usingThisFileAlready" : "notQuiteYet-sorry"
+}

@@ -1,0 +1,58 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : {" section" : "English_News" }
+            }
+        },
+        "seoValue" : [ "news" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "English_News__World_Headlines" }
+            }
+        },
+        "seoValue" : [ "world-news", "news-world", "news-world-headlines" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "English_News__Topics_Business" }
+            }
+        }
+        ,"seoValue" : [ "business-news", "business-headlines" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "Nederlands_Nieuws" }
+            }
+        },
+        "seoValue" : [ "nieuws" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "Nederlands_Nieuws__Wereld" }
+            }
+        },
+        "seoValue" : [ "wereld-nieuws", "nieuws-internationale-headlines" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "Deutsche_nachrichten" }
+            }
+        },
+        "seoValue" : "nachrichten"
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news" : {
+                "#siteContent" : { "section" : "Arabic" }
+            }
+        },
+        "seoValue" : "english-arabic-news"
+    }
+]

@@ -1,0 +1,14 @@
+{
+    "Owners" : {
+        "realname" : "said.by Owners"
+    },
+    "Chief Officers" : {
+        "realname" : "said.by Chief Officers"
+    },
+    "Moderators" : {
+        "realname" : "said.by Moderators"
+    },
+    "Guests" : {
+        "realname" : "said.by Guests"
+    }
+}

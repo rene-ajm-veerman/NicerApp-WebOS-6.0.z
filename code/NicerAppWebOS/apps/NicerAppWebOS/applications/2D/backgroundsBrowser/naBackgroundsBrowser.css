@@ -1,0 +1,29 @@
+.naBackgroundsBrowser_img {
+    width:300px;
+    float:left;
+    margin : 20px;
+    border : 1px solid silver;
+    box-shadow : -2px -2px 4px 2px rgba(255,255,255,0.555), 2px 2px 5px 2px rgba(0,0,0,0.8);
+}
+.naBackgroundsBrowser_keyword {
+    float:left;
+    margin : 7px;
+    padding : 5px;
+    border-radius : 10px;
+    border : 1px solid silver;
+    box-shadow : -2px -2px 4px 2px rgba(255,255,255,0.555), 2px 2px 5px 2px rgba(0,0,0,0.8);
+    background : rgba(0,50,0,0.46);
+    font-weight : bold;
+    font-size : large;
+}
+.naBackgroundsBrowser_keyword.shown {
+    background : rgba(0,200,0,0.46);
+}
+#naBackgroundsBrowser_search {
+    background : rgba(255,255,255,0.4);
+    border-radius : 10px;
+    margin : 15px;
+    padding : 10px;
+    font-size : x-large;
+    font-weight : bold;
+}

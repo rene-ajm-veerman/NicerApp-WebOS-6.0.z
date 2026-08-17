@@ -1,0 +1,32 @@
+.naForums_header {
+    border : 2px ridge white;
+    border-radius : 8px;
+    background : rgba(0,0,0,0.4);
+    color : lime;
+}
+
+.naForums_forumCategoryName {
+    color : yellow;
+    padding : 10px;
+    border-radius : 4px;
+    background : rgba(0,50,0,0.5);
+    box-shadow : 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+.naForums_forumCategoryName_input {
+    color : yellow;
+    background : rgba(0,50,0,0.5);
+    box-shadow : inset 2px 2px 2px 2px rgba(0,0,0,0.7), 4px 4px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.naForums_forumName {
+    color : cyan;
+    padding : 10px;
+    border-radius : 4px;
+    background : rgba(0,0,50,0.5);
+    box-shadow : 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+.naForums_forumName_input {
+    color : cyan;
+    background : rgba(0,0,50,0.5);
+    box-shadow : inset 2px 2px 2px 2px rgba(0,0,0,0.7), 4px 4px 2px 2px rgba(0, 0, 0, 0.5);
+}

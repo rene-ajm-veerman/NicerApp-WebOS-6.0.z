@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NicerApp Vivid Desktop – Grid Layout v0.9.1</title>
+
+  <style>
+    :root {
+      --outerGap: 32px;
+      --innerGap: 32px;
+      --bg-dark: #0f0f14;
+      --panel-bg: #1a1a22;
+      --border: #444;
+      --text: #d0d0e0;
+      --accent: #5a7eff;
+      --titlebar-bg: #222;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #vividDesktop {
+      position: fixed;
+      inset: var(--outerGap);
+      display: grid;
+      grid-template-columns: 320px 280px 1fr 280px 360px;
+      grid-template-rows: auto 1fr auto auto;
+      gap: var(--innerGap);
+      height: calc(100% - 2 * var(--outerGap));
+      width: calc(100% - 2 * var(--outerGap));
+      background: transparent;
+      transition: grid-template-columns 0.45s ease-in-out;
+    }
+
+    /* Full-width spans */
+    #siteToolbarTop    { grid-column: 1 / 6; grid-row: 1; }
+    #siteToolbarBottom { grid-column: 1 / 6; grid-row: 3; }
+    #siteTaskbar       { grid-column: 1 / 6; grid-row: 4; }
+
+    /* Side panels */
+    #siteThemeEditor   { grid-column: 1; grid-row: 2; }
+    #siteToolbarLeft   { grid-column: 2; grid-row: 2; }
+    #siteContent       { grid-column: 3; grid-row: 2; }
+    #siteToolbarRight  { grid-column: 4; grid-row: 2; }
+    #siteComments      { grid-column: 5; grid-row: 2; }
+
+    /* Slide-out states */
+    #vividDesktop.slid-theme    { grid-template-columns: 0    280px 1fr 280px 360px; }
+    #vividDesktop.slid-left     { grid-template-columns: 320px 0    1fr 280px 360px; }
+    #vividDesktop.slid-right    { grid-template-columns: 320px 280px 1fr 0    360px; }
+    #vividDesktop.slid-comments { grid-template-columns: 320px 280px 1fr 280px 0   ; }
+
+    /* Optional: slim peek instead of full collapse (uncomment if preferred) */
+    /*
+    #vividDesktop.slid-theme-peek    { grid-template-columns: 44px 280px 1fr 280px 360px; }
+    #vividDesktop.slid-left-peek     { grid-template-columns: 320px 44px 1fr 280px 360px; }
+    #vividDesktop.slid-right-peek    { grid-template-columns: 320px 280px 1fr 44px 360px; }
+    #vividDesktop.slid-comments-peek { grid-template-columns: 320px 280px 1fr 280px 44px; }
+    */
+
+    .vividDialog,
+    .site-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titlebar {
+      height: 38px;
+      background: var(--titlebar-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+      cursor: move;
+    }
+
+    .title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slide-btn {
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.2s, transform 0.2s;
+      margin-left: 8px;
+    }
+
+    .slide-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .slide-btn::after {
+      content: '◀';
+    }
+
+    .vividDialog.slid-out .slide-btn::after {
+      content: '▶';
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .vividDialog.slid-out .content-area,
+    .vividDialog.slid-out .title > * {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Bottom panels */
+    #siteToolbarBottom,
+    #siteTaskbar {
+      min-height: 90px;
+    }
+
+    #siteTaskbar .content-area {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+    }
+
+    /* Debug label */
+    .gap-label {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="vividDesktop">
+
+    <!-- Top -->
+    <div id="siteToolbarTop" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Navigation • Search • Quick Actions</div>
+      </div>
+      <div class="content-area">Top toolbar content goes here…</div>
+    </div>
+
+    <!-- Theme Editor -->
+    <div id="siteThemeEditor" class="vividDialog">
+      <div class="titlebar">
+        <div class="title">Theme Editor</div>
+        <button class="slide-btn" data-slide-target="theme" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">
+        <p>Customize colors, fonts, spacing, shadows, etc.</p>
+        <div style="margin: 16px 0;">
+          <button style="background:#5a7eff; color:white; padding:8px 16px; border:none; border-radius:4px;">Apply Dark Theme</button>
+          <button style="background:#444; color:white; padding:8px 16px; border:none; border-radius:4px; margin-left:12px;">Preview Light</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Toolbar -->
+    <div id="siteToolbarLeft" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Tools • Apps • Bookmarks</div>
+        <button class="slide-btn" data-slide-target="left" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Left sidebar – menu items, app launcher, etc.</div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="siteContent" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Main Workspace</div>
+      </div>
+      <div class="content-area">
+        <h2>NicerApp Desktop v0.9.1</h2>
+        <p>Central area — drag & drop widgets, open documents, run applications here.</p>
+      </div>
+    </div>
+
+    <!-- Right Toolbar -->
+    <div id="siteToolbarRight" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Properties • Layers • Preview</div>
+        <button class="slide-btn" data-slide-target="right" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">Right sidebar – inspector, details, previews…</div>
+    </div>
+
+    <!-- Comments -->
+    <div id="siteComments" class="vividDialog">
+      <div class="titlebar">
+        <div class="title">Comments • Discussion • Notes</div>
+        <button class="slide-btn" data-slide-target="comments" title="Slide out / in"></button>
+      </div>
+      <div class="content-area">
+        <p>Threaded comments, annotations, chat…</p>
+        <div style="margin-top:20px; opacity:0.6;">(Comment system loading...)</div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div id="siteToolbarBottom" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Status • Extra Controls</div>
+      </div>
+      <div class="content-area">Bottom toolbar – progress, messages, additional tools</div>
+    </div>
+
+    <div id="siteTaskbar" class="vividDialog site-panel">
+      <div class="titlebar">
+        <div class="title">Taskbar</div>
+      </div>
+      <div class="content-area">
+        Pinned applications • System tray • Clock • Notifications
+      </div>
+    </div>
+
+  </div>
+
+  <div class="gap-label">OuterGap: var(--outerGap) • InnerGap: var(--innerGap)</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('NicerApp Desktop v0.9.1 – slide-out enabled');
+
+      const desktop = document.getElementById('vividDesktop');
+
+      document.querySelectorAll('.slide-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.slideTarget;
+          if (!target) return;
+
+          const className = `slid-${target}`;
+          desktop.classList.toggle(className);
+
+          const panel = btn.closest('.vividDialog');
+          if (panel) {
+            panel.classList.toggle('slid-out');
+          }
+        });
+      });
+
+      // Optional: show real gap values
+      const root = getComputedStyle(document.documentElement);
+      const outer = root.getPropertyValue('--outerGap').trim();
+      const inner = root.getPropertyValue('--innerGap').trim();
+      document.querySelector('.gap-label').textContent = `OuterGap: ${outer} • InnerGap: ${inner}`;
+    });
+  </script>
+</body>
+</html>

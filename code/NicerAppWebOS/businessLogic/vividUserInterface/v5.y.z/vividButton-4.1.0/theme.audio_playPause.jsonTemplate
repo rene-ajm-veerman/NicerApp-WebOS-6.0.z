@@ -1,0 +1,155 @@
+".btn_audioVideo_playPause" : {
+    "selfAttrButtonClass" : "btn_audioVideo_playPause",
+    "startupState" : "paused",
+    "selectedState" : "playing",
+    "circumstances" : {
+        "normal" : {
+            "layers" : {
+                ".roundIcon_background" : { 
+                    "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']",
+                    "animType" : "css : radial-gradient",
+                    "shape" : "circle",
+                    "position" : "center",
+                    "size" : "closest-side",
+                    "linear-color-stops" : [
+                            { "color" : "rgba(0,255,0,0)", "length" : [0, 0] },
+                            { "color" : "rgba(0,0,0,0.7)", "length" : [1, 100] }
+                    ]
+                }
+            }
+        },
+        "hover" : {
+            "layers" : {
+                ".roundIcon_background" : { 
+                    "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                    "animType" : "css : radial-gradient",
+                    "shape" : "circle",
+                    "position" : "center",
+                    "size" : "closest-side",
+                    "linear-color-stops" : [
+                            { "color" : "rgba(0,255,0,0.3)", "length" : [0, 92] },
+                            { "color" : "rgba(0,255,0,0.7)", "length" : [100, 100] }
+                    ]
+                }
+            }
+        }
+    },
+    "layers" : {
+        ".roundIcon_svg" : {
+            "layerID" : "b.theme.layers['.roundIcon_svg']",
+            "animType" : "svg",
+            "src" : "/NicerAppWebOS/logic.userInterface/naVividButton-4.1.0/btn.audioVideo.playPause.svg",
+            "srcVars" : {
+                "{$fillColor}" : "lime"
+            },
+            "startupCode" : "$('#from_pause_to_play')[0].beginElement();",
+            "onclick" : "if ($('#btnPlayPause').is('.selected')) $('#svgPlayPause').addClass('playing'); else $('#svgPlayPause').removeClass('playing'); if (!$('#svgPlayPause').is('.playing') && !$('#btnPlayPause').is('.paused')) { $('#from_play_to_pause')[0].beginElement(); } /*else { $('#from_pause_to_play')[0].beginElement(); }; */",
+            
+            "onmouseover" : "if (!$('#svgPlayPause').is('.playing') ) $('#from_pause_to_play')[0].beginElement(); else $('#from_play_to_pause')[0].beginElement();",
+            
+            "onmouseout" : "setTimeout(function(){$('#from_pause_to_play')[0].beginElement();},500);"
+        }
+    },
+    "states" : {
+        "playing" : {
+            "circumstances" : {
+                "normal" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']", 
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                },
+                "hover" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }                            
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "paused" : {
+            "circumstances" : {
+                "normal" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.normal.layers['.roundIcon_background']", 
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "hover" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                },
+                "hover" : {
+                    "layers" : {
+                        ".roundIcon_background" : {
+                            "layerID" : "b.theme.circumstances.hover.layers['.roundIcon_background']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500,
+                                    "animInterval" : 10,
+                                    "steps" : [ ]
+                                }
+                            }                            
+                        },
+                        ".roundIcon_svg" : {
+                            "layerID" : "b.theme.layers['.roundIcon_svg']",
+                            "layerID_php" : "button['layers']['.roundIcon_svg']",
+                            "animTo" : {
+                                "normal" : {
+                                    "animDuration" : 500
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

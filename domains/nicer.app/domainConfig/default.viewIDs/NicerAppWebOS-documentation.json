@@ -1,0 +1,42 @@
+[
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/diskText" : {
+                "#siteContent" : {
+                    "file" : "/NicerAppWebOS/documentation/NicerApp-WebOS--overview.php"
+                }
+            }
+        },
+        "seoValue" : [ "docs-overview" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/diskText" : {
+                "#siteContent" : {
+                    "file" : "/NicerAppWebOS/LICENSE.php"
+                }
+            }
+        },
+        "seoValue" : [ "docs-license" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/diskText" : {
+                "#siteContent" : {
+                    "file" : "/NicerAppWebOS/documentation/NicerApp-WebOS--todoList.php"
+                }
+            }
+        },
+        "seoValue" : [ "docs-todoList" ]
+    },
+    {
+        "apps" : {
+            "/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/diskText" : {
+                "#siteContent" : {
+                    "file" : "/NicerAppWebOS/documentation/NicerEnterprises--company.php"
+                }
+            }
+        },
+        "seoValue" : [ "company" ]
+    }
+]

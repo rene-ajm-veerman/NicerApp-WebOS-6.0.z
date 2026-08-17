@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NicerApp Vivid Desktop – v0.12.0</title>
+
+  <style>
+    :root {
+      --outerGap: 32px;
+      --innerGap: 32px;
+      --bg: #0f0f14;
+      --panel: #1a1a22;
+      --border: #444;
+      --titlebar: #222;
+      --text: #d0d0e0;
+      --accent: #5a7eff;
+      --handle: #ff9800aa;     /* semi-transparent orange */
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      height:100%; width:100%; overflow:hidden;
+      background:var(--bg); color:var(--text);
+      font-family:system-ui, sans-serif;
+    }
+
+    #vividDesktop {
+      position:fixed;
+      inset:var(--outerGap);
+      display:grid;
+      grid-template-columns: 320px 280px 1fr 280px 360px;
+      grid-template-rows: auto 1fr auto auto;
+      gap:var(--innerGap);
+      height:calc(100% - 2*var(--outerGap));
+      width:calc(100% - 2*var(--outerGap));
+      background:transparent;
+      transition: grid-template-columns 0.4s ease, grid-template-rows 0.4s ease;
+    }
+
+    #siteToolbarTop    { grid-column:1/-1; grid-row:1; }
+    #siteThemeEditor   { grid-column:1; grid-row:2; }
+    #siteToolbarLeft   { grid-column:2; grid-row:2; }
+    #siteContent       { grid-column:3; grid-row:2; }
+    #siteToolbarRight  { grid-column:4; grid-row:2; }
+    #siteComments      { grid-column:5; grid-row:2; }
+    #siteToolbarBottom { grid-column:1/-1; grid-row:3; }
+    #siteTaskbar       { grid-column:1/-1; grid-row:4; }
+
+    /* Slide-out states */
+    #vividDesktop.slid-theme    { grid-template-columns: 0    280px 1fr 280px 360px; }
+    #vividDesktop.slid-left     { grid-template-columns: 320px 0    1fr 280px 360px; }
+    #vividDesktop.slid-right    { grid-template-columns: 320px 280px 1fr 0    360px; }
+    #vividDesktop.slid-comments { grid-template-columns: 320px 280px 1fr 280px 0   ; }
+
+    #vividDesktop.slid-top      { grid-template-rows: 0    1fr auto auto; }
+    #vividDesktop.slid-bottom   { grid-template-rows: auto 1fr 0    auto; }
+    #vividDesktop.slid-taskbar  { grid-template-rows: auto 1fr auto 0   ; }
+
+    .panel {
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:6px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      position:relative;
+      min-width:160px;
+      min-height:120px;
+    }
+
+    .titlebar {
+      height:38px;
+      background:var(--titlebar);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+      font-size:14px;
+      font-weight:500;
+      user-select:none;
+    }
+
+    .title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .slide-btn {
+      width:28px; height:28px;
+      background:transparent; border:none; color:#aaa;
+      font-size:18px; cursor:pointer; border-radius:4px;
+      margin-left:8px;
+    }
+
+    .slide-btn:hover { background:rgba(255,255,255,0.08); }
+
+    .slide-btn::after { content:'◀'; }
+    .panel.slid-out .slide-btn::after { content:'▶'; }
+
+    .slide-btn[data-slide-target="top"]::after           { content:'▲'; }
+    .panel.slid-out .slide-btn[data-slide-target="top"]::after { content:'▼'; }
+
+    .slide-btn[data-slide-target="bottom"]::after,
+    .slide-btn[data-slide-target="taskbar"]::after       { content:'▼'; }
+    .panel.slid-out .slide-btn[data-slide-target="bottom"]::after,
+    .panel.slid-out .slide-btn[data-slide-target="taskbar"]::after { content:'▲'; }
+
+    .content-area {
+      flex:1; padding:16px; overflow:auto;
+      transition:opacity 0.3s;
+    }
+
+    .panel.slid-out .content-area,
+    .panel.slid-out .title { opacity:0; visibility:hidden; }
+
+    /* ── Resize handles ──────────────────────────────────────── */
+    .resize-handle {
+      position:absolute;
+      z-index:20;
+      background:transparent;
+      transition:background 0.15s;
+      pointer-events:auto;
+    }
+
+    .panel:hover .resize-handle { background:var(--handle); }
+
+    .resize-handle.n,.resize-handle.s { left:0; right:0; height:6px; }
+    .resize-handle.e,.resize-handle.w { top:0; bottom:0; width:6px; }
+
+    .resize-handle.n  { top:-2px; cursor:ns-resize; }
+    .resize-handle.s  { bottom:-2px; cursor:ns-resize; }
+    .resize-handle.e  { right:-2px; cursor:ew-resize; }
+    .resize-handle.w  { left:-2px; cursor:ew-resize; }
+
+    .resize-handle.ne,.resize-handle.nw,
+    .resize-handle.se,.resize-handle.sw { width:12px; height:12px; }
+
+    .resize-handle.ne { top:-4px; right:-4px; cursor:nesw-resize; }
+    .resize-handle.nw { top:-4px; left:-4px; cursor:nwse-resize; }
+    .resize-handle.se { bottom:-4px; right:-4px; cursor:nwse-resize; }
+    .resize-handle.sw { bottom:-4px; left:-4px; cursor:nesw-resize; }
+
+    /* Visual feedback during resize */
+    .resizing-active .resize-handle,
+    .resizing-active body { cursor:inherit !important; }
+
+    /* Bottom panels */
+    #siteToolbarBottom, #siteTaskbar { min-height:90px; }
+
+    .gap-label {
+      position:fixed; bottom:12px; left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.7); padding:6px 12px;
+      border-radius:6px; font-size:12px; z-index:9999;
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="vividDesktop">
+
+  <div id="siteToolbarTop" class="panel">
+    <div class="titlebar">
+      <div class="title">Navigation • Search • Quick Actions</div>
+      <button class="slide-btn" data-slide-target="top"></button>
+    </div>
+    <div class="content-area">Top toolbar…</div>
+    <div class="resize-handle n" data-dir="n"></div>
+  </div>
+
+  <div id="siteThemeEditor" class="panel">
+    <div class="titlebar">
+      <div class="title">Theme Editor</div>
+      <button class="slide-btn" data-slide-target="theme"></button>
+    </div>
+    <div class="content-area">
+      <p>Customize colors, fonts, spacing…</p>
+      <!-- your theme controls here -->
+    </div>
+    <div class="resize-handle n"  data-dir="n"></div>
+    <div class="resize-handle s"  data-dir="s"></div>
+    <div class="resize-handle e"  data-dir="e"></div>
+    <div class="resize-handle w"  data-dir="w"></div>
+    <div class="resize-handle ne" data-dir="ne"></div>
+    <div class="resize-handle nw" data-dir="nw"></div>
+    <div class="resize-handle se" data-dir="se"></div>
+    <div class="resize-handle sw" data-dir="sw"></div>
+  </div>
+
+  <div id="siteToolbarLeft" class="panel">
+    <div class="titlebar">
+      <div class="title">Tools • Apps • Bookmarks</div>
+      <button class="slide-btn" data-slide-target="left"></button>
+    </div>
+    <div class="content-area">Left sidebar…</div>
+    <div class="resize-handle n"  data-dir="n"></div>
+    <div class="resize-handle s"  data-dir="s"></div>
+    <div class="resize-handle e"  data-dir="e"></div>
+    <div class="resize-handle w"  data-dir="w"></div>
+    <div class="resize-handle ne" data-dir="ne"></div>
+    <div class="resize-handle nw" data-dir="nw"></div>
+    <div class="resize-handle se" data-dir="se"></div>
+    <div class="resize-handle sw" data-dir="sw"></div>
+  </div>
+
+  <div id="siteContent" class="panel">
+    <div class="titlebar">
+      <div class="title">Main Workspace v0.12.0</div>
+    </div>
+    <div class="content-area">
+      <h2>Welcome</h2>
+      <p>Central area — widgets, documents, apps…</p>
+    </div>
+  </div>
+
+  <div id="siteToolbarRight" class="panel">
+    <div class="titlebar">
+      <div class="title">Properties • Layers • Preview</div>
+      <button class="slide-btn" data-slide-target="right"></button>
+    </div>
+    <div class="content-area">Right sidebar…</div>
+    <div class="resize-handle n"  data-dir="n"></div>
+    <div class="resize-handle s"  data-dir="s"></div>
+    <div class="resize-handle e"  data-dir="e"></div>
+    <div class="resize-handle w"  data-dir="w"></div>
+    <div class="resize-handle ne" data-dir="ne"></div>
+    <div class="resize-handle nw" data-dir="nw"></div>
+    <div class="resize-handle se" data-dir="se"></div>
+    <div class="resize-handle sw" data-dir="sw"></div>
+  </div>
+
+  <div id="siteComments" class="panel">
+    <div class="titlebar">
+      <div class="title">Comments • Discussion • Notes</div>
+      <button class="slide-btn" data-slide-target="comments"></button>
+    </div>
+    <div class="content-area">
+      <p>Threaded comments…</p>
+    </div>
+    <div class="resize-handle n"  data-dir="n"></div>
+    <div class="resize-handle s"  data-dir="s"></div>
+    <div class="resize-handle e"  data-dir="e"></div>
+    <div class="resize-handle w"  data-dir="w"></div>
+    <div class="resize-handle ne" data-dir="ne"></div>
+    <div class="resize-handle nw" data-dir="nw"></div>
+    <div class="resize-handle se" data-dir="se"></div>
+    <div class="resize-handle sw" data-dir="sw"></div>
+  </div>
+
+  <div id="siteToolbarBottom" class="panel">
+    <div class="titlebar">
+      <div class="title">Status • Extra Controls</div>
+      <button class="slide-btn" data-slide-target="bottom"></button>
+    </div>
+    <div class="content-area">Bottom toolbar…</div>
+    <div class="resize-handle n" data-dir="n"></div>
+    <div class="resize-handle s" data-dir="s"></div>
+  </div>
+
+  <div id="siteTaskbar" class="panel">
+    <div class="titlebar">
+      <div class="title">Taskbar</div>
+      <button class="slide-btn" data-slide-target="taskbar"></button>
+    </div>
+    <div class="content-area">Pinned apps • Clock • Notifications</div>
+    <div class="resize-handle n" data-dir="n"></div>
+    <div class="resize-handle s" data-dir="s"></div>
+  </div>
+
+</div>
+
+<div class="gap-label">OuterGap: 32px • InnerGap: 32px</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('vividDesktop');
+
+  // Slide logic
+  document.querySelectorAll('.slide-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.slideTarget;
+      if (t) {
+        grid.classList.toggle(`slid-${t}`);
+        btn.closest('.panel')?.classList.toggle('slid-out');
+      }
+    });
+  });
+
+  // Gap label
+  const root = getComputedStyle(document.documentElement);
+  document.querySelector('.gap-label').textContent =
+    `OuterGap: ${root.getPropertyValue('--outerGap').trim()} • InnerGap: ${root.getPropertyValue('--innerGap').trim()}`;
+
+  // ── RESIZING LOGIC ──────────────────────────────────────────────
+  let isResizing = false;
+  let currentHandle = null;
+  let startX = 0, startY = 0;
+  let startCols = [], startRows = [];
+
+  function parseGrid(str) {
+    return str.split(/\s+/).map(v => v === '1fr' ? '1fr' : parseFloat(v) || 0);
+  }
+
+  function buildGrid(arr) {
+    return arr.map(v => typeof v === 'number' ? Math.round(v)+'px' : v).join(' ');
+  }
+
+  // Attach down events
+  document.querySelectorAll('.resize-handle').forEach(h => {
+    h.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      currentHandle = h;
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      const cs = getComputedStyle(grid);
+      startCols = parseGrid(cs.gridTemplateColumns);
+      startRows = parseGrid(cs.gridTemplateRows);
+
+      document.body.style.cursor = getComputedStyle(h).cursor;
+      document.body.style.userSelect = 'none';
+      console.log(`Resize start — dir: ${h.dataset.dir}, cols:`, startCols);
+    });
+  });
+
+  document.addEventListener('pointermove', e => {
+    if (!isResizing || !currentHandle) return;
+console.log(grid.style.gridTemplateColumns);
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const dir = currentHandle.dataset.dir;
+
+    let cols = [...startCols];
+    let rows = [...startRows];
+
+    // Find column index of the panel being resized
+    const panel = currentHandle.closest('.panel');
+    if (!panel) return;
+    const colIndex = Array.from(grid.children).indexOf(panel);
+
+    // Horizontal resize
+    if (dir.includes('e') || dir.includes('w')) {
+      if (colIndex >= 0 && colIndex < cols.length && typeof cols[colIndex] === 'number') {
+        let delta = dir.includes('e') ? dx : -dx;
+        cols[colIndex] = Math.max(160, cols[colIndex] + delta);
+      }
+    }
+
+    // Vertical resize (content row = index 1)
+    if (dir.includes('s') || dir.includes('n')) {
+      if (typeof rows[1] === 'number') {
+        let delta = dir.includes('s') ? dy : -dy;
+        rows[1] = Math.max(200, rows[1] + delta);
+      }
+    }
+
+    grid.style.gridTemplateColumns = buildGrid(cols);
+    grid.style.gridTemplateRows    = buildGrid(rows);
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (isResizing) {
+      isResizing = false;
+      currentHandle = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      console.log('Resize ended');
+    }
+  });
+});
+</script>
+</body>
+</html>

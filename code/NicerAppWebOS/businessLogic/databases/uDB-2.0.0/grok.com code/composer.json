@@ -1,0 +1,11 @@
+{
+    "require": {
+        "guzzlehttp/guzzle": "^7.10",
+        "symfony/console": "^7.3",
+        "react/http": "^1.11",
+        "react/socket": "^1.17",
+        "react/event-loop": "^1.6",
+        "cboden/ratchet": "^0.4",
+        "clue/http-proxy-react": "^1.9"
+    }
+}

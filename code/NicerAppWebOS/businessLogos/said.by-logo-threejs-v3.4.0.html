@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bustling City Park ThreeJS Scene with Free Camera Controls</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        <strong>Camera Controls:</strong><br>
+        WASD - Move<br>
+        Mouse - Look around<br>
+        Space - Move up<br>
+        Shift - Move down<br>
+        Scroll - Speed up/down
+    </div>
+    <script type="importmap">
+			{
+				"imports": {
+					"three": "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js",
+					"three/addons/": "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/"
+				}
+			}
+	</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+        import { ColladaLoader } from 'https://threejs.org/examples/jsm/loaders/ColladaLoader.js';
+        import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
+        import { HDRLoader } from 'https://threejs.org/examples/jsm/loaders/HDRLoader.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+
+        // Load HDR for photorealistic lighting and environment
+        new HDRLoader().load('https://threejs.org/examples/textures/equirectangular/venice_sunset_4K.hdr', (texture) => {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.background = texture;
+            scene.environment = texture;
+        });
+
+        // Camera setup - start position
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, -10);
+
+        // Renderer with improved settings
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Lights with shadows
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(50, 100, 50);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 500;
+        directionalLight.shadow.camera.left = -100;
+        directionalLight.shadow.camera.right = 100;
+        directionalLight.shadow.camera.top = 100;
+        directionalLight.shadow.camera.bottom = -100;
+        scene.add(directionalLight);
+
+        // Ground: Lawn and road with better materials
+        const groundGeometry = new THREE.PlaneGeometry(200, 200);
+        const lawnMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 0.8, metalness: 0.0 });
+        const lawn = new THREE.Mesh(groundGeometry, lawnMaterial);
+        lawn.rotation.x = -Math.PI / 2;
+        lawn.position.set(0, 0, 30);
+        lawn.receiveShadow = true;
+        scene.add(lawn);
+
+        const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.5, metalness: 0.2 });
+        const road = new THREE.Mesh(groundGeometry, roadMaterial);
+        road.rotation.x = -Math.PI / 2;
+        road.position.set(0, 0.01, -30);
+        road.receiveShadow = true;
+        scene.add(road);
+
+        // Lake with simple water effect
+        const lakeShape = new THREE.Shape();
+        lakeShape.moveTo(0, 0);
+        lakeShape.bezierCurveTo(10, 20, 30, 20, 40, 0);
+        lakeShape.bezierCurveTo(50, -20, 30, -40, 10, -30);
+        lakeShape.bezierCurveTo(-10, -40, -30, -20, -20, 0);
+        lakeShape.bezierCurveTo(-30, 20, -10, 40, 0, 0);
+        const lakeGeometry = new THREE.ShapeGeometry(lakeShape);
+        const lakeMaterial = new THREE.MeshStandardMaterial({ color: 0x1E90FF, roughness: 0.1, metalness: 0.5, side: THREE.DoubleSide });
+        const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+        lake.rotation.x = -Math.PI / 2;
+        lake.scale.set(2, 2, 2);
+        lake.position.set(0, 0.1, 60);
+        lake.receiveShadow = true;
+        scene.add(lake);
+
+        // Improved trees with multiple foliage layers
+        function createTree(position) {
+            const trunkGeometry = new THREE.CylinderGeometry(1, 1.5, 5, 32);
+            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.9, metalness: 0.0 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.copy(position);
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+
+            const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 0.8, metalness: 0.0 });
+            for (let i = 0; i < 3; i++) {
+                const foliageGeometry = new THREE.SphereGeometry(3 - i * 0.5, 32, 32);
+                const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+                foliage.position.set(position.x, position.y + 4 + i * 2, position.z);
+                foliage.castShadow = true;
+                foliage.receiveShadow = true;
+                scene.add(foliage);
+            }
+            scene.add(trunk);
+        }
+
+        for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2;
+            const x = 40 * Math.cos(angle) + (Math.random() - 0.5) * 10;
+            const z = 60 + 40 * Math.sin(angle) + (Math.random() - 0.5) * 10;
+            createTree(new THREE.Vector3(x, 0, z));
+        }
+
+        // Reeds
+        function createReed(position) {
+            const reedGeometry = new THREE.CylinderGeometry(0.2, 0.2, 3, 32);
+            const reedMaterial = new THREE.MeshStandardMaterial({ color: 0x556B2F, roughness: 0.7, metalness: 0.0 });
+            const reed = new THREE.Mesh(reedGeometry, reedMaterial);
+            reed.position.copy(position);
+            reed.castShadow = true;
+            scene.add(reed);
+        }
+
+        for (let i = 0; i < 50; i++) {
+            const angle = (i / 50) * Math.PI * 2;
+            const x = 35 * Math.cos(angle) + (Math.random() - 0.5) * 5;
+            const z = 60 + 35 * Math.sin(angle) + (Math.random() - 0.5) * 5;
+            createReed(new THREE.Vector3(x, 0, z));
+        }
+
+        // Background highrises with windows
+        function createBuilding(position, height, width, depth) {
+            const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+            const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xA9A9A9, roughness: 0.3, metalness: 0.5 });
+            const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            building.position.copy(position);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            scene.add(building);
+
+            // Green balconies
+            for (let floor = 1; floor < height / 5; floor++) {
+                const balconyGeometry = new THREE.BoxGeometry(width + 2, 0.5, depth + 2);
+                const balconyMaterial = new THREE.MeshStandardMaterial({ color: 0x32CD32, roughness: 0.6, metalness: 0.0 });
+                const balcony = new THREE.Mesh(balconyGeometry, balconyMaterial);
+                balcony.position.set(position.x, position.y + floor * 5, position.z);
+                balcony.castShadow = true;
+                scene.add(balcony);
+            }
+
+            // Add simple windows
+            const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x87CEEB, roughness: 0.1, metalness: 0.8 });
+            for (let floor = 0; floor < height / 5; floor++) {
+                for (let side = 0; side < 4; side++) {
+                    const windowGeometry = new THREE.PlaneGeometry(1, 2);
+                    const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
+                    if (side === 0) {
+                        windowMesh.position.set(position.x + (Math.random() - 0.5) * width, position.y + floor * 5 + 2.5, position.z + depth / 2 + 0.01);
+                    } else if (side === 1) {
+                        windowMesh.position.set(position.x + (Math.random() - 0.5) * width, position.y + floor * 5 + 2.5, position.z - depth / 2 - 0.01);
+                        windowMesh.rotation.y = Math.PI;
+                    } else if (side === 2) {
+                        windowMesh.position.set(position.x - width / 2 - 0.01, position.y + floor * 5 + 2.5, position.z + (Math.random() - 0.5) * depth);
+                        windowMesh.rotation.y = Math.PI / 2;
+                    } else {
+                        windowMesh.position.set(position.x + width / 2 + 0.01, position.y + floor * 5 + 2.5, position.z + (Math.random() - 0.5) * depth);
+                        windowMesh.rotation.y = -Math.PI / 2;
+                    }
+                    scene.add(windowMesh);
+                }
+            }
+        }
+
+        for (let i = 0; i < 10; i++) {
+            const x = (i - 5) * 20 + (Math.random() - 0.5) * 10;
+            const height = 50 + Math.random() * 50;
+            createBuilding(new THREE.Vector3(x, height / 2, 150), height, 10, 10);
+        }
+
+        // Bridges
+        function createBridge(startPos, endPos) {
+            const direction = new THREE.Vector3().subVectors(endPos, startPos);
+            const length = direction.length();
+            const bridgeGeometry = new THREE.BoxGeometry(length, 2, 5);
+            const bridgeMaterial = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.4, metalness: 0.3 });
+            const bridge = new THREE.Mesh(bridgeGeometry, bridgeMaterial);
+            bridge.position.copy(startPos.clone().add(endPos).multiplyScalar(0.5));
+            bridge.lookAt(endPos);
+            bridge.castShadow = true;
+            scene.add(bridge);
+        }
+
+        createBridge(new THREE.Vector3(-20, 30, 150), new THREE.Vector3(0, 30, 150));
+        createBridge(new THREE.Vector3(20, 40, 150), new THREE.Vector3(40, 40, 150));
+
+        // === FREE CAMERA CONTROLS (WASD + Mouse + Space/Shift) ===
+        const moveSpeed = { value: 10 };
+        const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+        const mouse = { x: 0, y: 0 };
+        let isPointerLocked = false;
+
+        // Lock pointer on click
+        renderer.domElement.addEventListener('click', () => {
+            renderer.domElement.requestPointerLock();
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            isPointerLocked = document.pointerLockElement === renderer.domElement;
+        });
+
+        // Mouse movement for looking
+        document.addEventListener('mousemove', (e) => {
+            if (!isPointerLocked) return;
+            const sensitivity = 0.002;
+            mouse.x -= e.movementX * sensitivity;
+            mouse.y -= e.movementY * sensitivity;
+            mouse.y = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouse.y));
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key in keys) keys[key] = true;
+            if (key === ' ') keys.space = true;
+            if (e.shiftKey) keys.shift = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key in keys) keys[key] = false;
+            if (key === ' ') keys.space = false;
+            if (!e.shiftKey) keys.shift = false;
+        });
+
+        // Mouse wheel for speed
+        renderer.domElement.addEventListener('wheel', (e) => {
+            moveSpeed.value = THREE.MathUtils.clamp(moveSpeed.value + e.deltaY * 0.01, 1, 50);
+        });
+
+        // Update camera based on input
+        const clock = new THREE.Clock();
+        function updateCamera() {
+            const delta = clock.getDelta();
+            const speed = moveSpeed.value * delta;
+
+            // Get camera direction
+            const forward = new THREE.Vector3();
+            camera.getWorldDirection(forward);
+            forward.y = 0;
+            forward.normalize();
+
+            const right = new THREE.Vector3();
+            right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+            // Movement
+            if (keys.w) camera.position.addScaledVector(forward, speed);
+            if (keys.s) camera.position.addScaledVector(forward, -speed);
+            if (keys.a) camera.position.addScaledVector(right, -speed);
+            if (keys.d) camera.position.addScaledVector(right, speed);
+            if (keys.space) camera.position.y += speed;
+            if (keys.shift) camera.position.y -= speed;
+
+            // Rotation
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = mouse.x;
+            camera.rotation.x = mouse.y;
+        }
+
+        // Animation map for different models
+        const animationMap = {
+            man: { idle: 'Idle', walk: 'Walk', run: 'Run' },
+            woman: { idle: 'KeyAction', walk: 'KeyAction', run: 'KeyAction' },
+            child: { idle: 'KeyAction', walk: 'KeyAction', run: 'KeyAction' }
+        };
+
+        // Load varying GLTF models
+        var loader = new GLTFLoader();
+        const manUrl = 'https://threejs.org/examples/models/gltf/Soldier.glb';
+        const womanUrl = '/NicerAppWebOS/businessLogos/glTF-Sample-Models-main/sourceModels/RiggedFigure/RiggedFigure.dae';
+        const childUrl = '/NicerAppWebOS/businessLogos/glTF-Sample-Models-main/sourceModels/RiggedSimple/RiggedSimple.dae';
+
+        loader.load(manUrl, (gltfMan) => {
+            const manTemplate = gltfMan.scene;
+            manTemplate.scale.set(2, 2, 2);
+            const manAnimations = gltfMan.animations;
+
+
+            loader = new ColladaLoader();
+
+            loader.load(womanUrl, (gltfWoman) => {
+                const womanTemplate = gltfWoman.scene;
+                womanTemplate.scale.set(2, 2, 2);
+                const womanAnimations = gltfWoman.animations;
+
+                loader.load(childUrl, (gltfChild) => {
+                    const childTemplate = gltfChild.scene;
+                    childTemplate.scale.set(1, 1, 1);
+                    const childAnimations = gltfChild.animations;
+
+                    function createPerson(type, position, animationType, rotationY = 0) {
+                        let template, animations;
+                        if (type === 'man') { template = manTemplate; animations = manAnimations; }
+                        else if (type === 'woman') { template = womanTemplate; animations = womanAnimations; }
+                        else if (type === 'child') { template = childTemplate; animations = childAnimations; }
+
+                        const model = template.clone();
+                        model.position.copy(position);
+                        model.rotation.y = rotationY;
+                        model.castShadow = true;
+                        model.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                                if (child.material) {
+                                    const stdMaterial = new THREE.MeshStandardMaterial({
+                                        map: child.material.map,
+                                        normalMap: child.material.normalMap,
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    });
+                                    child.material = stdMaterial;
+                                }
+                            }
+                        });
+                        scene.add(model);
+
+                        const mixer = new THREE.AnimationMixer(model);
+                        const animName = animationMap[type][animationType];
+                        const clip = THREE.AnimationClip.findByName(animations, animName);
+                        if (clip) {
+                            const action = mixer.clipAction(clip);
+                            action.play();
+                        }
+
+                        return { model, mixer, position: position.clone(), type };
+                    }
+
+                    // People on lawn: 15 groups → ~45-75 people
+                    const people = [];
+                    const groupCount = 15;
+                    for (let g = 0; g < groupCount; g++) {
+                        const groupCenterX = (Math.random() - 0.5) * 50;
+                        const groupCenterZ = 20 + Math.random() * 20;
+                        const memberCount = 3 + Math.floor(Math.random() * 3);
+                        for (let m = 0; m < memberCount; m++) {
+                            const angle = (m / memberCount) * Math.PI * 2;
+                            const offsetX = Math.cos(angle) * 2;
+                            const offsetZ = Math.sin(angle) * 2;
+                            const pos = new THREE.Vector3(groupCenterX + offsetX, 0, groupCenterZ + offsetZ);
+                            const rotationY = angle + Math.PI;
+                            const type = Math.random() < 0.33 ? 'man' : Math.random() < 0.5 ? 'woman' : 'child';
+                            people.push(createPerson(type, pos, 'idle', rotationY));
+                        }
+                    }
+
+                    // Skaters and twirlers
+                    const skaters = [], twirlers = [];
+                    const circleRadius = 10;
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (i / 5) * Math.PI * 2;
+                        const x = circleRadius * Math.cos(angle);
+                        const z = -20 + circleRadius * Math.sin(angle);
+                        const type = Math.random() < 0.33 ? 'man' : Math.random() < 0.5 ? 'woman' : 'child';
+                        skaters.push(createPerson(type, new THREE.Vector3(x, 0, z), 'run'));
+                    }
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (i / 5) * Math.PI * 2 + Math.PI / 5;
+                        const x = circleRadius * Math.cos(angle);
+                        const z = -20 + circleRadius * Math.sin(angle);
+                        const type = Math.random() < 0.33 ? 'man' : Math.random() < 0.5 ? 'woman' : 'child';
+                        const person = createPerson(type, new THREE.Vector3(x, 0, z), 'walk');
+                        const fireGeometry = new THREE.BufferGeometry();
+                        const fireVertices = [];
+                        for (let j = 0; j < 100; j++) {
+                            fireVertices.push((Math.random() - 0.5) * 0.5, Math.random() * 2 + 2, (Math.random() - 0.5) * 0.5);
+                        }
+                        fireGeometry.setAttribute('position', new THREE.Float32BufferAttribute(fireVertices, 3));
+                        const fireMaterial = new THREE.PointsMaterial({ color: 0xFF4500, size: 0.1, blending: THREE.AdditiveBlending, transparent: true });
+                        person.fire = new THREE.Points(fireGeometry, fireMaterial);
+                        person.model.add(person.fire);
+                        twirlers.push(person);
+                    }
+
+                    const allMixers = [...people, ...skaters, ...twirlers].map(p => p.mixer);
+
+                    function updateAnimations() {
+                        const delta = clock.getDelta();
+                        allMixers.forEach(mixer => mixer.update(delta));
+                    }
+
+                    function animateLawnPeople(time) {
+                        people.forEach((person, i) => {
+                            person.model.position.y = Math.sin(time * 2 + i) * 0.05;
+                        });
+                    }
+
+                    function animateCircleMovers(time, group, speed, offset) {
+                        group.forEach((person, i) => {
+                            const angle = time * speed + (i / group.length) * Math.PI * 2 + offset;
+                            const newX = circleRadius * Math.cos(angle);
+                            const newZ = -20 + circleRadius * Math.sin(angle);
+                            const dx = -Math.sin(angle) * (speed > 0 ? 1 : -1);
+                            const dz = Math.cos(angle) * (speed > 0 ? 1 : -1);
+                            const lookAtPos = new THREE.Vector3(newX + dx, person.model.position.y, newZ + dz);
+                            person.model.lookAt(lookAtPos);
+                            person.model.position.x = newX;
+                            person.model.position.z = newZ;
+                            if (person.fire) person.fire.rotation.y += 0.05;
+                        });
+                    }
+
+                    let time = 0;
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        const delta = clock.getDelta();
+                        time += delta;
+
+                        updateCamera();
+                        updateAnimations();
+                        animateLawnPeople(time);
+                        animateCircleMovers(time, skaters, 0.5, 0);
+                        animateCircleMovers(time, twirlers, -0.3, Math.PI / 5);
+
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                });
+            });
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

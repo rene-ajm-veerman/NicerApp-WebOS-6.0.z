@@ -1,0 +1,15 @@
+[Unit]
+Description=PHP Daemon (ReactPHP)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/php /path/to/proxy-daemon.php
+Restart=always
+User=www-data
+StandardOutput=append:/var/log/php-daemon.log
+StandardError=append:/var/log/php-daemon.log
+WorkingDirectory=/path/to/your/project
+
+[Install]
+WantedBy=multi-user.target

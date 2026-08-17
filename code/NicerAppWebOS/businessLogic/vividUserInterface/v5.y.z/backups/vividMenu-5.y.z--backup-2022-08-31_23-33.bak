@@ -1,0 +1,884 @@
+// TODO : include vividButton-5.y.z.js in this file!
+
+if (!naVividMenu_settings) var naVividMenu_settings = [
+    /*{
+        menuID : t.el.id,
+        url : window.location.href,
+        items : [
+            {
+                browserSizeX : parseInt($(window).width()),
+                browserSizeY : parseInt($(window).height()),
+                menuHTML : t.el.innerHTML,
+                positions : [
+                    {
+                        offsetX : it.offsetX,
+                        offsetY : it.offsetY,
+                        zIndex : it.zIndex,
+                        level : it.level
+                    }
+                ]
+            }
+        ]
+    }*/
+];
+
+class naVividMenu {
+    constructor(el, bypassInitItems, callback7) {
+        var t = this;
+        t.el = el;
+        t.t = $(el).attr('theme');
+        t.type = $(el).attr('type') || 'horizontal';
+        t.items = [];
+        //debugger;
+        if (bypassInitItems) {
+            var callback4 = function (menu, dat) {
+                if (t.wasFoundInDB) {
+                    t.initDBloadedMenuItems(); 
+                    if (typeof callback7=='function') callback7 (menu);
+                } else {
+                    var callback3 = function (menu) {
+                        t.initDBloadedMenuItems(); 
+                        if (typeof callback7=='function') callback7 (menu);
+                    }
+                    t.onresize(callback3);                    
+                }
+            };
+            t.loadPositionData(callback4);
+        } else {
+            var callback3 = function (menuID) {
+                if (typeof callback=='function') callback (menuID);
+            }
+            t.onresize(callback3);
+        }
+        t.updateItemStates();
+    }
+    
+    initDBloadedMenuItems() {
+        var t = this;
+        $(t.el).find('li').each(function(idx,li) {
+            $(li).attr('id', 'li__'+idx);
+        });
+        $('.vividMenu_item', t.el).each(function(idx,menuItem){
+            var li = $('#li__'+idx)[0];
+            t.items[idx] = {
+                li : li,
+                b : new naVividButton(menuItem,'',t.el,false),
+                level : jQuery(li).parents('ul').length,
+                path : ''
+            };
+            var it = t.items[idx];
+            li.it = it;
+            setTimeout (function(t, it, menuItem, li, idx) {
+                $(menuItem).bind('mouseover', function() {
+                    t.onmouseover(it);
+                });
+                $(menuItem).bind('mouseout', function() {
+                    t.onmouseout(it);
+                });
+                $(menuItem).bind('click', function() {
+                    t.onclick(it);
+                });
+                $(li).parents('ul').each(function(idx2,ul){
+                    //var it = t.items[idx];
+                    for (var i=0; i<t.items.length; i++) {
+                        var it2 = t.items[i];
+                        if ($(ul).parents('li')[0]===it2.li) {
+                            if (it.path!=='') it.path += ',';
+                            it.path += '#'+it2.b.el.id;
+                            if (!it.p) it.p = it2.li;
+                            if (!it.parent) it.parent = i;
+                            break;
+                        }
+                    }
+                });
+            }, 500, t, it, menuItem, li, idx);
+        });
+    }
+    
+    initItems() {
+        var t = this;
+        $('.vividMenu_item', t.el).remove();
+        $(t.el).find('li').each(function(idx,li) {
+            
+            var html = '<div id="'+t.el.id+'_'+idx+'" class="vividButton vividButton_text vividMenu_item" theme="'+t.t+'" style="opacity:0.0001;">'+$(li).children('a')[0].outerHTML+'</div>';
+//if ($(li).children('a')[0].outerHTML=='Apps') debugger;
+            t.items[idx] = {
+                li : li,
+                b : new naVividButton(null,html,t.el,true),
+                level : jQuery(li).parents('ul').length,
+                path : ''
+            };
+            var it = t.items[idx];
+            if (it.level===1) $(it.b.el).addClass('level1');            
+            li.it = it;            
+            $('#'+it.b.el.id/*+'::before'*/).bind('mouseover', function() {
+                t.onmouseover(it);
+            });
+            $('#'+it.b.el.id/*+'::before'*/).bind('mouseout', function() {
+                t.onmouseout(it);
+            });
+            $('#'+it.b.el.id/*+'::before'*/).bind('click', function() {
+                t.onclick(it);
+            });
+            $(li).parents('ul').each(function(idx2,ul){
+                var it = t.items[idx];
+                for (var i=0; i<t.items.length; i++) {
+                    var it2 = t.items[i];
+                    if ($(ul).parents('li')[0]===it2.li) {
+                        if (it.path!=='') it.path += ',';
+                        it.path += '#'+it2.b.el.id;
+                        if (!it.p) it.p = it2.li;
+                        if (!it.parent) it.parent = i;
+                        //break;
+                    }
+                }
+            });
+        });
+        //debugger;
+    }
+
+
+    
+    loadPositionData(callback4c) {
+        if (na.site.globals.hasDB) {
+            var
+            t = this,
+            fncn = 'naVividMenu.loadPositionData(callback4) (t.el.id='+t.el.id+')',
+            url = '/NicerAppWebOS/businessLogic/ajax/ajax_get_settings_positions.php',
+            ajaxCmd = {
+                type : 'POST',
+                url : url,
+                data : {
+                    dbType : 'settings_navividmenu',
+                    menuID : t.el.id,
+                    url : window.location.href,
+                    browserSizeX : parseInt($(window).width()),
+                    browserSizeY : parseInt($(window).height())
+                },
+                success : function (data, ts, xhr) {
+                    t.wasFoundInDB = false;
+                    data = data.trim();
+                    if (typeof data=='string' && data!=='') {
+                        try {
+                            var dat = JSON.parse(data);
+                        } catch (error) {
+                            na.site.fail (fncn+' : AJAX decode error in data returned for url='+url+', error='+error.message+', in data='+data, xhr);
+                        }
+
+                        naVividMenu_settings.push ({
+                            menuID : t.el.id,
+                            url : window.location.href,
+                            items : dat.items
+                        });
+                        t.el.innerHTML = dat.items.menuHTML;
+                        t.wasFoundInDB = true;
+
+                    } else {
+                        var
+                        dat = null,
+                        it = null;
+                    }
+
+                    var
+                    url = document.location.href.replace(document.location.origin,'').replace(document.location.host,'').replace('/apps/',''),
+                    appStr = url.match(/\/apps/)?na.m.decode_base64_url(url):{url:url};
+                    if (t.wasFoundInDB) {
+                        na.m.log (110, 'layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+', app='+appStr+' at the current resolution that is stored in the server DB, was loaded into local memory.', false);
+                        //debugger;
+                        //na.m.log (100, 'menu innerHTML is now : '+t.el.innerHTML);
+                    } else {
+                        //debugger;
+                        na.m.log (110, 'layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+', app='+appStr+' could not be found in server DB. calculating the data now.', false);
+                    }
+                    if (typeof callback4c=='function') callback4c (t.el, dat);
+
+                },
+                error : function (xhr, textStatus, errorThrown) {
+                    na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+                }
+            };
+            $.ajax(ajaxCmd);
+        } else {
+            // !na.site.globals.hasDB
+            var
+            t = this,
+            fncn = 'naVividMenu.loadPositionData(callback4) (t.el.id='+t.el.id+')',
+            dat = null,
+            url = document.location.href.replace(document.location.origin,'').replace(document.location.host,'').replace('/apps/',''),
+            appStr = url.match(/\/apps/)?na.m.decode_base64_url(url):{url:url},
+            msg = 'layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+', app='+appStr+' could not be found on server, since no database architecture is installed there at the moment. calculating the data locally now.';
+
+            na.m.log (110, msg, false);
+            na.site.setStatusMsg (msg, true, 4000);
+            if (typeof callback4c=='function') callback4c (t.el, dat);
+        }
+    }
+    
+    savePositionData (callback8) {
+        var 
+        t = this,
+        fncn = 'naVividMenu.savePositionData() (t.el.id='+t.el.id+')',
+        items = [];
+        
+        //debugger;
+        for (var i=0; i < naVividMenu_settings.length; i++) {
+            var it = naVividMenu_settings[i];
+            if (
+                it.menuID === t.el.id
+                && it.url === window.location.href
+                && it.browserSizeX === parseInt($(window).width())
+                && it.browserSizeY === parseInt($(window).height())
+            ) items = it.items;
+        };
+        
+        var 
+        url = '/NicerAppWebOS/businessLogic/ajax/ajax_set_settings_positions.php',
+        ajaxCmd = {
+            type : 'POST',
+            url : url,
+            data : {
+                dbType : 'settings_navividmenu',
+                menuID : t.el.id,
+                url : window.location.href,
+                browserSizeX : parseInt(''+$(window).width()),
+                browserSizeY : parseInt(''+$(window).height()),
+                items : JSON.stringify(items)
+            },
+            success : function (data, ts, xhr) {
+                if (data=='status : Success.') {
+                    var 
+                    url2a = document.location.href.replace(document.location.origin,'').replace(document.location.host,''),
+                    url2b = url2a.replace('/apps/',''),
+                    appStr = url2a.match(/\/apps/)?na.m.decode_base64_url(url2):{url:url2a};
+                    na.m.log (110, 'layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+', app='+appStr+' at current resolution was saved to the server DB.', false);
+                } else {
+                    na.m.log (110, 'FAILURE : layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+' at current resolution was attempted to be saved the server DB, but this FAILED. '+data, false);
+                }
+                if (typeof callback8 == 'function') callback8 (t.el);
+            },
+            error : function (xhr, textStatus, errorThrown) {
+                na.m.log (110, 'FAILURE : layout-position data for menu with ID '+t.el.id+' for url='+window.location.href+' at current resolution was attempted to be saved the server DB, but this FAILED. '+data, false);
+                na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+            }                
+        };
+        $.ajax(ajaxCmd);
+    }
+    
+    updateItemStates() {
+        var t = this;
+        $(this.el).find('li > a').each(function(idx,li) {
+            let 
+            isc = $(li).attr('vividMenu_isSelected_condition');
+            
+            if (isc) {
+                var 
+                menuItem = t.items[idx].b.el,
+                r = eval(isc);
+                
+                if (r)
+                    $(menuItem).addClass('vividButtonSelected').removeClass('vividButton');
+                else
+                    $(menuItem).removeClass('vividButtonSelected').addClass('vividButton')
+            }
+        });
+    }
+    
+    onresize (callback5) {
+        var t = this;
+        
+        if (t.type=='horizontal') {
+            var 
+            menuWidth = parseInt($(t.el).attr('itemWidth')) * $('#siteMenu > ul > li').length,
+            menuHeight = $(t.el).height();
+            $(t.el).css({width:menuWidth, height:menuHeight});
+        } else {
+            var 
+            menuWidth = parseInt($(t.el).attr('itemWidth')),
+            menuHeight = $(t.el).height() * $('#siteMenu > ul > li').length;
+            $(t.el).css({width:menuWidth, height:menuHeight});
+        }
+        
+        var settingsFoundInLocalDB = false;
+        for (var i=0; i < naVividMenu_settings.length - 1; i++) {
+            var sit = naVividMenu_settings[i];
+            if (
+                sit.menuID === t.el.id
+                && sit.url === window.location.href
+                //&& parseInt(sit.browserSizeX) === parseInt(''+$(window).width())
+                //&& parseInt(sit.browserSizeY) === parseInt(''+$(window).height())
+            ) {
+                for (var j=0; j < sit.items.length; j++) {
+                    var it = sit.items[j];
+                    if (
+                        parseInt(it.browserSizeX) === parseInt(''+$(window).width())
+                        && parseInt(it.browserSizeY) === parseInt(''+$(window).height())
+                    ) settingsFoundInLocalDB = i;
+                }
+            }
+        }
+        
+        //debugger;
+        if (settingsFoundInLocalDB===false) {
+            var callback2a = function(t) {
+                /*-- calculations of the final menu item positions on the browser screen are now completed,
+                 *-- prepare the call to the server PHP code that saves these calculation results into it's database
+                 *-- for use by future clients elsewhere in the world that view the same page and use exactly the same browser screen size dimensions
+                 *-- at some point in the future.
+                 */
+                
+                
+                var recIdx = false;
+                for (var i=0; i < naVividMenu_settings.length; i++) {
+                    var it = naVividMenu_settings[i];
+                    if (
+                        it.menuID === t.el.id
+                        && it.url === window.location.href
+                        && parseInt($(window).width()) === it.browserSizeX
+                        && parseInt($(window).height()) === it.browserSizeY
+                    ) {
+                        recIdx = i;
+                        break;
+                    }
+                }
+                
+                if (recIdx === false) {
+                    naVividMenu_settings.push ({
+                        menuID : t.el.id,
+                        url : window.location.href,
+                        browserSizeX : parseInt($(window).width()),
+                        browserSizeY : parseInt($(window).height()),
+                        items : {
+                            menuHTML : t.el.innerHTML,
+                        }
+                    });
+                };
+                //debugger;
+                t.savePositionData(callback5);            
+            };
+            t.wasFoundInDB = false;
+            t.initItems();
+            //debugger;
+            t.onresize_calculate (t, {}, callback2a);
+        } else {
+            var it = naVividMenu_settings[settingsFoundInLocalDB];
+            t.el.innerHTML = it.items.menuHTML;
+        }
+        
+    }
+    
+    onresize_calculate (t, levels, callback) {
+        var
+        windowWidth = $(window).width(),
+        windowHeight = $(window).height();
+    
+        if (!t) t = this;
+        if (!levels) levels = {};
+        
+        if (!t.resizeDoingIdx) t.resizeDoingIdx=0;
+        if (!t.resizeDoneCount) t.resizeDoneCount=0;
+        t.resizeDoneCount++;
+        if (t.resizeDoneCount>25) {
+            setTimeout(function() {
+                t.resizeDoneCount = 0;
+                t.onresize_calculate (t, levels, callback);
+            }, 200);
+        } else {
+            if (t.resizeDoingIdx>=t.items.length) {
+                t.resizeDoingIdx = 0;
+                t.resizeDoneCount = 0;
+                if (typeof callback=='function') callback(t);
+            } else {
+                let it = t.items[t.resizeDoingIdx];
+                it.label = $(it.b.el).children('a').html();
+                it.pul = $(it.li).parents('ul')[0];
+                var path = '';
+                $(it.li).parents('ul').each(function(idx,ulEl){ 
+                    path += '/' + $('li a',this)[0].innerHTML 
+                });
+                na.m.log (6668, 'naVividMenu : initializing for menu #'+t.el.id+' : '+t.resizeDoingIdx+', path='+path, false);
+                //debugger; 
+                
+                $(it.pul).children('li').each(function(idx,li) {
+                    if (it.li === li) {
+                        it.levelIdx = idx;
+                    }
+                });
+                
+                $(it.b.el).css({display:'flex'});
+                
+                var
+                pl = null,
+                columnCount = Math.floor((windowWidth-($(it.b.el).width()/3)) / $(it.b.el).width()),
+                itemsOnLevelCount = 0;
+                
+                for (var j=0; j<t.items.length; j++) {
+                    var it2 = t.items[j];
+                    if (it2.parent === it.parent && it2.level === it.level) itemsOnLevelCount++;
+                };
+                
+                var
+                rowCount = Math.ceil(itemsOnLevelCount / columnCount);
+                
+                
+                if (t.type=='horizontal') {
+                    if (it.level===0) {
+                        columnCount = 1;
+                        rowCount = 9999;
+                    } else if (columnCount > rowCount) {
+                        columnCount = Math.floor(Math.sqrt(itemsOnLevelCount));
+                        rowCount = Math.ceil(itemsOnLevelCount / columnCount);
+                    };
+
+                    while (columnCount * ( $(it.b.el).width() ) > $(t.el).width() ) {
+                        rowCount++;
+                        columnCount = Math.ceil(itemsOnLevelCount / rowCount);
+                    }
+                }
+                
+                let 
+                parent = t.items[it.parent],
+                l = levels['path '+it.path],
+                placing = 'right',
+                placingVertical = 'bottom',
+                //left = ($(it.b.el).offset().left - $(t.el).offset().left ) - ( (parent ? parent.offsetX : $(it.b.el).width()) - $(t.el).offset().left ),
+                //right = (windowWidth - jQuery(it.b.el).offset().left /* - ($(it.b.el).width() * 0.7)*/ - (parent ? parent.offsetX : $(it.b.el).width())),
+                left = ( parent ? parent.offsetX : parseInt($(t.el).attr('itemWidth'))) + $(t.el).offset().left,
+                right = $(window).width() - ( parent ? parent.offsetX : parseInt($(t.el).attr('itemWidth')) ) - $(t.el).offset().left,
+                left2 = left - ($(it.b.el).width() * columnCount) - ((parseInt($(t.el).attr('itemWidth'))/4)*3),
+                right2 = right + ($(it.b.el).width() * columnCount) + ((parseInt($(t.el).attr('itemWidth'))/4)*3),
+                top = jQuery(it.b.el).offset().top + (parent ? parent.offsetY : $(it.b.el).height()),
+                bottom = (windowHeight - jQuery(it.b.el).offset().top /* - ($(it.b.el).width() * 0.7)*/ - (parent ? parent.offsetY : $(it.b.el).height()));
+                
+                if (Math.abs(left) > Math.abs(right)) placing = 'left';
+                if (placing=='left') var width = Math.abs(left); else var width = Math.abs(right);
+                if (Math.abs(top) > Math.abs(bottom)) placingVertical = 'top';
+                if (placingVertical=='top') var height = Math.abs(top); else var height = Math.abs(bottom);
+                //if (it.label=='HD Video') debugger;
+                if (t.type=='verticalMenu') {
+                    t.onresize_calculate_vertical (t, it, levels, callback, windowHeight, windowWidth, parent, l, placingVertical, height, top, bottom, placing, width, left, right);
+                } else {
+                    t.onresize_calculate_horizontal (t, it, levels, callback, windowHeight, windowWidth, parent, l, placing, width, left, right, placingVertical, height, top, bottom);
+                }
+            }
+        }
+        //debugger;
+    }
+
+    onresize_calculate_vertical(t, it, levels, callback, windowHeight, windowWidth, parent, l, placingVertical, height, top, bottom, placing, width, left, right ) {
+                let
+                pl = null,
+                //columnCount = Math.floor(((placingVertical=='bottom'?bottom:top)-($(it.b.el).width()/3)) / $(it.b.el).width()),
+                rowCount =  Math.floor(((placingVertical=='bottom'?bottom:top)-($(it.b.el).height()/3)) / $(it.b.el).height()),
+                itemsOnLevelCount = 0;
+                
+                for (let j=0; j<t.items.length; j++) {
+                    let it2 = t.items[j];
+                    if (it2.parent === it.parent && it2.level === it.level) {
+                        itemsOnLevelCount++;
+                        //debugger;
+                    }
+                };
+                
+                let 
+                columnCount = Math.floor(Math.sqrt(itemsOnLevelCount)),
+                column = 0,
+                columnIdx = 0,
+                row = 0,
+                rowIdx = 0;
+                rowCount = Math.ceil(itemsOnLevelCount / columnCount);
+                
+                l = levels['path '+it.path];
+                if (!l) {
+                    if (!parent || !levels['path '+parent.path]) {
+                        pl = {
+                            offsetX : 0,
+                            offsetY : placingVertical=='bottom'?7:-7,
+                            zIndexOffset : 0,
+                            row : 0,
+                            column : 0
+                        }
+                    } else {
+                        pl = levels['path '+parent.path];
+                    }
+                    
+                    let zof = pl.zIndexOffset + 1;
+                    levels['path '+it.path] = jQuery.extend({}, pl);
+                    levels['path '+it.path].offsetX = pl.offsetX;
+                    levels['path '+it.path].offsetY = pl.offsetY;
+                    levels['path '+it.path].zIndexOffset = zof;
+                    levels['path '+it.path].row = 0;
+                    levels['path '+it.path].column = 0;
+                    l = levels['path '+it.path];
+                };
+                
+                let row1 = l.row;
+                for (let j=0; j<t.items.length; j++) {
+                    let it2 = t.items[j];
+                    if (it2.parent === it.parent && it2.level === it.level) {
+                        //debugger;
+                        if (column >= columnCount) {
+                            row = l.row + 1;
+                            column = 1;
+                        } else {
+                            column++;
+                            row = row1;
+                        }
+                        //if ($('a',it.b.el)[0].innerHTML=='Dark mode') debugger;
+                        //if ($('a',it.b.el)[0].innerHTML=='Landscape') debugger;
+                        if (it2.b.el.id === it.b.el.id) break;
+                    } 
+                };
+                l.row = row;
+                l.column = column;
+                //if (it.level == 3 && t.items[it.parent].label=='Landscape') debugger;
+                
+                it.childrenPlacement = placingVertical;
+                it.columnIdx = columnIdx;
+                it.column = column;
+                it.rowIdx = rowIdx;
+                it.row = row;
+                it.offsetY = (
+                    it.level === 1
+                    ? ( ($(it.b.el).height() + 20) * it.levelIdx )
+                    : l
+                        ? it.level === 2
+                            ? placingVertical==='top'
+                                ? l.offsetY + parent.offsetY - ( ($(it.b.el).height()+18) * it.row) 
+                                : l.offsetY + parent.offsetY + ( ($(it.b.el).height()+18) * it.row) 
+                            : placingVertical==='top'
+                                ? l.offsetY + parent.offsetY - ( ($(it.b.el).height()+18) * it.row) - ($(it.b.el).height()+2)
+                                : l.offsetY + parent.offsetY + ( ($(it.b.el).height()+18) * it.row) + ($(it.b.el).height()+2)
+                        : it.level === 2
+                            ? placingVertical==='top'
+                                ? parent.offsetY - ( ($(it.b.el).height()+18) * it.row)
+                                : parent.offsetY + ( ($(it.b.el).height()+18) * it.row) 
+                            : placingVertical==='top'
+                                ? parent.offsetY - ( ($(it.b.el).height()+18) * it.row) - ($(it.b.el).height()*2)
+                                : parent.offsetY + ( ($(it.b.el).height()+18) * it.row) + ($(it.b.el).height()*2)
+                );
+                it.offsetX = (
+                    it.level === 1
+                    ? 0
+                    : placing === 'left'
+                        ? parent.offsetX - ( parseInt($(t.el).attr('itemWidth')) * (it.column-1) ) - (($(it.b.el).width()/4)*3)
+                        : parent.offsetX + ( parseInt($(t.el).attr('itemWidth')) * (it.column-1) ) + (($(it.b.el).width()/4)*3)
+                );
+                
+                it.zIndex = (100 * 1000) + l.zIndexOffset;
+
+                $(it.b.el).css({
+                    left : it.offsetX,
+                    top : it.offsetY,
+                    zIndex : it.zIndex,
+                    display : it.level===1 ? 'flex' : 'none',
+                    opacity : it.level===1 ? 1 : 0
+                    
+                });
+                
+                t.resizeDoingIdx++;
+                setTimeout (function(){t.onresize_calculate (t, levels, callback)}, 10);
+    }
+    
+    onresize_calculate_horizontal (t, it, levels, callback, windowHeight, windowWidth, parent, l, placing, width, left, right, placingVertical, height, top, bottom) {
+
+    //onresize_calculate_horizontal(t, it, levels, callback, windowHeight, windowWidth, parent, l, placing, width, left, right) {
+                var
+                pl = null,
+                columnCount = Math.floor((windowWidth-($(it.b.el).width()/3)) / $(it.b.el).width()),
+                itemsOnLevelCount = 0;
+                
+                for (var j=0; j<t.items.length; j++) {
+                    var
+                    it2 = t.items[j],
+                    p = t.items[it.parent],
+                    p2 = t.items[it2.parent];
+                    if (it2.parent === it.parent && it2.level === it.level) itemsOnLevelCount++;
+                };
+                
+                var
+                rowCount = Math.ceil(itemsOnLevelCount / columnCount);
+
+                if (it.level===0) {
+                    columnCount = 1;
+                    rowCount = 9999;
+                } else if (columnCount > rowCount) {
+                    columnCount = Math.floor(Math.sqrt(itemsOnLevelCount));
+                    rowCount = Math.ceil(itemsOnLevelCount / columnCount);
+                };
+
+                while (columnCount * ( $(it.b.el).width() ) > $(t.el).width() ) {
+                    rowCount++;
+                    columnCount = Math.ceil(itemsOnLevelCount / rowCount);
+                }
+                
+
+                var
+                column = 0,
+                columnIdx = 1,
+                l = levels['path '+it.path];
+
+
+                for (var j=0; j<t.items.length; j++) {
+                    var it2 = t.items[j];
+                    if (it2.parent === it.parent && it2.level === it.level) {
+                        if ((it.levelIdx+1) <= (column * rowCount) + columnIdx ) {
+                            //columnIdx--;
+                        } else if (columnIdx >= rowCount) {
+                            column++;
+                            columnIdx = 1;
+                        } else columnIdx++;
+                    } 
+                };
+                it.childrenPlacement = placing;
+                it.columnIdx = columnIdx;
+                it.column = column;
+                
+                //if (it.label=='Dark mode') debugger;
+                //if (it.label=='Dark mode' || it.label=='Landscape') debugger;
+                //if (it.label=='Blogging') debugger;
+                //if (!l) debugger;
+                //if (it.parent && t.items[it.parent].label=='News') debugger;
+                it.offsetX = (
+                    it.level === 1
+                    ? ( parseInt($(t.el).attr('itemWidth')) * it.levelIdx )
+                        + ( parseInt($(it.b.el).css('borderLeftWidth')) * it.levelIdx )
+                        + ( parseInt($(it.b.el).css('borderRightWidth')) * it.levelIdx )
+
+                    : it.level === 2
+                        ? placing==='right'
+                            ? parent.offsetX
+                                + ( parseInt($(t.el).attr('itemWidth')) * it.column)
+                                + ( parseInt($(it.b.el).css('borderLeftWidth')) * it.column )
+                                + ( parseInt($(it.b.el).css('borderRightWidth')) * it.column )
+                            : parent.offsetX
+                                - ( parseInt($(t.el).attr('itemWidth')) * it.column)
+                                - ( parseInt($(it.b.el).css('borderLeftWidth')) * it.column )
+                                - ( parseInt($(it.b.el).css('borderRightWidth')) * it.column )
+                        : /* it.level > 2 */ placing === 'right'
+                            ? parent.offsetX
+                                + ( parseInt($(t.el).attr('itemWidth')) * it.column)
+                                + ( parseInt($(it.b.el).css('borderLeftWidth')) * it.column )
+                                + ( parseInt($(it.b.el).css('borderRightWidth')) * it.column )
+                                + ( parseInt($(t.el).attr('itemWidth')) * 0.75 )
+                            : parent.offsetX
+                                - ( parseInt($(t.el).attr('itemWidth')) * it.column)
+                                - ( parseInt($(it.b.el).css('borderLeftWidth')) * it.column )
+                                - ( parseInt($(it.b.el).css('borderRightWidth')) * it.column )
+                                - ( parseInt($(t.el).attr('itemWidth')) * 0.75 )
+                );
+                if (l) it.offsetX += l.offsetX;
+                //if (it.level===1) debugger;
+                it.offsetY = (
+                    it.level === 1
+                    ? (
+                        $(t.el).height()
+                        - $(it.b.el).height()
+                        - parseInt($(it.b.el).css('borderTopWidth'))
+                        - parseInt($(it.b.el).css('borderBottomWidth'))
+                    ) / 2
+                    : it.level === 2
+                        ? $(it.b.el).outerHeight() * (it.columnIdx)
+                        : parent.offsetY + $(it.b.el).outerHeight() * (it.columnIdx)
+                            + ( placingVertical == 'bottom' ? -22 : 22 )
+                );
+                
+                
+                if (placing=='right') {
+                    if (parent &&  $(t.el).offset().left + it.offsetX > $(window).width() ) {
+                        var 
+                        xDirection = -1,
+                        xAdjustment = xDirection * Math.abs( ( $(t.el).width() - (parseInt($(t.el).attr('itemWidth')))*(columnCount+1) ) / 2 ),
+                        yAdjustment = 0;//it.level > 2 ? 15 : 0;
+                    } else {
+                        var xAdjustment = 0, yAdjustment = 0;
+                    }
+                } else {
+                    if (parent && ( $(t.el).offset().left + it.offsetX )  < 0 ) {
+                        var 
+                        xDirection = 1,
+                        xAdjustment = xDirection * Math.abs( ( $(t.el).width() - (parseInt($(t.el).attr('itemWidth')))*(columnCount+1) ) / 2 ),
+                        yAdjustment = 0;//it.level > 2 ? 15 : 0;
+                    } else {
+                        var xAdjustment = 0, yAdjustment = 0;
+                    }
+                }
+                
+//                 if (it.label=='Landscape' ) debugger;
+//                 if (it.label=='Apps' || it.label=='Background') debugger;
+                
+                if (!l) {
+                    if (!parent || !levels['path '+parent.path]) {
+                        pl = {
+                            offsetX : 0,
+                            offsetY : 0,
+                            zIndexOffset : 0
+                        }
+                    } else {
+                        pl = levels['path '+parent.path];
+                    }
+                    
+                    var zof = pl.zIndexOffset + 1;
+                    levels['path '+it.path] = jQuery.extend({}, pl);
+                    levels['path '+it.path].offsetX = pl.offsetX;
+                    levels['path '+it.path].offsetY = pl.offsetY;
+                    levels['path '+it.path].zIndexOffset = zof;
+                    l = levels['path '+it.path];
+                };
+                it.zIndex = (100 * 1000) + l.zIndexOffset;
+                
+                l.xAdjustment = xAdjustment;
+                l.yAdjustment = yAdjustment;
+
+                for (var k=0; k < t.items.length; k++) {
+                    var it2 = t.items[k]
+                    if (typeof it2.offsetX == 'number' && !it2.adjusted && it2.parent === it.parent) {
+                        //if (xAdjustment!==0) debugger;
+                        it2.offsetX += l.xAdjustment;
+                        it2.offsetY += l.yAdjustment;
+                        $(it2.b.el).css({
+                            left : it.offsetX,
+                            top : it.offsetY
+                        });
+                        it2.adjusted = true;
+                    }
+                }
+
+                $(it.b.el).css({
+                    padding : 0,
+                    left : it.offsetX,
+                    top : it.offsetY,
+                    zIndex : it.zIndex,
+                    display : (it.level===1 ? 'flex' : 'none'),
+                    opacity : (it.level===1 ? 1 : 0.0001)                    
+                });
+                
+                t.resizeDoingIdx++;
+                setTimeout (function(){t.onresize_calculate (t, levels, callback)}, 10);
+    }
+    
+    onmouseover(it) {
+        var
+        t = this,
+        opLevMax = 1,
+        opLevMin = 0.2;
+        if (it.p) it.p.it.travelledIntoChild = true;
+        if (it.level===1) for (var i=0; i<t.items.length; i++) {
+            var it2 = t.items[i];
+            if (it2.li.openChildren) it2.li.openChildren.each(function(idx,cli){
+                $(cli.it.b.el).fadeOut('fast');
+            });
+        }
+        if (t.timeoutMouseout) clearTimeout (t.timeoutMouseout);
+        if (t.timeoutMouseover) clearTimeout (t.timeoutMouseover);
+        t.timeoutMouseover = setTimeout (function() {
+            $(it.p).find('li').each(function(idx,pcli){
+                //if (pcli!==it.li) {
+                    if (pcli.openChildren) pcli.openChildren.each(function(idx2,li) {
+                        $(li.it.b.el).fadeOut('fast');
+                        if (li.openChildren) li.openChildren.each(function(idx3,li2){
+                            $(li2.it.b.el).fadeOut('fast');
+                        });
+                    });
+                //}
+            });
+            it.li.openChildren = $(it.li).children('ul').children('li');
+            var hasChildren = false;
+            it.li.openChildren.each(function(idx,li) {
+                var
+                opLev = opLevMin + (
+                    ( (opLevMax-opLevMin) / ((li.it.level-it.level)) )
+                );
+                if (li.it.level!==it.level) {
+                    if ($(li.it.b.el).css('display')==='none') $(li.it.b.el).css({display:'flex',opacity:0});
+                    $(li.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                    hasChildren = true;
+                }
+            });
+            
+            $(it.li).parents('ul').each(function(idx,pul) {
+                //debugger;
+                if (idx<$(it.li).parents('ul').length-1) $(pul).children('li').each(function(idx2,cli){
+                    var
+                    opLevFactor =
+                        (opLevMax-opLevMin) / (cli.it.level + idx)*10//(cli.it.level /*>*/<= $(it.li).parents('ul').length ? cli.it.level * 2 : (((opLevMax-opLevMin)*10*(idx+2))-2)*5),
+                    opLev = 
+                        opLevMax - (
+                            (opLevMax-opLevMin) / ((opLevFactor + cli.it.level) / 4)
+                        );
+                        
+                        
+                    //if (cli.it.label=='Dark mode'||cli.it.label=='Anime') debugger;
+                    if (opLev >= 0 && opLev <= 1) {
+                        if ($(cli.it.b.el).css('display')==='none') $(cli.it.b.el).css({display:'flex',opacity:0});
+                        $(cli.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                    }
+                });
+                
+                if (idx===0 && !hasChildren) $(pul).children('li').each(function(idx,cli){
+                    if ($(cli.it.b.el).css('display')==='none') $(cli.it.b.el).css({display:'flex',opacity:0});
+                    $(cli.it.b.el).stop(true,true).delay(20).animate({opacity:1},'fast');
+                });
+            });
+
+            $(it.path).stop(true,true).animate ({opacity:1},'fast');
+            $('#'+it.b.el.id).stop(true,true).delay(20).animate ({opacity:1},'fast');
+            var opLev = null, opLev2 = null;
+            if (it.travelledIntoChild && it.parent) {
+                $(it.p).children('ul').children('li').each(function(idx3,li3) {
+                    opLev = opLevMin + (
+                        ( (opLevMax-opLevMin) / ((li3.it.level-it.p.it.level+1)) )
+                    );
+                    if (li3.it.level===it.level) {
+                        if ($(li3.it.b.el).css('display')==='none') $(li3.it.b.el).css({display:'flex',opacity:0});
+                        $(li3.it.b.el).stop(true,true).delay(20).animate({opacity:opLev},'fast');
+                        hasChildren = true;
+                    }
+                });
+                t.items[it.parent].li.openChildren.each(function(idx,el){
+                    if ($(el.it.b.el).css('display')==='none') $(el.it.b.el).css({display:'flex',opacity:0});
+                    opLev2 = (
+                        el === it.li
+                        ? 1
+                        : opLev
+                    );
+                    $(el.it.b.el).stop(true,true).delay(20).animate ({opacity:opLev2},'fast');
+                });
+                $(it.li).children('ul').children('li').each(function(idx2,el2){
+                    if ($(el2.it.b.el).css('display')==='none') $(el2.it.b.el).css({display:'flex',opacity:0});
+                    $(el2.it.b.el).stop(true,true).delay(20).animate ({opacity:1},'fast');
+                });
+                delete it.travelledIntoChild;
+            }
+        }, 100);
+    }
+    
+    onmouseout(it) {
+        var
+        t = this;
+        if (t.timeoutMouseout) clearTimeout (t.timeoutMouseout);
+        t.timeoutMouseout = setTimeout (function() {
+            for (var i=0; i<t.items.length; i++) {
+                var it2 = t.items[i];
+                if (it2.li.openChildren) it2.li.openChildren.each(function(idx,li) {
+                    $(li.it.b.el).fadeOut('slow');
+                });
+                if (it2.level===1) {
+                    $(it2.b.el).animate({opacity:1},'fast');
+                }
+            }
+        }, 1000);
+    }
+
+    onclick(it) {
+        var a = $(it.b.el).children('a');
+        if (
+            typeof a.attr('windowName') == 'string'
+            && a.attr('windowName')!==''
+        ) {
+            window.open(a.attr('href'),a.attr('windowName')).focus();
+        } else {
+            var href = a.attr('href');
+            if (href.match(/javascript:/)) eval(href.replace('javascript:','')); else window.location.href = href;
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "forumCategories": {
+        "Geo-Politics": {
+            "forums": {
+                "World Politics": [],
+                "World Economy": []
+            }
+        },
+        "National Politics": {
+            "forums": {
+                "USA": [],
+                "European Union": [],
+                "United Kingdom": []
+            }
+        }
+    }
+}

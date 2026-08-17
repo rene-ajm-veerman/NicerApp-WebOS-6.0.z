@@ -1,0 +1,1 @@
+PNG transparent canvas spinners for AJAX retrievals

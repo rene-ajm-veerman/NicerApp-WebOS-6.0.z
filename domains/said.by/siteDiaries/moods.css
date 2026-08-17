@@ -1,0 +1,25 @@
+       .naDiaryMoodAnger .naDiaryEntryHeader {
+            background : rgba(255,0,0,0.7);
+            color : ivory;
+        }
+        .naDiaryMoodAnger {
+            background : rgba(200,200,200,0.8);
+        }
+
+
+        .naDiaryMoodDivinicus .naDiaryEntryHeader {
+            background : rgba(255,0,255,0.7);
+            color : ivory;
+        }
+        .naDiaryMoodDivinicus {
+            background : rgba(150,150,150,0.8);
+        }
+
+
+        .naDiaryMoodDivineWorld .naDiaryEntryHeader {
+            background : rgba(0, 255, 0,0.35);
+            color : ivory;
+        }
+        .naDiaryMoodDivineWorld {
+            background : rgba(150,150,150,0.8);
+        }

@@ -1,0 +1,1 @@
+01 02 * * * root /usr/bin/env bash -c 'source /etc/cron.d/nicerapp__checks_globals.sh && nice -n 5 php $ROOT_PATH/install.cron.d/nicerapp__check_photo_backgrounds.php > $ROOT_PATH/NicerAppWebOS/siteLogs/$dateYear/$dateMonth/$dateDayHour/nicerapp__check_photo_backgrounds.php.html'

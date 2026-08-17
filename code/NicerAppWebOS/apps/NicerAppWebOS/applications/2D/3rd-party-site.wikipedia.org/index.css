@@ -1,0 +1,218 @@
+ html, body, .vector-header-container, .vector-feature-zebra-design-disabled, .mw-page-container, .vector-feature-zebra-design-disabled body, .vector-feature-zebra-design-disabled .mw-page-container, .vector-feature-zebra-design-disabled .vector-header-container, .mw-body, .parsoid-body, #mw-page-base {
+     background : transparent;
+ }
+html, body {
+    left : 3px !important;
+}
+ .central-featured-lang, .other-project-link, .footer-sidebar-content, .footer-sidebar-text, .app-badges .footer-sidebar-content, .vector-feature-zebra-design-disabled .vector-toc { border-radius : 8px; background : rgba(255,255,255,0.5);}
+.central-featured-lang :hover {background-color:transparent;}
+.central-featured-lang:hover, .other-project-link:hover {background-color:rgba(0,0,100,0.5);}
+ .mw-parser-output #mp-topbanner {
+     background : rgba(200,200,255,0.555);
+ }
+
+.mw-parser-output #mp-right, .infobox td, .infobox th {
+    background : rgba(100,100,255,0.4);
+}
+.infobox td, .infobox th, .mw-parser-output p {
+    border-radius : 5px;
+    padding : 5px;
+}
+.mw-parser-output p, .mw-parser-output li {
+    left : 20px;
+    width : calc(100% - 40px);
+
+    background : none;
+}
+#mp-tfa-img {
+    margin : 0.5em 0.9em 0.4em 30px !important;
+    z-index : 999999999999 !important;
+}
+.mw-parser-output li {
+    width : fit-content;
+}
+
+.mw-parser-output p {
+
+}
+
+.infobox, .vector-pinned-container, .vector-body-before-content, .vector-page-toolbar-container, .vector-toc, .hatnote {
+    background : transparent;
+    position : relative;
+    color : white !important;
+    justify-self: end;
+    width : 100% !important;
+}
+.infobox::before, .vector-pinned-container::before, .vector-body-before-content::before, .vector-page-toolbar-container::before, .hatnote::before, .mw-parser-output p::before:not(.jsl10n), .mw-parser-output > ul > li::before {
+    content : '';
+    background : rgba(255,255,255,0.5);
+    border-radius : 10px;
+    top : 0px;
+    left : 0px;
+    width : 100%;
+    height: 100%;
+    display : block;
+    position:absolute;
+    z-index : -1;
+}
+#mp-topbanner > div > div {
+    margin : 20px !important;
+}
+#footer ul { margin : 20px; }
+#footer li { color : white; }
+.mw-parser-output #articlecount>ul>li {
+    margin:20px !important;
+}
+.mw-parser-output {
+    display : grid;
+}
+.mw-parser-output a {
+    text-shadow : 2px 2px 3px rgba(0,0,0,0.555);
+    padding : 0px !important;
+}
+.mw-parser-output > ul, .mw-parser-output > ul > li {
+    display : block;
+    position: relative;
+}
+.mw-parser-output > ul > li {
+    display : list-item;
+    list-style : inside;
+    list-style-type: disc;
+    list-style-image : url(https://en.wikipedia.org/w/skins/Vector/resources/common/images/bullet-icon.svg?d4515);
+}
+.mw-parser-output > ul > li {
+    padding : 15px;
+    margin : 20px;
+}
+.mw-body h1, .mw-body-content h1, .mw-body-content h2, .mw-body-content h3, .mw-body-content h4 {
+    background : rgba(0,0,50,0.5);
+    box-shadow : 2px 2px 4px 1px rgba(0,0,0,0.8);
+    color : white;
+    padding : 7px !important;
+    margin : 7px !important;
+    border-radius : 10px;
+}
+.mw-heading1, h1, .mw-heading2, h2 {
+    border-bottom : none !important;
+}
+.mw-body-content {
+    display : flex;
+    flex-wrap:wrap;
+}
+input {
+    color : fieldtext;
+}
+figure[typeof~='mw:File/Thumb'], figure[typeof~='mw:File/Frame'] {
+    background:none !important;
+    border:none !important;
+}
+figure[typeof~='mw:File/Thumb'] > figcaption, figure[typeof~='mw:File/Frame'] > figcaption {
+    border : none !important;
+    color : white !important;
+    text-shadow : 1px 1px 3px rgba(0,0,0,0.751) !important;
+}
+.vector-toc-contents li {
+    margin : 20px !important;
+}
+.vector-pinnable-header-label {
+    padding : 15px;
+    margin : 20px !important;
+    color : yellow;
+}
+.vector-sticky-pinned-container:after {
+    background : none !important;
+}
+.hlist {
+    margin : 20px !important;
+    flex-wrap : wrap !important;
+    display : flex !important;
+    list-style: none;           /* removes bullets */
+
+    gap: 12px 16px;
+}
+.hlist li {
+    white-space:nowrap;
+    margin : 20px !important;
+    display:inline-block !important;
+}
+
+
+.vector-toc-text span { font-weight:bold; background : none; box-shadow: none; }
+#siteSub { color : white !important; }
+.vector-menu-content a {
+  background: none !important;
+}
+.vector-header-start a {
+  background: none !important;
+}
+.mw-content-text h1, .mw-content-text h2, .mw-content-text h3, .mw-body h1, .mw-body h2 {
+  padding : 8px;
+  margin : 8px;
+  border-radius : 10px;
+}
+.mw-body p {
+  padding : 8px !important;
+}
+.vector-page-titlebar::after  {
+  background : none !important;
+}
+.vector-page-toolbar-container {
+  box-shadow : none !important;
+}
+
+.mw-parser-output p {
+    color : white !important;
+    background : rgba(100,100,255,0.4) !important;
+    box-shadow : 1px 1px 4px 3px rgba(0,0,0,0.751);
+    text-shadow : 2px 2px 4px rgba(0,0,0,0.751);
+    color : black;
+    opacity : 1;
+    z-index : -1;
+    display : block;
+    position: relative;
+    justify-self: start;
+}
+.mw-parser-output span {
+    color : #9999FF !important;
+    font-size : large;
+}
+#mp-left .mp-contains-float .contentSectionTitle3_a span {
+    color : yellow !important;
+    font-size : large;
+}
+.mp-contains-float li, .mw-parser-output span, .mw-parser-output p, .mp-box li {
+    font-size : large;
+    text-shadow : 0px 0px 3px rgba(0,0,0,1), 2px 2px 4px rgba(0,0,0,1);
+}
+.mw-parser-output li, .mp-contains-float li {
+    font-size : large;
+    background : rgba(255,50,50,0.7061504030201000  );
+    border-radius : 10px;
+    padding : 10px;
+    margin : 20px;
+}
+.references > li > span {
+    border : 0px solid black;
+    box-shadow : none;
+}
+.mw-parser-output li > div {
+    background : rgba(0,0,50,0.5);
+    border-radius : 8px;
+    margin : 8px;
+    color : lightgreen;
+}
+.mw-parser-output .mp-box {
+    border : none;
+}
+.mw-parser-output {
+    color : black;
+}
+.mp-contains-float > div, .mp-box div { color : white !important; background : rgba(0,0,0,0.555); border-radius:20px;padding:10px;margin:10px; }
+.mw-footer li { padding : 15px !important; }
+.mw-parser-output .navbox { border:none !important;}
+.infobox { border:none !important; margin:10px !important;}
+
+#mp-topbanner, #mp-left, #mp-right, #mp-middle, #mp-lower {
+    margin : 10px !important;
+    padding : 10px !important;
+}

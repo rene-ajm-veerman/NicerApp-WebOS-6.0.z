@@ -1,0 +1,24 @@
+#mp3s {
+    overflow-x : none;
+}
+
+#app__musicPlayer__player {
+    color : white;
+}
+#app__musicPlayer__player > .vdBackground {
+    background : rgba(0,0,0,0.5);
+}
+
+#app__musicPlayer__description {
+    color : white;
+}
+#app__musicPlayer__description > .vdBackground {
+    background : rgba(0,0,0,0.5);
+}
+
+#app__musicPlayer__playlist {
+    color : white;
+}
+#app__musicPlayer__playlist > .vdBackground {
+    background : rgba(0,0,0,0.5);
+}

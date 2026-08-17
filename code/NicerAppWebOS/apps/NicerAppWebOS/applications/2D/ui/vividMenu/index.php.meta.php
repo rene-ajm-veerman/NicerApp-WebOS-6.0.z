@@ -1,0 +1,2 @@
+<meta name="keywords" content="png, png sprite, menu, menus, javascript menu, web menu, html menu, animated menu, video menu"/>
+<meta name="description" content="PNG-sprite animated javascript menu component that you can put video fragments on"/>

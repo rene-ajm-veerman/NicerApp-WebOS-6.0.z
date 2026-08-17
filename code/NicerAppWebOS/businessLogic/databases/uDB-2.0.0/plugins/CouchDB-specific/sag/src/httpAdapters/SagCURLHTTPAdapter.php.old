@@ -1,0 +1,408 @@
+<?php
+/**
+ * Uses the PHP cURL bindings for HTTP communication with CouchDB. This gives
+ * you more advanced features, like SSL supports, with the cost of an
+ * additional dependency that your shared hosting environment might now have. 
+ *
+ * @version %VERSION%
+ * @package HTTP
+ */
+require_once('SagHTTPAdapter.php');
+require_once(dirname(__FILE__).'/../../../../apps/NicerAppWebOS/applications/2D/ui/jsonViewer/jsonViewer.php');
+
+class SagCURLHTTPAdapter extends SagHTTPAdapter {
+  private $ch;
+
+  private $followLocation; //whether cURL is allowed to follow redirects
+
+  public function __construct($host, $port) {
+    if(!extension_loaded('curl')) {
+      throw new SagException('Sag cannot use cURL on this system: the PHP cURL extension is not installed.');
+    }
+
+    parent::__construct($host, $port);
+
+    /*
+     * PHP doesn't like it if you tell cURL to follow location headers when
+     * open_basedir is set in PHP's configuration. Only check to see if it's
+     * set once so we don't ini_get() on every request.
+     */
+    $this->followLocation = !ini_get('open_basedir');
+
+    $this->ch = curl_init();
+
+  }
+
+  public function procPacket($method, $url, $data = null, $reqHeaders = array(), $specialHost = null, $specialPort = null) {
+    global $naWebOS;
+    // the base cURL options
+    $url = (
+      isset($_SESSION)
+      && array_key_exists('cdb_loginName', $_SESSION)
+      && array_key_exists('cdb_pw', $_SESSION)
+      ? "{$this->proto}://".$naWebOS->domainFolderForDB.'___'.preg_replace('/.*___/','',str_replace(' ','_',str_replace('.','__',$_SESSION['cdb_loginName']))).":".$_SESSION['cdb_pw']."@{$this->host}:{$this->port}{$url}"
+      : "{$this->proto}://{$this->host}:{$this->port}{$url}"
+    );
+    //var_dump ('t3322'); var_dump ($url); die();
+
+    $opts = array(
+      CURLOPT_URL => $url,
+      CURLOPT_PORT => $this->port,
+      CURLOPT_FOLLOWLOCATION => $this->followLocation,
+      CURLOPT_HEADER => true,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_NOBODY => false,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => $method
+    );
+
+    // cURL wants the headers as an array of strings, not an assoc array
+    if(is_array($reqHeaders) && sizeof($reqHeaders) > 0) {
+      $opts[CURLOPT_HTTPHEADER] = array();
+
+      foreach($reqHeaders as $k => $v) {
+        $opts[CURLOPT_HTTPHEADER][] = "$k: $v";
+      }
+    }
+
+    // send data through cURL's poorly named opt
+    //echo '<pre style="color:green">'; var_dump ($data); echo '</pre>'.PHP_EOL;
+    if($data) {
+      $opts[CURLOPT_POSTFIELDS] = $data;
+    }
+
+    if($method == 'GET') {
+      $opts[CURLOPT_ENCODING] = "";
+    }
+
+    // special considerations for HEAD requests
+    if($method == 'HEAD') {
+      $opts[CURLOPT_NOBODY] = true;
+    }
+
+    // connect timeout
+    if(is_int($this->socketOpenTimeout)) {
+      $opts[CURLOPT_CONNECTTIMEOUT] = $this->socketOpenTimeout;
+    }
+
+    // exec timeout (seconds)
+    if(is_int($this->socketRWTimeoutSeconds)) {
+      $opts[CURLOPT_TIMEOUT] = $this->socketRWTimeoutSeconds;
+    }
+
+    // exec timeout (ms)
+    if(is_int($this->socketRWTimeoutMicroseconds)) {
+      $opts[CURLOPT_TIMEOUT_MS] = $this->socketRWTimeoutMicroseconds;
+    }
+
+    // SSL support: don't verify unless we have a cert set
+    if($this->proto === 'https') {
+      if(!$this->sslCertPath) {
+        $opts[CURLOPT_SSL_VERIFYPEER] = false;
+      }
+      else {
+        $opts[CURLOPT_SSL_VERIFYPEER] = true;
+        $opts[CURLOPT_SSL_VERIFYHOST] = 2;
+        $opts[CURLOPT_CAINFO] = $this->sslCertPath;
+      }
+    }
+
+    curl_reset($this->ch);
+    curl_setopt_array($this->ch, $opts);
+    $chResponse = curl_exec($this->ch);
+
+    if (false && strpos($opts[CURLOPT_URL], 'logentries')===false) {
+      $msg = 'debug_backtrace()='.json_encode(debug_backtrace(), JSON_PRETTY_PRINT);
+      //echo PHP_EOL.$msg.'<br/>'.PHP_EOL;
+      //trigger_error ($msg, E_USER_NOTICE);
+      $msg = '$opts='.json_encode($opts, JSON_PRETTY_PRINT);
+      echo PHP_EOL.$msg.'<br/>'.PHP_EOL;
+      //trigger_error ($msg, E_USER_NOTICE);
+      $msg = '$chResponse='.json_encode($chResponse, JSON_PRETTY_PRINT);
+      echo PHP_EOL.$msg.'<br/>'.PHP_EOL;
+      //trigger_error ($msg, E_USER_NOTICE);
+    }
+
+   if($chResponse !== false) {
+      // prepare the response object
+      $response = new stdClass();
+      $response->headers = new stdClass();
+      $response->headers->_HTTP = new stdClass();
+      $response->body = '';
+
+      // split headers and body
+      list($respHeaders, $response->body) = explode("\r\n\r\n", $chResponse, 2);
+
+      // split up the headers
+      $respHeaders = explode("\r\n", $respHeaders);
+
+      for($i = 0; $i < sizeof($respHeaders); $i++) {
+        // first element will always be the HTTP status line
+        if($i === 0) {
+          $response->headers->_HTTP->raw = $respHeaders[$i];
+
+          preg_match('(^HTTP/(?P<version>\d+\.\d+)\s+(?P<status>\d+))S', $respHeaders[$i], $match);
+
+          $response->headers->_HTTP->version = $match['version'];
+          $response->headers->_HTTP->status = $match['status'];
+          $response->status = $match['status'];
+        }
+        else {
+          $line = explode(':', $respHeaders[$i], 2);
+          $line[0] = strtolower($line[0]);
+          $response->headers->{$line[0]} = ltrim($line[1]);
+
+          if($line[0] == 'set-cookie') {
+            $response->cookies = $this->parseCookieString($line[1]);
+          }
+        }
+      }
+    }
+    else if(curl_errno($this->ch)) {
+      throw new SagException('cURL error #' . curl_errno($this->ch) . ': ' . curl_error($this->ch));
+    }
+    else {
+      throw new SagException('cURL returned false without providing an error.');
+    }
+
+    global $naWebOS;
+    global $na_error_log_filepath_html;
+    global $na_error_log_filepath_txt;
+    //if (is_object($naWebOS->dbs)) { echo '<pre>'; var_dump ($naWebOS->dbs->findConnection('couchdb')->username); echo '</pre>'; }
+
+    $dbg = [
+      1 => (isset($na_error_log_filepath_html)),
+      2 => (is_object($naWebOS->dbs)),
+      3 => (is_object($naWebOS->dbs) ? $naWebOS->dbs->findConnection('couchdb')->username : 'NOTSETYET'),
+      4 => $this->debug
+    ];
+    //echo '<pre>'.PHP_EOL; var_dump ($dbg); echo '</pre>'.PHP_EOL;die();
+    if (
+      $this->debug // declared in SagHTTPAdapter.php::__construct()
+      && session_status() === PHP_SESSION_ACTIVE
+      && is_object($naWebOS->dbs)
+      /*&& (
+        $naWebOS->dbs->findConnection('couchdb')->username=='said_by___Rene_AJM_Veerman'
+        || $naWebOS->dbs->findConnection('couchdb')->username=='said_by___Guest'
+        || $naWebOS->dbs->findConnection('couchdb')->username=='nicer_app___Guest'
+      )*/
+      && strpos($opts[CURLOPT_URL], 'logentries')===false
+      && strpos($opts[CURLOPT_URL], '_session')===false
+    ) {
+
+      $optsTranslated = [];
+      foreach ($opts as $k => $v) {
+        switch ($k) {
+          case CURLOPT_URL : $optsTranslated['CURLOPT_URL'] = $v; break;
+          case CURLOPT_PORT : $optsTranslated['CURLOPT_PORT'] = $v; break;
+          case CURLOPT_FOLLOWLOCATION : $optsTranslated['CURLOPT_FOLLOWLOCATION'] = $v; break;
+          case CURLOPT_HEADER : $optsTranslated['CURLOPT_HEADER'] = $v; break;
+          case CURLOPT_RETURNTRANSFER : $optsTranslated['CURLOPT_RETURNTRANSFER'] = $v; break;
+          case CURLOPT_NOBODY : $optsTranslated['CURLOPT_NOBODY'] = $v; break;
+          case CURLOPT_HTTP_VERSION : $optsTranslated['CURLOPT_HTTP_VERSION'] = 'CURL_HTTP_VERSION_1_1'; break;
+          case CURLOPT_CUSTOMREQUEST : $optsTranslated['CURLOPT_CUSTOMREQUEST'] = $v; break;
+          case CURLOPT_HTTPHEADER : $optsTranslated['CURLOPT_HTTPHEADER'] = $v; break;
+          case CURLOPT_POSTFIELDS : $optsTranslated['CURLOPT_POSTFIELDS'] = json_decode($v); break;
+          default :
+            $constants = get_defined_constants(true);
+            $curlOptLookup = preg_grep('/^CURLOPT_/', array_flip($constants['curl']));
+            $optsTranslated[$curlOptLookup[$k]] = $v;
+            break;
+        }
+      }
+
+
+      //var_dump ($na_error_log_filepath_html); die();
+      $now = DateTime::createFromFormat('U', (
+        array_key_exists('started', $_SESSION)
+          ? $_SESSION['started']
+          : time()//microtime(true)
+      ));
+      $now->setTimezone(new DateTimeZone(exec('date +%z')));
+      $date = $now->format("Y-m-d H:i:s.u ").preg_replace('/.*\s/','',date(DATE_RFC2822));
+      //$date = $now->format("Y-m-d_H:i:s");
+
+      /*
+      $dbgOpts = json_encode($optsTranslated, JSON_PRETTY_PRINT);
+      $dbgOpts = str_replace('\/','/',$dbgOpts);
+      $dbgOpts = str_replace("\n",'<br/>',$dbgOpts);
+      $dbgOpts = str_replace('\n','<br/>',$dbgOpts);
+      $dbgOpts = str_replace(" ",'&nbsp;',$dbgOpts);
+
+      $ret = json_encode(json_decode($response->body), JSON_PRETTY_PRINT);
+      $ret = str_replace('\/','/',$ret);
+      $ret = str_replace("\n",'<br/>',$ret);
+      $ret = str_replace('\n','<br/>',$ret);
+      $ret = str_replace(" ",'&nbsp;',$ret);
+      */
+      //if (!is_null($na_error_log_filepath_html)) {
+        $dbgOpts = json_decode(json_encode($optsTranslated), true);
+        if (array_key_exists('CURLOPT_POSTFIELDS', $dbgOpts))
+          $dbgOpts = [
+            'cURL POST Fields' => $dbgOpts['CURLOPT_POSTFIELDS'],
+            'ALL cURL fields' => $dbgOpts
+          ];
+        //$dbgOpts2 = hmJSON ($dbgOpts, 'cURL options', [ 'themeName' => 'naColorgradientSchemeMagicalBlue' ] );
+
+        //$ret = json_decode($response->body,true);
+        //$ret2 = hmJSON ($ret, 'cURL response', [ 'themeName' => 'naColorgradientSchemeGreen' ] );
+
+        /*
+        $dbgHTML =
+          '<div id="entry_'.$_SESSION['dbgNum2'].'" class="naLogEntry">'
+          .'<div class="naLogEntry_header"><span class="naLogHeader_title">Database Query</span><br/><span class="naLogHeader_datetime">'.$date.'</span><br/><span class="naLogHeader_url">'.$opts[CURLOPT_URL].'</span></div>'
+          //.'<div class="naLogHeader_curlOptions" style="display:flex;align-items:center;">'.$this->buttonExpand().'curl options</div>'
+          .'<div id="expandData_'.($_SESSION['dbgNum']-1).'" class="naLogCurlOptions">'
+          .$dbgOpts2
+          .'</div>'
+          //.'<div class="naLogHeader_curlResponse" style="display:flex;align-items:center;">'.$this->buttonExpand().'curl response</div>'
+          .'<div id="expandData_'.($_SESSION['dbgNum']-1).'" class="naLogCurlResponse">'
+          .$ret2
+          .'</div>'
+          .'</div>';
+        */
+        $_SESSION['dbgNum2']++;
+        //file_put_contents ($na_error_log_filepath_html, $dbgHTML, FILE_APPEND);
+
+        $dbgTxt =
+          'curl options = '
+          .str_replace('\/','/',json_encode($optsTranslated, JSON_PRETTY_PRINT)).PHP_EOL
+          .'curl response = '
+          .json_encode(json_decode($response->body), JSON_PRETTY_PRINT).PHP_EOL.PHP_EOL
+          .'----------------------'.PHP_EOL.PHP_EOL;
+        //file_put_contents ($na_error_log_filepath_txt, $dbgTxt, FILE_APPEND);
+      //}
+
+      global $phpScript_startupTime;
+      global $naIP;
+      global $naIsBot; global $naIsDesktop; global $naIsMobile; global $naBrowserMarketSharePercentage;
+      global $naLAN;
+      global $naVersionNumber;
+      $time = microtime(true) - $phpScript_startupTime;
+      //var_dump (dirname(__FILE__).'/errors.css');
+      //date_default_timezone_set('UTC');
+      $dtz = new DateTime('now');//new DateTimeZone(date_default_timezone_get());
+      $dtz_offset = $dtz->getOffset();
+      $unixTimeStamp = time();//date(DATE_ATOM);//date(DATE_RFC2822);//date('Y-m-d H:i:sa');
+      $timestamp = date(DATE_RFC2822);
+
+      $err = [
+          's1' => $_SESSION['started'],
+          's2' => time(),//microtime(true),
+          'i' => $_SESSION['startedID'],
+          'isIndex' => false,//DONT! $_SERVER['SCRIPT_NAME']==='/NicerAppWebOS/index.php',
+          'isBot' => $naIsBot,
+          'isLAN' => $naLAN,
+          'isDesktop' => $naIsDesktop,
+          'isMobile' => $naIsMobile,
+          'browserMarketSharePercentage' => $naBrowserMarketSharePercentage,
+          't' => $unixTimeStamp,
+          'to' => $dtz_offset,
+          'ts' => $timestamp,
+          'ip' => $naIP,
+          'sid' => session_id(),
+          'nav' => $naVersionNumber,
+          'type' => 'db',
+          'httpOpts' => $dbgOpts,
+          'httpResponse' => json_decode($response->body,true),
+          'txt' => $dbgTxt
+      ];
+
+      global $naLog;
+      $naLog->add ( [ $err ] );
+
+    }
+
+    // in the event cURL can't follow and we got a Location header w/ a 3xx
+    if(!$this->followLocation &&
+        isset($response->headers->location) &&
+        $response->status >= 300 &&
+        $response->status < 400
+    ) {
+      $parts = parse_url($response->headers->location);
+
+      if(empty($parts['path'])) {
+        $parts['path'] = '/';
+      }
+
+      $adapter = $this->makeFollowAdapter($parts);
+
+      // we want the old headers (ex., Auth), but might need a new Host
+      if(isset($parts['host'])) {
+        $reqHeaders['Host'] = $parts['host'];
+
+        if(isset($parts['port'])) {
+          $reqHeaders['Host'] .= ':' . $parts['port'];
+        }
+      }
+
+      return $adapter->procPacket($method, $parts['path'], $data, $reqHeaders);
+    }
+
+    return self::makeResult($opts, $response, $method);
+  }
+
+
+  private function buttonExpand () {
+    global $naWebOS;
+    $r = $naWebOS->html_vividButton(
+      0, 'display:inline-block;margin:5px;',
+
+      'expand_'.$_SESSION['dbgNum'],
+      'vividButton_icon_50x50', '_50x50', 'grouped',
+      '',
+      'if (!$(this).is(\'.disabled\')) { var $el = $(\'#expandData_'.$_SESSION['dbgNum'].'\'), $el2 = $(\'#entry_'.$_SESSION['dbgNum2'].'\'), $btn = $(\'#expand_'.$_SESSION['dbgNum'].'\'); if ($el.css(\'display\')==\'none\') { $(\'.vividButton_icon_imgButtonIcon_50x50\', $btn)[0].src = \'/siteMedia/btnCheckmark_green.png\'; $el2.addClass(\'naLogEntry_read\');/*.animate({width:\'98%\'});*/ $el.slideDown(); window.location.hash=\''.$_SESSION['dbgNum2'].'\'; setTimeout (function() {            scrollParentToChild($(\'#siteContent .vividScrollpane\')[0], $el2[0]); }, 1250); } else { $(\'.vividButton_icon_imgButtonIcon_50x50\', $btn)[0].src = \'/siteMedia/btnPlus.png\'; $el2.animate({ width : ($(window).width() - 200) / 2 }); $el.slideUp(); window.location.hash = \'\'; }}',
+      '',
+      '',
+
+      7, 'Expand',
+
+      'btnCssVividButton_outerBorder.png',
+      'btnCssVividButton.png',
+      null,//'btnCssVividButton.grey2a.png',
+      'btnPlus.png',
+
+      '',
+      '',
+
+      null,
+      null,
+      null
+    );
+    $_SESSION['dbgNum']++;
+    return $r;
+  }
+
+
+
+  /**
+   * Used when we need to create a new adapter to follow a redirect because
+   * cURL can't.
+   *
+   * @param array $parts Return value from url_parts() for the location header.
+   * @return SagCURLHTTPAdapter Returns $this if talking to the same server
+   * with the same protocol, otherwise creates a new instance.
+   */
+  private function makeFollowAdapter($parts) {
+    // re-use $this if we just got a path or the host/proto info matches
+    if(empty($parts['host']) ||
+        ($parts['host'] == $this->host &&
+          $parts['port'] == $this->port &&
+          $parts['scheme'] == $this->proto
+        )
+    ) {
+      return $this;
+    }
+
+    if(empty($parts['port'])) {
+      $parts['port'] = ($parts['scheme'] == 'https') ? 443 : 5984;
+    }
+
+    $adapter = new SagCURLHTTPAdapter($parts['host'], $parts['port']);
+    $adapter->useSSL($parts['scheme'] == 'https');
+    $adapter->setTimeoutsFromArray($this->getTimeouts());
+
+    return $adapter;
+  }
+}
+?>

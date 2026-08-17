@@ -1,0 +1,2099 @@
+# do not touch without a clue about apache2 rewriterules.
+# read the manual; https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+ServerSignature Off
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    # initialization of the apache2 rewrite engine;
+    RewriteEngine on
+    RewriteBase /
+    # redirect www.nicer.app to nicer.app
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=307,L]
+
+
+    # pre-compiled gzip:
+        RewriteCond %{HTTP:Accept-Encoding} gzip
+        RewriteCond %{REQUEST_FILENAME}.gz -s
+        RewriteRule ^(.*)\.(json|js|css|html)$ $1.$2.gz [QSA]
+
+        RewriteRule \.json\.gz$  - [T=text/json,E=no-gzip:1]
+        RewriteRule \.js\.gz$  - [T=text/javascript,E=no-gzip:1]
+        RewriteRule \.css\.gz$ - [T=text/css,E=no-gzip:1]
+
+        Header set Content-Encoding gzip env=no-gzip
+        Header append Vary Accept-Encoding
+
+    # uses /view-content/logs due to na.site.loadContent() URL mangling in na.site.transformLinks()!
+    #RewriteCond %{REQUEST_METHOD} ^(GET)$
+    #RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    #RewriteRule ^logs$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=logs&%{QUERY_STRING} [L]
+    #RewriteCond %{REQUEST_METHOD} ^(GET)$
+    #RewriteRule ^logs$ NicerAppWebOS/index.php?seoValue=logs&%{QUERY_STRING} [L]
+
+
+    # /*--Heart of the blogging features--*/
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=in&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/on/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=on&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/about/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=about&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/during/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=during&dataID=$2 [L]
+
+        # it's not a facebook post, and it's not a forum thread either. not even a nested forum thread.
+        # it's just text, photo, audio and video data ranging from tweet sized to gigabytes sized,
+        # that's gotta get edited very efficiently
+        # and displayed fast and correctly each time,
+        # in a very, eh, diverse range of circumstances.
+        #
+        # NicerApp again works in a very simple way,
+        # with one 'dataID' pointing to all content and data related to a 'post',
+        # as structured (recently or not) by it's author and the 'commenters' to that 'post'.
+        # (to speak in facebook terminology, for lack of a better set of analogies).
+        #
+        # i could start speaking in my own marketing choice terminology about my products and services,
+        # but i'd really like to avoid that and help create an industry standard of at least
+        # what to call things that one posts or says online.
+        #
+        # dataIDs and viewIDs are formed inside the server (at random) upon creation of the 'post' or 'view',
+        # (of text data, a photo-album, or even an entire 2D and/or 3D webpage filled with people and data),
+        # trying low counts of random characters first each time,
+        # and then slowly increasing the number of characters used to create a new dataID
+        # when what's being tried is again already found in the database on the server.
+        #
+        # a dataID points to a JSON record containing not just theme settings for new viewers
+        # to that post's data, along with possibly also *other* dataIDs,
+        # which often leads NicerApp to possibly pull in content from there as well[1],
+        # to arrive at a final 2D and/or 3D view in the browser.
+        #
+        # a dataID points to JSON records in the '{$myDomainName}___data_by_users' table,
+        # and those records have a structure like this :
+            #
+            #### someone's post :
+            #
+            # "username" : "Guest",
+            # "dataID" : "csB",
+            # "view" : "{$aViewID}",
+            # "appParameters" : [
+            #     {
+            #         "{$someAppName}" : {
+            #             "someApp_param_1_keyName" : "someApp_param_1_value"
+            #         ",
+            #         ...
+            #     },
+            #     .....
+            # ],
+            # "theme" : { ... }
+            #
+            #
+            #### someone's comment to another person's post :
+            #
+            # "username" : "Rene AJM Veerman",
+            # "dataID" : "cAsD",
+            # "view" : "{$aViewID}",
+            # "appParameters" : [
+            #     {
+            #         "{$someAppName}" : {
+            #             "dataID" : "{$dataID}" # the dataID of the post being replied to.
+            #         ",
+            #         ...
+            #     },
+            #     .....
+            # ],
+            # "theme" : { ... }
+            #
+
+
+                # the viewID points to a record in the '{$myDomainName}___views' table,
+                # with a viewID pointing to a JSON record that is structured like a piece of JSON
+                # directly derived from a 'view record' as listed in :
+                    #
+                    #   .../NicerAppWebOS/domainConfigs/nicer.app/mainmenu.items.php:
+                    #       $na_apps_structure[...]['apps-current']['NicerApp-WebOS__pageSettings'],
+                    #
+                # but with that piece of JSON able to udergo (1) a string replacement procedure from data/parameters
+                # that can be found in 'viewParameters_initial' upon rendering into the browser,
+                # and (2), a file-inclusion mechanism like PHP's require_once(), to prevent databases from getting filled
+                # with field values that are larger than the underlying database server manufacturer supports.
+
+                # the theme settings are listed in a field with name 'theme', which contains data like what's
+                # defined in and returned by the function
+                # .../NicerAppWebOS/logic.business/class.core.WebsiteOperatingSystem-5.y.z.php::getPageCSS()
+                # but which is to be overlayed *on top* of the data provided that is provided as the default set of
+                # specificity and theme data for the rendering, using key names like 'before_0' to indicate that a certain
+                # sub-array should be inserted at the very start of the array provided by getPageCSS().
+                #
+                # this would properly configure the 'specificity' and 'theme' settings for end-users,
+                # who are (or are not) allowed by NicerApp to override the theme settings
+                # that an author of a post has chosen.
+
+                # in the case of someone commenting on another person's post,
+                # the value for 'someApp_param_1_keyName' in a post's record
+                # becomes the value for 'commentID' in a comment's record instead.
+
+
+        #
+        # this allows for a very limited amout of '{$myDomainName}___views' table records to be used
+        # for very large amounts of dataIDs, without maintenance to the view rendering sub-system of NicerApp
+        # leading to much downtime at all.
+        # things like rendering a specific 'post' with newly created view processing code become easily possible.
+        #
+        # [1]   in a very efficient way, with amazingly fast binary-tree calculations
+        #       happening basically inside the server's CPU,
+        #       because the database is running on the same hardware as the webserver.
+        #
+        # [2]   this is true for all couchdb, filesystemDB and SQL database business logic within NicerApp.
+        #
+        # [3]   which is in the case of a JSON database
+        #       (or in the case of a JSON database hosted on a SQL database server)
+        #       a 'record', known in programming languages as a 'recursive array' or 'data object'.
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/index.php?username=$1&url1=in&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/on/(.*)$ NicerAppWebOS/index.php?username=$1&url1=on&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/about/(.*)$ NicerAppWebOS/index.php?username=$1&url1=about&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/during/(.*)$ NicerAppWebOS/index.php?username=$1&url1=during&dataID=$2 [L]
+
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^c/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?commentID=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^c/(.*)$ NicerAppWebOS/index.php?commentID=$1 [L]
+
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wiki-search/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org-search=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki-search/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org-search=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wiki/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki/$ NicerAppWebOS/index.php?app-wikipedia.org=frontpage [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wikipedia/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wikipedia/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wikipedia.org/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wikipedia.org/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+
+    # /*--Front page--*/
+    # front page's data when requested with (javascript) $.ajax aka na.site.loadContent()
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(?!/)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?viewID=/ [L]
+
+    # front page when it needs the full NicerApp framework
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(?!/)$ NicerAppWebOS/index.php?viewID=/ [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^nc$ NicerAppWebOS/index.php?uvt=n&lc=n&viewID=/ [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^dtl$ NicerAppWebOS/index.php?dtl=y [L]
+
+    # /*--all other pages--*/
+
+    # all other pages' data that got requested with (javascript) $.ajax aka na.site.loadContent()
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^view/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    # all pages that got requested via a bookmark or as links elsewhere on the web
+    # (requiring the full NicerApp WebOS HTML, CSS and JS to be sent along with the content)
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteRule ^view/(.*)$ NicerAppWebOS/index.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(?!/)([\-\w\d]+)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteRule ^(?!/)([\-\w\d]+)$ NicerAppWebOS/index.php?seoValue=$1&%{QUERY_STRING} [L]
+</IfModule>
+
+
+
+<IfModule mod_rewrite.c>
+# .../domainConfig/nicer.app/mainmenu.items.php::$na_apps_structure as RewriteRules back into /*--NICERAPP_BASICS--*/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^docs$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tb3ZlcnZpZXcucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2RvY3VtZW50YXRpb25cL05pY2VyQXBwLVdlYk9TLS1vdmVydmlldy50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJkb2NzIiwiZG9jcy1vdmVydmlldyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^docs$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tb3ZlcnZpZXcucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2RvY3VtZW50YXRpb25cL05pY2VyQXBwLVdlYk9TLS1vdmVydmlldy50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJkb2NzIiwiZG9jcy1vdmVydmlldyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^docs-overview$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tb3ZlcnZpZXcucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2RvY3VtZW50YXRpb25cL05pY2VyQXBwLVdlYk9TLS1vdmVydmlldy50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJkb2NzIiwiZG9jcy1vdmVydmlldyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^docs-overview$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tb3ZlcnZpZXcucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2RvY3VtZW50YXRpb25cL05pY2VyQXBwLVdlYk9TLS1vdmVydmlldy50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJkb2NzIiwiZG9jcy1vdmVydmlldyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^license$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^license$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^LICENSE$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^LICENSE$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^docs-license$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^docs-license$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnBocCIsInRpdGxlIjoiXC9OaWNlckFwcFdlYk9TXC9MSUNFTlNFLnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImxpY2Vuc2UiLCJMSUNFTlNFIiwiZG9jcy1saWNlbnNlIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^todo$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tdG9kb0xpc3QtLXY1Lnkuei5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtV2ViT1MtLXRvZG9MaXN0LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbInRvZG8iLCJkb2NzLXRvZG9MaXN0Il19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^todo$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tdG9kb0xpc3QtLXY1Lnkuei5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtV2ViT1MtLXRvZG9MaXN0LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbInRvZG8iLCJkb2NzLXRvZG9MaXN0Il19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^docs-todoList$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tdG9kb0xpc3QtLXY1Lnkuei5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtV2ViT1MtLXRvZG9MaXN0LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbInRvZG8iLCJkb2NzLXRvZG9MaXN0Il19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^docs-todoList$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tdG9kb0xpc3QtLXY1Lnkuei5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtV2ViT1MtLXRvZG9MaXN0LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbInRvZG8iLCJkb2NzLXRvZG9MaXN0Il19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^company$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC0tY29tcGFueS5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtLWNvbXBhbnkudGl0bGUucGhwIiwic2VvVmFsdWUiOlsiY29tcGFueSIsImNvIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^company$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC0tY29tcGFueS5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtLWNvbXBhbnkudGl0bGUucGhwIiwic2VvVmFsdWUiOlsiY29tcGFueSIsImNvIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^co$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC0tY29tcGFueS5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtLWNvbXBhbnkudGl0bGUucGhwIiwic2VvVmFsdWUiOlsiY29tcGFueSIsImNvIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^co$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC0tY29tcGFueS5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJBcHAtLWNvbXBhbnkudGl0bGUucGhwIiwic2VvVmFsdWUiOlsiY29tcGFueSIsImNvIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^musicCopyrightDisclaimer$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9hcHBzXC9OaWNlckFwcFdlYk9TXC9hcHBsaWNhdGlvbnNcLzJEXC9tdXNpY1BsYXllci5qYXZhc2NyaXB0UmVuZGVyaW5nXC9jb3B5cmlnaHQucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmphdmFzY3JpcHRSZW5kZXJpbmdcL2NvcHlyaWdodC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJtdXNpY0NvcHlyaWdodERpc2NsYWltZXIiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^musicCopyrightDisclaimer$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9hcHBzXC9OaWNlckFwcFdlYk9TXC9hcHBsaWNhdGlvbnNcLzJEXC9tdXNpY1BsYXllci5qYXZhc2NyaXB0UmVuZGVyaW5nXC9jb3B5cmlnaHQucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmphdmFzY3JpcHRSZW5kZXJpbmdcL2NvcHlyaWdodC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJtdXNpY0NvcHlyaWdodERpc2NsYWltZXIiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^geopolitics$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1nZW9wb2xpdGljcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tZ2VvcG9saXRpY3MudGl0bGUucGhwIiwic2VvVmFsdWUiOiJnZW9wb2xpdGljcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^geopolitics$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1nZW9wb2xpdGljcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tZ2VvcG9saXRpY3MudGl0bGUucGhwIiwic2VvVmFsdWUiOiJnZW9wb2xpdGljcyJ9fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^ownersMemoires$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^ownersMemoires$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^memoires$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^memoires$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^om$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^om$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckVudGVycHJpc2VzLS1vd25lcnNNZW1vaXJlcy5waHAiLCJ0aXRsZSI6IlwvTmljZXJBcHBXZWJPU1wvZG9jdW1lbnRhdGlvblwvTmljZXJFbnRlcnByaXNlcy0tb3duZXJzTWVtb2lyZXMudGl0bGUucGhwIiwic2VvVmFsdWUiOlsib3duZXJzTWVtb2lyZXMiLCJtZW1vaXJlcyIsIm9tIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^backgroundsBrowser$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^backgroundsBrowser$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^backgroundBrowser$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^backgroundBrowser$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^bb$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^bb$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wallpapersBrowser$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wallpapersBrowser$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wallpaperBrowser$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wallpaperBrowser$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wb$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wb$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2JhY2tncm91bmRzQnJvd3NlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJiYWNrZ3JvdW5kc0Jyb3dzZXIiLCJiYWNrZ3JvdW5kQnJvd3NlciIsImJiIiwid2FsbHBhcGVyc0Jyb3dzZXIiLCJ3YWxscGFwZXJCcm93c2VyIiwid2IiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^me$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9jbXNNYW5hZ2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm1lIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^me$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9jbXNNYW5hZ2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm1lIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^listUsers$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC91c2Vyc0dyb3VwTWFuYWdlci0wLjEuMCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJsaXN0VXNlcnMiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^listUsers$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC91c2Vyc0dyb3VwTWFuYWdlci0wLjEuMCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJsaXN0VXNlcnMiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^news$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3cyIsInNlb1ZhbHVlIjoibmV3cyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^news$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3cyIsInNlb1ZhbHVlIjoibmV3cyJ9fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^world-news$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^world-news$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^news-world$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^news-world$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^world-headlines$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^world-headlines$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^news-world-headlines$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^news-world-headlines$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIiwic2VvVmFsdWUiOlsid29ybGQtbmV3cyIsIm5ld3Mtd29ybGQiLCJ3b3JsZC1oZWFkbGluZXMiLCJuZXdzLXdvcmxkLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nbh$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nbh$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^news-business$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^news-business$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^business$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^business$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^business-news$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^business-news$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^news-business-headlines$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^news-business-headlines$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyIsInNlb1ZhbHVlIjpbIm5iaCIsIm5ld3MtYnVzaW5lc3MiLCJidXNpbmVzcyIsImJ1c2luZXNzLW5ld3MiLCJuZXdzLWJ1c2luZXNzLWhlYWRsaW5lcyJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nieuws$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzIiwic2VvVmFsdWUiOiJuaWV1d3MifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nieuws$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzIiwic2VvVmFsdWUiOiJuaWV1d3MifX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nieuws-internationale-headlines$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19XZXJlbGQiLCJzZW9WYWx1ZSI6Im5pZXV3cy1pbnRlcm5hdGlvbmFsZS1oZWFkbGluZXMifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nieuws-internationale-headlines$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19XZXJlbGQiLCJzZW9WYWx1ZSI6Im5pZXV3cy1pbnRlcm5hdGlvbmFsZS1oZWFkbGluZXMifX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nachrichten$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuIiwic2VvVmFsdWUiOiJuYWNocmljaHRlbiJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nachrichten$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuIiwic2VvVmFsdWUiOiJuYWNocmljaHRlbiJ9fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^Arabic-news-English$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpYyIsInNlb1ZhbHVlIjoiQXJhYmljLW5ld3MtRW5nbGlzaCJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^Arabic-news-English$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpYyIsInNlb1ZhbHVlIjoiQXJhYmljLW5ld3MtRW5nbGlzaCJ9fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wiki$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wiki$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wikipedia$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wikipedia$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^wikipedia.org$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^wikipedia.org$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLndpa2lwZWRpYS5vcmciOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOlsid2lraSIsIndpa2lwZWRpYSIsIndpa2lwZWRpYS5vcmciXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^grokipedia$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^grokipedia$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^gp$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^gp$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^tarot$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2NhcmRnYW1lLnRhcm90Ijp7ImRlY2siOiJcL1dhaXRlLVNtaXRoXC9QYW0gQ29sbWFuIFNtaXRoXC9PcmlnaW5hbCBSaWRlciBXYWl0ZSIsInJlYWRpbmciOiIzLUNhcmRzIiwic2VvVmFsdWUiOlsidGFyb3QiLCJjYXJkZ2FtZS10YXJvdCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^tarot$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2NhcmRnYW1lLnRhcm90Ijp7ImRlY2siOiJcL1dhaXRlLVNtaXRoXC9QYW0gQ29sbWFuIFNtaXRoXC9PcmlnaW5hbCBSaWRlciBXYWl0ZSIsInJlYWRpbmciOiIzLUNhcmRzIiwic2VvVmFsdWUiOlsidGFyb3QiLCJjYXJkZ2FtZS10YXJvdCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^cardgame-tarot$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2NhcmRnYW1lLnRhcm90Ijp7ImRlY2siOiJcL1dhaXRlLVNtaXRoXC9QYW0gQ29sbWFuIFNtaXRoXC9PcmlnaW5hbCBSaWRlciBXYWl0ZSIsInJlYWRpbmciOiIzLUNhcmRzIiwic2VvVmFsdWUiOlsidGFyb3QiLCJjYXJkZ2FtZS10YXJvdCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^cardgame-tarot$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2NhcmRnYW1lLnRhcm90Ijp7ImRlY2siOiJcL1dhaXRlLVNtaXRoXC9QYW0gQ29sbWFuIFNtaXRoXC9PcmlnaW5hbCBSaWRlciBXYWl0ZSIsInJlYWRpbmciOiIzLUNhcmRzIiwic2VvVmFsdWUiOlsidGFyb3QiLCJjYXJkZ2FtZS10YXJvdCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music-2D-beatPulse$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music-2D-beatPulse$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music-2D-fancy$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music-2D-fancy$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music-fancy$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music-fancy$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^signalsManager$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3NpZ25hbHNNYW5hZ2VyIjp7InNlb1ZhbHVlIjpbInNpZ25hbHNNYW5hZ2VyIiwic2lnbmFsc01hbmFnZXIiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^signalsManager$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3NpZ25hbHNNYW5hZ2VyIjp7InNlb1ZhbHVlIjpbInNpZ25hbHNNYW5hZ2VyIiwic2lnbmFsc01hbmFnZXIiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^signalsManager$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3NpZ25hbHNNYW5hZ2VyIjp7InNlb1ZhbHVlIjpbInNpZ25hbHNNYW5hZ2VyIiwic2lnbmFsc01hbmFnZXIiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^signalsManager$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3NpZ25hbHNNYW5hZ2VyIjp7InNlb1ZhbHVlIjpbInNpZ25hbHNNYW5hZ2VyIiwic2lnbmFsc01hbmFnZXIiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^dataPhoenix$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2RhdGFQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImRhdGFQaG9lbml4IiwiRGF0YVBob2VuaXgiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^dataPhoenix$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2RhdGFQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImRhdGFQaG9lbml4IiwiRGF0YVBob2VuaXgiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^DataPhoenix$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2RhdGFQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImRhdGFQaG9lbml4IiwiRGF0YVBob2VuaXgiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^DataPhoenix$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2RhdGFQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImRhdGFQaG9lbml4IiwiRGF0YVBob2VuaXgiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^filePhoenix$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2ZpbGVQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImZpbGVQaG9lbml4IiwiRmlsZVBob2VuaXgiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^filePhoenix$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2ZpbGVQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImZpbGVQaG9lbml4IiwiRmlsZVBob2VuaXgiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^FilePhoenix$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2ZpbGVQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImZpbGVQaG9lbml4IiwiRmlsZVBob2VuaXgiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^FilePhoenix$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL2ZpbGVQaG9lbml4Ijp7InNlb1ZhbHVlIjpbImZpbGVQaG9lbml4IiwiRmlsZVBob2VuaXgiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^tasksManager$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3Rhc2tzTWFuYWdlclwvbWFuYWdlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJ0YXNrc01hbmFnZXIiLCJUYXNrc01hbmFnZXIiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^tasksManager$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3Rhc2tzTWFuYWdlclwvbWFuYWdlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJ0YXNrc01hbmFnZXIiLCJUYXNrc01hbmFnZXIiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^TasksManager$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3Rhc2tzTWFuYWdlclwvbWFuYWdlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJ0YXNrc01hbmFnZXIiLCJUYXNrc01hbmFnZXIiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^TasksManager$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2J1c2luZXNzTG9naWNcL3Rhc2tzTWFuYWdlclwvbWFuYWdlciI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6WyJ0YXNrc01hbmFnZXIiLCJUYXNrc01hbmFnZXIiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^analytics$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2FuYWx5dGljcyI6eyJzZW9WYWx1ZSI6ImFuYWx5dGljcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^analytics$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2FuYWx5dGljcyI6eyJzZW9WYWx1ZSI6ImFuYWx5dGljcyJ9fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^demo-3D-cube$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2RlbW8uM0QuY3ViZSI6eyJwYXJhbWV0ZXJzIjpbXSwic2VvVmFsdWUiOiJkZW1vLTNELWN1YmUifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^demo-3D-cube$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2RlbW8uM0QuY3ViZSI6eyJwYXJhbWV0ZXJzIjpbXSwic2VvVmFsdWUiOiJkZW1vLTNELWN1YmUifX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^demo-3D-models$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2RlbW8uM0QubW9kZWxMb2FkaW5nIjp7InBhcmFtZXRlcnMiOltdLCJzZW9WYWx1ZSI6ImRlbW8tM0QtbW9kZWxzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^demo-3D-models$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2RlbW8uM0QubW9kZWxMb2FkaW5nIjp7InBhcmFtZXRlcnMiOltdLCJzZW9WYWx1ZSI6ImRlbW8tM0QtbW9kZWxzIn19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^demo-3D-fileBrowser$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^demo-3D-fileBrowser$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^3D-data$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^3D-data$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^3D$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^3D$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^3d$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^3d$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvM0RcL2FwcC4zRC5maWxlRXhwbG9yZXIiOnsicGFyYW1ldGVycyI6eyJ0aHVtYm5haWxzIjoiLlwvdGh1bWJzXC8zMDBcLyRmaWxlbmFtZS4kZXh0In0sInNlb1ZhbHVlIjpbImRlbW8tM0QtZmlsZUJyb3dzZXIiLCIzRC1kYXRhIiwiM0QiLCIzZCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^mail$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3dlYm1haWwiOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOiJtYWlsIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^mail$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3dlYm1haWwiOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOiJtYWlsIn19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^forums-configuration$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtc19fdmlld19pbmRleCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcy1jb25maWd1cmF0aW9uIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^forums-configuration$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtc19fdmlld19pbmRleCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcy1jb25maWd1cmF0aW9uIn19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^jv$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3VpXC9qc29uVmlld2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImp2IiwianNvblZpZXdlciJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^jv$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3VpXC9qc29uVmlld2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImp2IiwianNvblZpZXdlciJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^jsonViewer$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3VpXC9qc29uVmlld2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImp2IiwianNvblZpZXdlciJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^jsonViewer$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL3VpXC9qc29uVmlld2VyIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImp2IiwianNvblZpZXdlciJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^logs$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2xvZ3MiOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOiJsb2dzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^logs$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2xvZ3MiOnsicGFnZSI6ImluZGV4Iiwic2VvVmFsdWUiOiJsb2dzIn19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-actualités$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19BY3R1YWxpdMOpcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-actualités$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19BY3R1YWxpdMOpcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-international$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19JbnRlcm5hdGlvbmFsIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-international$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19JbnRlcm5hdGlvbmFsIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-france$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19GcmFuY2UifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-france$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19GcmFuY2UifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-economie$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19FY29ub21pZSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-economie$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19FY29ub21pZSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-culture$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19DdWx0dXJlIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-culture$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19DdWx0dXJlIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-sport$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19TcG9ydCJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-sport$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19TcG9ydCJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-planète$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19QbGFuw6h0ZSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-planète$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19QbGFuw6h0ZSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-pixels$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19QaXhlbHMifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-pixels$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19QaXhlbHMifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-sciences$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19TY2llbmNlcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-sciences$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19TY2llbmNlcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-opinions$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19PcGluaW9ucyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-opinions$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19PcGluaW9ucyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-m-le-mag$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19NX2xlX21hZyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-m-le-mag$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19NX2xlX21hZyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^actualités-françaises-lemonde.fr-guide-d’achat$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19HdWlkZV9k4oCZYWNoYXQifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^actualités-françaises-lemonde.fr-guide-d’achat$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFjdHVhbGl0w6lzX2ZyYW7Dp2Fpc2VzX19sZU1vbmRlLmZyX19HdWlkZV9k4oCZYWNoYXQifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^deutsche-nachrichten$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^deutsche-nachrichten$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^deutsche-nachrichten-n-tv.de$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19uLXR2LmRlIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^deutsche-nachrichten-n-tv.de$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19uLXR2LmRlIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^deutsche-nachrichten-sport$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19TcG9ydCJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^deutsche-nachrichten-sport$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19TcG9ydCJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^deutsche-nachrichten-sport-sportschau.de$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19TcG9ydF9fU3BvcnRzY2hhdS5kZSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^deutsche-nachrichten-sport-sportschau.de$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkRldXRzY2hlX25hY2hyaWNodGVuX19TcG9ydF9fU3BvcnRzY2hhdS5kZSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-wereld$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19XZXJlbGQifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-wereld$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19XZXJlbGQifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-binnenland$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19CaW5uZW5sYW5kIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-binnenland$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19CaW5uZW5sYW5kIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-sport$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19TcG9ydCJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-sport$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19TcG9ydCJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-tech-en-wetenschap$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19UZWNoX2VuX1dldGVuc2NoYXAifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-tech-en-wetenschap$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19UZWNoX2VuX1dldGVuc2NoYXAifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-zakelijk$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19aYWtlbGlqayJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-zakelijk$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19aYWtlbGlqayJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^nederlands-nieuws-lifestyle$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19MaWZlc3R5bGUifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^nederlands-nieuws-lifestyle$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6Ik5lZGVybGFuZHNfTmlldXdzX19MaWZlc3R5bGUifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3cyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3cyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-world-headlines$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-world-headlines$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fV29ybGRfSGVhZGxpbmVzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-forums$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fRm9ydW1zIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-forums$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fRm9ydW1zIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-social-media$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-social-media$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-social-media-us-politicians$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhX19VU19Qb2xpdGljaWFucyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-social-media-us-politicians$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhX19VU19Qb2xpdGljaWFucyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-social-media-political$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhX19Qb2xpdGljYWwifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-social-media-political$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fU29jaWFsX01lZGlhX19Qb2xpdGljYWwifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-opinions$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fT3BpbmlvbnMifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-opinions$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fT3BpbmlvbnMifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9ucyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9ucyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-usa$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19VU0EifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-usa$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19VU0EifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-canada$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19DYW5hZGEifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-canada$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19DYW5hZGEifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-india$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JbmRpYSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-india$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JbmRpYSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-japan$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19KYXBhbiJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-japan$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19KYXBhbiJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-indonesia$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JbmRvbmVzaWEifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-indonesia$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JbmRvbmVzaWEifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-australia$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19BdXN0cmFsaWEifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-australia$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19BdXN0cmFsaWEifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-new-zealand$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19OZXdfWmVhbGFuZCJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-new-zealand$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19OZXdfWmVhbGFuZCJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-south-korea$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Tb3V0aC1Lb3JlYSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-south-korea$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Tb3V0aC1Lb3JlYSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-north-korea$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Ob3J0aC1Lb3JlYSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-north-korea$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Ob3J0aC1Lb3JlYSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-russia$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19SdXNzaWEifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-russia$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19SdXNzaWEifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-united-kingdom$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Vbml0ZWRfS2luZ2RvbSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-united-kingdom$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Vbml0ZWRfS2luZ2RvbSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-ireland$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JcmVsYW5kIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-ireland$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19JcmVsYW5kIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-countries-united-arab-emirates$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Vbml0ZWRfQXJhYl9FbWlyYXRlcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-countries-united-arab-emirates$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQ291bnRyaWVzX19Vbml0ZWRfQXJhYl9FbWlyYXRlcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-americas$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQW1lcmljYXMifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-americas$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQW1lcmljYXMifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-africa$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQWZyaWNhIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-africa$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQWZyaWNhIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-europe$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fRXVyb3BlIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-europe$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fRXVyb3BlIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-middle-east$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fTWlkZGxlX0Vhc3QifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-middle-east$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fTWlkZGxlX0Vhc3QifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-regions-asia$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQXNpYSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-regions-asia$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fUmVnaW9uc19fQXNpYSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-art$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19BcnQifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-art$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19BcnQifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-business$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-business$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-business-spglobal.com$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzc19fc3BHbG9iYWwuY29tIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-business-spglobal.com$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzc19fc3BHbG9iYWwuY29tIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-business-marketwatch.com$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzc19fTWFya2V0V2F0Y2guY29tIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-business-marketwatch.com$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19CdXNpbmVzc19fTWFya2V0V2F0Y2guY29tIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-careers$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19DYXJlZXJzIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-careers$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19DYXJlZXJzIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-cybersecurity$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19DeWJlcnNlY3VyaXR5In19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-cybersecurity$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19DeWJlcnNlY3VyaXR5In19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-entertainment$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19FbnRlcnRhaW5tZW50In19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-entertainment$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19FbnRlcnRhaW5tZW50In19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-education$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19FZHVjYXRpb24ifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-education$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19FZHVjYXRpb24ifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-health$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19IZWFsdGgifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-health$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19IZWFsdGgifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-lifestyle$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19MaWZlc3R5bGUifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-lifestyle$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19MaWZlc3R5bGUifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-new-age$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19OZXdfQWdlIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-new-age$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19OZXdfQWdlIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-military$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19NaWxpdGFyeSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-military$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19NaWxpdGFyeSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-real-estate-business$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19SZWFsX0VzdGF0ZV9CdXNpbmVzcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-real-estate-business$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19SZWFsX0VzdGF0ZV9CdXNpbmVzcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-small-business$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TbWFsbF9CdXNpbmVzcyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-small-business$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TbWFsbF9CdXNpbmVzcyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-sports$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TcG9ydHMifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-sports$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TcG9ydHMifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-sports-usa$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TcG9ydHNfX1VTQSJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-sports-usa$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TcG9ydHNfX1VTQSJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-stock-trading$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TdG9ja19UcmFkaW5nIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-stock-trading$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TdG9ja19UcmFkaW5nIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-travel$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19UcmF2ZWwifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-travel$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19UcmF2ZWwifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-technology$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19UZWNobm9sb2d5In19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-technology$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19UZWNobm9sb2d5In19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^english-news-topics-science$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TY2llbmNlIn19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^english-news-topics-science$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkVuZ2xpc2hfTmV3c19fVG9waWNzX19TY2llbmNlIn19 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^arabic$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpYyJ9fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^arabic$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpYyJ9fQ [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^arabic-business$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpY19fQnVzaW5lc3MifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^arabic-business$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpY19fQnVzaW5lc3MifX0 [N]
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^arabic-middle-east$ /view-content/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpY19fTWlkZGxlX0Vhc3QifX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^arabic-middle-east$ /view/eyIvTmljZXJBcHBXZWJPUy9hcHBzL05pY2VyQXBwV2ViT1MvYXBwbGljYXRpb25zLzJEL25ld3MiOnsic2VjdGlvbiI6IkFyYWJpY19fTWlkZGxlX0Vhc3QifX0 [N]
+
+
+</IfModule>
+
+
+
+<ifModule mod_gzip.c>
+mod_gzip_on Yes
+mod_gzip_dechunk Yes
+mod_gzip_item_include file .(html?|txt|css|js|json|php|pl)$
+mod_gzip_item_include handler ^cgi-script$
+mod_gzip_item_include mime ^text/.*
+mod_gzip_item_include mime ^application/x-javascript.*
+mod_gzip_item_exclude mime ^image/.*
+mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+</ifModule>
+<IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE "application/atom+xml" \
+                                  "application/javascript" \
+                                  "application/json" \
+                                  "application/ld+json" \
+                                  "application/manifest+json" \
+                                  "application/rdf+xml" \
+                                  "application/rss+xml" \
+                                  "application/schema+json" \
+                                  "application/vnd.geo+json" \
+                                  "application/vnd.ms-fontobject" \
+                                  "application/x-font-ttf" \
+                                  "application/x-javascript" \
+                                  "application/x-web-app-manifest+json" \
+                                  "application/xhtml+xml" \
+                                  "application/xml" \
+                                  "font/eot" \
+                                  "font/opentype" \
+                                  "image/bmp" \
+                                  "image/svg+xml" \
+                                  "image/vnd.microsoft.icon" \
+                                  "image/x-icon" \
+                                  "text/cache-manifest" \
+                                  "text/css" \
+                                  "text/html" \
+                                  "text/javascript" \
+                                  "text/plain" \
+                                  "text/vcard" \
+                                  "text/vnd.rim.location.xloc" \
+                                  "text/vtt" \
+                                  "text/x-component" \
+                                  "text/x-cross-domain-policy" \
+                                  "text/xml"
+
+</IfModule>
+
+

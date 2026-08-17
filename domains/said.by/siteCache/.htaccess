@@ -1,0 +1,11 @@
+# do not touch without a clue about apache2 rewriterules.
+# read the manual; https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+ServerSignature Off
+Options +FollowSymLinks
+Options All -Indexes
+<IfModule mod_rewrite.c>
+    # initialization of the apache2 rewrite engine;
+    RewriteEngine on
+    RewriteBase /
+    RewriteRule ^(*.csv) - [F,L,NC]
+</IfModule>

@@ -1,0 +1,1 @@
+*/5 * * * * root /usr/bin/env bash -c 'source /etc/cron.d/nicerapp__init_globals.sh && nice -n -10 php $NA_ROOT_PATH/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news/crontabEntry_manageDatabase.php > $NA_LOGS_PATH/$dateMinutesSeconds-nicerapp__fetchNewNews.txt 2>&1'

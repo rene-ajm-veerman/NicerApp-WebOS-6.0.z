@@ -1,0 +1,260 @@
+# do not touch without a clue about apache2 rewriterules.
+# read the manual; https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+ServerSignature Off
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    # initialization of the apache2 rewrite engine;
+    RewriteEngine on
+    RewriteBase /
+    # redirect www.nicer.app to nicer.app
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=307,L]
+
+
+    # pre-compiled gzip:
+        RewriteCond %{HTTP:Accept-Encoding} gzip
+        RewriteCond %{REQUEST_FILENAME}.gz -s
+        RewriteRule ^(.*)\.(json|js|css|html)$ $1.$2.gz [QSA]
+
+        RewriteRule \.json\.gz$  - [T=text/json,E=no-gzip:1]
+        RewriteRule \.js\.gz$  - [T=text/javascript,E=no-gzip:1]
+        RewriteRule \.css\.gz$ - [T=text/css,E=no-gzip:1]
+
+        Header set Content-Encoding gzip env=no-gzip
+        Header append Vary Accept-Encoding
+
+    # uses /view-content/logs due to na.site.loadContent() URL mangling in na.site.transformLinks()!
+    #RewriteCond %{REQUEST_METHOD} ^(GET)$
+    #RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    #RewriteRule ^logs$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=logs&%{QUERY_STRING} [L]
+    #RewriteCond %{REQUEST_METHOD} ^(GET)$
+    #RewriteRule ^logs$ NicerAppWebOS/index.php?seoValue=logs&%{QUERY_STRING} [L]
+
+
+    # /*--Heart of the blogging features--*/
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=in&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/on/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=on&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/about/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=about&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(.*)/during/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?username=$1&url1=during&dataID=$2 [L]
+
+        # it's not a facebook post, and it's not a forum thread either. not even a nested forum thread.
+        # it's just text, photo, audio and video data ranging from tweet sized to gigabytes sized,
+        # that's gotta get edited very efficiently
+        # and displayed fast and correctly each time,
+        # in a very, eh, diverse range of circumstances.
+        #
+        # NicerApp again works in a very simple way,
+        # with one 'dataID' pointing to all content and data related to a 'post',
+        # as structured (recently or not) by it's author and the 'commenters' to that 'post'.
+        # (to speak in facebook terminology, for lack of a better set of analogies).
+        #
+        # i could start speaking in my own marketing choice terminology about my products and services,
+        # but i'd really like to avoid that and help create an industry standard of at least
+        # what to call things that one posts or says online.
+        #
+        # dataIDs and viewIDs are formed inside the server (at random) upon creation of the 'post' or 'view',
+        # (of text data, a photo-album, or even an entire 2D and/or 3D webpage filled with people and data),
+        # trying low counts of random characters first each time,
+        # and then slowly increasing the number of characters used to create a new dataID
+        # when what's being tried is again already found in the database on the server.
+        #
+        # a dataID points to a JSON record containing not just theme settings for new viewers
+        # to that post's data, along with possibly also *other* dataIDs,
+        # which often leads NicerApp to possibly pull in content from there as well[1],
+        # to arrive at a final 2D and/or 3D view in the browser.
+        #
+        # a dataID points to JSON records in the '{$myDomainName}___data_by_users' table,
+        # and those records have a structure like this :
+            #
+            #### someone's post :
+            #
+            # "username" : "Guest",
+            # "dataID" : "csB",
+            # "view" : "{$aViewID}",
+            # "appParameters" : [
+            #     {
+            #         "{$someAppName}" : {
+            #             "someApp_param_1_keyName" : "someApp_param_1_value"
+            #         ",
+            #         ...
+            #     },
+            #     .....
+            # ],
+            # "theme" : { ... }
+            #
+            #
+            #### someone's comment to another person's post :
+            #
+            # "username" : "Rene AJM Veerman",
+            # "dataID" : "cAsD",
+            # "view" : "{$aViewID}",
+            # "appParameters" : [
+            #     {
+            #         "{$someAppName}" : {
+            #             "dataID" : "{$dataID}" # the dataID of the post being replied to.
+            #         ",
+            #         ...
+            #     },
+            #     .....
+            # ],
+            # "theme" : { ... }
+            #
+
+
+                # the viewID points to a record in the '{$myDomainName}___views' table,
+                # with a viewID pointing to a JSON record that is structured like a piece of JSON
+                # directly derived from a 'view record' as listed in :
+                    #
+                    #   .../NicerAppWebOS/domainConfigs/nicer.app/mainmenu.items.php:
+                    #       $na_apps_structure[...]['apps-current']['NicerApp-WebOS__pageSettings'],
+                    #
+                # but with that piece of JSON able to udergo (1) a string replacement procedure from data/parameters
+                # that can be found in 'viewParameters_initial' upon rendering into the browser,
+                # and (2), a file-inclusion mechanism like PHP's require_once(), to prevent databases from getting filled
+                # with field values that are larger than the underlying database server manufacturer supports.
+
+                # the theme settings are listed in a field with name 'theme', which contains data like what's
+                # defined in and returned by the function
+                # .../NicerAppWebOS/logic.business/class.core.WebsiteOperatingSystem-5.y.z.php::getPageCSS()
+                # but which is to be overlayed *on top* of the data provided that is provided as the default set of
+                # specificity and theme data for the rendering, using key names like 'before_0' to indicate that a certain
+                # sub-array should be inserted at the very start of the array provided by getPageCSS().
+                #
+                # this would properly configure the 'specificity' and 'theme' settings for end-users,
+                # who are (or are not) allowed by NicerApp to override the theme settings
+                # that an author of a post has chosen.
+
+                # in the case of someone commenting on another person's post,
+                # the value for 'someApp_param_1_keyName' in a post's record
+                # becomes the value for 'commentID' in a comment's record instead.
+
+
+        #
+        # this allows for a very limited amout of '{$myDomainName}___views' table records to be used
+        # for very large amounts of dataIDs, without maintenance to the view rendering sub-system of NicerApp
+        # leading to much downtime at all.
+        # things like rendering a specific 'post' with newly created view processing code become easily possible.
+        #
+        # [1]   in a very efficient way, with amazingly fast binary-tree calculations
+        #       happening basically inside the server's CPU,
+        #       because the database is running on the same hardware as the webserver.
+        #
+        # [2]   this is true for all couchdb, filesystemDB and SQL database business logic within NicerApp.
+        #
+        # [3]   which is in the case of a JSON database
+        #       (or in the case of a JSON database hosted on a SQL database server)
+        #       a 'record', known in programming languages as a 'recursive array' or 'data object'.
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/in/(.*)$ NicerAppWebOS/index.php?username=$1&url1=in&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/on/(.*)$ NicerAppWebOS/index.php?username=$1&url1=on&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/about/(.*)$ NicerAppWebOS/index.php?username=$1&url1=about&dataID=$2 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(.*)/during/(.*)$ NicerAppWebOS/index.php?username=$1&url1=during&dataID=$2 [L]
+
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^c/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?commentID=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^c/(.*)$ NicerAppWebOS/index.php?commentID=$1 [L]
+
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wiki-search/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org-search=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki-search/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org-search=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wiki/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki/$ NicerAppWebOS/index.php?app-wikipedia.org=frontpage [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wiki/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wikipedia/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wikipedia/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^wikipedia.org/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?app-wikipedia.org=$1 [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^wikipedia.org/(.*)$ NicerAppWebOS/index.php?app-wikipedia.org=$1 [L]
+
+
+    # /*--Front page--*/
+    # front page's data when requested with (javascript) $.ajax aka na.site.loadContent()
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(?!/)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?viewID=/ [L]
+
+    # front page when it needs the full NicerApp framework
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^(?!/)$ NicerAppWebOS/index.php?viewID=/ [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^nc$ NicerAppWebOS/index.php?uvt=n&lc=n&viewID=/ [L]
+
+    RewriteCond %{REQUEST_METHOD} ^(GET)$
+    RewriteRule ^dtl$ NicerAppWebOS/index.php?dtl=y [L]
+
+    # /*--all other pages--*/
+
+    # all other pages' data that got requested with (javascript) $.ajax aka na.site.loadContent()
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^view/(.*)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    # all pages that got requested via a bookmark or as links elsewhere on the web
+    # (requiring the full NicerApp WebOS HTML, CSS and JS to be sent along with the content)
+            # tried this already (doesn't work)
+            ##RewriteCond %{REQUEST_FILENAME} !-f
+            ##RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteRule ^view/(.*)$ NicerAppWebOS/index.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+    RewriteRule ^(?!/)([\-\w\d]+)$ NicerAppWebOS/businessLogic/ajax/ajax_get_content.php?seoValue=$1&%{QUERY_STRING} [L]
+
+    RewriteCond %{REQUEST_URI} !^/NicerAppWebOS/apps/NicerAppWCS/applications/2D/musicPlayer/music/.*$
+    RewriteRule ^(?!/)([\-\w\d]+)$ NicerAppWebOS/index.php?seoValue=$1&%{QUERY_STRING} [L]
+</IfModule>
+

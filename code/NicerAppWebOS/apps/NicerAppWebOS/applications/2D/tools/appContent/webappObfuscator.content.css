@@ -1,0 +1,6 @@
+#tabs {
+	opacity : 0.65;
+}
+.tabPage, .tabContent {
+	height : 500px;
+}

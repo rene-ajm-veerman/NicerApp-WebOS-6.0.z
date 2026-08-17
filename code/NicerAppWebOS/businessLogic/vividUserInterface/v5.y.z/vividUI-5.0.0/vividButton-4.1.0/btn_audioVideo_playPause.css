@@ -1,0 +1,20 @@
+.btn_audio_playPause {
+}
+
+/*---
+ * -- BUTTON STATE : playing
+ */
+.btn_audio_playPause--state-playing {
+}
+
+.btn_audio_playPause--state-playing--circumstance-normal {
+}
+
+/*---
+ * -- BUTTON STATE : paused
+ */
+.btn_audio_playPause--state-paused {
+}
+
+.btn_audio_playPause--state-paused--circumstance-normal {
+}

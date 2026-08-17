@@ -1,0 +1,8 @@
+this will be the initial spot for the 'businessLogic' that applies to all authentication PHP classes that deal with authenticating data used in the https://nicer.app parts of the NicerApp WCS as a whole
+
+verification systems like authenticating what valid photo data is in large tasks of checking the validity of entire new photo collections that get uploaded from the user interface parts (the contentManagementSystem parts) of NicerAppWebOS.
+
+and the same for video data
+
+and any other data that gets consumed and/or edited by the end-users.
+

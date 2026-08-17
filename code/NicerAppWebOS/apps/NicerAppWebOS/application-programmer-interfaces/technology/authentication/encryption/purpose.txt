@@ -1,0 +1,4 @@
+this will be the initial spot for the 'businessLogic' that applies to all authentication PHP classes that deal with authenticating login data used between parts of NicerApp WCS core code and written by the owner of https://nicer.app
+
+verification systems like SSH, oAuth, letsencrypt and certbot.
+

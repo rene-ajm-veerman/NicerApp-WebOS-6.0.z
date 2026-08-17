@@ -1,0 +1,21 @@
+<h1>saTreeview-1.0.0</h1>
+
+<h2>Overview</h2>
+
+<p>
+The basic problem with modeling a treeview after a nested JSON datastructure is this:<br/>
+How do you store the treeview-specific settings (such as which treenodes are folded open at any time) while not mangling the original JSON nested datastructure that populates the treeview in the first place?<br/>
+None of the free javascript treeview components I checked out for usage in seductiveapps do this (yet, at time of creating this component).<br/>
+</p>
+
+<p>
+The answer is : you store the treeview-specific settings seperately from the original datastructure, and have the javascript treeview component serve as a liason between the two datastructures (to the point of automatically saving both the original datastructure and the treeview-instance-specific settings whenever needed).
+</p>
+
+<p>
+So, onto the next question : where do you store the treeview-specific settings?<br/>
+In window.top, to provide not only a single point of storage for all treeview-specific settings, but to potentially let these settings be used throughout an entire site.<br/>
+</p>
+
+
+

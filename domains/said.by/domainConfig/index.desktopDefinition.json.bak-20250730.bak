@@ -1,0 +1,259 @@
+{
+    "negotiateOptions" : [
+    {
+        "conditions" : [
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarThemeEditor" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarLeft" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarRight" }
+        ],
+        "conditionsMet" : {
+            "mode" : 0, "#siteToolbarLeft" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteTaskbar" },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }, "#siteToolbarThemeEditor" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteTaskbar" },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }, "#siteToolbarRight" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "right" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteTaskbar" },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }
+        },
+        "conditionsFailed" : {}
+    }, {
+        "conditions" : [
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarLeft" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarExcludes" : "#siteToolbarThemeEditor" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarRight" }
+        ],
+        "conditionsMet" : {
+            "mode" : 0.1,
+            "#siteToolbarLeft" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        {
+                            "jsVar" : "na.d.s.visibleDivs",
+                            "jsVarIncludes" : "#siteTaskbar"
+                        },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            },
+            "#siteToolbarRight" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "right" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        {
+                            "jsVar" : "na.d.s.visibleDivs",
+                            "jsVarIncludes" : "#siteTaskbar"
+                        },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }
+        },
+        "conditionsFailed" : {}
+    }, {
+        "conditions" : [
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarExcludes" : "#siteToolbarLeft" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarExcludes" : "#siteToolbarThemeEditor" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarRight" }
+        ],
+        "conditionsMet" : {
+            "mode" : 0.1,
+            "#siteToolbarRight" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "right" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        {
+                            "jsVar" : "na.d.s.visibleDivs",
+                            "jsVarIncludes" : "#siteTaskbar"
+                        },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }
+        },
+        "conditionsFailed" : {}
+    }, {
+        "conditions" : [
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarLeft" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarExcludes" : "#siteToolbarThemeEditor" },
+            { "jsVar" : "na.d.s.visibleDivs", "jsVarExcludes" : "#siteToolbarRight" }
+        ],
+        "conditionsMet" : {
+            "mode" : 0.1,
+            "#siteToolbarLeft" : {
+                "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxY",
+                "growToLimits" : {
+                    "conditions" : [
+                        {
+                            "jsVar" : "na.d.s.visibleDivs",
+                            "jsVarIncludes" : "#siteTaskbar"
+                        },
+                        {
+                            "htmlSelector" : "#siteTaskbar",
+                            "cssPropertyName" : "display",
+                            "isNotExactly" : "none"
+                        }
+                    ],
+                    "conditionsMet" : [{"element" : "#siteTaskbar","edge" : "top" }],
+                    "conditionsFailed" : []
+                }
+            }
+        },
+        "conditionsFailed" : {}
+    },    {
+        "mode" : 0,
+        "#siteToolbarTop" : {
+            "snapTo" : [
+                { "element" : "body", "edge" : "top" },
+                { "element" : "body", "edge" : "left" }
+            ]
+        },
+        "#siteTaskbar" : {
+            "snapTo" : [
+                { "element" : "body", "edge" : "bottom" },
+                { "element" : "body", "edge" : "left" }
+            ],
+            "offsetY" : 5
+        }
+    }, {
+        "conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteContent" } ],
+        "conditionsMet" : {
+            "#siteContent" : {
+               "mode" : 1,
+               "snapTo" : {
+                    "conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarThemeEditor" } ],
+                    "conditionsMet" : [
+                        {"element" : "body","edge" : "top" },
+                        {"element" : "#siteToolbarThemeEditor","edge" : "right" }
+                    ],
+                    "conditionsFailed" : {
+                        "conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarLeft" } ],
+                        "conditionsMet" : [
+                            {"element" : "body","edge" : "top" },
+                            {"element" : "#siteToolbarLeft","edge" : "right" }
+                        ],
+                        "conditionsFailed" : [
+                            {"element" : "body","edge" : "top" },
+                            {"element" : "body","edge" : "left" }
+                        ]
+                    }
+                },
+                "growTo" : "max",
+                "growToLimits" : [
+                    { "element" : "#siteTaskbar", "edge" : "top" },
+                    { "element" : "#siteToolbarRight", "edge" : "left" }
+                ]
+            }
+        },
+        "conditionsFailed" : {}
+    }, {
+        "conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteToolbarTop" } ],
+        "conditionsMet" : {
+            "#siteTaskbar" : {
+               "mode" : 1,
+               "snapTo" : [
+                    {"element" : "body","edge" : "top" },
+                    {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxX"
+            }
+        },
+        "conditionsFailed" : {}
+    }, {
+        "conditions" : [ { "jsVar" : "na.d.s.visibleDivs", "jsVarIncludes" : "#siteTaskbar" } ],
+        "conditionsMet" : {
+            "#siteTaskbar" : {
+               "mode" : 1,
+               "snapTo" : [
+                            {"element" : "body","edge" : "bottom" },
+                            {"element" : "body","edge" : "left" }
+                ],
+                "growTo" : "maxX"
+            }
+        },
+        "conditionsFailed" : {}
+    }
+    ]
+}

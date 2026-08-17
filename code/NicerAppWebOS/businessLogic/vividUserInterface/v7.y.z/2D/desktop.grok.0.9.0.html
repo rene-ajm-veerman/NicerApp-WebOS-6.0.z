@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NicerApp Vivid Desktop – Grid Layout v0.8.1</title>
+  <script type="text/javascript" src="/NicerAppWebOS/3rd-party/jQuery/jquery-3.7.1-NicerAppWebOS-5.10.0.js?c=20260226_050606"></script>
+  <script type="text/javascript" src="/NicerAppWebOS/3rd-party/jQuery/jquery-ui-1.13.3.custom/jquery-ui.js?c=20260226_050606"></script>
+  <style>
+    :root {
+      --outerGap: 32px;
+      --innerGap: 32px;
+      --bg-dark: #0f0f14;
+      --panel-bg: #1a1a22;
+      --border: #444;
+      --text: #d0d0e0;
+      --accent: #5a7eff;
+      --titlebar-bg: #222;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #vividDesktop {
+      position: fixed;
+      inset: var(--outerGap);
+      display: grid;
+      grid-template-columns: auto 280px 1fr 280px auto;   /* 1:theme 2:left 3:content 4:right 5:comments */
+      grid-template-rows: auto 1fr auto auto;
+      gap: var(--innerGap);
+      height: calc(100% - 2 * var(--outerGap));
+      width: calc(100% - 2 * var(--outerGap));
+      background: transparent;
+    }
+
+    /* Spanning full width for top/bottom */
+    #siteToolbarTop    { grid-column: 1 / 6; grid-row: 1; }
+    #siteToolbarBottom { grid-column: 1 / 6; grid-row: 3; }
+    #siteTaskbar       { grid-column: 1 / 6; grid-row: 4; }
+
+    /* Left-to-right docked panels */
+    #siteThemeEditor   { grid-column: 1; grid-row: 2; }
+    #siteToolbarLeft   { grid-column: 2; grid-row: 2; }
+    #siteContent       { grid-column: 3; grid-row: 2; }
+    #siteToolbarRight  { grid-column: 4; grid-row: 2; }
+    #siteComments      { grid-column: 5; grid-row: 2; }
+
+    /* Common panel look */
+    .vividDialog,
+    .site-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titlebar {
+      height: 38px;
+      background: var(--titlebar-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+      cursor: move;
+    }
+
+    .title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    /* Bottom panels get more height */
+    #siteToolbarBottom,
+    #siteTaskbar {
+      min-height: 90px;
+    }
+
+    #siteTaskbar .content-area {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+    }
+
+    /* Debug label */
+    .gap-label {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="vividDesktop">
+
+    <!-- Top row – full width -->
+    <div id="siteToolbarTop" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Navigation • Search • Quick Actions</div></div>
+      <div class="content-area">Top toolbar content goes here…</div>
+    </div>
+
+    <!-- Left-to-right side panels (row 2) -->
+    <div id="siteThemeEditor" class="vividDialog">
+      <div class="titlebar"><div class="title">Theme Editor</div></div>
+      <div class="content-area">
+        <p>Customize colors, fonts, spacing, shadows, etc.</p>
+        <div style="margin: 16px 0;">
+          <button style="background:#5a7eff; color:white; padding:8px 16px; border:none; border-radius:4px;">Apply Dark Theme</button>
+          <button style="background:#444; color:white; padding:8px 16px; border:none; border-radius:4px; margin-left:12px;">Preview Light</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="siteToolbarLeft" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Tools • Apps • Bookmarks</div></div>
+      <div class="content-area">Left sidebar – menu items, app launcher, etc.</div>
+    </div>
+
+    <div id="siteContent" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Main Workspace</div></div>
+      <div class="content-area">
+        <h2>NicerApp Desktop v0.8.1</h2>
+        <p>Central area — drag & drop widgets, open documents, run applications here.</p>
+      </div>
+    </div>
+
+    <div id="siteToolbarRight" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Properties • Layers • Preview</div></div>
+      <div class="content-area">Right sidebar – inspector, details, previews…</div>
+    </div>
+
+    <div id="siteComments" class="vividDialog">
+      <div class="titlebar"><div class="title">Comments • Discussion • Notes</div></div>
+      <div class="content-area">
+        <p>Threaded comments, annotations, chat…</p>
+        <div style="margin-top:20px; opacity:0.6;">(Comment system loading...)</div>
+      </div>
+    </div>
+
+    <!-- Bottom rows – full width -->
+    <div id="siteToolbarBottom" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Status • Extra Controls</div></div>
+      <div class="content-area">Bottom toolbar – progress, messages, additional tools</div>
+    </div>
+
+    <div id="siteTaskbar" class="vividDialog site-panel">
+      <div class="titlebar"><div class="title">Taskbar</div></div>
+      <div class="content-area">
+        Pinned applications • System tray • Clock • Notifications
+      </div>
+    </div>
+
+  </div>
+
+  <div class="gap-label">OuterGap: var(--outerGap) • InnerGap: var(--innerGap)</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('NicerApp Vivid Desktop v0.8.1 initialized');
+      // → Add drag/resize logic here later
+    });
+  </script>
+</body>
+</html>

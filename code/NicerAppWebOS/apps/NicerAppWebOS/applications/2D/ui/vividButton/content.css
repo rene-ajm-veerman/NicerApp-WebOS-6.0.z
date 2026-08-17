@@ -1,0 +1,52 @@
+span.inputStateSelector {
+	font-size : 10px;
+}
+
+.vividButton td {
+	font-size : 10px;
+}
+
+#btn_stone_001 td {
+	color : white;
+	font-weight : bold;
+}
+
+#btn_polarbear_001 td {
+	color : yellow;
+	font-size : 11px;
+	font-weight : bold;
+}
+
+#btn_space_001 td {
+	color : white;
+}
+
+#btn_birds_001 td {
+	font-family : "Trebuchet MS";
+	color : lime;
+}
+
+#btn_lava_001 td {
+	font-family : impact;
+	color : white;
+}
+
+#btn_fish_001 td {
+	color : white;
+	font-weight : bold;
+}
+
+#btn_trees_001 td {
+	font-family : Verdana;
+	color : lime;
+	font-weight : bold;
+}
+
+#btn_earth_001 td {
+	color : yellow;
+}
+
+
+#btn_divers_001 td {
+	color : white;
+}

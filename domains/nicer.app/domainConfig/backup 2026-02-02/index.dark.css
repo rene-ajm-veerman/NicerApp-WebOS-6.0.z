@@ -1,0 +1,1224 @@
+:root {
+  --mainDelay : 0.25s;
+}
+
+.backdropped {
+  width : fit-content;
+  margin : 15px;
+  padding : 10px;
+  border-radius : 7px;
+  background : rgba(0,0,0,0.45);
+  box-shadow : inset 2px 2px 4px 1px rgba(0,0,0,0.555), 0px 0px 4px 1px rgba(0,0,0,0.555), 2px 2px 5px 2px rgba(0,0,0,0.7);
+  border : 1px solid grey;
+}
+
+#siteSettingsMenu {
+    background: rgba(100, 20, 20, 0.47);
+  backdrop-filter: blur(20px) saturate(180%);
+
+}
+
+#siteBackground {
+  background : url(/siteMedia/backgrounds/Tiled/Grey/seamless_texture_of_ice.jpg) repeat;
+}
+
+#btnSettings .vividButton_icon_imgButtonIconBG_50x50 {
+  opacity : 0.555;
+}
+
+#siteContent > .vividDialogContent > div > p > a {
+  color : lime;
+  font-weight : bold;
+}
+#siteContent > .vividDialogContent > div > p > a:hover {
+  color : white;
+  font-weight : bold;
+}
+#siteContent > .vividDialogContent > div > p > a:visited {
+  color : rgba(200,200,250,0.761);
+  font-weight : bold;
+}
+
+#btnOptions_menu .vividDialogPopup_background {
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  border-radius : 20px;
+}
+#siteSettingsMenu, .vividDialogPopup_background {
+  background: rgba(20, 100, 20, 0.33);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+#siteLogin .vividDialogPopup_background {
+  content:'';
+  z-index:-1;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background : url(/siteMedia/backgrounds/Tiled/Green/green-rust-1.png) repeat;
+  opacity : 0.8;
+}
+#siteRegistration .vividDialogPopup_background {
+  content:'';
+  z-index:-1;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background : url(/siteMedia/backgrounds/Tiled/gold/metal_seamless_texture_64_by_jojo_ojoj_d98yn7d-pre.jpg) repeat;
+  opacity : 0.8;
+}
+
+.vividDialog {
+  display: inline-block;
+  position:absolute;
+  border-radius : 10px;
+  box-shadow : inset 2px 2px 4px 1px rgba(0,0,0,0.555), 0px 0px 4px 1px rgba(0,0,0,0.555), 2px 2px 5px 2px rgba(0,0,0,0.7);
+}
+.vividDialog > .vividDialogBackground1 {
+    border-radius : 16px;
+    position:absolute;
+    top : 8px;
+    left : 8px;
+    width : calc(100% - 16px);
+    height : calc(100% - 16px);
+    box-shadow : inset 0px 0px 6px 4px rgba(0, 0, 0, 0.55);
+    z-index : 1;
+  -webkit-transition: all var(--mainDelay) linear;
+  -moz-transition: all var(--mainDelay) linear;
+  -o-transition: all var(--mainDelay) linear;
+  transition: all var(--mainDelay) linear;
+  position : absolute;
+  top : 0px;
+  left : 0px;
+  width : 100%;
+  height : 100%;
+  border-radius : 10px;
+  background : rgba(0,0,0,0.4);
+}
+.vividDialog > .vividDialogContent {
+  z-index : 10;
+  position : relative;
+  display : none;
+}
+
+#btnOptions_menu {
+  padding : 20px;
+}
+.btnOptions_menu__specificity__containerDiv, .btnOptions_menu__theme__containerDiv {
+  padding : 10px;
+}
+.vividButton_container_50x50 { margin : 10px }
+.vividDialogPopup {
+  color : white;
+  font-weight : bold;
+  text-shadow : 0px 0px 3px yellow;
+    border : 1px solid ivory;
+    box-shadow : -1px -1px 3px 2px rgba(255,255,255,0.7), 1px 1px 4px 2px rgba(0,0,0,0.7);
+    border-radius : 16px;
+    position : absolute;
+/*     min-width : 300px; */
+    height : auto;
+    margin : 6px;
+    padding : 10px;
+    display : none;
+}
+.vividDialogPopup label, .btnOptions_menu__label__specificity_dropdown, .btnOptions_menu__label__themes_dropdown {
+    background-color : rgba(0,0,0,0.55) !important;
+    backdrop-filter: blur(8px);
+    opacity : 0.7;
+    margin : 10px;
+    padding : 10px;
+    border-radius : 10px;
+    font-size : large;
+    font-weight : bold;
+}
+.vividDialogPopup input {
+    background-color : rgba(255,255,255,0.55) !important;
+    backdrop-filter: blur(8px);
+    opacity : 0.7;
+    margin : 10px;
+    padding : 10px;
+    border-radius : 10px;
+    color: navy;
+    font-size : large;
+    font-weight : bold;
+}
+#siteLoginContainer {
+  margin-right : 70px;
+}
+.vividDialogPopup::before {
+    content : '';
+    border-radius : 16px;
+    background : linear-gradient(180deg,
+        rgba(0,255,0,0.55) 0%,
+        rgba(0,0,200,0.55) 50%,
+        rgba(0,255,0,0.55) 100%
+
+    );
+    z-index : -1;
+    -webkit-mask-image: url("/siteMedia/vividDialog_borderMask_500x1000.png");
+    mask-image: url("/siteMedia/vividDialog_borderMask_500x1000.png");
+    -webkit-mask-size: 100% 100%, contain;
+    -webkit-mask-repeat : no-repeat;
+    position:absolute;
+    top : 0px;
+    left : 0px;
+    height : 100%;
+    width : 100%;
+    opacity : 0.8;
+}
+.vividDialogPopup_background {
+  /*background : url(/siteMedia/backgrounds/Tiled/Red/318801228_12f7b6a8a2.jpg) repeat;
+    background-size : 100%;
+    */
+  background: rgba(20, 100, 20, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+
+    /*
+     *background : url(/siteMedia/backgrounds/Tiled/Green/forest_Green_textured_background_seamless.jpg) repeat;
+     *background : url('/siteMedia/backgrounds/Tiled/grey/pale_blue_background_111.jpg') repeat;
+     */
+    opacity : 0.33;
+    z-index : -1;
+    border-radius : 4px;
+    position:absolute;
+    top : 0px;
+    left : 0px;
+    height : 100%;
+    width : 100%;
+    opacity : 0.8;
+}
+#siteLoginFailed  .vividDialogPopup_background {
+  background: rgba(20, 100, 20, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  opacity : 0.5;
+}
+
+.vividButton {
+    border: rgba(255, 255, 255, 0.7);
+    box-shadow: rgba(255, 255, 255, 0.4) 2px 2px 4px 4px inset, rgba(0, 0, 0, 0.55) 2px 2px 1px 1px;
+}
+#siteContent {
+  padding : 10px;
+  top : calc(50% - 25px);
+  left : calc(50% - 25px);
+  width : calc(50px);
+  height : calc(50px);
+  z-index : 1000;
+}
+
+#siteTaskbar {
+  position : absolute;
+  bottom : 20px;
+  left : 25px;
+  width : calc(100% - 50px);
+  height : 80px;
+  box-shadow : 0px 0px 3px 2px rgba(255,255,255,0.5), inset 0px 0px 7px 6px rgba(255,255,255,0.5);
+  z-index : 500;
+}
+#siteTaskbar > canvas {
+  width : calc(100% );
+  height : 80px;
+  position : absolute;
+  border-radius : 3px;
+  z-index : 1000;
+  overflow:auto;
+}
+#siteTaskbar > .vividDialogBackground1 {
+  width : 100%;
+  height : 100%;
+  position : absolute;
+  border-radius : 10px;
+  background : url(/siteMedia/backgrounds/Tiled/Blue/blue170.jpg) repeat;
+  opacity : 0.37;
+  z-index : -1;
+}
+#btnSettings, #btnShowStartMenu {
+  position : relative;
+  display : inline-block;
+  margin-top : 15px;
+  margin-left : 15px;
+  margin-bottom : 7px;
+  width : 50px;
+  height : 50px;
+  border-radius : 10px;
+  border : 3px ridge rgba(0,0,255,0.7);
+  background : rgba(0,0,100,0.5);
+  box-shadow : inset 0px 0px 3px 2px rgba(0,0,0,0.6);
+  z-index : 8000000;
+}
+#btnSettings img, #btnShowStartMenu img {
+  z-index : 8100000;
+}
+#siteDatetime {
+  position : relative;
+  display : block;
+  align-items : center;
+  flex-flow: row wrap;
+  align-content: space-between;
+  justify-content: space-between;
+  float : right;
+  margin-top : 14px;
+  margin-right : 14px;
+  margin-bottom : 14px;
+  width : auto;
+  color : white;
+  font-weight : bolder;
+  padding : 5px;
+  height : 36px;
+  border-radius : 10px;
+  border : 3px ridge rgba(255,0,0,0.7);
+  background : rgba(100,0,0,0.5);
+  box-shadow : inset 0px 0px 3px 2px rgba(0,0,0,0.6);
+  z-index : 8000100;
+}
+.datetime {
+  display : block;
+  width : 100%;
+  text-align : center;
+}
+.datetime.time {
+  page-break-after: always; /* CSS 2.1 syntax */
+  break-after: always; /* CSS 3 syntax */
+  wrap-after: flex; /* New proposed syntax */
+}
+.datetime.date {
+  font-size : small;
+}
+
+#siteSettingsMenu {
+  -webkit-transition: all var(--mainDelay) linear;
+  -moz-transition: all var(--mainDelay) linear;
+  -o-transition: all var(--mainDelay) linear;
+  transition: all var(--mainDelay) linear;
+  padding : 10px;
+}
+#siteSettingsMenu.hidden {
+  bottom : 100px;
+  left : 100px;
+  width : fit-content;
+  height : 30px;
+  border-radius : 10px;
+  box-shadow : none;
+  opacity : 0.001;
+  overflow : hidden;
+}
+#siteSettingsMenu.shown {
+  bottom : 110px;
+  left : 100px;
+  width : fit-content;
+  height : fit-content;
+  border-radius : 10px;
+  box-shadow : 0px 0px 4px 3px rgba(255,255,255,0.45);
+  opacity : 1;
+  overflow : hidden;
+}
+
+#siteToolbarLeft::before, #siteToolbarRight::before, #siteToolbarThemeEditor::before {
+    -webkit-mask-image: url("/siteMedia/vividDialog_borderMask_320x1500.png");
+    mask-image: url("/siteMedia/vividDialog_borderMask_320x1500.png");
+}
+#siteToolbarThemeEditor {
+  width : 320px;
+}
+.select.mainBar_forThemeEditor {
+    order:2;
+    vertical-align:middle;
+    background: rgb(2,0,36);
+    background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);
+    padding : 5px;
+    margin-left : 7px;
+    border : 2px ridge white;
+    border-radius : 8px;
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.75), 3px 3px 2px 2px rgba(0,0,0,0.75);
+    color : white;
+    font-weight : bold;
+}
+.select.mainBar_forThemeEditor option {
+    background : rgba(2,0,45, 0.7);
+}
+.naNavBar_darkenedBG {
+  position : relative;
+  display : flex;
+  align-items : center;
+  justify-content : space-between;
+  border-radius : 10px;
+  box-shadow : inset 0px 0px 4px 2px rgba(0,0,0,0.6);
+  background : rgba(0,0,0,0.55);
+}
+.navbarTheme_navy {
+  position : relative;
+  display : flex;
+  align-items : center;
+  justify-content : space-between;
+  border-radius : 10px;
+  padding : 8px;
+  margin-right : 5px;
+  margin-top : 5px;
+  box-shadow : inset 0px 0px 4px 2px rgba(0,0,0,0.6);
+  background : rgba(0,0,75,0.55);
+}
+#nb_url1_label, #nb_url2_label, #url1_label, #url2_label {
+    white-space : nowrap;
+}
+#nb_url1_dropdown, #nb_url1-2, #nb_url2_value, #nb_documentLabel, #url1_dropdown, #url1-2, #url2_value, #documentLabel, .vividDropDownBox_selected, .vividDropDownBox_selector {
+    z-index : 30000;
+}
+#nb_url2_value, #nb_documentLabel, #nb_documentTitle, .vividTheme_input_urls, #url2_value, #documentLabel, #documentTitle, .vividDropDownBox_selected, .vividDropDownBox_selector, .vividListSelector {
+    height : 1.5em;
+    padding : 5px;
+    margin : 8px;
+    margin-left : 7px;
+    border : 2px ridge white;
+    border-radius : 8px;
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.75), 3px 3px 2px 2px rgba(0,0,0,0.5);
+    background: linear-gradient(0deg, rgba(2,0,20,0.8) 0%, rgba(9,9,70,0.8) 35%, rgba(0,150,180,0.8) 100%);
+    white-space: nowrap;
+    overflow : hidden;
+    color : white;
+    display : inline;
+    z-index : 30000;
+}
+.vividDropDownBox_selector .hasData {
+    background: linear-gradient(0deg, rgba(255,150,50,0.8) 0%, rgba(255,225,50,0.8) 35%, rgba(255,150,50,0.8) 100%);
+    color : navy;
+}
+.vividDropDownBox_selector .hasData.selected, .vividDropDownBox_selector .selected {
+    color : white;
+s}
+.vividDropDownBox_selected, .vividDropDownBox_selector {
+    width : -webkit-box-flex;
+    display : inline-block;
+    position : relative;
+}
+.vividDropDownBox_selected {
+    vertical-align : middle;
+    text-align : center;
+}
+.vividDropDownBox_selector {
+    position : fixed;
+    display : none;
+    height : auto;
+    width : fit-content;
+    max-height : fit-content;
+    z-index : 920000;
+}
+.vividListSelector {
+    /*position : fixed;*/
+    height : auto;
+    max-height : fit-content;
+    z-index : 920000;
+    display : block;
+    position : relative;
+    width : 272px;
+}
+#siteToolbarThemeEditor__elementPicker .vividButton {
+    font-size : 0.58em;
+}
+.vividDropDownBox_selector > .vividScrollpane > div, .vividListSelector > .vividScrollpane > div {
+    width : calc(100% - 20px);
+    white-space: nowrap;
+    padding : 5px;
+    margin : 5px;
+    border-radius : 20px;
+}
+.vividDropDownBox_selector > div.disabled, .vividListSelector > div.disabled {
+    color : grey;
+}
+.btnOptions_menu__label__specificity_dropdown, .btnOptions_menu__label__themes_dropdown, .changeBackgroundsAutomatically_label, #myForm p, .btnOptions_menu__backgroundTimeSettingsChanged_save__containerDiv div label, .smallPadding  {
+    color : white;
+}
+.vividDropDownBox_selected, .vividDropDownBox_selector {
+    font-size: clamp(0.4375rem, 0.4004rem + 0.1854vw, 0.875rem);
+    font-size: clamp(1rem, 0.9386rem + 0.2586vw, 1.5625rem);
+}
+
+#nb_url2_value, #url2_value, .vividDropDownBox_selected {
+    background: linear-gradient(0deg, rgba(2,0,36,0.5) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,0.5) 100%);
+}
+.vividDropDownBox_selector > .vividScrollpane > div:hover, .vividListSelector > .vividScrollpane > div:hover {
+    background : linear-gradient(0deg, rgba(2,150,36,0) 0%, rgba(2,150,36,.55) 25%, rgba(0,50,155,.55) 50%, rgba(2,150,36,.55) 75%, rgba(2,150,36,0) 100%);
+    color : white;
+}
+.vividDropDownBox_selector > .vividScrollpane > div.selected, .vividListSelector > .vividScrollpane > div.selected {
+    background : linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.4) 25%, rgba(0,50,155,.4) 50%, rgba(255,255,255,.4) 75%, rgba(255,255,255,0) 100%);
+    color:white;
+}
+
+#nb_documentLabel, #documentLabel {
+    background: linear-gradient(0deg, rgba(2,36,0,0.5) 0%, rgba(9,121,9,0.5) 35%, rgba(0,255,211,0.5) 100%);
+}
+#nb_documentTitle, #documentTitle {
+    background: linear-gradient(0deg, rgba(255,172,15,0.5) 0%, rgba(150,25,15,0.5) 40%, rgba(150,25,15,0.5) 60%, rgba(255,238,0,0.5) 100%);
+    color : cyan;
+    text-shadow : 2px 2px 3px rgba(0,0,0, 0.7);
+}
+
+
+.vividScrollpane {
+    overflow : auto;
+}
+.vividButton_icon_50x50_siteTop:focus-visible, .vividScrollpane:focus-visible{
+    outline : 0;
+}
+.vividScrollpane:active{
+    box-shadow : none;
+    border-radius : none;
+    border : none;
+}
+.vividScrollpane::-webkit-scrollbar {
+  width: 1rem;
+}
+.vividScrollpane::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background : rgba(0,0,0,0.5);
+}
+.vividScrollpane::-webkit-scrollbar-button:vertical:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 10px 0px 0px;
+  background : url('/siteMedia/vividDialog/frame_e02_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:vertical:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 0px 10px 10px;
+  background : url('/siteMedia/vividDialog/frame_e03_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:horizontal:decrement {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  color : white;
+  padding : 0;
+  margin : 0;
+  border-radius : 10px 0px 0px 10px;
+  background : url('/siteMedia/vividDialog/frame_e06_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-button:horizontal:increment {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  padding : 0;
+  margin : 0;
+  color : white;
+  border-radius : 0px 10px 10px 0px;
+  background : url('/siteMedia/vividDialog/frame_e07_001.png') center;
+}
+.vividScrollpane::-webkit-scrollbar-thumb {
+  background : url('/siteMedia/backgrounds/Tiled/Blue/blue174.jpg') repeat;
+  border-radius : 20px;
+}
+
+
+
+
+
+
+
+.vividButton, .vividButton a, .vividButton span,
+.vividButtonSelected, .vividButtonSelected a, .vividButtonSelected span,
+.vividMenu_item, .vividMenu_item a, .vividMenu_item span {
+    height : auto;
+    padding : 4px;
+}
+.vividButton {
+    border : 2px ridge rgba(255,255,255,0.7);
+    border-radius : 14px;
+    padding : 4px;
+    margin : 8px;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+}
+.vividButton {
+    border-radius : 14px;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+    padding : 3px;
+}
+.vividButton.selected, .vividButtonSelected {
+    border : 2px ridge rgba(0,255,0,0.75);
+    border-radius : 14px;
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButton.selected, .vividButtonSelected {
+    border : 2px ridge rgba(0,255,0,0.75);
+    border-radius : 14px;
+    z-index : 1;
+    pointer-events : none;
+}
+.vividButton:before {
+    content: "";
+    position: absolute;
+    pointer-events: all;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,40,40,0.8) 81%);
+    border-radius : 12px;
+    z-index: -1;
+    opacity: 0;
+}
+.vividButton:hover:before {
+    opacity: 1;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,50,0.4)  25%, rgba(40,40,80,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,50,0.4) 25%, rgba(40,40,80,0.8) 81%);
+}
+.vividButtonSelected:before, .vividButton.selected:before {
+    content: "";
+    position: absolute;
+    pointer-events: all;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,0,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    border-radius : 12px;
+    z-index: -1;
+    transition: opacity 0.5s linear;
+    opacity: 1;
+}
+.vividButtonSelected:hover:before, .vividButton.selected:hover:before {
+    opacity: 1;
+    background-image: -o-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,100,0,0.4)  25%, rgba(40,255,40,0.8) 81%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+    background-image: linear-gradient(bottom, rgba(0,100,0,0.4) 25%, rgba(40,255,40,0.8) 81%);
+}
+
+
+
+.sliderOpacityRange {
+    position : absolute;
+    top : -2px;
+    left : 55px;
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: calc(100% - 55px); /* Full-width */
+    height: 25px; /* Specified height */
+    background: rgba(0,0,0,0.95); /* Grey background */
+    z-index : 5000;
+    border : 2px ridge rgba(100,100,100,0.7);
+    border-radius : 8px;
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+.sliderOpacityRange:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+.sliderOpacityRange::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderOpacityRangethemeEditor {
+    vertical-align : middle;
+    position : absolute;
+    left : 5px;
+    display : none;
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: calc(100% - 15px); /* Full-width */
+    background: rgba(0,0,0,0.95); /* Grey background */
+    z-index : 5000;
+    border : 2px ridge rgba(100,100,100,0.7);
+    border-radius : 8px;
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+    margin : 4px;
+}
+.sliderOpacityRangethemeEditor:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+.sliderOpacityRangethemeEditor::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderOpacityRangeBorderSettings {
+    position : relative;
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    height: 25px; /* Specified height */
+    background: rgba(0,0,0,0.95); /* Grey background */
+    z-index : 5000;
+    border : 2px ridge rgba(100,100,100,0.7);
+    border-radius : 8px;
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+.sliderOpacityRangeBorderSettings:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+.sliderOpacityRangeBorderSettings::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+.borderSettings_label, .boxShadowSettings_label, .textSettings_label, .textShadowSettings_label, .themePermissions_label {
+    background : rgba(0,0,0,0.55);
+    border-radius : 5px;
+    box-shadow : 2px 2px 1px 1px rgba(0,0,0,0.7);
+    text-shadow : 2px 2px 1px rgba(0,0,0,0.7);
+}
+#borderSettings select, #textSettings select {
+    border : 2px ridge white;
+    border-radius : 10px;
+    background : rgba(55,55,255,0.3);
+    color : cyan;
+    font-weight : bold;
+    text-shadow : 4px 4px 3px rgba(0,0,0,0.7), 0px 0px 4px rgba(0,0,0,0.8);
+    box-shadow : inset 2px 2px 1px 1px rgba(0,0,0,0.55), 2px 2px 1px 1px rgba(0,0,0,0.8);
+}
+.boxShadow_containerDiv, .textShadow_containerDiv {
+    background : rgba(50, 50, 150, 0.4);
+    border-radius : 10px;
+    box-shadow : inset 2px 2px 1px 1px rgba(0, 0, 0, 0.7), 3px 3px 2px 2px rgba(0,0,0,0.7);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.vividButton_icon_50x50_text {
+  /*border : 3px solid rgba(0,0,0,0.50);
+  height : 44px;*/
+  box-shadow : inset 2px 2px 4px 2px rgba(255,255,255,0.5), inset 0px 0px 3px 2px rgba(0,0,0,0.70050);
+}
+.vividButton_icon_50x50_text.mouseover div {
+  --bg-size: 400%;
+  --color-one: Green;
+  --color-two: lime;
+  background: linear-gradient(
+                315deg,
+                var(--color-one),
+                var(--color-two),
+                var(--color-one)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 0px 0px 2px rgba(255,255,255,0.33), 3px 3px 3px rgba(0,0,0,0.8);
+  position : relative;
+}
+.vividButton_icon_50x50_text.mouseout div {
+  --bg-size: 400%;
+  --color-one: ivory;
+  --color-two: yellow;
+  background: linear-gradient(
+                315deg,
+                var(--color-one),
+                var(--color-two),
+                var(--color-one)
+              ) 0 0 / var(--bg-size) 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: move-bg 8s infinite cubic-bezier(0.11, 0, 0.5, 0);
+  text-shadow : 0px 0px 2px rgba(255,255,255,0.33), 3px 3px 3px rgba(0,0,0,0.8);
+  position : relative;
+}
+
+
+.sp-container {
+    background : linear-gradient(to top, rgba(255,255,200,0.7), rgba(100,255,100,0.75) 50%, rgba(255,255,200,0.7) 100%);
+    padding : 5px;
+    margin : 5px;
+    border-radius : 10px;
+}
+:root {
+  --select-border: #777;
+  --select-focus: blue;
+  --select-arrow: var(--select-border);
+}
+
+/* BEGIN thanks https://freefrontend.com/css-select-boxes/ and https://codepen.io/5t3ph/pen/MWyyYNz */
+select {
+  background-color: transparent;
+  border: none;
+  padding: 0 1em 0 0;
+  margin: 0;
+  width: calc(100%);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+  z-index: 1;
+
+  outline: none;
+}
+
+.select {
+  display: inline-block;
+  grid-template-areas: "select";
+  align-items: center;
+  position: relative;
+  grid-area: select;
+  box-sizing:border-box;
+
+  border: 1px solid var(--select-border);
+  border-radius: 0.25em;
+  padding: 0.25em 0.5em;
+
+  cursor: pointer;
+  line-height: 1.1;
+  height : 2em;
+
+  background-image: linear-gradient(to top, rgba(255,255,255,0.4), rgba(255,255,255,0.7) 33%);
+}
+.select.mainBar_forThemeEditor {
+    height : 2.5em;
+}
+.select::after {
+    grid-area: select;
+    box-sizing:border-box;
+    content: "";
+    justify-self: end;
+    width: 0.8em;
+    height: 0.5em;
+    background-color: var(--select-arrow);
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+}
+
+select:focus + .focus {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border: 2px solid var(--select-focus);
+  border-radius: inherit;
+}
+
+select[multiple] {
+  padding-right: 0;
+
+  /*
+   * Safari will not reveal an option
+   * unless the select height has room to
+   * show all of it
+   * Firefox and Chrome allow showing
+   * a partial option
+   */
+  height: 6rem;
+
+  option {
+    white-space: normal;
+
+    outline-color: var(--select-focus);
+  }
+}
+
+.select--disabled {
+  cursor: not-allowed;
+  background-image: linear-gradient(to top, rgba(255,255,255,0.7), rgba(255,255,255,0.7) 33%);
+}
+
+.select + label {
+  margin-top: 2rem;
+}
+/* END thanks https://freefrontend.com/css-select-boxes/ and https://codepen.io/5t3ph/pen/MWyyYNz */
+
+
+#specificitySettings {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items : center;
+  background : rgba(0,0,0,0.55);
+  border-radius : 10px;
+  box-shadow : inset 1px 1px 2px 1px rgba(0,0,0,0.8);
+}
+#nate_selectorSet, #specificitySettings {
+  padding : 7px;
+  margin : 7px;
+  width : calc(100% - 28px);
+  align-content: center;
+}
+
+#themeEditor_photoAlbum_specs {
+  margin : 4px;
+}
+label.specificityCB {
+    width : auto;
+    display : inline-block;
+}
+input.specificityCB {
+    vertical-align : middle;
+    position : relative;
+    bottom : 1px;
+}
+#specificitySettings::before, #specificitySettings::after {
+  content: '';
+  width: 100%;
+  order: 1;
+}
+.sds_dialogTitle {
+    display : flex;
+    align-items : center;
+    background : rgba(0,0,0,0.5);
+    border-radius : 10px;
+    box-shadow : 2px 2px 3px 2px rgba(0,0,0,0.5) inset;
+    padding : 5px;
+    margin : 4px;
+}
+.sds_dialogTitle .vividButton_icon_50x50_sdsdt {
+    display : inline-block;
+    position : relative;
+    margin-left : 10px;
+    margin-right:10px;
+    z-index : 1100;
+    width : 35px;
+    height : 35px;
+}
+#sds_dialogTitle {
+    font-weight : bold;
+}
+#boxShadowControls img, #textShadowControls img, #themePermissionsControls img {
+    width : 50px;
+    height : 50px;
+}
+#specificityForDiv {
+    font-weight : bold;
+}
+.textSettingsLabel2 {
+    width : 85px;
+}
+.themeItem input {
+    background:rgba(0,0,100,0.5);
+    border:1px solid white;
+    border-radius:10px;
+    margin : 5px;
+    padding : 5px;
+    color : white;
+}
+.themeItem.onfocus input {
+    background : rgba(0,0,255,0.5);
+}
+
+.specificityLabel {
+    width : 88px;
+}
+
+#document_headers > .sections, #document_navBar > .sections {
+    display : inline-block;
+}
+.navbar {
+    display : inline-block;
+    padding : 0;
+    margin : 0;
+    margin-bottom : 4px;
+    align-content : center;
+    align-items : center;
+    height : fit-content;
+    width : 100%;
+}
+.navbar_section {
+    display:inline-block;
+    align-content : center;
+    align-items : center;
+    vertical-align:middle;
+    margin-right   : 20px;
+}
+.navbar_button {
+    width : 50px;
+}
+.themeEditorComponent {
+    display : inline-block;
+    justify-content : center;
+    align-items : flex-start;
+    padding : 4px;
+    left : 4px;
+}
+.themeEditorComponent_containerDiv {
+    display : inline-flex;
+    justify-content : center;
+    align-items : center;
+    width : calc(100% - 30px);
+}
+.themeEditor_input_containerDiv {
+    display : flex;
+    align-items : center;
+    width : 100%;
+    margin-top : 7px;
+}
+.borderSettings_label_containerDiv, .textSettings_label_containerDiv, .textShadowSettings_label_containerDiv,
+.borderSettings_input_containerDiv, .textSettings_input_containerDiv, .textShadowSettings_input_containerDiv {
+    display : inline-block;
+}
+.themeEditorComponent > * {
+    vertical-align : middle;
+
+}
+.borderSettings_input_containerDiv, .textSettings_input_containerDiv, .textShadowSettings_input_containerDiv {
+    padding-left : 8px;
+    width : 100%;
+}
+.borderSettings_input {
+    padding : 5px;
+}
+.borderSettings_label, .textSettings_label, .textShadowSettings_label {
+    width : 50px;
+    display : flex;
+    padding : 5px;
+    font-weight : bold;
+    text-shadow : 2px 2px 1px rgba(0,0,0,0.8);
+}
+.borderSettings_label_containerDiv, .textSettings_label_containerDiv, .textShadowSettings_label_containerDiv {
+    width : 60px;
+}
+#boxShadowInset_spacer {
+    width : 130px;
+}
+.boxShadow_containerDiv, .textShadow_containerDiv {
+    width : 100%;
+    margin : 5px;
+    padding : 7px;
+}
+.boxShadow_containerDiv.selected, .textShadow_containerDiv.selected {
+    background : rgba(200, 200, 200, 0.7);
+    border : 1px solid white;
+}
+
+.sliderOpacityRangeBorderSettings, #textFontFamily, #textSize, #textWeight {
+    width : calc(100% - 4px);
+}
+.textShadow > span {
+    margin-top : 0 !important;
+    margin-bottom : 0 !important;
+    padding-top : 2px !important;
+    padding-bottom : 0 !important;
+}
+
+label {
+    width : fit-content;
+    font-size : 88%;
+    display : inline-block;
+}
+#documentTitle_label {
+    padding : 5px;
+}
+.radioInput {
+    display : inline-block;
+    border : 0px;
+    width : 20px;
+    height : 1.2em;
+}
+.flexColumns {
+    display : flex;
+}
+.labelthemeEditor2 {
+    display : inline-flex;
+    position : relative;
+}
+
+
+#site3D_label {
+    background : rgba(0,0,50,0.5);
+    box-shadow : inset 2px 2px 1px 1px rgba(255,255,255,0.5), 4px 4px 3px 2px rgba(0,0,0,0.5);
+    display : inline-block;
+    position:absolute;
+    padding : 5px;
+    border-radius : 5px;
+    z-index : 10000000;
+};
+
+
+.naAudioPlayerUI {
+}
+.naAudioPlayerPlaylist {
+  width : calc(100% - 40px);
+  left : 10px;
+  position:relative;
+  background : rgba(0,0,0,0.5);
+  padding : 5px;
+  border-radius : 5px;
+  box-shadow : inset 0 0 8px rgba(0,0,0,0.8);
+}
+.naFolderFilesList {
+  width : calc(100% - 40px);
+  left : 10px;
+  position:relative;
+  background : rgba(0,0,0,0.5);
+  padding : 5px;
+  border-radius : 5px;
+  box-shadow : inset 0 0 8px rgba(0,0,0,0.8);
+}
+
+.audioPlayerControls {
+    display : flex;
+    order : 2;
+    flex-direction : row;
+    justify-content : space-around;
+    width : calc(100% - 30px);
+    left : 15px;
+    position:relative;
+}
+
+.audioVolumeBar, .audioSeekBar {
+    width : 130px;
+    min-width : 130px;
+    max-width : 130px;
+    height : 1em;
+    border-radius : 8px;
+    height : 23px;
+}
+
+.audioVolumeBar {
+    background : url('/siteMedia/backgrounds/Tiled/blue/seamless-texture-blue-watercolor.jpg');
+}
+.audioVolumeBar_setting {
+    background : url('/siteMedia/backgrounds/Tiled/Green/5492.jpg');
+    height : 17px;
+    top : 3px;
+    left : 4px;
+    position : relative;
+    width : calc(100% - 8px);
+    border-radius : 4px;
+}
+
+.audioSeekBar {
+    background : url('/siteMedia/backgrounds/Tiled/orange/467781133_4f4354223e.jpg');
+}
+.audioSeekBar_setting {
+    background : url('/siteMedia/backgrounds/Tiled/blue/fabric_seamless_blue_woven_texture2.jpg');
+    height : 17px;
+    top : 3px;
+    left : 4px;
+    position : relative;
+    width : 0px;
+    border-radius : 4px;
+}
+
+.audioPlayerControlsLabels {
+    display : flex;
+    order : 3;
+    flex-direction : row;
+    justify-content : space-around;
+    width : 100%;
+}
+
+.audioVolumeBarLabel {
+    display : flex;
+    order : 4;
+    flex-direction : row;
+    justify-content : space-between;
+    width : 130px;
+}
+
+.audioSeekBarLabel {
+    display : flex;
+    order : 4;
+    flex-direction : row;
+    justify-content : space-between;
+    width : 130px;
+}
+
+#siteToolbarThemeEditor {
+  left : -400px;
+}
+
+
+
+
+
+
+
+/* --- LOADING ICON */
+.lds-facebook {
+  display: block;
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  left : calc(50% - 40px);
+  top : calc(50% - 40px);
+  z-index : 1000000;
+}
+.lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background : linear-gradient(rgba(48, 211, 255, 1), rgba(15, 5, 133, 1));
+  border-radius : 5px;
+  margin : 3px;
+  box-shadow : 2px 2px 1px 1px rgba(0,0,0,0.4);
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+.lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+.lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+.lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px;
+    opacity : 0.3;
+  }
+  50% {
+    top: 24px;
+    height: 32px;
+    opacity : 0.87;
+  }
+  100% {
+    top: 24px;
+    height: 32px;
+    opacity : 0.3;
+  }
+}
