@@ -524,7 +524,7 @@ class naScreenshots
         $now = date('Y-m-d H:i:s');
         $id  = $job['_id'];
 
-        echo "claimNextJob: attempting to claim {$id}\n";
+        echo "<div class=\"phpError\"><div class=\"backdropped phpError\">claimNextJob: attempting to claim {$id}</div>";
 
         try {
             // Use the raw CouchDB client directly
@@ -538,7 +538,7 @@ class naScreenshots
             $rev = $current->body->_rev ?? null;
 
             if (!$rev) {
-                echo "claimNextJob: no _rev for {$id}\n";
+                echo "<div class\"phpError\">claimNextJob: no _rev for {$id}</div>";
                 return null;
             }
 
@@ -552,13 +552,14 @@ class naScreenshots
             ]);
 
             $cdb->put($id, $updatedDoc);
-            echo "claimNextJob: successfully claimed {$id}\n";
+            echo "<div class=\"phpError\">claimNextJob: successfully claimed {$id}</div></div>";
 
             return $updatedDoc;
 
         } catch (Throwable $e) {
-            echo "claimNextJob EXCEPTION: " . $e->getMessage() . "\n";
-            echo $e->getTraceAsString() . "\n";
+            echo "<div class=\"phpError\"><div class\"backdropped phpError\">claimNextJob EXCEPTION: " . $e->getMessage() . "</div>";
+	    $t = $e->getTraceAsString();
+	    echo '<pre class="backdropped phpError">'.$t.'</pre></div></div>';
             return null;
         }
     }
@@ -857,7 +858,7 @@ class naScreenshots
                     $docs = $result->body->docs ?? [];
                     return json_decode(json_encode($docs), true) ?: [];
                 } catch (Throwable $e) {
-                    echo "find() EXCEPTION: " . $e->getMessage() . "\n";
+                    echo "<p class=\"phpError\">find() EXCEPTION: " . $e->getMessage() . "</p>";
                     return [];
                 }
             }

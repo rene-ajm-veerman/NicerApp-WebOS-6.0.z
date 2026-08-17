@@ -970,7 +970,7 @@ class class_naComments {
         if ($releaseStale) {
             $released = $this->releaseStaleLocks();
             if ($verbose && $released > 0) {
-                echo "[" . date('H:i:s') . "] Released {$released} stale lock(s)\n";
+		    echo "<p class=\"phpError\">[" . date('H:i:s') . "] Released {$released} stale lock(s)</p>";
             }
         }
 
@@ -981,7 +981,7 @@ class class_naComments {
 
             if (!$job) {
                 if ($verbose) {
-                    echo "[" . date('H:i:s') . "] No more pending jobs.\n";
+                    echo "<p class=\"phpError\">[" . date('H:i:s') . "] No more pending jobs.</p>";
                 }
                 break;
             }
@@ -989,7 +989,7 @@ class class_naComments {
             $url = $job['url'] ?? '(unknown)';
 
             if ($verbose) {
-                echo "[" . date('H:i:s') . "] Processing: {$url}\n";
+		    echo "<p class=\"phpError\">[" . date('H:i:s') . "] Processing: {$url}</p>";
             }
 
             try {
