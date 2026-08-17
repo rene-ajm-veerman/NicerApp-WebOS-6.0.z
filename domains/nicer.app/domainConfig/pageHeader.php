@@ -13,7 +13,7 @@
 ?>
     <style>
         #companyLogosAndName {
-            width:98%;
+            width:100%;
             display:flex;
             justify-content:left;
             align-items:center;
@@ -63,7 +63,7 @@
         <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Original idea by unknown and/or anonymous human(s) ;-)<br/>For which I plan to donate to charities whenever I can.</p></div>
         </div>
         </td>
-        <td align="right"><img src="/NicerAppWebOS/documentation/selfies/rene-ajm-veerman/IMG_20251109_145323_1.jpg" style="width:200px;padding:10px;border-radius:5px;background:rgba(0,0,50,0.4);border:1px solid grey;"></td>
+        <td align="right" style="width:220px;padding-right:10px;"><img src="/NicerAppWebOS/documentation/selfies/rene-ajm-veerman/IMG_20251109_145323_1.jpg" style="box-shadow:3px 3px 5px 3px rgba(0,0,0,0.7);width:200px;padding:10px;border-radius:5px;background:rgba(0,0,50,0.4);border:1px solid grey;"></td>
         </tr>
         </table>
 

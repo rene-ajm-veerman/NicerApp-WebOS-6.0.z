@@ -33,10 +33,9 @@
         Project status : <span id="siteLastModified"></span>.
         </p>
         <p style="padding:8px;border-radius:5px;margin-block-start:0;margin-block-end:0;margin-inline-start:0;margin-inline-end:0;">
-        <!--Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.0.z" class="nomod noPushState" target="naGithub">v6.0.z on Github.com</a>,
-        and -->Available as <a href="https://nicer.app/downloads" class="nomod noPushState" target="naDownload">full package here</a>, <br/>
+        Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.0.z" class="nomod noPushState" target="naGithub">v6.0.z on Github.com</a>,
+        and available as <a href="https://nicer.app/downloads" class="nomod noPushState" target="naDownload">full package here</a>, <br/>
         </p>
-        <p style="font-weight:bold">14 Aug 2026 : Today : source tree cleanup and release</p>
 
         <p><a href="https://said.by/view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TIjp7ImNtc1ZpZXdNZWRpYSI6eyJjb2RlUGF0aCI6IlwvdmFyXC93d3dcL25pY2VyLmFwcC01LjEwLnpcL2RvbWFpbnNcL3NhaWQuYnlcL3NpdGVEYXRhXC9zYWlkLmJ5XC9Vc2Vyc1wvUmVuZSBBSk0gVmVlcm1hblwvTWVkaWEgQWxidW1zXC9OZXciLCJmaWxlbmFtZSI6IlNjcmVlbnNob3RfMjAyNjA2MTJfMjAxMjQwLnBuZyJ9fX0" class="nomod noPushState" target="naScreenshots-20260623-1016CET-AMS">Screenshot</a> <a href="https://said.by/Rene-AJM-Veerman/about/NicerApp" class="nomod noPushState" target="naScreenshots-collection">collection</a> of <a class="nomod noPushState" target="naDiary-20260623-1008CET-AMS" href="https://nicer.app/view/eyJhaWQiOjAsImZkcyI6NTcxMjAwLCJycCI6IlwvMjAyNiBCZXN0XC8ifQ?idxStart=0&pw=alwaysXMASzzz">this</a>.</p>
         <p style="padding:8px;border-radius:5px;margin-block-start:0;margin-block-end:0;margin-inline-start:0;margin-inline-end:0;">
@@ -90,15 +89,12 @@ NL30INGB0007689155
     <p class="backdropped">
     2026-Aug-15th, 14:48CEST
     </p>
-    <p class="backdropped">
-    I am migrating away from github, well, at least until they start to show the exact commands needed for linking up multiple repositories inside a single published repository on github.com and in a, or the, kubuntu git binary.
-    </p>
     <p class="backdropped">It sure looks like I'm not getting back on to x.com (legal problems related to 'authenticity' without further specification into offending post urls/links..) And I already could not get back onto facebook.com; so for my latest diary entries look no further than my '<a href="https://said.by/Rene-AJM-Veerman/in/hisDiary" class="nomod noPushState" target="RVsDiary">hisDiary link</a>' :-)</p>
     </div>
 
     <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
     <p class="backdropped">
-    2026-Aug-2nd, 09:40CEST
+    2026-Aug-17th, 09:11CEST
     </p>
     <p class="backdropped">
     These webservers are in the process of undergoing a major version upgrade of the database business logic code as well as other base layers. This upgrade is now nearly complete.
@@ -107,7 +103,7 @@ NL30INGB0007689155
     Services may go down temporarily on any of my servers for seemingly unexplainable reasons over the next few weeks.
     </p>
     <p class="backdropped">
-    In addition, the PHP database backup-to-filesystem scripts are scheduled to get coded within the next few weeks, and put on 6-hour intervals of execution into folders which automatically get backed up whenever i update my sourcecode backups.
+    In addition, the PHP database backup-to-filesystem scripts are scheduled to get coded within the next week, and put on 6-hour intervals of execution into folders which automatically get backed up whenever i update my sourcecode backups.
     </p>
     </div>
 
