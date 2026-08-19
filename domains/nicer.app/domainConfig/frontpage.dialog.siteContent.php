@@ -86,12 +86,13 @@ NL30INGB0007689155
     </p>
     </div>
 
-    <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
+   <!-- <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
     <p class="backdropped">
     2026-Aug-15th, 14:48CEST
     </p>
     <p class="backdropped">It sure looks like I'm not getting back on to x.com (legal problems related to 'authenticity' without further specification into offending post urls/links..) And I already could not get back onto facebook.com; so for my latest diary entries look no further than my '<a href="https://said.by/Rene-AJM-Veerman/in/hisDiary" class="nomod noPushState" target="RVsDiary">hisDiary link</a>' :-)</p>
     </div>
+-->
 
     <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
     <p class="backdropped">

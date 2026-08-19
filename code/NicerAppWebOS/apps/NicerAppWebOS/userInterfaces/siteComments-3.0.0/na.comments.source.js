@@ -117,8 +117,8 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             let pid = $('.naComment_parentID', el).text().trim();
             const id  = $('.naComment_id', el).text().trim();   // or data-id or whatever you use
             $('.naComment_msgHTML > a > img',el).remove();
-            $('.naComment_msgHTML > p > iframe', el).each(function(idx,el2){
-		    $(el2).parents('.naComment_msgHTML').css({display:'grid',justifyContent:'right'});
+            $('.naComment_msgHTML > p > iframe, .naComment_msgHTML > p', el).each(function(idx,el2){
+		    $(el2).parents('.naComment_msgHTML').css({justifyItems:'flex-end',display:'grid',justifyContent:'right'});
 	    });
 
 

@@ -73,6 +73,7 @@ na.desktop = na.d = {
                     top : $('#siteDateTime').height()+20,
                     left : -1000,
                     height : $(window).height()-120,
+			width : 550,
                     opacity : 0.0001
                 },
                 '#siteToolbarLeft' : {

@@ -524,7 +524,7 @@ class naScreenshots
         $now = date('Y-m-d H:i:s');
         $id  = $job['_id'];
 
-        echo "<div class=\"phpError\"><div class=\"backdropped phpError\">claimNextJob: attempting to claim {$id}</div>";
+        echo "<div class=\"phpError\"><span class=\"backdropped\">claimNextJob: attempting to claim {$id}</span><br/>";
 
         try {
 	$step = 0;
@@ -543,7 +543,7 @@ class naScreenshots
 	    $step = 1.3;
 
             if (!$rev) {
-                echo "<div class\"phpError\">claimNextJob: no _rev for {$id}</div>";
+                echo "<span class=\"backdropped\">claimNextJob: no _rev for {$id}</span><br/>";
 		$step = 1.4;
                 return null;
             }
@@ -560,7 +560,7 @@ class naScreenshots
 	    $step = 3;
 
             $cdb->put($id, $updatedDoc);
-            echo "<div class=\"phpError\">claimNextJob: successfully claimed {$id}</div></div>";
+            echo "<span class=\"backdropped\">claimNextJob: successfully claimed {$id}</span></div>";
 	    $step = 4;
 
             return $updatedDoc;

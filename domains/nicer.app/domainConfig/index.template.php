@@ -1096,7 +1096,7 @@ echo $naWebOS->html_vividButton (
 );
 ?>
             </div>
-            <div id="themeEditor_jsTree_selectors" class="themeEditorComponent vividScrollpane" style="top:auto;position:relative;width:auto;"></div>
+            <div id="themeEditor_jsTree_selectors" class="themeEditorComponent vividScrollpane" style="top:auto;position:relative;width:auto;margin:0;padding:0;"></div>
         </div>
         <div id="borderSettings" class="themeEditorComponent" style="top:auto;">
             <div class="themeEditorComponent_containerDiv" style="order:1">

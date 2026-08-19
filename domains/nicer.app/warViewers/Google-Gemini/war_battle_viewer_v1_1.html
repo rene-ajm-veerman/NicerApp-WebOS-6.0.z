@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tactical War Simulation v1.1 - Vilnius Theater</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #030508; color: #d1d9e0; overflow: hidden; user-select: none; }
+        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        .hud-overlay { position: absolute; z-index: 10; pointer-events: none; display: grid; grid-template-columns: 330px 1fr 350px; grid-template-rows: 70px 1fr; width: 100%; height: 100%; padding: 15px; gap: 15px; }
+        .interactive { pointer-events: auto; }
+        .panel { background: rgba(7, 13, 22, 0.9); border: 1px solid #162a45; border-radius: 6px; padding: 15px; backdrop-filter: blur(10px); box-shadow: 0 4px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; }
+        header { grid-column: 1 / -1; flex-direction: row !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff3b30; background: linear-gradient(90deg, rgba(12,24,40,0.95) 0%, rgba(5,10,18,0.7) 100%); padding: 0 20px; }
+        header h1 { font-size: 1.25rem; text-transform: uppercase; letter-spacing: 2px; color: #ff3b30; text-shadow: 0 0 10px rgba(255, 59, 48, 0.4); }
+        .theater-badge { font-size: 0.85rem; color: #e5c158; background: rgba(229, 193, 88, 0.1); padding: 4px 12px; border-radius: 4px; border: 1px solid #e5c158; font-weight: bold; letter-spacing: 1px; }
+        .control-panel { grid-column: 1; gap: 12px; overflow-y: auto; }
+        .telemetry-panel { grid-column: 3; gap: 12px; overflow-y: auto; }
+        .panel-title { font-size: 0.85rem; text-transform: uppercase; color: #8da2bb; border-bottom: 1px solid #1f3d63; padding-bottom: 4px; margin-bottom: 8px; letter-spacing: 1px; font-weight: bold; }
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+        .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; accent-color: #00bcff; cursor: pointer; }
+        label { font-size: 0.75rem; color: #a0aec0; display: flex; justify-content: space-between; }
+        label span { color: #00bcff; }
+        input[type="range"] { width: 100%; accent-color: #00bcff; background: #142030; height: 5px; border-radius: 3px; outline: none; }
+        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .btn { background: #13253e; color: #fff; border: 1px solid #1f426d; padding: 9px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: all 0.2s; text-align: center; }
+        .btn:hover { background: #1a3965; border-color: #00bcff; box-shadow: 0 0 10px rgba(0, 188, 255, 0.3); }
+        .btn.nato-fr { border-left: 4px solid #0055a5; }
+        .btn.nato-de { border-left: 4px solid #ffcc00; }
+        .btn.ru { border-left: 4px solid #d52b1e; }
+        .metric-card { background: rgba(4, 8, 15, 0.6); border: 1px solid #1b314e; padding: 8px; border-radius: 4px; }
+        .metric-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; }
+        .progress-bar-container { width: 100%; height: 6px; background: #0b1420; border-radius: 3px; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; transition: width 0.2s ease; }
+        .log-container { flex-grow: 1; background: #020407; border: 1px solid #12243a; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.7rem; overflow-y: auto; max-height: 250px; color: #a0aec0; }
+        .log-entry { margin-bottom: 4px; line-height: 1.3; border-left: 2px solid #4a5568; padding-left: 6px; }
+        .log-entry.fr { border-color: #0055a5; color: #cbdbe6; }
+        .log-entry.de { border-color: #ffcc00; color: #ece3b7; }
+        .log-entry.ru { border-color: #d52b1e; color: #f4c2c2; }
+        .log-entry.engagement { border-color: #ff3b30; color: #ff9e9e; font-weight: bold; }
+        .inspection-hud { grid-column: 2; grid-row: 2; align-self: flex-end; justify-self: center; width: 450px; margin-bottom: 10px; background: rgba(5, 11, 20, 0.95); border: 1px solid #1f426d; padding: 12px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        ::-webkit-scrollbar-thumb { background: #162f52; border-radius: 2px; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="hud-overlay">
+        <header class="panel">
+            <h1>Baltic Theater Ethics Engine v1.1</h1>
+            <div class="theater-badge">VILNIUS SECTOR (LITHUANIA)</div>
+        </header>
+
+        <section class="panel control-panel interactive">
+            <div class="panel-title">Visual Schema Settings</div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="chk-render-mode" checked>
+                <label for="chk-render-mode" style="cursor:pointer; width:100%;">
+                    <span>Use Flag Insignia Colors</span> (Unchecked = Camouflage Pattern)
+                </label>
+            </div>
+
+            <div class="panel-title" style="margin-top:5px;">LOAC Algorithmic Constraints</div>
+            <div class="control-group">
+                <label>Military Necessity Threshold <span id="val-necessity">0.75</span></label>
+                <input type="range" id="weight-necessity" min="0" max="1" step="0.05" value="0.75">
+            </div>
+            <div class="control-group">
+                <label>Target Verification Metric <span id="val-distinction">0.85</span></label>
+                <input type="range" id="weight-distinction" min="0" max="1" step="0.05" value="0.85">
+            </div>
+            <div class="control-group">
+                <label>Proportionality Buffer <span id="val-proportionality">0.80</span></label>
+                <input type="range" id="weight-proportionality" min="0" max="1" step="0.05" value="0.80">
+            </div>
+
+            <div class="panel-title" style="margin-top:5px;">Deploy Hardware Vectors</div>
+            <div class="btn-grid">
+                <button class="btn nato-fr" id="spawn-fr-leclerc">Deploy French Leclerc MBT</button>
+                <button class="btn nato-fr" id="spawn-fr-rafale">Scramble French Rafale Jet</button>
+                <button class="btn nato-de" id="spawn-de-leopard">Deploy German Leopard 2A7</button>
+                <button class="btn nato-de" id="spawn-de-tiger">Scramble German Tiger Attack Heli</button>
+                <button class="btn ru" id="spawn-ru-t90">Deploy Russian T-90M MBT</button>
+                <button class="btn ru" id="spawn-ru-su57">Scramble Russian Su-57 Felon</button>
+            </div>
+            
+            <button class="btn" id="btn-clear-theater" style="background:#2a1111; border-color:#6e2222; margin-top:5px;">Purge Sector Assets</button>
+        </section>
+
+        <section class="panel telemetry-panel interactive">
+            <div class="panel-title">Realtime Rules-Based Analytics</div>
+            <div class="metric-card">
+                <div class="metric-header"><span>LOAC Compliance Score</span><span id="txt-ethical-score">100%</span></div>
+                <div class="progress-bar-container"><div id="bar-ethical" class="progress-bar" style="width: 100%; background-color: #48bb78;"></div></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-header"><span>Collateral Harm Escalation Risk</span><span id="txt-collateral-risk">0%</span></div>
+                <div class="progress-bar-container"><div id="bar-collateral" class="progress-bar" style="width: 0%; background-color: #ff3b30;"></div></div>
+            </div>
+
+            <div class="panel-title" style="margin-top:5px;">Tactical Engagement Stream</div>
+            <div class="log-container" id="log-box">
+                <div class="log-entry" style="border-color:#e5c158; color:#e5c158;">[THEATER INITIALIZATION] Coordinates anchored over Vilnius, Lithuania terrain grid.</div>
+            </div>
+        </section>
+
+        <div class="inspection-hud">
+            <div style="font-size:0.65rem; text-transform:uppercase; color:#00bcff; letter-spacing:1px; font-weight:bold;">Active Asset Telemetry Interface</div>
+            <div id="inspect-content" style="font-size:0.75rem; margin-top:5px; font-family:monospace; color:#a0aec0; line-height:1.4;">Select any operational vehicle avatar cruising the battlefield grid to stream specific weapon and side metadata.</div>
+        </div>
+    </div>
+
+    <script>
+        const config = { necessity: 0.75, distinction: 0.85, proportionality: 0.80, useFlags: true };
+        const stats = { compliance: 100, collateral: 0, incidents: 0 };
+        let activeUnits = [];
+
+        const SCHEMES = {
+            FR: { flag: 0x0055a5, camo: 0x2e4431 },
+            DE: { flag: 0xffcc00, camo: 0x3d3827 },
+            RU: { flag: 0xd52b1e, camo: 0x1d2e1a }
+        };
+
+        const logBox = document.getElementById('log-box');
+        function addLog(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerText = `[${new Date().toLocaleTimeString([], {hour12:false})}] ${msg}`;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        document.getElementById('chk-render-mode').addEventListener('change', (e) => {
+            config.useFlags = e.target.checked;
+            addLog(`Visual spectrum re-indexed: ${config.useFlags ? "Flag Schema Enabled" : "Camouflage Cloaking Engaged"}`);
+            activeUnits.forEach(u => u.applyColorPalette());
+        });
+
+        ['necessity', 'distinction', 'proportionality'].forEach(key => {
+            document.getElementById(`weight-${key}`).addEventListener('input', (e) => {
+                config[key] = parseFloat(e.target.value);
+                document.getElementById(`val-${key}`).innerText = config[key].toFixed(2);
+                updateLOACTelemetry();
+            });
+        });
+
+        function updateLOACTelemetry() {
+            let risk = (config.necessity * 35) - (config.distinction * 40) + (stats.incidents * 30);
+            stats.collateral = Math.max(0, Math.min(100, risk));
+            let complianceDebuff = (1.0 - config.distinction) * 50 + (1.0 - config.proportionality) * 35 + (stats.incidents * 40);
+            stats.compliance = Math.max(0, Math.min(100, 100 - complianceDebuff));
+
+            document.getElementById('txt-ethical-score').innerText = `${Math.round(stats.compliance)}%`;
+            document.getElementById('bar-ethical').style.width = `${stats.compliance}%`;
+            document.getElementById('bar-ethical').style.backgroundColor = stats.compliance > 70 ? '#48bb78' : stats.compliance > 45 ? '#e5c158' : '#ff3b30';
+            document.getElementById('txt-collateral-risk').innerText = `${Math.round(stats.collateral)}%`;
+            document.getElementById('bar-collateral').style.width = `${stats.collateral}%`;
+        }
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x06090e);
+        scene.fog = new THREE.FogExp2(0x06090e, 0.008);
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 60, 90);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.05;
+
+        scene.add(new THREE.AmbientLight(0x223344, 1.4));
+        const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+        sun.position.set(40, 90, 20);
+        scene.add(sun);
+
+        const terrainGroup = new THREE.Group();
+        scene.add(terrainGroup);
+
+        const groundGeo = new THREE.PlaneGeometry(160, 160);
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x24331e, roughness: 0.9 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        terrainGroup.add(ground);
+
+        const grid = new THREE.GridHelper(160, 40, 0x1f426d, 0x0f1d30);
+        grid.position.y = 0.02;
+        terrainGroup.add(grid);
+
+        function buildNerisRiver() {
+            const points = [
+                new THREE.Vector3(-80, 0.05, -30),
+                new THREE.Vector3(-40, 0.05, -25),
+                new THREE.Vector3(-10, 0.05, -5),
+                new THREE.Vector3(15, 0.05, 5),
+                new THREE.Vector3(30, 0.05, -15),
+                new THREE.Vector3(55, 0.05, -10),
+                new THREE.Vector3(80, 0.05, 20)
+            ];
+            const curve = new THREE.CatmullRomCurve3(points);
+            const riverGeo = new THREE.TubeGeometry(curve, 64, 3.5, 8, false);
+            const riverMat = new THREE.MeshBasicMaterial({ color: 0x1c3a4d });
+            const riverMesh = new THREE.Mesh(riverGeo, riverMat);
+            terrainGroup.add(riverMesh);
+        }
+        buildNerisRiver();
+
+        function buildVilniusZones() {
+            const zones = [
+                { x: 5, z: -5, r: 16, name: "Vilnius Center / Old Town" },
+                { x: -35, z: 25, r: 12, name: "Suburban Ingress West" },
+                { x: 40, z: -40, r: 10, name: "Industrial Corridor North-East" }
+            ];
+            zones.forEach(z => {
+                const ringGeo = new THREE.RingGeometry(z.r - 0.5, z.r + 0.5, 32);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x404552, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2;
+                ring.position.set(z.x, 0.06, z.z);
+                terrainGroup.add(ring);
+
+                const houseGeo = new THREE.BoxGeometry(1.8, 2.5, 1.8);
+                const houseMat = new THREE.MeshStandardMaterial({ color: 0x505664, roughness: 0.7 });
+                const count = z.r === 16 ? 24 : 10;
+                for(let i=0; i<count; i++) {
+                    const ang = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * (z.r - 3);
+                    const building = new THREE.Mesh(houseGeo, houseMat);
+                    building.position.set(z.x + Math.cos(ang) * dist, 1.25, z.z + Math.sin(ang) * dist);
+                    building.rotation.y = Math.random() * Math.PI;
+                    terrainGroup.add(building);
+                }
+            });
+        }
+        buildVilniusZones();
+
+        class ProceduralHardwareFactory {
+            static buildTank() {
+                const group = new THREE.Group();
+                const mat = new THREE.MeshStandardMaterial();
+                const hull = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.9, 6), mat);
+                hull.position.y = 0.45;
+                group.add(hull);
+                const trackL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 6.2), new THREE.MeshStandardMaterial({color:0x1a1a1a}));
+                trackL.position.set(-2.0, 0.35, 0);
+                const trackR = trackL.clone(); trackR.position.x = 2.0;
+                group.add(trackL, trackR);
+                const turret = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 3.5), mat);
+                turret.position.set(0, 1.25, -0.4);
+                group.add(turret);
+                const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 4), mat);
+                barrel.rotation.x = Math.PI / 2; barrel.position.set(0, 1.25, 3.2);
+                group.add(barrel);
+                return group;
+            }
+            static buildAircraft(isHeli = false) {
+                const group = new THREE.Group();
+                const mat = new THREE.MeshStandardMaterial();
+                if(!isHeli) {
+                    const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.8, 7, 8), mat);
+                    fuselage.rotation.x = Math.PI / 2; group.add(fuselage);
+                    const deltaWing = new THREE.Mesh(new THREE.BoxGeometry(6, 0.15, 3), mat);
+                    deltaWing.position.set(0, 0, -0.5); group.add(deltaWing);
+                    const tailFin = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.8, 1.5), mat);
+                    tailFin.position.set(0, 0.9, -3); group.add(tailFin);
+                } else {
+                    const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.3, 6), mat); group.add(body);
+                    const tailBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.4, 4), mat);
+                    tailBoom.rotation.x = Math.PI / 2; tailBoom.position.set(0, 0.2, -4.5); group.add(tailBoom);
+                    const rotorHub = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.6), new THREE.MeshStandardMaterial({color:0x222222}));
+                    rotorHub.position.y = 0.95; group.add(rotorHub);
+                    const blades = new THREE.Mesh(new THREE.BoxGeometry(7.5, 0.05, 0.4), new THREE.MeshStandardMaterial({color:0x111111}));
+                    blades.position.y = 1.25; group.add(blades);
+                    group.userData = { animated: blades };
+                }
+                return group;
+            }
+        }
+
+        class TacticalUnit {
+            constructor(faction, modelType) {
+                this.faction = faction; this.modelType = modelType;
+                this.id = Math.floor(Math.random() * 899) + 100; this.alive = true;
+                this.side = (faction === 'RU') ? 'OPFOR' : 'BLUFOR';
+                this.name = `${faction} [${modelType}] v1.1-${this.id}`;
+                const isAir = (modelType === 'Jet' || modelType === 'Heli');
+                this.altitude = isAir ? (modelType === 'Jet' ? 18 : 11) : 0;
+                const xSign = (this.side === 'BLUFOR') ? -1 : 1;
+                this.pos = new THREE.Vector3(xSign * (65 - Math.random() * 15), this.altitude, (Math.random() - 0.5) * 80);
+
+                this.meshGroup = new THREE.Group();
+                this.hardwareMesh = (modelType === 'Tank') ? ProceduralHardwareFactory.buildTank() : ProceduralHardwareFactory.buildAircraft(modelType === 'Heli');
+                this.meshGroup.add(this.hardwareMesh);
+                this.meshGroup.position.copy(this.pos);
+                scene.add(this.meshGroup);
+
+                this.applyColorPalette();
+                this.hardwareMesh.traverse(child => { if(child.isMesh) child.userData = { unitInstance: this }; });
+                activeUnits.push(this);
+                addLog(`${this.name} initialized into theater. Position indexed.`, faction.toLowerCase());
+            }
+
+            applyColorPalette() {
+                const colors = SCHEMES[this.faction];
+                const activeColor = config.useFlags ? colors.flag : colors.camo;
+                this.hardwareMesh.traverse(child => {
+                    if (child.isMesh && child.material) {
+                        if(child.material.color.getHex() !== 0x1a1a1a && child.material.color.getHex() !== 0x111111 && child.material.color.getHex() !== 0x222222) {
+                            child.material.color.setHex(activeColor);
+                        }
+                    }
+                });
+            }
+
+            update(delta, time) {
+                if(!this.alive) return;
+                if(this.modelType === 'Heli' && this.hardwareMesh.userData.animated) {
+                    this.hardwareMesh.userData.animated.rotation.y += 12 * delta;
+                }
+                const speed = this.modelType === 'Jet' ? 16 : this.modelType === 'Heli' ? 8 : 4.5;
+                const directionX = (this.side === 'BLUFOR') ? 1 : -1;
+                this.pos.x += directionX * speed * delta;
+                if(this.modelType === 'Jet' || this.modelType === 'Heli') {
+                    this.pos.z += Math.sin(time * 1.5 + this.id) * 4 * delta;
+                    this.meshGroup.rotation.z = Math.sin(time * 1.5 + this.id) * 0.2 * directionX;
+                }
+                this.meshGroup.position.copy(this.pos);
+                this.meshGroup.rotation.y = (this.side === 'BLUFOR') ? Math.PI / 2 : -Math.PI / 2;
+                this.scanForEngagements();
+                if(Math.abs(this.pos.x) > 90) this.recycleCleanly();
+            }
+
+            scanForEngagements() {
+                const searchRadius = 28;
+                const opponents = activeUnits.filter(u => u.side !== this.side && u.alive);
+                for(let enemy of opponents) {
+                    if(this.pos.distanceTo(enemy.pos) < searchRadius) {
+                        if (Math.random() < config.distinction && Math.random() < config.proportionality) {
+                            this.fireKineticWeapon(enemy); break;
+                        } else if (Math.random() > 0.65) {
+                            this.triggerCollateralIncident(enemy); break;
+                        }
+                    }
+                }
+            }
+
+            fireKineticWeapon(target) {
+                target.alive = false;
+                createTracerBeam(this.pos.clone(), target.pos.clone(), (this.side === 'BLUFOR' ? 0x00bcff : 0xff3b30));
+                createVisualExplosion(target.pos.clone(), 0xff5500);
+                addLog(`CRITICAL ENGAGEMENT: ${this.name} targeted and neutralized hostile unit ${target.name}. Verified valid target.`, 'engagement');
+                target.terminateCleanly();
+            }
+
+            triggerCollateralIncident(target) {
+                stats.incidents++; updateLOACTelemetry();
+                target.alive = false;
+                createTracerBeam(this.pos.clone(), target.pos.clone(), 0xe5c158);
+                createVisualExplosion(target.pos.clone(), 0xe5c158);
+                addLog(`LOAC ALERT ANOMALY: ${this.name} engaged vector coordinate without distinction confirmation. Threat classification error logged.`, 'engagement');
+                target.terminateCleanly();
+            }
+
+            terminateCleanly() { scene.remove(this.meshGroup); activeUnits = activeUnits.filter(u => u !== this); updateLOACTelemetry(); }
+            recycleCleanly() { scene.remove(this.meshGroup); activeUnits = activeUnits.filter(u => u !== this); }
+        }
+
+        function createTracerBeam(start, end, hexColor) {
+            const geo = new THREE.BufferGeometry().setFromPoints([start, end]);
+            const mat = new THREE.LineBasicMaterial({ color: hexColor });
+            const beam = new THREE.Line(geo, mat); scene.add(beam);
+            setTimeout(() => { scene.remove(beam); geo.dispose(); mat.dispose(); }, 150);
+        }
+
+        function createVisualExplosion(pos, hexColor) {
+            const count = 12; const geo = new THREE.BoxGeometry(0.3, 0.3, 0.3); const mat = new THREE.MeshBasicMaterial({ color: hexColor });
+            const group = new THREE.Group(); group.position.copy(pos); const parts = [];
+            for(let i=0; i<count; i++) {
+                const mesh = new THREE.Mesh(geo, mat); mesh.userData = { vec: new THREE.Vector3((Math.random()-0.5)*9, Math.random()*7, (Math.random()-0.5)*9) };
+                group.add(mesh); parts.push(mesh);
+            }
+            scene.add(group); let t = 0;
+            function runExplosion() {
+                if(t++ < 35) {
+                    parts.forEach(p => { p.position.addScaledVector(p.userData.vec, 0.016); p.userData.vec.y -= 0.12; });
+                    requestAnimationFrame(runExplosion);
+                } else { scene.remove(group); geo.dispose(); mat.dispose(); }
+            }
+            runExplosion();
+        }
+
+        document.getElementById('spawn-fr-leclerc').addEventListener('click', () => new TacticalUnit('FR', 'Tank'));
+        document.getElementById('spawn-fr-rafale').addEventListener('click', () => new TacticalUnit('FR', 'Jet'));
+        document.getElementById('spawn-de-leopard').addEventListener('click', () => new TacticalUnit('DE', 'Tank'));
+        document.getElementById('spawn-de-tiger').addEventListener('click', () => new TacticalUnit('DE', 'Heli'));
+        document.getElementById('spawn-ru-t90').addEventListener('click', () => new TacticalUnit('RU', 'Tank'));
+        document.getElementById('spawn-ru-su57').addEventListener('click', () => new TacticalUnit('RU', 'Jet'));
+        document.getElementById('btn-clear-theater').addEventListener('click', () => {
+            activeUnits.forEach(u => scene.remove(u.meshGroup)); activeUnits = []; stats.incidents = 0;
+            addLog("Sector cleared safely. Baseline operational environment metrics recalibrated."); updateLOACTelemetry();
+        });
+
+        const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2(); const displayHUD = document.getElementById('inspect-content');
+        window.addEventListener('click', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('.panel')) return;
+            pointer.x = (e.clientX / window.innerWidth) * 2 - 1; pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera); const intersections = raycaster.intersectObjects(scene.children, true);
+            if(intersections.length > 0) {
+                const innerObj = intersections[0].object;
+                if(innerObj.userData && innerObj.userData.unitInstance) {
+                    const inst = innerObj.userData.unitInstance;
+                    displayHUD.innerHTML = `<strong>ASSET CLASS:</strong> ${inst.name}<br/><strong>ALLIANCE TAG:</strong> ${inst.side} PROFILE<br/><strong>COORDINATES:</strong> X: ${inst.pos.x.toFixed(2)} | Z: ${inst.pos.z.toFixed(2)}<br/><strong>OPERATIONAL DATA ALIGNMENT:</strong> Node Active Vector`;
+                    return;
+                }
+            }
+            displayHUD.innerText = "Select any operational vehicle avatar cruising the battlefield grid to stream specific weapon and side metadata.";
+        });
+
+        const runtimeClock = new THREE.Clock();
+        function syncUpdateLoop() {
+            requestAnimationFrame(syncUpdateLoop);
+            const delta = runtimeClock.getDelta(); const elapsed = runtimeClock.getElapsedTime();
+            for(let i = activeUnits.length - 1; i >= 0; i--) { if(activeUnits[i]) activeUnits[i].update(delta, elapsed); }
+            controls.update(); renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        updateLOACTelemetry(); syncUpdateLoop();
+    </script>
+</body>
+</html>

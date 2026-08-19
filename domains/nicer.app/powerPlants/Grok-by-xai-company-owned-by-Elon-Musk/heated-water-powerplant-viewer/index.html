@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heated Water Electrical Powerplant – Interactive 3D Map</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0e14; font-family: system-ui, -apple-system, sans-serif; }
+    #canvas-container { width: 100%; height: 100%; }
+    canvas { display: block; }
+
+    #ui {
+      position: absolute; top: 12px; left: 12px; z-index: 10;
+      background: rgba(10, 14, 20, 0.85); border: 1px solid #1e2a3a;
+      border-radius: 10px; padding: 14px 16px; color: #c8d4e0;
+      max-width: 320px; backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #ui h1 { font-size: 15px; font-weight: 600; color: #7dd3fc; margin-bottom: 6px; letter-spacing: 0.02em; }
+    #ui p { font-size: 12px; line-height: 1.45; color: #94a3b8; margin-bottom: 10px; }
+    #ui .hint { font-size: 11px; color: #64748b; }
+    #info-panel {
+      position: absolute; bottom: 16px; left: 12px; z-index: 10;
+      background: rgba(10, 14, 20, 0.9); border: 1px solid #1e2a3a;
+      border-radius: 10px; padding: 12px 16px; color: #e2e8f0;
+      min-width: 260px; display: none; backdrop-filter: blur(8px);
+    }
+    #info-panel h2 { font-size: 14px; color: #38bdf8; margin-bottom: 6px; }
+    #info-panel .row { font-size: 12px; margin: 3px 0; display: flex; justify-content: space-between; gap: 16px; }
+    #info-panel .label { color: #94a3b8; }
+    #info-panel .value { color: #f1f5f9; font-variant-numeric: tabular-nums; }
+    #status-bar {
+      position: absolute; top: 12px; right: 12px; z-index: 10;
+      background: rgba(10, 14, 20, 0.85); border: 1px solid #1e2a3a;
+      border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #94a3b8;
+    }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .ok { background: #22c55e; }
+    .warn { background: #eab308; }
+    .alarm { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="ui">
+    <h1>Heated Water Powerplant</h1>
+    <p>Procedural 3D map of a thermal / heated-water electrical plant. Click any equipment for live-style status. Orbit with left mouse, pan with right, zoom with wheel.</p>
+    <div class="hint">Inspired by Viewer3D-style industrial SCADA maps · pure Three.js · no build step</div>
+  </div>
+
+  <div id="info-panel">
+    <h2 id="info-title">Equipment</h2>
+    <div class="row"><span class="label">Type</span><span class="value" id="info-type">–</span></div>
+    <div class="row"><span class="label">Status</span><span class="value" id="info-status">–</span></div>
+    <div class="row"><span class="label">Temp / Flow</span><span class="value" id="info-metrics">–</span></div>
+    <div class="row"><span class="label">Power</span><span class="value" id="info-power">–</span></div>
+  </div>
+
+  <div id="status-bar">
+    <span class="status-dot ok"></span><span id="fps">–</span> fps · click equipment for details
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ---------- Scene setup ----------
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0e14);
+    scene.fog = new THREE.Fog(0x0a0e14, 80, 220);
+
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 500);
+    camera.position.set(55, 45, 70);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.maxPolarAngle = Math.PI * 0.48;
+    controls.minDistance = 15;
+    controls.maxDistance = 160;
+    controls.target.set(0, 5, 0);
+
+    // Lights
+    const hemi = new THREE.HemisphereLight(0x87a0c0, 0x1a2030, 0.55);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xfff0dd, 1.35);
+    sun.position.set(40, 60, 30);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 10;
+    sun.shadow.camera.far = 200;
+    sun.shadow.camera.left = -80;
+    sun.shadow.camera.right = 80;
+    sun.shadow.camera.top = 80;
+    sun.shadow.camera.bottom = -80;
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0x6b9cff, 0.25);
+    fill.position.set(-30, 20, -40);
+    scene.add(fill);
+
+    // ---------- Materials ----------
+    const matGround = new THREE.MeshStandardMaterial({ color: 0x1a2332, roughness: 0.92, metalness: 0.05 });
+    const matConcrete = new THREE.MeshStandardMaterial({ color: 0x4a5568, roughness: 0.85, metalness: 0.1 });
+    const matSteel = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.35, metalness: 0.75 });
+    const matPipeHot = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4, metalness: 0.6, emissive: 0x3b0a0a, emissiveIntensity: 0.15 });
+    const matPipeCold = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4, metalness: 0.6 });
+    const matTank = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.4 });
+    const matCooling = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.2 });
+    const matAccent = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.3, metalness: 0.5, emissive: 0x0c4a6e, emissiveIntensity: 0.2 });
+    const matWarn = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.4, metalness: 0.3, emissive: 0x713f12, emissiveIntensity: 0.25 });
+    const matAlarm = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4, metalness: 0.3, emissive: 0x7f1d1d, emissiveIntensity: 0.35 });
+
+    // ---------- Helpers ----------
+    function box(w, h, d, mat, x = 0, y = 0, z = 0) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+      m.position.set(x, y, z);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      return m;
+    }
+    function cyl(rTop, rBot, h, mat, x = 0, y = 0, z = 0, segs = 24) {
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, h, segs), mat);
+      m.position.set(x, y, z);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      return m;
+    }
+    function pipe(length, radius, mat, x, y, z, rotY = 0, rotZ = 0) {
+      const m = cyl(radius, radius, length, mat, x, y, z, 12);
+      m.rotation.z = Math.PI / 2 + rotZ;
+      m.rotation.y = rotY;
+      return m;
+    }
+
+    // Ground
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), matGround);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Grid helper (subtle)
+    const grid = new THREE.GridHelper(180, 36, 0x1e293b, 0x15202b);
+    grid.position.y = 0.02;
+    scene.add(grid);
+
+    // ---------- Equipment registry for interaction ----------
+    const equipment = [];
+    function register(mesh, data) {
+      mesh.userData = data;
+      equipment.push(mesh);
+      scene.add(mesh);
+      return mesh;
+    }
+
+    // ---------- Build the plant ----------
+
+    // Main turbine / generator hall
+    const hall = box(28, 12, 16, matConcrete, -25, 6, 0);
+    register(hall, {
+      name: 'Turbine Hall',
+      type: 'Building',
+      status: 'OK',
+      metrics: 'Steam in 540 °C',
+      power: '320 MW'
+    });
+    // Roof accents
+    scene.add(box(29, 0.6, 17, matSteel, -25, 12.3, 0));
+
+    // Cooling towers (classic hyperbolic approx)
+    function coolingTower(x, z, scale = 1) {
+      const group = new THREE.Group();
+      const base = cyl(7 * scale, 8.5 * scale, 4 * scale, matCooling, 0, 2 * scale, 0, 32);
+      const mid = cyl(5.5 * scale, 7 * scale, 10 * scale, matCooling, 0, 9 * scale, 0, 32);
+      const top = cyl(6.2 * scale, 5.5 * scale, 6 * scale, matCooling, 0, 17 * scale, 0, 32);
+      group.add(base, mid, top);
+      group.position.set(x, 0, z);
+      // simple vapor
+      const vapor = new THREE.Mesh(
+        new THREE.CylinderGeometry(4 * scale, 5.5 * scale, 8 * scale, 16, 1, true),
+        new THREE.MeshBasicMaterial({ color: 0xaaccff, transparent: true, opacity: 0.12, side: THREE.DoubleSide })
+      );
+      vapor.position.y = 24 * scale;
+      group.add(vapor);
+      register(group, {
+        name: 'Cooling Tower',
+        type: 'Heat Rejection',
+        status: 'OK',
+        metrics: 'ΔT ≈ 12 °C',
+        power: '–'
+      });
+      return group;
+    }
+    coolingTower(25, -22, 1.1);
+    coolingTower(42, -18, 0.95);
+
+    // Hot-water / steam drums & tanks
+    function horizontalTank(x, y, z, len, r, mat, name) {
+      const body = cyl(r, r, len, mat, x, y, z, 20);
+      body.rotation.z = Math.PI / 2;
+      const cap1 = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), mat);
+      cap1.position.set(x - len / 2, y, z);
+      const cap2 = cap1.clone();
+      cap2.position.set(x + len / 2, y, z);
+      const g = new THREE.Group();
+      g.add(body, cap1, cap2);
+      register(g, {
+        name,
+        type: 'Pressure Vessel',
+        status: Math.random() > 0.85 ? 'WARN' : 'OK',
+        metrics: (180 + Math.random() * 40).toFixed(0) + ' °C / 4.2 MPa',
+        power: '–'
+      });
+      return g;
+    }
+    horizontalTank(-8, 3.5, 18, 14, 2.2, matTank, 'Steam Drum A');
+    horizontalTank(-8, 3.5, 26, 14, 2.2, matTank, 'Steam Drum B');
+    horizontalTank(8, 2.8, 22, 10, 1.8, matTank, 'Feedwater Heater');
+
+    // Vertical storage tanks
+    function vertTank(x, z, h, r, name) {
+      const t = cyl(r, r, h, matTank, x, h / 2, z, 20);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(r + 0.15, 1.2, 16), matSteel);
+      roof.position.set(x, h + 0.5, z);
+      scene.add(roof);
+      register(t, {
+        name,
+        type: 'Storage Tank',
+        status: 'OK',
+        metrics: (40 + Math.random() * 30).toFixed(0) + ' °C',
+        power: '–'
+      });
+    }
+    vertTank(18, 12, 9, 3.5, 'Condensate Tank');
+    vertTank(28, 14, 7, 2.8, 'Demin Water');
+
+    // Boiler / furnace block
+    const boiler = box(12, 16, 10, matConcrete, -42, 8, -12);
+    register(boiler, {
+      name: 'Boiler / Heater Block',
+      type: 'Heat Source',
+      status: 'OK',
+      metrics: 'Flue 820 °C · Water 185 °C',
+      power: '–'
+    });
+    scene.add(box(13, 0.8, 11, matSteel, -42, 16.4, -12));
+
+    // Generator / transformer area
+    const gen = box(8, 5, 6, matSteel, -10, 2.5, -22);
+    register(gen, {
+      name: 'Generator Unit',
+      type: 'Electrical',
+      status: 'OK',
+      metrics: '50 Hz · 15 kV',
+      power: '320 MW'
+    });
+    const xfmr = box(5, 4, 4, matAccent, 2, 2, -22);
+    register(xfmr, {
+      name: 'Step-up Transformer',
+      type: 'Electrical',
+      status: Math.random() > 0.9 ? 'ALARM' : 'OK',
+      metrics: '15 / 220 kV',
+      power: '340 MVA'
+    });
+
+    // Pipe network (hot = red, cold = blue)
+    // Main hot header
+    scene.add(pipe(55, 0.55, matPipeHot, -5, 4.5, 8, 0));
+    scene.add(pipe(22, 0.45, matPipeHot, -32, 4.5, -2, Math.PI / 2));
+    scene.add(pipe(18, 0.4, matPipeHot, -8, 4.5, 15, Math.PI / 2));
+    // Return / cold
+    scene.add(pipe(50, 0.5, matPipeCold, -2, 2.2, -5, 0.1));
+    scene.add(pipe(25, 0.4, matPipeCold, 20, 2.2, 5, Math.PI / 2));
+    // Vertical risers
+    scene.add(cyl(0.45, 0.45, 8, matPipeHot, -32, 6, 8));
+    scene.add(cyl(0.4, 0.4, 6, matPipeCold, 18, 4, -5));
+
+    // Control / admin building
+    const ctrl = box(14, 7, 10, matConcrete, 35, 3.5, 18);
+    register(ctrl, {
+      name: 'Control Building',
+      type: 'Building',
+      status: 'OK',
+      metrics: 'SCADA online',
+      power: '–'
+    });
+    // Simple windows
+    for (let i = 0; i < 4; i++) {
+      const w = box(1.6, 1.4, 0.15, matAccent, 35 - 4.5 + i * 3, 4.2, 23.1);
+      scene.add(w);
+    }
+
+    // Switchyard poles (simple)
+    for (let i = 0; i < 5; i++) {
+      const pole = cyl(0.25, 0.3, 12, matSteel, 12 + i * 5, 6, -32);
+      scene.add(pole);
+      const cross = box(4, 0.2, 0.2, matSteel, 12 + i * 5, 11.5, -32);
+      scene.add(cross);
+    }
+
+    // Road / path
+    const road = box(12, 0.15, 90, new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.95 }), 0, 0.08, 0);
+    scene.add(road);
+
+    // ---------- Interaction (raycaster) ----------
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let selected = null;
+    const originalMats = new Map();
+
+    function highlight(obj, on) {
+      if (!obj) return;
+      const root = obj.parent && obj.parent.type === 'Group' ? obj.parent : obj;
+      root.traverse(c => {
+        if (c.isMesh && c.material) {
+          if (on) {
+            if (!originalMats.has(c)) originalMats.set(c, c.material);
+            c.material = c.material.clone();
+            c.material.emissive = new THREE.Color(0x38bdf8);
+            c.material.emissiveIntensity = 0.45;
+          } else if (originalMats.has(c)) {
+            c.material = originalMats.get(c);
+            originalMats.delete(c);
+          }
+        }
+      });
+    }
+
+    function showInfo(data) {
+      const panel = document.getElementById('info-panel');
+      if (!data) {
+        panel.style.display = 'none';
+        return;
+      }
+      document.getElementById('info-title').textContent = data.name;
+      document.getElementById('info-type').textContent = data.type;
+      const st = document.getElementById('info-status');
+      st.textContent = data.status;
+      st.style.color = data.status === 'OK' ? '#22c55e' : data.status === 'WARN' ? '#eab308' : '#ef4444';
+      document.getElementById('info-metrics').textContent = data.metrics;
+      document.getElementById('info-power').textContent = data.power;
+      panel.style.display = 'block';
+    }
+
+    function onPointer(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(equipment, true);
+      if (hits.length) {
+        let obj = hits[0].object;
+        while (obj && !obj.userData?.name) obj = obj.parent;
+        if (obj && obj.userData?.name) {
+          if (selected !== obj) {
+            highlight(selected, false);
+            selected = obj;
+            highlight(selected, true);
+            showInfo(obj.userData);
+          }
+          return;
+        }
+      }
+      highlight(selected, false);
+      selected = null;
+      showInfo(null);
+    }
+
+    window.addEventListener('pointerdown', onPointer);
+
+    // ---------- Animate status colors occasionally ----------
+    function pulseAlarms(t) {
+      equipment.forEach(eq => {
+        const d = eq.userData;
+        if (!d) return;
+        if (d.status === 'ALARM' || d.status === 'WARN') {
+          eq.traverse(c => {
+            if (c.isMesh && c.material && c.material.emissive) {
+              const base = d.status === 'ALARM' ? 0.35 : 0.2;
+              c.material.emissiveIntensity = base + 0.15 * Math.sin(t * 0.004);
+            }
+          });
+        }
+      });
+    }
+
+    // ---------- Resize & loop ----------
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    let last = performance.now();
+    let frames = 0;
+    const fpsEl = document.getElementById('fps');
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      controls.update();
+      pulseAlarms(now);
+      renderer.render(scene, camera);
+
+      frames++;
+      if (now - last > 500) {
+        fpsEl.textContent = Math.round((frames * 1000) / (now - last));
+        frames = 0;
+        last = now;
+      }
+    }
+    animate();
+
+    // Optional: gentle auto-rotate when idle (comment out if preferred)
+    // controls.autoRotate = true; controls.autoRotateSpeed = 0.4;
+  </script>
+</body>
+</html>

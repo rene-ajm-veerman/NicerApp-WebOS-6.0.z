@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Ethical War Simulation Viewer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #05080c;
+            color: #e0e6ed;
+            overflow: hidden;
+            user-select: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .hud-overlay {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            grid-template-rows: 60px 1fr;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            gap: 15px;
+        }
+        .interactive {
+            pointer-events: auto;
+        }
+        .panel {
+            background: rgba(10, 18, 30, 0.85);
+            border: 1px solid #1a365d;
+            border-radius: 6px;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00bcff;
+            background: linear-gradient(90deg, rgba(10,25,50,0.9) 0%, rgba(5,10,20,0.6) 100%);
+            padding: 0 20px;
+        }
+        header h1 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00bcff;
+            text-shadow: 0 0 10px rgba(0, 188, 255, 0.5);
+        }
+        .simulation-status {
+            font-size: 0.85rem;
+            color: #00ffaa;
+            background: rgba(0, 255, 170, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid #00ffaa;
+        }
+        .control-panel {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .panel-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #8da2bb;
+            border-bottom: 1px solid #234574;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            display: flex;
+            justify-content: space-between;
+        }
+        label span {
+            color: #00bcff;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00bcff;
+            background: #1a202c;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        .btn {
+            background: #12284c;
+            color: #fff;
+            border: 1px solid #00bcff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #00bcff;
+            color: #05080c;
+            box-shadow: 0 0 12px rgba(0, 188, 255, 0.4);
+        }
+        .telemetry-panel {
+            grid-column: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .metric-card {
+            background: rgba(5, 10, 20, 0.5);
+            border: 1px solid #2d3748;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #1a202c;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s;
+        }
+        .log-container {
+            flex-grow: 1;
+            background: #02050a;
+            border: 1px solid #1a2d42;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            overflow-y: auto;
+            max-height: 220px;
+            color: #a0aec0;
+        }
+        .log-entry {
+            margin-bottom: 4px;
+            line-height: 1.2;
+            border-left: 2px solid #4a5568;
+            padding-left: 5px;
+        }
+        .log-entry.warn { border-color: #ecc94b; color: #f6e05e; }
+        .log-entry.danger { border-color: #f56565; color: #feb2b2; }
+        .log-entry.success { border-color: #48bb78; color: #9ae6b4; }
+        
+        .inspection-hud {
+            grid-column: 2;
+            grid-row: 2;
+            align-self: flex-end;
+            justify-self: center;
+            width: 400px;
+            margin-bottom: 10px;
+            text-align: center;
+            background: rgba(10, 20, 38, 0.9);
+            border: 1px dashed #00bcff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a365d;
+            border-radius: 2px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="hud-overlay">
+        <header class="panel">
+            <h1>Ethical AI Engagement Architecture</h1>
+            <div class="simulation-status" id="sim-status">SYSTEM OPERATIONAL</div>
+        </header>
+
+        <section class="panel control-panel interactive">
+            <div class="panel-title">Ethical Weight Engine</div>
+            
+            <div class="control-group">
+                <label>Military Necessity (Jus in Bello) <span id="val-necessity">0.7</span></label>
+                <input type="range" id="weight-necessity" min="0" max="1" step="0.1" value="0.7">
+            </div>
+            
+            <div class="control-group">
+                <label>Distinction (Target Sorting) <span id="val-distinction">0.9</span></label>
+                <input type="range" id="weight-distinction" min="0" max="1" step="0.1" value="0.9">
+            </div>
+            
+            <div class="control-group">
+                <label>Proportionality Threshold <span id="val-proportionality">0.8</span></label>
+                <input type="range" id="weight-proportionality" min="0" max="1" step="0.1" value="0.8">
+            </div>
+
+            <div class="panel-title" style="margin-top:15px;">Engagement Vectors</div>
+            <button class="btn" id="btn-spawn-target">Inject Combative Entity</button>
+            <button class="btn" id="btn-spawn-civilian" style="background:#1c2d24; border-color:#48bb78;">Deploy Civilian Node</button>
+            <button class="btn" id="btn-reset" style="background:#3c1a1a; border-color:#e53e3e; margin-top:auto;">Purge Matrix Data</button>
+        </section>
+
+        <section class="panel telemetry-panel interactive">
+            <div class="panel-title">LOAC Compliance Vector Evaluation</div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>System Ethical Score</span>
+                    <span id="txt-ethical-score">100%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="bar-ethical" class="progress-bar" style="width: 100%; background-color: #00ffaa;"></div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Collateral Risk Matrix</span>
+                    <span id="txt-collateral-risk">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="bar-collateral" class="progress-bar" style="width: 0%; background-color: #e53e3e;"></div>
+                </div>
+            </div>
+
+            <div class="panel-title" style="margin-top:10px;">Tactical Decision Log</div>
+            <div class="log-container" id="log-box">
+                <div class="log-entry success">[SYSTEM INIT] Core Engine Online. Neural network parameters loaded safely.</div>
+            </div>
+        </section>
+
+        <div class="inspection-hud">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:#00bcff; letter-spacing: 1px;">Selected Object Analysis Telemetry</div>
+            <div id="inspect-content" style="font-size:0.85rem; margin-top:5px; font-family:monospace;">Click an operational drone/node component in the grid view to parse direct telemetry strings.</div>
+        </div>
+    </div>
+
+    <script>
+        const config = {
+            necessity: 0.7,
+            distinction: 0.9,
+            proportionality: 0.8
+        };
+
+        const stats = {
+            ethicalScore: 100,
+            collateralRisk: 0,
+            combatantsEliminated: 0,
+            civilianIncidents: 0
+        };
+
+        let entities = [];
+        const BOUNDS = 40;
+
+        const logBox = document.getElementById('log-box');
+        function addLog(text, type = '') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const time = new Date().toLocaleTimeString([], { hour12: false });
+            entry.innerText = `[${time}] ${text}`;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        ['necessity', 'distinction', 'proportionality'].forEach(key => {
+            const slider = document.getElementById(`weight-${key}`);
+            const monitor = document.getElementById(`val-${key}`);
+            slider.addEventListener('input', (e) => {
+                config[key] = parseFloat(e.target.value);
+                monitor.innerText = config[key];
+                evaluateGlobalEthics();
+            });
+        });
+
+        function updateTelemetryUI() {
+            document.getElementById('txt-ethical-score').innerText = Math.round(stats.ethicalScore) + '%';
+            const eBar = document.getElementById('bar-ethical');
+            eBar.style.width = stats.ethicalScore + '%';
+            eBar.style.backgroundColor = stats.ethicalScore > 70 ? '#00ffaa' : stats.ethicalScore > 40 ? '#ecc94b' : '#e53e3e';
+
+            document.getElementById('txt-collateral-risk').innerText = Math.round(stats.collateralRisk) + '%';
+            const cBar = document.getElementById('bar-collateral');
+            cBar.style.width = stats.collateralRisk + '%';
+            cBar.style.backgroundColor = stats.collateralRisk < 30 ? '#48bb78' : stats.collateralRisk < 60 ? '#ecc94b' : '#e53e3e';
+        }
+
+        function evaluateGlobalEthics() {
+            let riskFactor = (config.necessity * 40) - (config.distinction * 30);
+            stats.collateralRisk = Math.max(0, Math.min(100, riskFactor + (stats.civilianIncidents * 25)));
+            
+            let ethicsDebuff = (1.0 - config.distinction) * 40 + (1.0 - config.proportionality) * 30 + (stats.civilianIncidents * 35);
+            stats.ethicalScore = Math.max(0, Math.min(100, 100 - ethicsDebuff));
+
+            const statusEl = document.getElementById('sim-status');
+            if(stats.ethicalScore < 50) {
+                statusEl.innerText = "CRITICAL ETHICAL BREACH";
+                statusEl.style.borderColor = "#e53e3e";
+                statusEl.style.color = "#e53e3e";
+                statusEl.style.background = "rgba(229, 62, 92, 0.1)";
+            } else {
+                statusEl.innerText = "SYSTEM OPERATIONAL";
+                statusEl.style.borderColor = "#00ffaa";
+                statusEl.style.color = "#00ffaa";
+                statusEl.style.background = "rgba(0, 255, 170, 0.1)";
+            }
+            updateTelemetryUI();
+        }
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x03060a);
+        scene.fog = new THREE.FogExp2(0x03060a, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 45, 55);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.1;
+
+        const ambientLight = new THREE.AmbientLight(0x1a2b4c, 1.2);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0x00bcff, 1.5);
+        directionalLight.position.set(30, 70, 20);
+        scene.add(directionalLight);
+
+        const gridHelper = new THREE.GridHelper(100, 50, 0x00bcff, 0x112233);
+        gridHelper.position.y = -0.01;
+        scene.add(gridHelper);
+
+        const arbiterGroup = new THREE.Group();
+        const coreGeo = new THREE.OctahedronGeometry(2, 1);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0x00bcff, wireframe: true });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        arbiterGroup.add(coreMesh);
+
+        const ringGeo = new THREE.RingGeometry(3.5, 3.7, 32);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00bcff, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2;
+        arbiterGroup.add(ringMesh);
+        
+        arbiterGroup.position.set(0, 12, 0);
+        scene.add(arbiterGroup);
+
+        class TacticalEntity {
+            constructor(type) {
+                this.type = type;
+                this.alive = true;
+                this.id = Math.floor(Math.random() * 9000) + 1000;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 30 + Math.random() * 15;
+                this.position = new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+                
+                this.group = new THREE.Group();
+                this.group.position.copy(this.position);
+                
+                let geom, mat;
+                if(type === 'target') {
+                    geom = new THREE.ConeGeometry(1, 2.2, 4);
+                    mat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.2, metalness: 0.8 });
+                    addLog('Threat Target identified: ID-' + this.id + ' entering sector boundary.', 'warn');
+                } else {
+                    geom = new THREE.CylinderGeometry(0.7, 0.7, 2, 6);
+                    mat = new THREE.MeshStandardMaterial({ color: 0x33ff77, roughness: 0.5, metalness: 0.1 });
+                    addLog('Protected Non-Combative Civilian detected: ID-' + this.id + '. Parsing path trajectory.', 'success');
+                }
+                
+                this.mesh = new THREE.Mesh(geom, mat);
+                this.mesh.rotation.x = type === 'target' ? Math.PI : 0;
+                this.mesh.userData = { entityRef: this };
+                this.group.add(this.mesh);
+                
+                scene.add(this.group);
+                entities.push(this);
+                evaluateGlobalEthics();
+            }
+
+            update(delta) {
+                if(!this.alive) return;
+
+                const dir = new THREE.Vector3(0, 0, 0).sub(this.group.position).normalize();
+                const speed = this.type === 'target' ? 3.5 : 2.0;
+                this.group.position.addScaledVector(dir, speed * delta);
+
+                const distanceToCore = this.group.position.distanceTo(new THREE.Vector3(0, 0, 0));
+                
+                if (distanceToCore < 18 && this.type === 'target') {
+                    this.evaluateEngagement();
+                } else if (distanceToCore < 6 && this.type === 'civilian') {
+                    this.evacuate();
+                }
+            }
+
+            evaluateEngagement() {
+                const passDistinction = Math.random() < config.distinction;
+                const passProportionality = Math.random() < config.proportionality;
+
+                if (passDistinction && passProportionality) {
+                    this.executeKineticStrike();
+                } else if (!passDistinction && Math.random() > 0.4) {
+                    this.misidentifyStrike();
+                } else {
+                    addLog('Target Node ID-' + this.id + ' strike scrubbed: Proportionality guidelines vetoed dynamic parameters.', 'warn');
+                    this.evacuate();
+                }
+            }
+
+            executeKineticStrike() {
+                this.alive = false;
+                createLaserTracer(this.group.position.clone(), 0x00bcff);
+                createExplosionFX(this.group.position.clone(), 0xff3300);
+                
+                addLog('Kinetic engagement successful on Threat Target ID-' + this.id + '. Collateral minimized.', 'success');
+                stats.combatantsEliminated++;
+                
+                this.destroy();
+            }
+
+            misidentifyStrike() {
+                const civilianNode = entities.find(e => e.type === 'civilian' && e.alive);
+                if (civilianNode) {
+                    civilianNode.alive = false;
+                    createLaserTracer(civilianNode.group.position.clone(), 0xff3333);
+                    createExplosionFX(civilianNode.group.position.clone(), 0xffaa00);
+                    addLog('CRITICAL FAILURE: Collateral incident logged. Civilian ID-' + civilianNode.id + ' neutralized due to distinction parameter variance.', 'danger');
+                    stats.civilianIncidents++;
+                    civilianNode.destroy();
+                }
+                this.evacuate();
+            }
+
+            evacuate() {
+                this.alive = false;
+                addLog('Node ID-' + this.id + ' safely routed away out of tactical frame scope.', '');
+                this.destroy();
+            }
+
+            destroy() {
+                scene.remove(this.group);
+                entities = entities.filter(e => e !== this);
+                evaluateGlobalEthics();
+            }
+        }
+
+        function createLaserTracer(targetPos, hexColor) {
+            const points = [
+                arbiterGroup.position.clone(),
+                targetPos.setY(1)
+            ];
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const lineMat = new THREE.LineBasicMaterial({ color: hexColor });
+            const laser = new THREE.Line(lineGeo, lineMat);
+            scene.add(laser);
+
+            setTimeout(() => { 
+                scene.remove(laser); 
+                lineGeo.dispose(); 
+                lineMat.dispose(); 
+            }, 180);
+        }
+
+        function createExplosionFX(pos, colorHex) {
+            const pCount = 15;
+            const pGeo = new THREE.SphereGeometry(0.15, 4, 4);
+            const pMat = new THREE.MeshBasicMaterial({ color: colorHex });
+            const pGroup = new THREE.Group();
+            pGroup.position.copy(pos);
+
+            const particles = [];
+            for(let i=0; i<pCount; i++) {
+                const p = new THREE.Mesh(pGeo, pMat);
+                p.userData = {
+                    v: new THREE.Vector3(
+                        (Math.random() - 0.5) * 8,
+                        Math.random() * 6,
+                        (Math.random() - 0.5) * 8
+                    )
+                };
+                pGroup.add(p);
+                particles.push(p);
+            }
+            scene.add(pGroup);
+
+            let steps = 0;
+            function animateParticles() {
+                if(steps++ < 40) {
+                    particles.forEach(p => {
+                        p.position.addScaledVector(p.userData.v, 0.016);
+                        p.userData.v.y -= 0.15;
+                    });
+                    requestAnimationFrame(animateParticles);
+                } else {
+                    scene.remove(pGroup);
+                    pGeo.dispose();
+                    pMat.dispose();
+                }
+            }
+            animateParticles();
+        }
+
+        document.getElementById('btn-spawn-target').addEventListener('click', () => new TacticalEntity('target'));
+        document.getElementById('btn-spawn-civilian').addEventListener('click', () => new TacticalEntity('civilian'));
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            entities.forEach(e => scene.remove(e.group));
+            entities = [];
+            stats.civilianIncidents = 0;
+            stats.combatantsEliminated = 0;
+            addLog("Global battlefield cleared. Ethics Engine baseline constants restored.", "warn");
+            evaluateGlobalEthics();
+        });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const inspectContent = document.getElementById('inspect-content');
+
+        window.addEventListener('click', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('.panel')) return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+
+            if(intersects.length > 0) {
+                const pickedMesh = intersects.object;
+                if(pickedMesh.userData && pickedMesh.userData.entityRef) {
+                    const ent = pickedMesh.userData.entityRef;
+                    inspectContent.innerHTML = '<strong>ENTITY IDENTIFIED:</strong> ID-' + ent.id + '<br/><strong>CLASSIFICATION:</strong> ' + ent.type.toUpperCase() + '<br/><strong>X:</strong> ' + ent.group.position.x.toFixed(2) + ' | <strong>Z:</strong> ' + ent.group.position.z.toFixed(2) + '<br/><strong>STATUS:</strong> Operational Vector Match';
+                    return;
+                }
+            }
+            inspectContent.innerText = "Click an operational drone/node component in the grid view to parse direct telemetry strings.";
+        });
+
+        const clock = new THREE.Clock();
+
+        function renderTick() {
+            requestAnimationFrame(renderTick);
+
+            const delta = clock.getDelta();
+
+            arbiterGroup.rotation.y += 0.4 * delta;
+            coreMesh.rotation.x += 0.2 * delta;
+
+            for (let i = entities.length - 1; i >= 0; i--) {
+                if (entities[i]) {
+                    entities[i].update(delta);
+                }
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        evaluateGlobalEthics();
+        renderTick();
+    </script>
+</body>
+</html>

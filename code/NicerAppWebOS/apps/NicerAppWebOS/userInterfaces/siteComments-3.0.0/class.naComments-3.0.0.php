@@ -782,7 +782,7 @@ class class_naComments {
         echo json_encode($rec);
     }
 
-    public function edit($in = null) {
+/*    public function edit($in = null) {
         $fncn = $this->cn.'::edit($in)';
         global $naWebOS, $naIP, $naUsername;
 
@@ -835,6 +835,107 @@ class class_naComments {
             ]);
         }
     }
+ */
+    public function edit($in = null) {
+    $fncn = $this->cn.'::edit($in)';
+    global $naWebOS, $naIP, $naUsername;
+
+    if (!is_array($in)) trigger_error($fncn.' : !is_array($in)', E_USER_ERROR);
+    if (!array_key_exists('rec', $in)) trigger_error($fncn.' : missing rec', E_USER_ERROR);
+
+    $rec = json_decode($in['rec'], true);
+    if (empty($rec['id'])) {
+        echo json_encode(['error' => 'Missing comment id']);
+        return;
+    }
+
+    $db     = $naWebOS->dbs->findConnection('couchdb');
+    $cdb    = $db->cdb;
+    $dbName = $db->dataSetName('cms_comments');
+    $cdb->setDatabase($dbName);
+
+    try {
+        $call = $cdb->get($rec['id']);
+        $doc  = $call->body;
+
+        // security: only the original author may edit
+        if (!isset($doc->clientUsername) || $doc->clientUsername !== $naUsername) {
+            echo json_encode(['error' => 'Not allowed']);
+            return;
+        }
+
+        // ───────────────────────────────────────────────
+        // 1. Build revision history entry (the "onedit")
+        // ───────────────────────────────────────────────
+        $this->onedit($doc, $rec);   // ← the new helper
+
+        // ───────────────────────────────────────────────
+        // 2. Apply the actual content change
+        // ───────────────────────────────────────────────
+        $doc->msgHTML = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $rec['msgHTML']);
+        $doc->msgHTML = str_replace('</span>', '', $doc->msgHTML);
+        $doc->msgHTML = str_replace('<p>', '<p class="backdropped">', $doc->msgHTML);
+
+        // last-edited timestamp
+        $now = time();
+        $doc->editedDatetime    = $now;
+        $doc->editedTZoffset    = $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0);
+        $doc->editedDatetimeStr = naDateTimeStr($now, $doc->editedTZoffset);
+
+        // keep original creation time intact
+        // (optional) $doc->clientIP = $naIP;
+
+        $cdb->put($doc->_id, $doc);
+
+        echo json_encode([
+            'ok'      => true,
+            'id'      => $doc->_id,
+            'history' => $doc->history ?? []   // optional: return the history to the client
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'errorHTML'       => 'Could not edit comment',
+            'couchdbErrorMsg' => $e->getMessage()
+        ]);
+    }
+}
+
+/**
+ * Called just before a comment document is updated.
+ * Pushes a snapshot of the current (pre-edit) state into $doc->history.
+ *
+ * @param object $doc   The CouchDB document (stdClass) that is about to be saved
+ * @param array  $rec   The incoming edit payload from the client
+ */
+private function onedit($doc, array $rec): void
+{
+    // Initialise history array if it does not exist yet
+    if (!isset($doc->history) || !is_array($doc->history)) {
+        $doc->history = [];
+    }
+
+    // Snapshot of the version that is about to be overwritten
+    $snapshot = [
+        'rev'               => $doc->_rev ?? null,          // CouchDB revision at the moment of edit
+        'msgHTML'           => $doc->msgHTML ?? '',
+        'editedDatetime'    => $doc->editedDatetime    ?? $doc->clientDatetime    ?? null,
+        'editedDatetimeStr' => $doc->editedDatetimeStr ?? $doc->datetimeStr       ?? null,
+        'editedTZoffset'    => $doc->editedTZoffset    ?? $doc->clientTZoffset    ?? 0,
+        'editedBy'          => $doc->clientUsername    ?? null,   // who wrote this version
+        'editedAt'          => time(),                            // server time of this history push
+        // add any other fields you want to keep historically
+        // 'clientIP'       => $doc->clientIP ?? null,
+    ];
+
+    // Push to the front (newest first)
+    array_unshift($doc->history, $snapshot);
+
+    // Keep only the last N revisions (adjust as you like)
+    $maxHistory = 30;
+    if (count($doc->history) > $maxHistory) {
+        $doc->history = array_slice($doc->history, 0, $maxHistory);
+    }
+}
 
     public function toggleHidden($in = null) {
         $fncn = $this->cn.'::toggleHidden($in)';
