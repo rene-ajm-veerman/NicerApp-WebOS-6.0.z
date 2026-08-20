@@ -60,10 +60,10 @@
         <div>
         <div><p class="backdropped" alt="(C) and (R) 2026 Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">(C) and (R) 2026 <a href="https://zoned.at/d1">Rene</a> AJM Veerman [<a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>].</p></div>
         <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Founded in 2002 by Rene AJM Veerman.</p></div>
-        <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Original idea by unknown and/or anonymous human(s) ;-)<br/>For which I plan to donate to charities whenever I can.</p></div>
+        <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Original idea by unknown and/or anonymous human(s) ;-)<br/>For which I plan to donate to charities when I finally can again.</p></div>
         </div>
         </td>
-        <td align="right" style="width:220px;padding-right:10px;"><img src="/NicerAppWebOS/documentation/selfies/rene-ajm-veerman/IMG_20251109_145323_1.jpg" style="box-shadow:3px 3px 5px 3px rgba(0,0,0,0.7);width:200px;padding:10px;border-radius:5px;background:rgba(0,0,50,0.4);border:1px solid grey;"></td>
+        <td align="right" style="box-shadow:3px 3px 5px 3px rgba(0,0,0,0.7);padding:10px;border-radius:5px;background:rgba(0,0,50,0.4);border:1px solid grey;width:220px;padding-right:10px;font-size:small;"><img src="/NicerAppWebOS/documentation/selfies/rene-ajm-veerman/Rene_at_Airlie_Beach_Australia_2004.jpg" style="box-shadow:3px 3px 5px 3px rgba(0,0,0,0.7);width:300px;padding:10px;border-radius:5px;background:rgba(0,0,50,0.4);border:1px solid grey;"><br/>Pictured in 2004 in Airlie Beach, Australia.<br/>And folks, i'm <em>straight</em>.</td>
         </tr>
         </table>
 

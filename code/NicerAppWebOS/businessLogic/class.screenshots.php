@@ -578,24 +578,23 @@ class naScreenshots
         $url = trim($job['url'] ?? '');
 
         // Fast-fail obviously unusable URLs
-        /*
-         *        if (
-         *            $url === '' ||
-         *            !filter_var($url, FILTER_VALIDATE_URL) ||
-         *            !preg_match('#^https?://#i', $url) ||
-         *            strlen($url) > 2000
-         *        ) {
-         *            $now = date('Y-m-d H:i:s');
-         *            $update = [
-         *                'status'   => 'failed',
-         *                'error'    => 'Invalid or unusable URL',
-         *                'lockedAt' => null,
-         *                'lockedBy' => null,
-         *                'updated'  => $now,
-         *            ];
-         *            $this->db->updateMany(['_id' => $job['_id']], ['$set' => $update]);
-         *            return array_merge($job, $update);
-    }*/
+        if (
+          $url === '' ||
+          !filter_var($url, FILTER_VALIDATE_URL) ||
+          !preg_match('#^https?://#i', $url) ||
+          strlen($url) > 2000
+        ) {
+            $now = date('Y-m-d H:i:s');
+            $update = [
+              'status'   => 'failed',
+              'error'    => 'Invalid or unusable URL',
+              'lockedAt' => null,
+              'lockedBy' => null,
+              'updated'  => $now,
+            ];
+            $this->db->updateMany(['_id' => $job['_id']], ['$set' => $update]);
+            return array_merge($job, $update);
+    	}
 
         $s = $this->nodeScript;   // currently forced to screenshot_other2.js
 
@@ -603,7 +602,7 @@ class naScreenshots
         try {
             $this->ensureDirectory($paths['dir']);
         } catch (Exception $e) {
-            echo 'Could not ensureDirectory() : '.$e->getMessage();
+            echo '<div class="phpError">Could not ensureDirectory() : '.$e->getMessage().'</div>';
         }
 
 
@@ -622,16 +621,17 @@ class naScreenshots
 
         $errorText = implode("\n", $output);
         $success   = ($returnCode === 0 && file_exists($paths['absolute']));
+        	$attempts    = (int)($job['attempts'] ?? 1);
+	        $maxAttempts = (int)($job['maxAttempts'] ?? 3);
+        	$now         = date('Y-m-d H:i:s');
+	if ($success) {
 
-        $attempts    = (int)($job['attempts'] ?? 1);
-        $maxAttempts = (int)($job['maxAttempts'] ?? 3);
-        $now         = date('Y-m-d H:i:s');
-
-        $exec = 'convert "'.$job['filePath'].'" -resize 1400 "'.$job['filePath'].'_thumb.png"';
-        $output = array(); $result = -1;
-        exec ($exec, $output, $result);
-        $dbg = [ '$exec' => $exec, '$output' => $output, '$result' => $result ];
-        //if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
+	        $exec = 'convert "'.$job['filePath'].'" -resize 1400 "'.$job['filePath'].'_thumb.png"';
+        	$output = array(); $result = -1;
+	        exec ($exec, $output, $result);
+        	$dbg = [ '$exec' => $exec, '$output' => $output, '$result' => $result ];
+	        //if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
+	};
 
         if ($success) {
             $update = [

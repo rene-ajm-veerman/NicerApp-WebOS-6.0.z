@@ -58,6 +58,33 @@
 
             <p class="backdropped">You will not offer people money or prizes or investment advice geared to your own investment company/firm/etc on this Website.<br/>
             I kindly refer you to my <a href="https://nicer.app/business-news" class="nomod noPushState" target="naNewsBusiness">business news segment</a> for that.
-            </p>
+           </p>
+
+<p class="backdropped">YDutch Freedom of Expression – Key Legal Limits (concise reference)  </p>
+
+<p class="backdropped">YNo prior censorship (Art. 7 Constitution), but speakers remain responsible under the law.
+</p>
+
+<p class="backdropped">YMain criminal restrictions (Wetboek van Strafrecht):</p>
+
+<p class="backdropped">YGroup insult (Art. 137c): Public intentional insult of a group based on race, religion/belief, sexual orientation, or disability. Includes (since Oct 2024) insulting denial, condoning, or gross trivialisation of genocide, crimes against humanity, or war crimes (when judicially established). Max. 1 year (2 years if professional/habitual or joint).
+Incitement to hatred/discrimination/violence (Art. 137d): Publicly inciting hatred, discrimination, or violence against persons or property on the same protected grounds. Max. 1–2 years.
+Dissemination of prohibited material (Art. 137e): Publicly spreading statements known (or that should reasonably be known) to be insulting or inciting on protected grounds (outside factual reporting). Max. 6 months.
+Defamation (smaad, Art. 261): Intentionally attacking someone’s honour/reputation by accusing them of a specific fact with intent to publicise. Max. 6 months (1 year if written/image).
+Slander (laster, Art. 262): Defamation while knowing the accusation is false. Max. 2 years.
+Simple insult (belediging, Art. 266): Intentional insult not amounting to smaad. Max. 3 months (higher when directed at certain public officials or members of the royal family in their capacity).
+Incitement to crime / sedition (opruiing, Arts. 131–132): Publicly urging commission of a criminal offence or violent action against public authority.
+Threats (Art. 285 and related provisions).</p>
+
+<p class="backdropped">YOther notes:</p>
+
+<p class="backdropped">YSpecific lèse-majesté largely abolished (2020); royal insults now fall under ordinary insult rules with possible enhancement.
+Glorification of terrorism / public support for terrorist organisations: bill submitted to Parliament (mid-2026); not yet in force.
+Criticism of ideas, religions, or ideologies as such is generally more protected than attacks on groups of persons.
+Civil liability (tort) and platform obligations (e.g. DSA) can apply independently.
+Application is contextual; political debate and public-interest speech receive strong protection.
+</p>
+
+<p class="backdropped">YThis is a practical summary only, not legal advice. Verify current law and consult counsel for operational use.</p>
         </td>
     </tr></table>

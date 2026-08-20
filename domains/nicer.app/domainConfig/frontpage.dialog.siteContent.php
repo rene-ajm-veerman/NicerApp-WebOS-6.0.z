@@ -69,7 +69,7 @@ NL30INGB0007689155
 <p class="backdropped" style="color:lime">
 2026-Aug-10th, 09:44CEST<br/>
 </p>
-<p class="backdropped">All donations and expenses will be handled in a tax-compliant way.<br/>I'm allowed to make about two-thousand Euros extra per year.</p>
+<p class="backdropped">All donations and expenses will be handled in a tax-compliant way.<br/>Please include what specifically you are donating for as part of your money transfer description.<br/>I'm allowed to make about two-thousand Euros extra per year.</p>
         </div>
 
     <div class="naFrontpage_headerText naFrontpage_headerText_recentAchievement" style="float:left">
