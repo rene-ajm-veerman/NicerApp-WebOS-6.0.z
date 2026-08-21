@@ -2,6 +2,9 @@
 /**
  * delete_couchdb_dbs_not_matching_prefixes.php
  *
+ * (C) 2026 Rene AJM Veerman and https://grok.com
+ * MIT licensed
+ *
  * Deletes every CouchDB database that does NOT start with any of the given prefixes.
  * Uses your existing uDB2 / class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 stack.
  *
