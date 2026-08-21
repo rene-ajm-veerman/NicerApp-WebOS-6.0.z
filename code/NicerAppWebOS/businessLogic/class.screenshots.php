@@ -149,8 +149,8 @@ class naScreenshots
         ? str_replace('/domainConfig', '', $naWebOS->domainPath) . '/siteData'
         : '');
 
-        $this->nodeScript = realpath(dirname(__FILE__) . '/screenshot_other2.js')
-        ?: realpath(dirname(__FILE__) . '/../businessLogic/screenshot_other2.js');
+        $this->nodeScript = realpath(dirname(__FILE__) . '/nodeScreenshot.js')
+        ?: realpath(dirname(__FILE__) . '/../businessLogic/nodeScreenshot.js');
 
         if ($db instanceof uDB2) {
             $this->db = $db;
