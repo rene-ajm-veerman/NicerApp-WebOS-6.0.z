@@ -1,0 +1,57 @@
+[
+    {
+        "_id": "8dxwmKxwlBgwYWik0yd",
+        "_rev": "1-7f485f6d403ff6817a07fa06cb4e49ec",
+        "database": "said_by___cms_tree___user___aivd-hq",
+        "id": "8dxwmKxwlBgwYWik0yd",
+        "parent": "GVU4ZGsq6T7h9hJrc1g",
+        "order": 0,
+        "text": "Blog",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    },
+    {
+        "_id": "GVU4ZGsq6T7h9hJrc1g",
+        "_rev": "1-16793797971190095e21b85586c770bd",
+        "database": "said_by___cms_tree___user___aivd-hq",
+        "id": "GVU4ZGsq6T7h9hJrc1g",
+        "parent": "baa",
+        "order": 0,
+        "text": "said_by___AIVD-HQ",
+        "state": {
+            "opened": true
+        },
+        "type": "naUserRootFolder"
+    },
+    {
+        "_id": "J6JwODDRzMfRzLb8csp",
+        "_rev": "1-dfda03961c00eb081d8511283cabd9db",
+        "database": "said_by___cms_tree___user___aivd-hq",
+        "id": "J6JwODDRzMfRzLb8csp",
+        "parent": "GVU4ZGsq6T7h9hJrc1g",
+        "order": 1,
+        "text": "Media Albums",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    },
+    {
+        "_id": "ctf9A9bcSoiq4hak2GZJ",
+        "_rev": "1-942d61043076cab79fa4d5ec5bb9f3c6",
+        "database": "said_by___cms_tree___user___aivd-hq",
+        "id": "ctf9A9bcSoiq4hak2GZJ",
+        "parent": "8dxwmKxwlBgwYWik0yd",
+        "order": 0,
+        "text": "New Document",
+        "url1": "in",
+        "seoValue": "New Document",
+        "state": {
+            "opened": true,
+            "selected": true
+        },
+        "type": "naDocument"
+    }
+]

@@ -1,0 +1,57 @@
+[
+    {
+        "_id": "equY0jeLkH9HcWYB3fl",
+        "_rev": "1-c8ca318e987961019d72153c9c6346b1",
+        "database": "said_by___cms_tree___user___aivd",
+        "id": "equY0jeLkH9HcWYB3fl",
+        "parent": "baa",
+        "order": 0,
+        "text": "AIVD",
+        "state": {
+            "opened": true
+        },
+        "type": "naUserRootFolder"
+    },
+    {
+        "_id": "gbXmjVLDp4LBUJo1LVHp",
+        "_rev": "1-925a8011efaf31dd0b418bb22e3552d6",
+        "database": "said_by___cms_tree___user___aivd",
+        "id": "gbXmjVLDp4LBUJo1LVHp",
+        "parent": "jamjOTie5yPcpIDxyX6V",
+        "order": 0,
+        "text": "New Document",
+        "url1": "in",
+        "seoValue": "New Document",
+        "state": {
+            "opened": true,
+            "selected": true
+        },
+        "type": "naDocument"
+    },
+    {
+        "_id": "jamjOTie5yPcpIDxyX6V",
+        "_rev": "1-ab586044d3e6a3e1204e0842f51644b9",
+        "database": "said_by___cms_tree___user___aivd",
+        "id": "jamjOTie5yPcpIDxyX6V",
+        "parent": "equY0jeLkH9HcWYB3fl",
+        "order": 0,
+        "text": "Blog",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    },
+    {
+        "_id": "sNlCJsTvXY6Xy2HxodH0",
+        "_rev": "1-68ccb8673f3c341d1f1d45a441df6f99",
+        "database": "said_by___cms_tree___user___aivd",
+        "id": "sNlCJsTvXY6Xy2HxodH0",
+        "parent": "equY0jeLkH9HcWYB3fl",
+        "order": 1,
+        "text": "Media Albums",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    }
+]

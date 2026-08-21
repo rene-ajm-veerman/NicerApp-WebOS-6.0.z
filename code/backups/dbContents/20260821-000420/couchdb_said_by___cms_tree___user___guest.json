@@ -1,0 +1,57 @@
+[
+    {
+        "_id": "dab",
+        "_rev": "1-db3e98edc6159f020cdfb4294a69d797",
+        "database": "said_by___cms_tree___user___guest",
+        "order": 1,
+        "id": "dab",
+        "parent": "baa",
+        "text": "Guest",
+        "state": {
+            "opened": true
+        },
+        "type": "naUserRootFolder"
+    },
+    {
+        "_id": "dba",
+        "_rev": "1-039bc8f568368772fb108745b0328449",
+        "database": "said_by___cms_tree___user___guest",
+        "order": 0,
+        "id": "dba",
+        "parent": "dab",
+        "text": "Blog",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    },
+    {
+        "_id": "dbb",
+        "_rev": "1-6224e47e845852c2092828f5f05568ec",
+        "database": "said_by___cms_tree___user___guest",
+        "order": 0,
+        "id": "dbb",
+        "parent": "dba",
+        "url1": "on",
+        "seoValue": "frontpage",
+        "pageTitle": "Front page",
+        "text": "Front page",
+        "state": {
+            "selected": true
+        },
+        "type": "naDocument"
+    },
+    {
+        "_id": "dbc",
+        "_rev": "1-3cff40771ee49720c379b1484584787b",
+        "database": "said_by___cms_tree___user___guest",
+        "order": 1,
+        "id": "dbc",
+        "parent": "dab",
+        "text": "Media Albums",
+        "state": {
+            "opened": true
+        },
+        "type": "naFolder"
+    }
+]
