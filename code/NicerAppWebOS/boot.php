@@ -47,7 +47,7 @@ NicerApp WebOS from Nicer Enterprises
             ) {
                 $settingsFilePath = $dir.'/../../../../../../../domains/'.$bn.'/domainConfig/settings.json';
             } else {
-                $settingsFilePath = $dir.'/../../domains/'.$bn.'/domainConfig/settings.json';
+                $settingsFilePath = $dir.'/../../../domains/'.$bn.'/domainConfig/settings.json';
             }
         }
         //echo '<pre>';var_dump ($_SERVER);echo '</pre>';

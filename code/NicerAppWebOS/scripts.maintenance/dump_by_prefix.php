@@ -1,36 +1,46 @@
 <?php
 /**
  * NicerApp WebOS – Database dump by prefix
- * Supports CouchDB + SQL, pagination, and gzip compression.
+ * Supports CouchDB + SQL, pagination, gzip compression,
+ * timestamped output folders and automatic retention.
  *
- * Usage (CLI):
- *   php dump_by_prefix.php --prefix="said_by___" [--type=couchdb|sql|both] [--username=admin] [--out=./dumps] [--page-size=1000] [--compress=1]
+ * Usage:
+ *   php dump_by_prefix-2.0.0.php --prefix="said_by___" \
+ *       [--type=couchdb|sql|both] \
+ *       [--username=admin] \
+ *       [--out=./dumps] \
+ *       [--page-size=2000] \
+ *       [--compress=1] \
+ *       [--retain-days=14]
  */
 
-require_once __DIR__ . '/boot.php';   // adjust path if needed
+require_once __DIR__ . '/../boot.php';
 
-/**
- * Main entry
- */
 function dumpByPrefix(
     string $prefix,
-    string $type       = 'both',      // couchdb | sql | both
-    string $username   = 'admin',
-    string $outDir     = './dumps',
-    int    $pageSize   = 1000,
-    bool   $compress   = true
+    string $type        = 'both',
+    string $username    = 'admin',
+    string $baseOutDir  = '../../backups/dbContents',
+    int    $pageSize    = 1000,
+    bool   $compress    = true,
+    int    $retainDays  = 14
 ): void {
+    // Create timestamped directory: ./dumps/20260821-015042
+    $timestamp = date('Ymd-His');
+    $outDir    = rtrim($baseOutDir, '/') . '/' . $timestamp;
+
     if (!is_dir($outDir)) {
         mkdir($outDir, 0755, true);
     }
 
     echo "=== NicerApp Dump by Prefix ===\n";
-    echo "Prefix    : {$prefix}\n";
-    echo "Type      : {$type}\n";
-    echo "Username  : {$username}\n";
-    echo "Output    : {$outDir}\n";
-    echo "Page size : {$pageSize}\n";
-    echo "Compress  : " . ($compress ? 'yes (gzip)' : 'no') . "\n\n";
+    echo "Prefix       : {$prefix}\n";
+    echo "Type         : {$type}\n";
+    echo "Username     : {$username}\n";
+    echo "Output       : {$outDir}\n";
+    echo "Page size    : {$pageSize}\n";
+    echo "Compress     : " . ($compress ? 'yes (gzip)' : 'no') . "\n";
+    echo "Retain days  : {$retainDays}\n\n";
 
     if ($type === 'couchdb' || $type === 'both') {
         dumpCouchDBByPrefix($prefix, $username, $outDir, $pageSize, $compress);
@@ -40,7 +50,64 @@ function dumpByPrefix(
         dumpSQLByPrefix($prefix, $username, $outDir, $pageSize, $compress);
     }
 
+    // Clean up old dump folders
+    cleanupOldDumps($baseOutDir, $retainDays);
+
     echo "\n=== Done ===\n";
+    echo "Dump saved to: {$outDir}\n";
+}
+
+/**
+ * Delete dump folders older than $retainDays
+ */
+function cleanupOldDumps(string $baseOutDir, int $retainDays): void
+{
+    if ($retainDays <= 0) {
+        return;
+    }
+
+    $baseOutDir = rtrim($baseOutDir, '/');
+    if (!is_dir($baseOutDir)) {
+        return;
+    }
+
+    $cutoff = time() - ($retainDays * 86400);
+    $deleted = 0;
+
+    foreach (scandir($baseOutDir) as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+
+        $path = $baseOutDir . '/' . $item;
+
+        // Only consider directories that look like YYYYMMDD-HHMMSS
+        if (!is_dir($path) || !preg_match('/^\d{8}-\d{6}$/', $item)) {
+            continue;
+        }
+
+        $mtime = filemtime($path);
+        if ($mtime !== false && $mtime < $cutoff) {
+            // Recursive delete
+            $it = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
+            $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+
+            foreach ($files as $file) {
+                if ($file->isDir()) {
+                    rmdir($file->getRealPath());
+                } else {
+                    unlink($file->getRealPath());
+                }
+            }
+            rmdir($path);
+            $deleted++;
+            echo "Deleted old dump: {$item}\n";
+        }
+    }
+
+    if ($deleted > 0) {
+        echo "Cleaned up {$deleted} old dump folder(s) (older than {$retainDays} days)\n";
+    }
 }
 
 /**
@@ -91,27 +158,18 @@ function dumpCouchDBByPrefix(
             $total    = 0;
 
             do {
-                $params = [
-                    'include_docs' => true,
-                    'limit'        => $pageSize + 1,   // +1 to detect more pages
-                ];
+                // Sag expects positional arguments
+                $response = $conn->cdb->getAllDocs(
+                    true,                           // include_docs = true (boolean)
+                    $pageSize + 1,                  // limit (+1 to detect more pages)
+                    $startKey,                      // startkey
+                    null,                           // endkey
+                    null,                           // keys
+                    false,                          // descending
+                    ($startKey !== null) ? 1 : 0    // skip previous last key
+                );
 
-                if ($startKey !== null) {
-                    $params['startkey'] = json_encode($startKey);
-                    $params['skip']     = 1;            // skip the previous last key
-                }
-
-                //$response = $conn->cdb->getAllDocs($params);
-		$response = $conn->cdb->getAllDocs(
-			    true,                       // include_docs
-			        $pageSize + 1,
-				    $startKey,
-				        null,
-					    null,
-					        false,
-						    ($startKey !== null) ? 1 : 0
-		);
-                $rows     = $response->body->rows ?? [];
+                $rows = $response->body->rows ?? [];
 
                 if (empty($rows)) {
                     break;
@@ -119,12 +177,12 @@ function dumpCouchDBByPrefix(
 
                 $hasMore = count($rows) > $pageSize;
                 if ($hasMore) {
-                    array_pop($rows);                   // remove the extra one
+                    array_pop($rows);
                 }
 
                 foreach ($rows as $row) {
                     if (isset($row->id) && str_starts_with($row->id, '_design/')) {
-                        continue;                       // skip design docs
+                        continue;
                     }
                     if (isset($row->doc)) {
                         $docs[] = $row->doc;
@@ -162,7 +220,6 @@ function dumpCouchDBByPrefix(
 
 /**
  * SQL dump with pagination + optional gzip
- * Uses uDB2 (mysqli path) – adjust connection details if needed
  */
 function dumpSQLByPrefix(
     string $prefix,
@@ -173,8 +230,6 @@ function dumpSQLByPrefix(
 ): void {
     echo "\n--- SQL ---\n";
 
-    // Example connection – replace with your real credentials / config loading
-    // You can also load from $naWebOS->cfg or domainConfig files
     global $naWebOS;
 
     $cRec = [
@@ -182,7 +237,7 @@ function dumpSQLByPrefix(
         'host'     => $naWebOS->cfg['sql']['host']     ?? 'localhost',
         'username' => $naWebOS->cfg['sql']['username'] ?? 'root',
         'password' => $naWebOS->cfg['sql']['password'] ?? '',
-        'database' => $naWebOS->cfg['sql']['database'] ?? '',   // empty = list tables across all DBs if allowed
+        'database' => $naWebOS->cfg['sql']['database'] ?? '',
     ];
 
     try {
@@ -192,8 +247,6 @@ function dumpSQLByPrefix(
         return;
     }
 
-    // List tables that match the prefix
-    // Note: uDB2 does not expose a native listTables yet, so we use raw mysqli
     $mysqli = new mysqli(
         $cRec['host'],
         $cRec['username'],
@@ -229,7 +282,7 @@ function dumpSQLByPrefix(
         try {
             $uDB->setTable($table);
 
-            $rows  = [];
+            $rows   = [];
             $offset = 0;
             $total  = 0;
 
@@ -282,21 +335,30 @@ if (php_sapi_name() === 'cli') {
         'username::',
         'out::',
         'page-size::',
-        'compress::'
+        'compress::',
+        'retain-days::'
     ]);
 
     if (empty($opts['prefix'])) {
         fwrite(STDERR, "Usage:\n");
-        fwrite(STDERR, "  php dump_by_prefix.php --prefix=NAME [--type=couchdb|sql|both] [--username=admin] [--out=./dumps] [--page-size=1000] [--compress=1]\n");
+        fwrite(STDERR, "  php dump_by_prefix-3.0.0.php --prefix=NAME \\\n");
+        fwrite(STDERR, "      [--type=couchdb|sql|both] \\\n");
+        fwrite(STDERR, "      [--username=admin] \\\n");
+        fwrite(STDERR, "      [--out=./dumps] \\\n");
+        fwrite(STDERR, "      [--page-size=2000] \\\n");
+        fwrite(STDERR, "      [--compress=1] \\\n");
+        fwrite(STDERR, "      [--retain-days=14]\n");
         exit(1);
     }
 
     dumpByPrefix(
         $opts['prefix'],
-        $opts['type']       ?? 'both',
-        $opts['username']   ?? 'admin',
-        $opts['out']        ?? './dumps',
-        (int)($opts['page-size'] ?? 1000),
-        ($opts['compress'] ?? '1') !== '0'
+        $opts['type']         ?? 'both',
+        $opts['username']     ?? 'admin',
+        $opts['out']          ?? './dumps',
+        (int)($opts['page-size']   ?? 1000),
+        ($opts['compress']    ?? '1') !== '0',
+        (int)($opts['retain-days'] ?? 14)
     );
 }
+?>
