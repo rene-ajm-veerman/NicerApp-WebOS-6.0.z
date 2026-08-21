@@ -2,6 +2,126 @@
 declare(strict_types=1);
 
 /**
+ * Redis-backed cache layer for naScreenshots
+ * Falls back gracefully when Redis is unavailable.
+ */
+trait naScreenshotsRedisCache
+{
+    /** @var \Predis\Client|\Redis|null */
+    private $redis = null;
+
+    private string $redisPrefix = 'na:ss:';
+    private int $defaultTtl = 604800; // 7 days
+
+    /**
+     * Lazy-connect to Redis. Supports both Predis and the phpredis extension.
+     */
+    private function redis(): ?object
+    {
+        if ($this->redis !== null) {
+            return $this->redis;
+        }
+
+        try {
+            // Prefer Predis (pure PHP) if available
+            if (class_exists('\Predis\Client')) {
+                $this->redis = new \Predis\Client([
+                    'scheme' => 'tcp',
+                    'host'   => getenv('REDIS_HOST') ?: '127.0.0.1',
+                    'port'   => (int)(getenv('REDIS_PORT') ?: 6379),
+                    'password' => getenv('REDIS_PASSWORD') ?: null,
+                    'database' => (int)(getenv('REDIS_DB') ?: 0),
+                ]);
+                $this->redis->ping();
+                return $this->redis;
+            }
+
+            // Fallback to phpredis extension
+            if (class_exists('\Redis')) {
+                $r = new \Redis();
+                $r->connect(
+                    getenv('REDIS_HOST') ?: '127.0.0.1',
+                    (int)(getenv('REDIS_PORT') ?: 6379),
+                    1.5
+                );
+                if ($pw = getenv('REDIS_PASSWORD')) {
+                    $r->auth($pw);
+                }
+                $r->select((int)(getenv('REDIS_DB') ?: 0));
+                $r->ping();
+                $this->redis = $r;
+                return $this->redis;
+            }
+        } catch (Throwable $e) {
+            // Redis not available – degrade silently
+            $this->redis = false; // mark as permanently unavailable for this request
+        }
+
+        return null;
+    }
+
+    private function cacheKey(string $type, string $url): string
+    {
+        return $this->redisPrefix . $type . ':' . md5($url);
+    }
+
+    private function cacheGet(string $type, string $url): ?array
+    {
+        $r = $this->redis();
+        if (!$r) return null;
+
+        try {
+            $raw = $r->get($this->cacheKey($type, $url));
+            if ($raw === false || $raw === null) return null;
+            $data = json_decode($raw, true);
+            return is_array($data) ? $data : null;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }
+
+    private function cacheSet(string $type, string $url, array $data, int $ttl = 0): void
+    {
+        $r = $this->redis();
+        if (!$r) return;
+
+        $ttl = $ttl > 0 ? $ttl : $this->defaultTtl;
+
+        try {
+            $r->setex(
+                $this->cacheKey($type, $url),
+                $ttl,
+                json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
+        } catch (Throwable $e) {
+            // ignore
+        }
+    }
+
+    private function cacheDelete(string $type, string $url): void
+    {
+        $r = $this->redis();
+        if (!$r) return;
+
+        try {
+            $r->del($this->cacheKey($type, $url));
+        } catch (Throwable $e) {
+            // ignore
+        }
+    }
+
+    /**
+     * Invalidate all cache entries for a URL
+     */
+    public function invalidateCache(string $url): void
+    {
+        $this->cacheDelete('url', $url);
+        $this->cacheDelete('file', $url);
+        $this->cacheDelete('ready', $url);
+    }
+}
+
+/**
  * Minimal working Screenshots manager for NicerApp
  * MIT licensed
  */
@@ -9,6 +129,7 @@ global $naWebOS;
 class naScreenshots
 {
     public string $cn = 'naScreenshots';
+    use naScreenshotsRedisCache;
 
     /** @var object */
     private object $db;
@@ -56,68 +177,91 @@ class naScreenshots
     // Public API
     // ------------------------------------------------------------------
 
-    public function enqueue(string $url, array $options = []): array
-    {
-        $url = trim($url);
+public function enqueue(string $url, array $options = []): array
+{
+$url = trim($url);
         if ($url === '') {
             throw new InvalidArgumentException('URL is required');
         }
 
         $force  = (bool)($options['force']  ?? false);
-        $retain = (int)($options['retain'] ?? 0);
+        $retain = (int)($options['retain'] ?? 0);   // 0 = keep forever (or use defaultTtl)
 
-        // 1. Check if the file physically exists ANYWHERE in the historic screenshots store
+        // 1. Fast path: Redis cache
+        if (!$force) {
+            $cached = $this->cacheGet('url', $url);
+            if ($cached && ($cached['status'] ?? '') === 'ready') {
+                // Respect retain window if set
+                if ($retain > 0) {
+                    $createdTs = strtotime($cached['created'] ?? $cached['updated'] ?? '0');
+                    if ((time() - $createdTs) >= $retain) {
+                        // expired → fall through to re-queue
+                    } else {
+                        return $cached;
+                    }
+                } else {
+                    return $cached; // keep forever
+                }
+            }
+        }
+
+        // 2. Disk existence (also cached)
         $filename = md5($url) . '.png';
-        $historicalPath = $this->locateExistingFileOnDisk($filename);
+        $fileCache = $this->cacheGet('file', $url);
+        $historicalPath = $fileCache['path'] ?? null;
+
+        if ($historicalPath === null) {
+            $historicalPath = $this->locateExistingFileOnDisk($filename);
+            if ($historicalPath) {
+                $this->cacheSet('file', $url, ['path' => $historicalPath], 86400);
+            }
+        }
         $fileExistsOnDisk = ($historicalPath !== null);
 
-        // 2. Resolve target paths for today in case a fresh generation is required
         $paths = $this->buildFilePath($url);
-
-        // If file exists historically, reuse its tracked paths instead of creating duplicates for today
         if ($fileExistsOnDisk) {
             $paths['absolute'] = $historicalPath;
             $paths['relative'] = str_replace($this->siteDataRoot . '/', '', $historicalPath);
         }
 
-        $existing = $this->findByUrl($url);
+        $existing = $this->findByUrl($url);   // also Redis-backed now
 
         if ($existing && !$force) {
             $status = $existing['status'] ?? '';
 
-            // If the database marks it ready AND the file is verified on disk
-            if ($status === 'ready' && $fileExistsOnDisk && $retain > 0) {
-                $createdTs = strtotime($existing['created'] ?? $existing['updated'] ?? '0');
-                if ((time() - $createdTs) < $retain) {
+            if ($status === 'ready' && $fileExistsOnDisk) {
+                if ($retain <= 0 || (time() - strtotime($existing['created'] ?? $existing['updated'] ?? '0')) < $retain) {
+                    $this->cacheSet('url', $url, $existing, $retain > 0 ? $retain : $this->defaultTtl);
                     return $existing;
                 }
             }
 
-            // Short-circuit: pull status back to ready if found on disk
             if ($status !== 'ready' && $fileExistsOnDisk) {
-                $existing['status'] = 'ready';
-                $existing['filePath'] = $paths['absolute'];
+                $existing['status']       = 'ready';
+                $existing['filePath']     = $paths['absolute'];
                 $existing['relativePath'] = $paths['relative'];
-                $existing['updated'] = date('Y-m-d H:i:s');
+                $existing['updated']      = date('Y-m-d H:i:s');
 
                 if (method_exists($this->db, 'setTable')) {
                     $this->db->setTable($this->table);
                 }
                 $this->db->updateMany(['url' => $url], ['$set' => [
-                    'status' => 'ready',
-                    'filePath' => $paths['absolute'],
+                    'status'       => 'ready',
+                    'filePath'     => $paths['absolute'],
                     'relativePath' => $paths['relative'],
-                    'updated' => $existing['updated']
+                    'updated'      => $existing['updated'],
                 ]]);
+
+                $this->cacheSet('url', $url, $existing, $retain > 0 ? $retain : $this->defaultTtl);
                 return $existing;
             }
 
             if (in_array($status, ['pending', 'processing'], true)) {
                 return $existing;
             }
-        }
+	}
 
-        // If no DB job entry exists, but file is sitting on disk, create pre-completed entry
+	// If no DB job entry exists, but file is sitting on disk, create pre-completed entry
         if (!$existing && $fileExistsOnDisk && !$force) {
             $now = date('Y-m-d H:i:s');
             $job = [
@@ -183,17 +327,57 @@ class naScreenshots
             $job['_id'] = $res['_id'] ?? null;
         }
 
+	$this->cacheSet('url', $url, $job, 300); // 5 min while processing
         return $job;
     }
 
-    public function findByUrl(string $url): ?array
-    {
-        return $this->db->findOne(['url' => $url]);
-    }
 
+	public function findByUrl(string $url): ?array
+    {
+        // 1. Redis first
+        $cached = $this->cacheGet('url', $url);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        // 2. DB
+        $row = $this->db->findOne(['url' => $url]);
+
+        // 3. Populate cache
+        if ($row) {
+            $ttl = (int)($row['retain'] ?? 0);
+            $this->cacheSet('url', $url, $row, $ttl > 0 ? $ttl : $this->defaultTtl);
+        }
+
+        return $row;
+    }
     // ------------------------------------------------------------------
     // Internal Path and Optimization Engines
     // ------------------------------------------------------------------
+
+    /**
+     * Call this from processJob() after a successful capture
+     */
+    public function markReady(array $job): void
+    {
+        $url = $job['url'] ?? '';
+        if ($url === '') return;
+
+        $ttl = (int)($job['retain'] ?? 0);
+        $this->cacheSet('url', $url, $job, $ttl > 0 ? $ttl : $this->defaultTtl);
+
+        if (!empty($job['filePath'])) {
+            $this->cacheSet('file', $url, ['path' => $job['filePath']], 86400);
+        }
+    }
+
+    /**
+     * Call this on failure or when force-refreshing
+     */
+    public function markInvalid(string $url): void
+    {
+        $this->invalidateCache($url);
+    }
 
     /**
      * Searches recursively within siteData/screenshots directory for an existing filename
@@ -632,6 +816,12 @@ class naScreenshots
         	$dbg = [ '$exec' => $exec, '$output' => $output, '$result' => $result ];
 	        //if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
 	};
+
+	if ($success) {
+    		$this->markReady(array_merge($job, $update));   // ← add this
+	} else {
+    		$this->markInvalid($url);                       // ← optional
+	}
 
         if ($success) {
             $update = [

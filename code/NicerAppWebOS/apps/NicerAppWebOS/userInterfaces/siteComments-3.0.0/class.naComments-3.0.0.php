@@ -354,10 +354,10 @@ class class_naComments {
         }
 
         // Process a couple of jobs right away
-        $screenshots->processQueue([
-            'maxJobs' => 3,
-            'verbose' => false
-        ]);
+        //$screenshots->processQueue([
+        //    'maxJobs' => 3,
+        //    'verbose' => false
+        //]);
 
         return
         '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css">'

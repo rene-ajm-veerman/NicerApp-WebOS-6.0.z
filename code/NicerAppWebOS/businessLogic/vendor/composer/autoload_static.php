@@ -7,6 +7,11 @@ namespace Composer\Autoload;
 class ComposerStaticInitc359e34deef5d681cb193267499c7ec4
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'Psr\\Http\\Message\\' => 17,
+            'Predis\\' => 7,
+        ),
         'J' => 
         array (
             'Jaybizzle\\CrawlerDetect\\' => 24,
@@ -14,6 +19,14 @@ class ComposerStaticInitc359e34deef5d681cb193267499c7ec4
     );
 
     public static $prefixDirsPsr4 = array (
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Predis\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/predis/predis/src',
+        ),
         'Jaybizzle\\CrawlerDetect\\' => 
         array (
             0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
