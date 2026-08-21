@@ -4,6 +4,9 @@
  * Supports CouchDB + SQL, pagination, gzip compression,
  * timestamped output folders and automatic retention.
  *
+ * (C) 2026 Rene AJM Veerman and https://grok.com
+ * MIT licensed
+ *
  * Usage:
  *   php dump_by_prefix-2.0.0.php --prefix="said_by___" \
  *       [--type=couchdb|sql|both] \

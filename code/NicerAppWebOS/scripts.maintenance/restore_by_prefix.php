@@ -2,6 +2,9 @@
 /**
  * NicerApp WebOS – Restore from dump
  *
+ * (C) 2026 Rene AJM Veerman and https://grok.com
+ * MIT licensed
+ *
  * Usage:
  *   php restore_by_prefix-2.0.0.php \
  *       --dump-dir=./dumps/20260821-015042 \
