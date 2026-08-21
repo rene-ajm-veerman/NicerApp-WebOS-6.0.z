@@ -495,6 +495,94 @@ class class_NicerAppWebOS_database_API {
         return $r;
     }
 
+    /**
+ * Retrieve the revision history for a document.
+ *
+ * @param string       $documentID   The live document's _id
+ * @param array        $options      {
+ *     @var int|null   $limit        Max number of history entries (default 50)
+ *     @var string     $history      History DB name/suffix (true = auto-derive)
+ *     @var array      $sort         Sort order (default newest first)
+ *     @var array      $fields       Optional field projection
+ * }
+ * @return array   List of history documents (newest first) or empty array
+ */
+public function getHistory(string $documentID, array $options = []): array
+{
+    if ($this->isCouch()) {
+        return $this->couchGetHistory($documentID, $options);
+    }
+
+    // SQL path can be added later
+    return [];
+}
+    private function couchGetHistory(string $documentID, array $options = []): array
+{
+    $this->ensureCouchConnector();
+
+    $limit   = (int)($options['limit'] ?? 50);
+    $sort    = $options['sort'] ?? [['historyDatetime' => 'desc']];
+    $fields  = $options['fields'] ?? null;
+
+    // Resolve history database name
+    $historySuffix = $options['history'] ?? true;
+    if ($historySuffix === true) {
+        $current = $this->table ?: $this->getCurrentDatabase();
+        // Keep the same naming style the rest of the system uses
+        if (method_exists($this->couchConnector, 'dataSetName')) {
+            // Prefer the real dataSetName helper when available
+            $base = preg_replace('/_history$/', '', $current);
+            $historySuffix = $base . '_history';
+            $histDbName = $this->couchConnector->dataSetName($historySuffix);
+        } else {
+            $histDbName = $current . '_history';
+        }
+    } else {
+        $histDbName = method_exists($this->couchConnector, 'dataSetName')
+            ? $this->couchConnector->dataSetName($historySuffix)
+            : $historySuffix;
+    }
+
+    // Switch to the history database
+    $this->couchConnector->cdb->setDatabase($histDbName);
+
+    $mango = [
+        'selector' => [
+            'documentID' => $documentID
+            // also accept the older field name used in the comments prototype
+            // 'commentID' => $documentID   // optional fallback if needed
+        ],
+        'limit' => $limit,
+        'sort'  => $sort
+    ];
+
+    if (is_array($fields) && !empty($fields)) {
+        $mango['fields'] = $fields;
+    }
+
+    try {
+        $result = $this->couchConnector->cdb->find($mango);
+        $docs = $result->body->docs ?? [];
+
+        // Convert stdClass → array for consistency with the rest of uDB2
+        $history = [];
+        foreach ($docs as $doc) {
+            $history[] = json_decode(json_encode($doc), true);
+        }
+
+        return $history;
+    } catch (Exception $e) {
+        trigger_error(
+            $this->cn . '::getHistory() error for documentID=' . $documentID . ': ' . $e->getMessage(),
+            E_USER_WARNING
+        );
+        return [];
+    } finally {
+        // Always restore the original database
+        $this->couchConnector->cdb->setDatabase($this->getCurrentDatabase());
+    }
+}
+    
     public function editDataSubSet ($ct=null, $relTableName=null, $findCommand=null, $recordOverlay=null) {
         $fncn = $this->cn.'::editDataSubSet($relTableName='.json_encode($relTableName).', $findCommand='.json_encode($findCommand).', $recordOverlay='.json_encode($recordOverlay).')';
         // parameter error handling

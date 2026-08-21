@@ -67,6 +67,11 @@ try {
         ]
     );
 
+    $uDB->createIndex(
+    ['documentID', 'historyDatetime'],
+    'by_documentID_historyDatetime'
+);
+
     echo "\n=== uDB2 Database Initialization Completed Successfully! ===\n";
 
 } catch (Exception $e) {

@@ -203,6 +203,44 @@ class uDB2
     }
 
     // ====================== CRUD ======================
+// ====================== UPDATE / REPLACE WITH OPTIONAL HISTORY ======================
+
+/**
+ * Update a single document.
+ * If $options['history'] is true (or a string = history DB suffix),
+ * a full snapshot is written to the corresponding ___history database first.
+ *
+ * @param array $filter   Mongo-style filter (usually ['_id' => '...'])
+ * @param array $update   Either ['$set' => [...]] or a plain field map
+ * @param array $options  [
+ *     'history'       => true | 'cms_comments_history' | false,
+ *     'historyMeta'   => extra fields to store in the history doc,
+ *     'upsert'        => bool
+ * ]
+ * @return array   ['ok' => bool, '_id' => ..., '_rev' => ..., 'historyId' => ...]
+ */
+public function updateOne(array $filter, array $update, array $options = []): array
+{
+    if ($this->isCouch()) {
+        return $this->couchUpdateOne($filter, $update, $options);
+    }
+
+    // SQL path (can be filled later)
+    throw new RuntimeException('updateOne() SQL path not yet implemented');
+}
+
+/**
+ * Full document replacement (keeps _id).
+ * Same history behaviour as updateOne().
+ */
+public function replaceOne(array $filter, array $replacement, array $options = []): array
+{
+    if ($this->isCouch()) {
+        return $this->couchReplaceOne($filter, $replacement, $options);
+    }
+
+    throw new RuntimeException('replaceOne() SQL path not yet implemented');
+}
 
     public function insertOne(array $document, array $options = []): array
     {
@@ -298,6 +336,89 @@ class uDB2
         $result = $this->find($filter, $options);
         return $result[0] ?? null;
     }
+
+    private function couchUpdateOne(array $filter, array $update, array $options = []): array
+{
+    $this->ensureCouchConnector();
+    $dbName = $this->getCurrentDatabase();
+    $this->couchConnector->cdb->setDatabase($dbName);
+
+    // 1. Fetch the current document
+    $docs = $this->couchFind($filter, ['limit' => 1]);
+    if (empty($docs)) {
+        return ['ok' => false, 'error' => 'Document not found'];
+    }
+    $doc = (array)$docs[0];
+
+    // 2. Write history snapshot if requested
+    $historyId = null;
+    if (!empty($options['history'])) {
+        $historyId = $this->onedit($doc, $options);
+    }
+
+    // 3. Apply the update
+    if (isset($update['$set']) && is_array($update['$set'])) {
+        foreach ($update['$set'] as $k => $v) {
+            $doc[$k] = $v;
+        }
+    } else {
+        foreach ($update as $k => $v) {
+            if ($k === '_id' || $k === '_rev') continue;
+            $doc[$k] = $v;
+        }
+    }
+
+    // 4. Save
+    try {
+        $response = $this->couchConnector->cdb->put($doc['_id'], $doc);
+        $body = (array)($response->body ?? []);
+        return [
+            'ok'        => true,
+            '_id'       => $body['id']  ?? $doc['_id'],
+            '_rev'      => $body['rev'] ?? null,
+            'historyId' => $historyId
+        ];
+    } catch (Exception $e) {
+        return ['ok' => false, 'error' => $e->getMessage()];
+    }
+}
+
+private function couchReplaceOne(array $filter, array $replacement, array $options = []): array
+{
+    $this->ensureCouchConnector();
+    $dbName = $this->getCurrentDatabase();
+    $this->couchConnector->cdb->setDatabase($dbName);
+
+    $docs = $this->couchFind($filter, ['limit' => 1]);
+    if (empty($docs)) {
+        return ['ok' => false, 'error' => 'Document not found'];
+    }
+    $old = (array)$docs[0];
+
+    // History first
+    $historyId = null;
+    if (!empty($options['history'])) {
+        $historyId = $this->onedit($old, $options);
+    }
+
+    // Build the new document (keep _id and current _rev)
+    $newDoc = $replacement;
+    $newDoc['_id']  = $old['_id'];
+    $newDoc['_rev'] = $old['_rev'];
+
+    try {
+        $response = $this->couchConnector->cdb->put($newDoc['_id'], $newDoc);
+        $body = (array)($response->body ?? []);
+        return [
+            'ok'        => true,
+            '_id'       => $body['id']  ?? $newDoc['_id'],
+            '_rev'      => $body['rev'] ?? null,
+            'historyId' => $historyId
+        ];
+    } catch (Exception $e) {
+        return ['ok' => false, 'error' => $e->getMessage()];
+    }
+}
 
     public function updateMany(array $filter, array $update, array $options = []): int
     {

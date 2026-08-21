@@ -835,7 +835,6 @@ class class_naComments {
             ]);
         }
     }
- */
     public function edit($in = null) {
     $fncn = $this->cn.'::edit($in)';
     global $naWebOS, $naIP, $naUsername;
@@ -899,42 +898,110 @@ class class_naComments {
         ]);
     }
 }
+*/
+    public function edit($in = null) {
+    // ... validation & security checks stay the same ...
+        $fncn = $this->cn.'::edit($in)';
+        global $naWebOS, $naIP, $naUsername;
+
+        if (!is_array($in)) trigger_error($fncn.' : !is_array($in)', E_USER_ERROR);
+        if (!array_key_exists('rec', $in)) trigger_error($fncn.' : missing rec', E_USER_ERROR);
+
+
+    $db = $naWebOS->dbs; // or the uDB2 instance
+    $uDB = $db;
+
+    $result = $uDB->updateOne(
+        ['_id' => $rec['id']],
+        ['$set' => [
+            'msgHTML'            => $cleanedMsgHTML,
+            'editedDatetime'     => time(),
+            'editedTZoffset'     => $rec['clientTZoffset'] ?? 0,
+            'editedDatetimeStr'  => naDateTimeStr(...),
+        ]],
+        [
+            'history'     => true,                    // or 'cms_comments_history'
+            'historyMeta' => [
+                'tz' => $rec['clientTZoffset'] ?? 0,
+                // any extra fields you want in the history doc
+            ]
+        ]
+    );
+
+    if ($result['ok']) {
+        echo json_encode(['ok' => true, 'id' => $result['_id']]);
+    } else {
+        echo json_encode(['errorHTML' => 'Could not edit comment', 'couchdbErrorMsg' => $result['error'] ?? '']);
+    }
+}
 
 /**
- * Called just before a comment document is updated.
- * Pushes a snapshot of the current (pre-edit) state into $doc->history.
+ * Write a full snapshot of $doc into the matching ___history database.
+ * Returns the new history document _id, or null on failure.
  *
- * @param object $doc   The CouchDB document (stdClass) that is about to be saved
- * @param array  $rec   The incoming edit payload from the client
+ * $options['history'] can be:
+ *   - true                  → auto-derive "currentTable_history"
+ *   - 'cms_comments_history'→ explicit history database name/suffix
  */
-private function onedit($doc, array $rec): void
+private function onedit(array $doc, array $options = []): ?string
 {
-    // Initialise history array if it does not exist yet
-    if (!isset($doc->history) || !is_array($doc->history)) {
-        $doc->history = [];
+    global $naWebOS, $naUsername, $naIP;
+
+    $historySuffix = $options['history'];
+    if ($historySuffix === true) {
+        // Auto-derive from current table/database name
+        $current = $this->table ?: $this->getCurrentDatabase();
+        $historySuffix = $current . '_history';
+        // If the current name already ends with a domain prefix, keep the same style
+        if (strpos($current, '___') !== false) {
+            $historySuffix = preg_replace('/___.*$/', '___' . basename(str_replace('___', '/', $current)) . '_history', $current);
+        }
     }
 
-    // Snapshot of the version that is about to be overwritten
-    $snapshot = [
-        'rev'               => $doc->_rev ?? null,          // CouchDB revision at the moment of edit
-        'msgHTML'           => $doc->msgHTML ?? '',
-        'editedDatetime'    => $doc->editedDatetime    ?? $doc->clientDatetime    ?? null,
-        'editedDatetimeStr' => $doc->editedDatetimeStr ?? $doc->datetimeStr       ?? null,
-        'editedTZoffset'    => $doc->editedTZoffset    ?? $doc->clientTZoffset    ?? 0,
-        'editedBy'          => $doc->clientUsername    ?? null,   // who wrote this version
-        'editedAt'          => time(),                            // server time of this history push
-        // add any other fields you want to keep historically
-        // 'clientIP'       => $doc->clientIP ?? null,
-    ];
+    // Resolve the real CouchDB database name the same way the rest of the system does
+    $histDbName = $this->couchConnector->dataSetName
+        ? $this->couchConnector->dataSetName($historySuffix)
+        : $historySuffix;
 
-    // Push to the front (newest first)
-    array_unshift($doc->history, $snapshot);
+    // Switch to history database
+    $this->couchConnector->cdb->setDatabase($histDbName);
 
-    // Keep only the last N revisions (adjust as you like)
-    $maxHistory = 30;
-    if (count($doc->history) > $maxHistory) {
-        $doc->history = array_slice($doc->history, 0, $maxHistory);
+    $now = time();
+    $meta = $options['historyMeta'] ?? [];
+
+    $historyDoc = array_merge([
+        '_id'               => bin2hex(random_bytes(12)),
+        'type'              => 'revision',
+        'documentID'        => $doc['_id'],
+        'originalRev'       => $doc['_rev'] ?? null,
+
+        // full snapshot of the document that is about to be overwritten
+        'snapshot'          => $doc,
+
+        // metadata about this history write
+        'historyDatetime'   => $now,
+        'historyDatetimeStr'=> function_exists('naDateTimeStr')
+                                ? naDateTimeStr($now, $meta['tz'] ?? 0)
+                                : date('c', $now),
+        'historyBy'         => $naUsername ?? ($meta['by'] ?? null),
+        'historyIP'         => $naIP ?? ($meta['ip'] ?? null),
+    ], $meta);
+
+    // Remove CouchDB system fields from the nested snapshot if you prefer a cleaner history
+    // unset($historyDoc['snapshot']['_id'], $historyDoc['snapshot']['_rev']);
+
+    try {
+        $resp = $this->couchConnector->cdb->post($historyDoc);
+        $id = $resp->body->id ?? $historyDoc['_id'];
+    } catch (Exception $e) {
+        trigger_error($this->cn.'::onedit() history write failed: '.$e->getMessage(), E_USER_WARNING);
+        $id = null;
     }
+
+    // Always switch back to the original database
+    $this->couchConnector->cdb->setDatabase($this->getCurrentDatabase());
+
+    return $id;
 }
 
     public function toggleHidden($in = null) {
