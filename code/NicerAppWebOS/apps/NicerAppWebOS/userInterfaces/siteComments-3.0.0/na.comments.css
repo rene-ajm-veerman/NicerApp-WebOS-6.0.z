@@ -1,3 +1,39 @@
+.naHistoryActions {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.naHistoryRestoreBtn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e8f0ff;
+    background: rgba(40, 100, 200, 0.7);
+    border: 1px solid rgba(120, 170, 255, 0.45);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.naHistoryRestoreBtn:hover {
+    background: rgba(60, 130, 230, 0.85);
+    transform: translateY(-1px);
+}
+
+.naHistoryRestoredBadge {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 9px;
+    font-size: 0.751rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #ffe8c8;
+    background: rgba(180, 90, 20, 0.65);
+    border: 1px solid rgba(255, 160, 60, 0.45);
+    border-radius: 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
  .naComments_header {
     margin : 20px;
     padding : 8px;
