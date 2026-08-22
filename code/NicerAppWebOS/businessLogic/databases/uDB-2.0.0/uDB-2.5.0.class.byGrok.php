@@ -646,3 +646,4 @@ private function couchReplaceOne(array $filter, array $replacement, array $optio
     }
 
 }
+?>

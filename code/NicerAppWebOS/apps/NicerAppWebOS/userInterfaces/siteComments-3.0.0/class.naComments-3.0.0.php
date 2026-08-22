@@ -639,9 +639,9 @@ class class_naComments {
                     ).PHP_EOL;
 		    $html .= html_viewHistoryButton($it['_id'], [
     'title'        => 'Comment Revision History',
-    'ajaxUrl'      => '/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/ajax_getHistory.php',
     'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
-    'limit'        => 40
+    'database' => 'cms_comments',
+    'limit'        => 55
 ]);
                 }
                 $html .= "\t".'<div style="display:none">'.PHP_EOL;
@@ -904,7 +904,6 @@ class class_naComments {
         ]);
     }
 }
-*/
     public function edit($in = null) {
     // ... validation & security checks stay the same ...
         $fncn = $this->cn.'::edit($in)';
@@ -940,6 +939,84 @@ class class_naComments {
         echo json_encode(['errorHTML' => 'Could not edit comment', 'couchdbErrorMsg' => $result['error'] ?? '']);
     }
 }
+ */
+    public function edit($in = null) {
+    $fncn = $this->cn.'::edit($in)';
+    global $naWebOS, $naIP, $naUsername;
+
+    if (!is_array($in)) {
+        trigger_error($fncn.' : !is_array($in)', E_USER_ERROR);
+    }
+    if (!array_key_exists('rec', $in)) {
+        trigger_error($fncn.' : missing rec', E_USER_ERROR);
+    }
+
+    $rec = json_decode($in['rec'], true);
+    if (empty($rec['id'])) {
+        echo json_encode(['error' => 'Missing comment id']);
+        return;
+    }
+
+    // -------------------------------------------------
+    // 1. Load the current document (old style for now)
+    // -------------------------------------------------
+    $db     = $naWebOS->dbsAdmin->findConnection('couchdb');
+    $cdb    = $db->cdb;
+    $dbName = $db->dataSetName('cms_comments');
+    $cdb->setDatabase($dbName);
+
+    try {
+        $call = $cdb->get($rec['id']);
+        $doc  = $call->body;
+
+        // security: only the original author may edit
+        if (!isset($doc->clientUsername) || $doc->clientUsername !== $naUsername) {
+            echo json_encode(['error' => 'Not allowed']);
+            return;
+        }
+
+        // -------------------------------------------------
+        // 2. Clean the new message
+        // -------------------------------------------------
+        $msgHTML = $rec['msgHTML'] ?? '';
+        $msgHTML = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $msgHTML);
+        $msgHTML = str_replace('</span>', '', $msgHTML);
+        $msgHTML = str_replace('<p>', '<p class="backdropped">', $msgHTML);
+
+        // -------------------------------------------------
+        // 3. Write history snapshot (old onedit for now)
+        // -------------------------------------------------
+        // You can later switch this to uDB2->updateOne(..., ['history'=>true])
+        $this->onedit((array)$doc, [
+            'history'     => 'cms_comments_history',
+            'historyMeta' => [
+                'tz' => $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0)
+            ]
+        ]);
+
+        // -------------------------------------------------
+        // 4. Apply the changes
+        // -------------------------------------------------
+        $now = time();
+        $doc->msgHTML            = $msgHTML;
+        $doc->editedDatetime     = $now;
+        $doc->editedTZoffset     = $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0);
+        $doc->editedDatetimeStr  = naDateTimeStr($now, $doc->editedTZoffset);
+
+        $cdb->put($doc->_id, $doc);
+
+        echo json_encode([
+            'ok' => true,
+            'id' => $doc->_id
+        ]);
+
+    } catch (Exception $e) {
+        echo json_encode([
+            'errorHTML'       => 'Could not edit comment',
+            'couchdbErrorMsg' => $e->getMessage()
+        ]);
+    }
+}
 
 /**
  * Write a full snapshot of $doc into the matching ___history database.
@@ -949,7 +1026,7 @@ class class_naComments {
  *   - true                  → auto-derive "currentTable_history"
  *   - 'cms_comments_history'→ explicit history database name/suffix
  */
-private function onedit(array $doc, array $options = []): ?string
+/*private function onedit(array $doc, array $options = []): ?string
 {
     global $naWebOS, $naUsername, $naIP;
 
@@ -1008,6 +1085,43 @@ private function onedit(array $doc, array $options = []): ?string
     $this->couchConnector->cdb->setDatabase($this->getCurrentDatabase());
 
     return $id;
+}
+ */
+private function onedit(array $doc, array $options = []): ?string
+{
+    global $naWebOS, $naUsername, $naIP;
+
+    $db     = $naWebOS->dbsAdmin->findConnection('couchdb');
+    $cdb    = $db->cdb;
+    $histDb = $db->dataSetName('cms_comments_history');
+    $cdb->setDatabase($histDb, true);
+
+    $now  = time();
+    $meta = $options['historyMeta'] ?? [];
+    $tz   = $meta['tz'] ?? 0;
+
+    $historyDoc = [
+        '_id'               => bin2hex(random_bytes(12)),
+        'type'              => 'revision',
+        'documentID'        => $doc['_id'] ?? $doc['_id'] ?? null,
+        'originalRev'       => $doc['_rev'] ?? null,
+        'snapshot'          => $doc,
+        'historyDatetime'   => $now,
+        'historyDatetimeStr'=> naDateTimeStr($now, $tz),
+        'historyBy'         => $naUsername ?? null,
+        'historyIP'         => $naIP ?? null,
+    ];
+
+    try {
+        $resp = $cdb->post($historyDoc);
+        return $resp->body->id ?? $historyDoc['_id'];
+    } catch (Exception $e) {
+        trigger_error($this->cn.'::onedit() failed: '.$e->getMessage(), E_USER_WARNING);
+        return null;
+    } finally {
+        // switch back
+        $cdb->setDatabase($db->dataSetName('cms_comments'));
+    }
 }
 
     public function toggleHidden($in = null) {

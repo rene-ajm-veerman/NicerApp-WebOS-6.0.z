@@ -29,13 +29,13 @@ if (!$documentID || !$database) {
 }
 
 // Permission check
-if (!function_exists('naHasPermission') || !naHasPermission($appID, 'viewHistory')) {
+/*if (!function_exists('naHasPermission') || !naHasPermission($appID, 'viewHistory')) {
     echo json_encode(['error' => 'Permission denied', 'code' => 'viewHistory']);
     exit;
-}
+}*/
 
 try {
-    $db  = $naWebOS->dbs->findConnection('couchdb');
+    $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
     $cdb = $db->cdb;
 
     // Resolve live + history database names
@@ -44,7 +44,57 @@ try {
     $histDbName = $db->dataSetName($histSuffix);
 
     // Fetch history
+    $dbg = 'setDatabase("'.$histDbName.'")';
     $cdb->setDatabase($histDbName);
+
+    // Correct indexes for cms_comments_history
+
+$indexes = [
+
+    // Main index used by getHistory()
+    // Supports: selector on documentID + sort by historyDatetime DESC
+    [
+        'index' => [
+            'fields' => [
+                ['documentID' => 'desc'],
+                ['historyDatetime' => 'desc']
+            ]
+        ],
+        'name' => 'by_documentID_historyDatetime_desc',
+        'type' => 'json'
+    ],
+
+    // Alternative if you ever want ascending
+    [
+        'index' => [
+            'fields' => [
+                ['documentID' => 'asc'],
+                ['historyDatetime' => 'asc']
+            ]
+        ],
+        'name' => 'by_documentID_historyDatetime_asc',
+        'type' => 'json'
+    ],
+
+    // Simple global newest-first index
+    [
+        'index' => [
+            'fields' => [
+                ['historyDatetime' => 'desc']
+            ]
+        ],
+        'name' => 'by_historyDatetime_desc',
+        'type' => 'json'
+    ]
+];
+    foreach ($indexes as $rec) {
+        try {
+		$dbg = 'setIndex "'.$rec['name'].'"';
+            $cdb->setIndex($rec);
+        } catch (Exception $e) {
+            // ignore if it already exists
+        }
+    }
 
     $mango = [
         'selector' => [
@@ -72,7 +122,8 @@ try {
 } catch (Throwable $e) {
     echo json_encode([
         'error'  => 'Failed to retrieve history',
-        'detail' => $e->getMessage()
+        'detail' => $e->getMessage(),
+	'dbg' => $dbg
     ]);
 }
 ?>

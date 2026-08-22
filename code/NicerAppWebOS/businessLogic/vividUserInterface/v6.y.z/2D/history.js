@@ -18,12 +18,13 @@ na.history = {
     view : function (documentID, options = {}) {
         const defaults = {
             title        : 'Revision History',
-            ajaxUrl      : '/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/ajax_getHistory.php',
+            ajaxUrl      : '/NicerAppWebOS/businessLogic/ajax/ajax_getHistory.php',
             contentField : 'msgHTML',          // fallback; better to use snapshot.msgHTML
             limit        : 50,
             dialogId     : 'naGenericHistoryDialog'
         };
         const opts = Object.assign({}, defaults, options);
+	    debugger;
 
         // Ensure dialog shell exists
         if ($('#' + opts.dialogId).length === 0) {
@@ -88,8 +89,9 @@ na.history = {
                 }
 
                 na.history.renderTimeline($content, data.history, opts);
+		   $('.naHistoryTimelineContent').css({display:'block'});
             },
-            error : function () {
+            error : function (err) {
                 $content.html('<div class="naHistoryError">Network error while loading history.</div>');
             }
         });
