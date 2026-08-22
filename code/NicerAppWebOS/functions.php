@@ -7,7 +7,36 @@ require_once(dirname(__FILE__).'/boot.php');
 //use Defuse\Crypto\Crypto;
 
 
+/**
+ * Generate a generic "View History" button.
+ *
+ * @param string $documentID
+ * @param array  $options   same options that na.history.view() accepts
+ * @return string HTML
+ */
+function html_viewHistoryButton(string $documentID, array $options = []): string
+{
+    global $naWebOS;
 
+    $optsJson = htmlspecialchars(json_encode($options), ENT_QUOTES, 'UTF-8');
+
+    return $naWebOS->html_vividButton(
+        1001, 'float:right',
+        'btnViewHistory_' . substr(md5($documentID), 0, 8),
+        'vividButton_icon_50x50 grouped btnViewHistory',
+        '_50x50', 'grouped',
+        '',
+        "na.history.view('" . addslashes($documentID) . "', " . $optsJson . ");",
+        '',
+        '',
+        1001, 'View revision history',
+        'btnCssVividButton_outerBorder.png',
+        'btnCssVividButton.png',
+        $options['buttonColor'] ?? 'btnCssVividButton.purple1a.png',
+        $options['buttonIcon']  ?? 'btnHistory.png',
+        '', '', '', ''
+    );
+}
 
 
 function safeHTTPinput ($in, $default=null) {

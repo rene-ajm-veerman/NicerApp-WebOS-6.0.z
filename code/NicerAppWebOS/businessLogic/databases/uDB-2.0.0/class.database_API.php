@@ -583,6 +583,48 @@ public function getHistory(string $documentID, array $options = []): array
     }
 }
     
+// ====================== UPDATE / REPLACE WITH OPTIONAL HISTORY ======================
+
+/**
+ * Update a single document.
+ * If $options['history'] is true (or a string = history DB suffix),
+ * a full snapshot is written to the corresponding ___history database first.
+ *
+ * @param array $filter   Mongo-style filter (usually ['_id' => '...'])
+ * @param array $update   Either ['$set' => [...]] or a plain field map
+ * @param array $options  [
+ *     'history'       => true | 'cms_comments_history' | false,
+ *     'historyMeta'   => extra fields to store in the history doc,
+ *     'upsert'        => bool
+ * ]
+ * @return array   ['ok' => bool, '_id' => ..., '_rev' => ..., 'historyId' => ...]
+ */
+public function updateOne(array $filter, array $update, array $options = []): array
+{
+    //if ($this->isCouch()) {
+        //return $this->couchUpdateOne($filter, $update, $options);
+    //}
+
+    // SQL path (can be filled later)
+    //throw new RuntimeException('updateOne() SQL path not yet implemented');
+    return $this->callDataSet($ct, 'updateOne', [ $filter, $update, $options ]);
+}
+
+/**
+ * Full document replacement (keeps _id).
+ * Same history behaviour as updateOne().
+ */
+public function replaceOne(array $filter, array $replacement, array $options = []): array
+{
+    //if ($this->isCouch()) {
+        //return $this->couchReplaceOne($filter, $replacement, $options);
+    //}
+
+    //throw new RuntimeException('replaceOne() SQL path not yet implemented');
+    return $this->callDataSet($ct, 'replaceOne', [ $filter, $replacement, $options ]);
+}
+
+
     public function editDataSubSet ($ct=null, $relTableName=null, $findCommand=null, $recordOverlay=null) {
         $fncn = $this->cn.'::editDataSubSet($relTableName='.json_encode($relTableName).', $findCommand='.json_encode($findCommand).', $recordOverlay='.json_encode($recordOverlay).')';
         // parameter error handling

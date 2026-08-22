@@ -1,84 +1,72 @@
 <?php
 /**
- * Generic History endpoint for uDB2 dataParts
+ * Generic History endpoint
  *
- * Expects POST/GET:
- *   - id            (string)  Document _id
- *   - limit         (int)     Max revisions (default 50)
- *   - history       (string)  Optional explicit history DB suffix
- *                             (e.g. "cms_comments_history")
- *   - database      (string)  Optional live database / table name
- *                             (used when auto-deriving the history DB)
+ * Required:
+ *   - id            Document _id
+ *   - database      Live database / table suffix (e.g. "cms_comments", "cms_pages")
  *
- * Returns JSON:
- *   { "ok": true, "id": "...", "history": [ ... ] }
- *   or { "error": "..." }
+ * Optional:
+ *   - limit         Max revisions (default 50)
+ *   - history       Explicit history DB suffix (default = database + "_history")
+ *   - appID         Used for permission check (default = database)
  */
 
-require_once(__DIR__ . '/../../boot.php');   // adjust path if needed
-global $naWebOS;
+require_once(__DIR__ . '/../../boot.php');
+global $naWebOS, $naUsername;
 
 header('Content-Type: application/json; charset=utf-8');
 
-// -----------------------------------------------------------------
-// Input
-// -----------------------------------------------------------------
-$documentID = $_POST['id']      ?? $_GET['id']      ?? null;
+$documentID = $_POST['id']       ?? $_GET['id']       ?? null;
+$database   = $_POST['database'] ?? $_GET['database'] ?? null;
 $limit      = (int)($_POST['limit']   ?? $_GET['limit']   ?? 50);
-$history    = $_POST['history'] ?? $_GET['history'] ?? true;   // true = auto-derive
-$database   = $_POST['database']?? $_GET['database']?? null;
+$history    = $_POST['history']  ?? $_GET['history']  ?? null;   // null = auto
+$appID      = $_POST['appID']    ?? $_GET['appID']    ?? $database;
 
-if (empty($documentID)) {
-    echo json_encode(['error' => 'Missing document id']);
+if (!$documentID || !$database) {
+    echo json_encode(['error' => 'Missing id or database']);
     exit;
 }
 
-// -----------------------------------------------------------------
-// Resolve a uDB2 instance
-// -----------------------------------------------------------------
-try {
-    // Prefer an already-configured connection if available
-    $db = $naWebOS->dbs->findConnection('couchdb');
-
-    // Create / obtain a uDB2 instance
-    // (adjust this line to however you normally instantiate uDB2 in v6)
-    if (method_exists($db, 'getUDB2')) {
-        $uDB = $db->getUDB2();
-    } else {
-        // Fallback – create from the existing connector
-        $uDB = uDB2::createFromConfig([
-            'driver'   => 'couchdb',
-            'database' => $database ?: ($db->dataSetName('cms_comments') ?? 'default')
-        ]);
-        // Make sure the underlying connector is set
-        $uDB->couchConnector = $db;   // or $db->cdb / whatever your structure uses
-    }
-
-    if ($database) {
-        $uDB->setTable($database);
-    }
-
-} catch (Throwable $e) {
-    echo json_encode([
-        'error' => 'Could not initialize database layer',
-        'detail'=> $e->getMessage()
-    ]);
+// Permission check
+if (!function_exists('naHasPermission') || !naHasPermission($appID, 'viewHistory')) {
+    echo json_encode(['error' => 'Permission denied', 'code' => 'viewHistory']);
     exit;
 }
 
-// -----------------------------------------------------------------
-// Fetch history
-// -----------------------------------------------------------------
 try {
-    $historyDocs = $uDB->getHistory($documentID, [
-        'limit'   => $limit,
-        'history' => $history
-    ]);
+    $db  = $naWebOS->dbs->findConnection('couchdb');
+    $cdb = $db->cdb;
+
+    // Resolve live + history database names
+    $liveDbName = $db->dataSetName($database);
+    $histSuffix = $history ?: ($database . '_history');
+    $histDbName = $db->dataSetName($histSuffix);
+
+    // Fetch history
+    $cdb->setDatabase($histDbName);
+
+    $mango = [
+        'selector' => [
+            'documentID' => $documentID
+        ],
+        'limit' => $limit,
+        'sort'  => [['historyDatetime' => 'desc']]
+    ];
+
+    $result = $cdb->find($mango);
+    $docs   = $result->body->docs ?? [];
+
+    $history = [];
+    foreach ($docs as $doc) {
+        $history[] = json_decode(json_encode($doc), true);
+    }
 
     echo json_encode([
-        'ok'      => true,
-        'id'      => $documentID,
-        'history' => $historyDocs
+        'ok'       => true,
+        'id'       => $documentID,
+        'database' => $database,
+        'history'  => $history
     ]);
 
 } catch (Throwable $e) {

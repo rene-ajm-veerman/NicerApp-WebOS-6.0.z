@@ -637,6 +637,12 @@ class class_naComments {
                                                         '1660_blk_19329_zoom.upperBodyOnly.256x256.png',          // or any icon you already have
                                                         '', '', '', ''
                     ).PHP_EOL;
+		    $html .= html_viewHistoryButton($it['_id'], [
+    'title'        => 'Comment Revision History',
+    'ajaxUrl'      => '/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/ajax_getHistory.php',
+    'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
+    'limit'        => 40
+]);
                 }
                 $html .= "\t".'<div style="display:none">'.PHP_EOL;
                 $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;

@@ -24,6 +24,7 @@
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/background.js",
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/desktop.js",
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/dialog.js",
+    "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/history.js",
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/button-4.1.0.js",
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/2D/button-5.y.z.js",
     "{$webPath}/NicerAppWebOS/businessLogic/vividUserInterface/v7.y.z/2D/vividMenu-7.0.6.js",

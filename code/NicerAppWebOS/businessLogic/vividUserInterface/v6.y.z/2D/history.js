@@ -66,11 +66,14 @@ na.history = {
         $.ajax({
             type : 'POST',
             url  : opts.ajaxUrl,
-            data : {
-                id    : documentID,
-                limit : opts.limit
-            },
-            success : function (raw) {
+		data : {
+    id       : documentID,
+    database : opts.database || null,
+    history  : opts.history  || null,
+    appID    : opts.appID    || null,
+    limit    : opts.limit
+},
+           success : function (raw) {
                 let data;
                 try {
                     data = (typeof raw === 'string') ? JSON.parse(raw) : raw;
@@ -143,4 +146,30 @@ na.history = {
         html += '</div>';
         $container.html(html);
     }
+};
+/**
+ * View history for any document in any database
+ *
+ * @param {string} database   e.g. "cms_comments", "cms_pages", "news_items"
+ * @param {string} documentID
+ * @param {object} options    extra options (title, contentField, limit, appID…)
+ */
+na.history.viewFor = function (database, documentID, options = {}) {
+    const defaults = {
+        title        : 'Revision History',
+        ajaxUrl      : '/NicerAppWebOS/businessLogic/ajax/getHistory.php',
+        contentField : 'snapshot.msgHTML',   // change per data type
+        limit        : 50,
+        appID        : database,             // used for permission check
+        dialogId     : 'naGenericHistoryDialog'
+    };
+
+    const opts = Object.assign({}, defaults, options, {
+        // force these two into the AJAX payload
+        database : database,
+        id       : documentID
+    });
+
+    // Re-use the existing view() method, but inject the extra parameters
+    na.history.view(documentID, opts);
 };
