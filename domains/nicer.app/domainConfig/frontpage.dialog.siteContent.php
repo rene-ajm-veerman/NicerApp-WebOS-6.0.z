@@ -85,9 +85,9 @@ NL30INGB0007689155
 I aim for symbiotic relationships with both governments and other (big-)tech companies.
 My longterm net-worth goal for this lifetime can stay under one-billion Euros.
 
-coz the way *i* see it, anything more than 200-million, is excess in my bank that ought to get spent on the needs of the poor.
+coz the way *i* see it, anything more than around 200-million Euros, is excess in my bank accounts and/or holdings accounts that ought to get spent on the needs of the poor.
 
-and that 200-million is there to fund any new businesses i might want to start. i do have some ideas, all of which i choose to keep secret. they're all peaceful civilian biz ideas, but still. don't want to ruin my own chances.
+and those around-200-million Euros are there to fund any new businesses i might want to start. i do have some ideas, all of which i choose to keep secret. they're all peaceful civilian biz ideas, but still. don't want to ruin my own chances.
 
 and to the rest of the civilian and military industrial markets out there i say : i'll get you plenty of free business ideas that i just don't have the time and/or money and/or expertise to implement myself.
 they'll be announced here and on <a href="https://zoned.at/d3" class="nomod noPushState" target="na-rv-diary-part3">http://zoned.at/d3</a>

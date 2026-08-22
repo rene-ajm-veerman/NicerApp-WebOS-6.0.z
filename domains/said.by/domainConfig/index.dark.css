@@ -2,19 +2,19 @@
   --mainDelay : 0.25s;
 }
 
-
 #siteContent span, #siteContent p {
-text-shadow:0px 0px 7px black, 0px 0px 2px black, 2px 2px 4px black;
+  text-shadow:0px 0px 7px black, 0px 0px 2px black, 2px 2px 4px black;
 }
-
 
 .naFrontpage_headerText {
   margin:40px;
-  max-width:1000px;
+  max-width:700px;
   padding:8px;
   border-radius:15px;
-  box-shadow:inset 0px 0px 3px 5px orange, 0px 0px 8px 4px rgba(0,0,0,0.631), 8px 8px 10px rgba(0,0,0,1);
+  border : 3px ridge rgba(355,230,230,0.55);
+  box-shadow: inset 0px 0px 3px 3px black, 0px 0px 8px 4px rgba(0,0,0,0.631), 8px 8px 10px rgba(0,0,0,1);
   line-height:1.5em;
+  width:fit-content;
 }
 .naFrontpage_headerText p {
   padding:8px;
@@ -48,11 +48,14 @@ text-shadow:0px 0px 7px black, 0px 0px 2px black, 2px 2px 4px black;
 .naComment_header {
   margin : 15px;
   padding : 10px;
-  background : rgba(0,255,255 ,0.5);
+  background : rgba(255,255,255 ,0.5);
+  color : brown;
+  font-weight : bold;
+  font-size : large;
   border-radius : 10px;
   border : 1px solid grey;
   box-shadow : 2px 2px 3px 2px rgba(0,0,0,0.7);
-  text-shadow : 2px 2px 3px rgba(0,0,0,0.85);
+  text-shadow : 0px 0px 2px rgba(0,0,0,0.555);
 }
 
 .backdropped {
@@ -65,18 +68,13 @@ text-shadow:0px 0px 7px black, 0px 0px 2px black, 2px 2px 4px black;
   border : 1px solid grey;
 }
 .vdBackground {
-  /*background : rgba(0,0,0,0.4);*/
+  background : rgba(0,0,0,0.4);
   position : absolute;
   top : 0px;
   left : 0px;
   width : 100%;
   height : 100%;
   z-index : -1;
-}
-.vividScrollpane {
-  background : rgba(0,0,0,0.3);
-  padding : 10px;
-  margin : 10px;
 }
 
 #siteSettingsMenu {
@@ -145,7 +143,6 @@ opacity : 0.8;
   display: inline-block;
   position:absolute;
   border-radius : 10px;
-  background : rgba(0,0,0,0.3);
   box-shadow : inset 2px 2px 4px 1px rgba(0,0,0,0.555), 0px 0px 4px 1px rgba(0,0,0,0.555), 2px 2px 5px 2px rgba(0,0,0,0.7);
 }
 .vividDialog > .vividDialogBackground1 {
@@ -171,9 +168,8 @@ opacity : 0.8;
 }
 .vividDialog > .vividDialogContent {
   z-index : 10;
+  position : relative;
   display : none;
-  width : calc(100% - 40px);
-  height : calc(100% - 40px);
 }
 
 #btnOptions_menu {
@@ -289,7 +285,7 @@ width : 100%;
 height : 100%;
 position : absolute;
 border-radius : 10px;
-background : url(/siteMedia/backgrounds/Tiled/Bricks%20Rocks%20and%20Stones/Stone-0256b.jpg) repeat;
+background : url(/siteMedia/backgrounds/Tiled/Blue/blue170.jpg) repeat;
 opacity : 0.37;
 z-index : -1;
 }
@@ -615,6 +611,11 @@ z-index : 30000;
 }
 .vividButton.selected, .vividButtonSelected {
   border : 2px ridge rgba(0,255,0,0.75);
+/*  background-image: -o-linear-gradient(bottom, rgba(0,50,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+  background-image: -moz-linear-gradient(bottom, rgba(0,50,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+  background-image: -webkit-linear-gradient(bottom, rgba(0,50,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+  background-image: -ms-linear-gradient(bottom, rgba(0,50,0,0.57) 25%, rgba(40,40,40,0.57) 81%);
+  background-image: linear-gradient(bottom, rgba(0,50,0,0.57) 25%, rgba(40,40,40,0.57) 81%);*/
   border-radius : 14px;
   z-index : 1;
   pointer-events : none;
@@ -937,9 +938,9 @@ border-radius : 10px;
 box-shadow : inset 1px 1px 2px 1px rgba(0,0,0,0.8);
 }
 #nate_selectorSet, #specificitySettings {
-padding : 20px;
-margin : 20px;
-:x
+padding : 7px;
+margin : 7px;
+width : calc(100% - 28px);
 align-content: center;
 }
 
@@ -1260,12 +1261,12 @@ left : -400px;
 .vividMenu_mainUL .menu-item.has-submenu {
   position: relative;           /* already should be, but enforce */
   padding-right: 4px;           /* tiny extension toward the submenu direction */
+  height : auto;
 }
 
 .vividMenu_mainUL .menu-item.has-submenu > a {
   display: block;               /* make sure <a> fills li horizontally */
   height: 100%;                 /* critical: stretch vertically too */
-  padding: 8px 12px;            /* adjust your actual values */
   box-sizing: border-box;
 }
 
@@ -1293,6 +1294,11 @@ left : -400px;
   background: transparent;
   pointer-events: auto;         /* catches mouse events */
   z-index: 2;
+}
+
+.vakata-context, .vakata-context ul {
+  z-index : 800000;
+  background : rgba(0,0,50,0.555);
 }
 
 /* interesting stuff straight from the MDN website :

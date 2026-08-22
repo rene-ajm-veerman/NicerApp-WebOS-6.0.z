@@ -32,7 +32,7 @@ function html_viewHistoryButton(string $documentID, array $options = []): string
         1001, 'View revision history',
         'btnCssVividButton_outerBorder.png',
         'btnCssVividButton.png',
-        $options['buttonColor'] ?? 'btnCssVividButton.purple1a.png',
+        $options['buttonColor'] ?? 'btnCssVividButton.redStone.png',
         $options['buttonIcon']  ?? 'btnHistory.png',
         '', '', '', ''
     );

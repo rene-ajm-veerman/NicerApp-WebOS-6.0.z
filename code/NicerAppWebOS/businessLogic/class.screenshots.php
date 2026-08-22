@@ -808,14 +808,14 @@ $url = trim($url);
         	$attempts    = (int)($job['attempts'] ?? 1);
 	        $maxAttempts = (int)($job['maxAttempts'] ?? 3);
         	$now         = date('Y-m-d H:i:s');
-	if ($success) {
+	//if ($success) {
 
 	        $exec = 'convert "'.$job['filePath'].'" -resize 1400 "'.$job['filePath'].'_thumb.png"';
         	$output = array(); $result = -1;
 	        exec ($exec, $output, $result);
         	$dbg = [ '$exec' => $exec, '$output' => $output, '$result' => $result ];
 	        //if ($debug) { echo 'convert : $dbg='; var_dump ($dbg); echo PHP_EOL.PHP_EOL; }
-	};
+	//};
 
 	if ($success) {
     		$this->markReady(array_merge($job, $update));   // ← add this

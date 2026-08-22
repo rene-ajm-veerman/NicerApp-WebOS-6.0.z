@@ -58,7 +58,7 @@
         <tr>
         <td rowspan="2" align="right">
         <div>
-        <div><p class="backdropped" alt="(C) and (R) 2026 Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">(C) and (R) 2026 <a href="https://zoned.at/d1">Rene</a> AJM Veerman [<a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>].</p></div>
+        <div><p class="backdropped" alt="(C) and (R) 2026 Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">(C) and (R) 2026 <a href="https://zoned.at/d3">Rene</a> AJM Veerman [<a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>].</p></div>
         <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Founded in 2002 by Rene AJM Veerman.</p></div>
         <div><p class="backdropped" alt="Founded in 2002 by Rene AJM Veerman [rene.veerman.netherlands@gmail.com]">Original idea by unknown and/or anonymous human(s) ;-)<br/>For which I plan to donate to charities when I finally can again.</p></div>
         </div>

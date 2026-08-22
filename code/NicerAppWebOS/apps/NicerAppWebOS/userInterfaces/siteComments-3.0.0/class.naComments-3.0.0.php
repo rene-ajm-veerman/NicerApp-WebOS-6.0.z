@@ -8,15 +8,17 @@ class class_naComments {
             'btnMainCommentAdd' => 'btnCssVividButton.greenBlue.png',
             'btnDeleteComment' => 'btnCssVividButton.yellow2a.png',
             'btnAddReply' => 'btnCssVividButton.yellow2a.png',
-            'btnEditComment'    => 'btnCssVividButton.greenYellow.png',
-            'btnHideComment'    => 'btnCssVividButton.yellow1a.png'
-        ],
+            'btnEditComment'    => 'btnCssVividButton.redStone.png',
+            'btnHistory'    => 'btnCssVividButton.redStone.png',
+            'btnHideComment'    => 'btnCssVividButton.redStone.png'
+         ],
         'DutchCulture' => [
             'btnMainCommentAdd' => 'btnCssVividButton.orange1c.png',
             'btnDeleteComment' => 'btnCssVividButton.yellow1a.png',
             'btnAddReply' => 'btnCssVividButton.yellow1a.png',
-            'btnEditComment'    => 'btnCssVividButton.greenYellow.png',
-            'btnHideComment'    => 'btnCssVividButton.yellow1a.png'
+            'btnEditComment'    => 'btnCssVividButton.redStone.png',
+            'btnHistory'    => 'btnCssVividButton.redStone.png',
+            'btnHideComment'    => 'btnCssVividButton.redStone.png'
         ]
     ];
     public $theme = 'simple';//'DutchCulture';

@@ -11,12 +11,12 @@ $comments = new class_naComments();
 $report = $comments->enqueueScreenshotsFromAllComments([
     'retain' => 86400 * 14,   // 14 days
     'force'  => false,
-    'limit'  => 3             // no limit
+    'limit'  => 0             // no limit
 ]);
 
 print_r($report);
 
 $workerId = 'worker-' . gethostname() . '-' . getmypid();
-$manager->runWorker($workerId, maxJobs: 20, sleepSeconds: 1);
+$manager->runWorker($workerId, maxJobs: 200, sleepSeconds: 1);
 
 echo "Done.\n";

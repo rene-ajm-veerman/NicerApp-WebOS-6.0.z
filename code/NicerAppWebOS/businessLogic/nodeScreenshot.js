@@ -27,7 +27,7 @@ if (!fs.existsSync(targetDir)) {
 
 // --- 2. GLOBAL PROCESS FAIL-SAFES ---
 // This guarantees PHP isn't left hanging on exec() forever if Chrome freezes
-const ENGINE_TIMEOUT_MS = 45000; 
+const ENGINE_TIMEOUT_MS = 120 * 1000; 
 const globalTimeout = setTimeout(() => {
     console.error("CRITICAL FAILURE: Node execution exceeded safety threshold (45s). Force terminating.");
     process.exit(1);
@@ -80,7 +80,7 @@ process.on('unhandledRejection', (reason) => {
         // This stops tracking pixels, ad engines, and sockets from causing infinite delays.
         await page.goto(targetUrl, {
             waitUntil: 'networkidle2',
-            timeout: 30000 // 30-second target page response window
+            timeout: 120 * 1000 // 120-second target page response window
         });
 
         // Give dynamic UI rendering arrays or CSS transitions a brief window to settle down

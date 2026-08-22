@@ -33,15 +33,15 @@ NicerApp WebOS from Nicer Enterprises
             $dcFolderName = basename($_SERVER['DOCUMENT_ROOT']);
             $settingsFilePath = $_SERVER['DOCUMENT_ROOT'].'/domainConfig/settings.json';
         } else {
-            $dcFolderName = explode('/',$_SERVER['PWD'])[5];
-            $dir = realpath(pathinfo($_SERVER['PATH_TRANSLATED'])['dirname']);
-            $bn = array_key_exists('PWD', $_SERVER)?$dcFolderName:explode('/',$dir)[5];
+            //$dcFolderName = explode('/',$_SERVER['PWD'])[5];
+            //$dir = realpath(pathinfo($_SERVER['PATH_TRANSLATED'])['dirname']);
+            //$bn = array_key_exists('PWD', $_SERVER)?$dcFolderName:explode('/',$dir)[5];
             //echo '<pre>'; var_dump ($_SERVER); var_dump ($dcFolderName); echo '</pre>'; die();
 
             //ugly hack:
-            if ($bn=='NicerAppWebOS') $bn = 'said.by';
+            //if ($bn=='NicerAppWebOS') $bn = 'said.by';
 
-            if (
+            /*if (
                 strpos($dir,'/news')!==false
                 || strpos($dir,'/musicPlayer.beatPulse')!==false
             ) {
@@ -49,6 +49,31 @@ NicerApp WebOS from Nicer Enterprises
             } else {
                 $settingsFilePath = $dir.'/../../../domains/'.$bn.'/domainConfig/settings.json';
             }
+	     */
+		$scriptDir = dirname(__FILE__);
+		//var_dump ($scriptDir); exit;
+
+		if (preg_match('#/domains/([^/]+)/#', $scriptDir, $m)) {
+    			$bn = $m[1];
+		} else {
+			//var_dump ('---- boot.php (1)');
+			/*var_dump ($_SERVER);
+    			// fallback to your existing explode + ugly hack
+			if (array_key_exists('PWD',$_SERVER)) {
+				var_dump (explode('/',$_SERVER['PWD']));
+				$dcFolderName = explode('/',$_SERVER['PWD'])[5];
+				var_dump ($dcFolderName);
+			}*/
+            		$dir = pathinfo($_SERVER['PATH_TRANSLATED'])['dirname'];
+            		$bn = explode('/',$dir)[5];
+			//var_dump ($bn); exit;
+		}
+		$settingsFilePath = dirname($scriptDir, 2) . '/domains/' . $bn . '/domainConfig/settings.json';
+		if (!file_exists($settingsFilePath)) {
+			$settingsFilePath = dirname($scriptDir, 2) . '/' . $bn . '/domainConfig/settings.json';
+		}
+//var_dump ($scriptDir); var_dump ($settingsFilePath); exit;
+// adjust the number of dirname() levels according to your real layout
         }
         //echo '<pre>';var_dump ($_SERVER);echo '</pre>';
         //echo $dcFolderName; die();
@@ -58,6 +83,10 @@ NicerApp WebOS from Nicer Enterprises
         //  using techniques from .../NicerAppWebOS/logic.filePhoenix
         //$settingsFilePath = dirname(__FILE__).'/domainConfigs/'.$dcFolderName.'/settings.json';
         //var_dump ($settingsFilePath); die();
+
+	// inside the else (CLI) block
+//
+//
         if (false) {
             echo $settingsFilePath;
             ob_flush();
