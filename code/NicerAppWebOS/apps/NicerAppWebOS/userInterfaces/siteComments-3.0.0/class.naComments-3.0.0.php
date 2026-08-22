@@ -8,15 +8,15 @@ class class_naComments {
             'btnMainCommentAdd' => 'btnCssVividButton.greenBlue.png',
             'btnDeleteComment' => 'btnCssVividButton.yellow2a.png',
             'btnAddReply' => 'btnCssVividButton.yellow2a.png',
-            'btnEditComment'    => 'btnCssVividButton.blue1a.png',
-            'btnHideComment'    => 'btnCssVividButton.blue1a.png'
+            'btnEditComment'    => 'btnCssVividButton.greenYellow.png',
+            'btnHideComment'    => 'btnCssVividButton.yellow1a.png'
         ],
         'DutchCulture' => [
             'btnMainCommentAdd' => 'btnCssVividButton.orange1c.png',
             'btnDeleteComment' => 'btnCssVividButton.yellow1a.png',
             'btnAddReply' => 'btnCssVividButton.yellow1a.png',
-            'btnEditComment'    => 'btnCssVividButton.blue1a.png',
-            'btnHideComment'    => 'btnCssVividButton.blue1a.png'
+            'btnEditComment'    => 'btnCssVividButton.greenYellow.png',
+            'btnHideComment'    => 'btnCssVividButton.yellow1a.png'
         ]
     ];
     public $theme = 'simple';//'DutchCulture';
@@ -581,7 +581,7 @@ class class_naComments {
                     '', '', '', ''
                 ).PHP_EOL;
                 if (array_key_exists('clientUsername',$it) && $it['clientUsername']==$naUsername) {
-                    $html .= $naWebOS->html_vividButton(
+                    /*$html .= $naWebOS->html_vividButton(
                         1001, 'float:right',
 
                         'btnRemoveComment',
@@ -598,6 +598,7 @@ class class_naComments {
                         'btnTrashcan_red.png',
                         '', '', '', ''
                     ).PHP_EOL;
+		     */
                     $html .= $naWebOS->html_vividButton(
                         1001, 'float:right',
                         'btnEditComment',

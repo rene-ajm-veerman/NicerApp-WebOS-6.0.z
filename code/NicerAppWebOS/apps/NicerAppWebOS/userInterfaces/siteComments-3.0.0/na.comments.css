@@ -133,3 +133,25 @@
 .naComment_entry.naComment_hidden .naComment_msgHTML {
    /* already handled by JS slideUp, but just in case */
 }
+
+.naHistoryActions {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.naHistoryRestoreBtn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e8f0ff;
+    background: rgba(40, 100, 200, 0.7);
+    border: 1px solid rgba(120, 170, 255, 0.45);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.naHistoryRestoreBtn:hover {
+    background: rgba(60, 130, 230, 0.85);
+    transform: translateY(-1px);
+}

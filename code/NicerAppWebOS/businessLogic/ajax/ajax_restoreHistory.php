@@ -31,7 +31,7 @@ if (!function_exists('naHasPermission') || !naHasPermission($appID, 'restoreHist
 }
 
 try {
-    $db  = $naWebOS->dbs->findConnection('couchdb');
+    $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
     $cdb = $db->cdb;
 
     $liveDb  = $db->dataSetName($database);

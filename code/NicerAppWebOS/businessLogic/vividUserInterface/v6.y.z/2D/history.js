@@ -144,7 +144,7 @@ restore : function (params) {
     /**
      * Render the vertical timeline
      */
-renderTimeline : function ($container, history, opts) {
+/*renderTimeline : function ($container, history, opts) {
     if (history.length === 0) {
         $container.html('<div class="naHistoryEmpty">No previous revisions exist.</div>');
         return;
@@ -204,7 +204,6 @@ const restoredBadge = restoredFrom
                 </div>
             </div>
         `;
-	*/
 	    html += `
     <div class="naHistoryEntry" data-idx="${idx}" data-history-id="${rev._id || ''}">
         <div class="naHistoryDot"></div>
@@ -254,6 +253,156 @@ const restoredBadge = restoredFrom
                 alert('Restore failed: ' + (msg || 'unknown error'));
             }
         });
+    });
+}
+*/
+	renderTimeline : function ($container, history, opts) {
+    if (history.length === 0) {
+        $container.html('<div class="naHistoryEmpty">No previous revisions exist.</div>');
+        return;
+    }
+
+    // Make sure we have the documentID available for the restore buttons
+    opts.documentID = opts.documentID || opts.id || null;
+
+    let html = '<div class="naHistoryTimelineTrack">';
+
+    history.forEach(function (rev, idx) {
+        const snap = rev.snapshot || rev;
+
+        const when = rev.historyDatetimeStr
+                  || (rev.historyDatetime ? new Date(rev.historyDatetime * 1000).toLocaleString() : 'unknown');
+
+        const who  = rev.historyBy || snap.clientUsername || 'unknown';
+
+        // Resolve content field (supports nested paths)
+        let content = '';
+        if (opts.contentField && opts.contentField.indexOf('.') > -1) {
+            const parts = opts.contentField.split('.');
+            let cur = rev;
+            for (const p of parts) {
+                cur = cur ? cur[p] : null;
+            }
+            content = cur || '';
+        } else {
+            content = snap[opts.contentField] || rev[opts.contentField] || '';
+        }
+
+        // Restored badge
+        const restoredBadge = rev.restoredFrom
+            ? `<span class="naHistoryRestoredBadge" title="This version was created by restoring an older revision">↩ Restored</span>`
+            : '';
+
+        // Only show the restore button when we have a usable snapshot
+        const canRestore = opts.allowRestore !== false && snap && Object.keys(snap).length > 2;
+
+        html += `
+            <div class="naHistoryEntry" data-idx="${idx}" data-history-id="${rev._id || ''}">
+                <div class="naHistoryDot"></div>
+                <div class="naHistoryCard">
+                    <div class="naHistoryMeta">
+                        <span class="naHistoryWhen">${when}</span>
+                        <span class="naHistoryBy">by ${who}</span>
+                        ${rev.originalRev ? `<span class="naHistoryRev">rev ${rev.originalRev}</span>` : ''}
+                        ${restoredBadge}
+                    </div>
+                    <div class="naHistoryBody">${content}</div>
+                    ${canRestore ? `
+                        <div class="naHistoryActions">
+                            <button type="button" class="naHistoryRestoreBtn"
+                                    data-history-id="${rev._id || ''}"
+                                    data-document-id="${opts.documentID || ''}"
+                                    data-database="${opts.database || ''}">
+                                Restore this version
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    $container.html(html);
+
+    // -------------------------------------------------
+    // Attach click handlers for the Restore buttons
+    // -------------------------------------------------
+    $container.find('.naHistoryRestoreBtn').off('click').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $btn        = $(this);
+        const historyId   = $btn.data('history-id');
+        const documentId  = $btn.data('document-id') || opts.documentID;
+        const database    = $btn.data('database') || opts.database;
+
+        if (!historyId || !documentId || !database) {
+            alert('Missing data – cannot restore.');
+            return;
+        }
+
+        if (!confirm('Restore this version?\n\nThis will overwrite the current document and create a new history entry of the current state.')) {
+            return;
+        }
+
+        na.history.restore({
+            historyId  : historyId,
+            documentId : documentId,
+            database   : database,
+            appID      : opts.appID || database,
+            onSuccess  : function () {
+                alert('Version restored successfully.');
+                // Refresh the timeline so the new history entry appears
+                na.history.view(documentId, opts);
+            },
+            onError : function (msg) {
+                alert('Restore failed: ' + (msg || 'unknown error'));
+            }
+        });
+    });
+}
+,
+	/**
+ * Restore a previous revision
+ */
+restore : function (params) {
+    const {
+        historyId,
+        documentId,
+        database,
+        appID,
+        onSuccess,
+        onError
+    } = params;
+
+    $.ajax({
+        type : 'POST',
+        url  : '/NicerAppWebOS/businessLogic/ajax/ajax_restoreHistory.php',
+        data : {
+            historyId  : historyId,
+            documentId : documentId,
+            database   : database,
+            appID      : appID || database
+        },
+        success : function (raw) {
+            let data;
+            try {
+                data = (typeof raw === 'string') ? JSON.parse(raw) : raw;
+            } catch (e) {
+                if (onError) onError('Invalid response from server');
+                return;
+            }
+
+            if (data.ok) {
+                if (onSuccess) onSuccess(data);
+            } else {
+                if (onError) onError(data.error || data.errorHTML || 'Restore failed');
+            }
+        },
+        error : function () {
+            if (onError) onError('Network error while restoring');
+        }
     });
 }
 };
