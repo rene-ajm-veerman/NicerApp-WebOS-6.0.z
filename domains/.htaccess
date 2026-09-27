@@ -267,58 +267,6 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
 RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^guseu$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvR3JpZmZpbi1VUy1FVVwvZmlsZXNcL2luZGV4LnBocCIsInRpdGxlIjoiXC9zaXRlRGlhcmllc1wvR3JpZmZpbi1VUy1FVVwvZmlsZXNcL2luZGV4LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImd1c2V1Il19fQ [N]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^guseu$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvR3JpZmZpbi1VUy1FVVwvZmlsZXNcL2luZGV4LnBocCIsInRpdGxlIjoiXC9zaXRlRGlhcmllc1wvR3JpZmZpbi1VUy1FVVwvZmlsZXNcL2luZGV4LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbImd1c2V1Il19fQ [N]
-
-
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^psychiatric-evolution$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvcHN5Y2hpYXRyaWMtZXZvbHV0aW9uXC9maWxlc1wvaW5kZXgucGhwIiwidGl0bGUiOiJcL3NpdGVEaWFyaWVzXC9wc3ljaGlhdHJpYy1ldm9sdXRpb25cL2ZpbGVzXC9pbmRleC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJwc3ljaGlhdHJpYy1ldm9sdXRpb24iXX19 [N]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^psychiatric-evolution$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvcHN5Y2hpYXRyaWMtZXZvbHV0aW9uXC9maWxlc1wvaW5kZXgucGhwIiwidGl0bGUiOiJcL3NpdGVEaWFyaWVzXC9wc3ljaGlhdHJpYy1ldm9sdXRpb25cL2ZpbGVzXC9pbmRleC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJwc3ljaGlhdHJpYy1ldm9sdXRpb24iXX19 [N]
-
-
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^Refirenda$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvUmVmaXJlbmRhXC9maWxlc1wvaW5kZXgucGhwIiwidGl0bGUiOiJcL3NpdGVEaWFyaWVzXC9SZWZpcmVuZGFcL2ZpbGVzXC9pbmRleC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJSZWZpcmVuZGEiXX19 [N]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^Refirenda$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvUmVmaXJlbmRhXC9maWxlc1wvaW5kZXgucGhwIiwidGl0bGUiOiJcL3NpdGVEaWFyaWVzXC9SZWZpcmVuZGFcL2ZpbGVzXC9pbmRleC50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJSZWZpcmVuZGEiXX19 [N]
-
-
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^Rene-AJM-Veerman$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvUmVuZS1BSk0tVmVlcm1hblwvZmlsZXNcL2luZGV4LnBocCIsInRpdGxlIjoiXC9zaXRlRGlhcmllc1wvUmVuZS1BSk0tVmVlcm1hblwvZmlsZXNcL2luZGV4LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbIlJlbmUtQUpNLVZlZXJtYW4iXX19 [N]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^Rene-AJM-Veerman$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9zaXRlRGlhcmllc1wvUmVuZS1BSk0tVmVlcm1hblwvZmlsZXNcL2luZGV4LnBocCIsInRpdGxlIjoiXC9zaXRlRGlhcmllc1wvUmVuZS1BSk0tVmVlcm1hblwvZmlsZXNcL2luZGV4LnRpdGxlLnBocCIsInNlb1ZhbHVlIjpbIlJlbmUtQUpNLVZlZXJtYW4iXX19 [N]
-
-
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
 RewriteRule ^docs$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2NvbnRlbnQtbWFuYWdlbWVudC1zeXN0ZW1zXC9OaWNlckFwcFdlYk9TXC9kaXNrVGV4dCI6eyJmaWxlIjoiXC9OaWNlckFwcFdlYk9TXC9kb2N1bWVudGF0aW9uXC9OaWNlckFwcC1XZWJPUy0tb3ZlcnZpZXcucGhwIiwidGl0bGUiOiJcL05pY2VyQXBwV2ViT1NcL2RvY3VtZW50YXRpb25cL05pY2VyQXBwLVdlYk9TLS1vdmVydmlldy50aXRsZS5waHAiLCJzZW9WYWx1ZSI6WyJkb2NzIiwiZG9jcy1vdmVydmlldyJdfX0 [N]
 
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -826,6 +774,32 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
 RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^grokipedia$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^grokipedia$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^gp$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^gp$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcLzNyZC1wYXJ0eS1zaXRlLmdyb2tpcGVkaWEuY29tIjp7InBhZ2UiOiJpbmRleCIsInNlb1ZhbHVlIjpbImdyb2tpcGVkaWEiLCJncCJdfX0 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
 RewriteRule ^tarot$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2NhcmRnYW1lLnRhcm90Ijp7ImRlY2siOiJcL1dhaXRlLVNtaXRoXC9QYW0gQ29sbWFuIFNtaXRoXC9PcmlnaW5hbCBSaWRlciBXYWl0ZSIsInJlYWRpbmciOiIzLUNhcmRzIiwic2VvVmFsdWUiOlsidGFyb3QiLCJjYXJkZ2FtZS10YXJvdCJdfX0 [N]
 
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -852,12 +826,51 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
 RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^music$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmphdmFzY3JpcHRSZW5kZXJpbmciOnsic2V0IjoiaW5kZXgiLCJzZW9WYWx1ZSI6Im11c2ljIn19 [N]
+RewriteRule ^music-2D-beatPulse$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^music$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmphdmFzY3JpcHRSZW5kZXJpbmciOnsic2V0IjoiaW5kZXgiLCJzZW9WYWx1ZSI6Im11c2ljIn19 [N]
+RewriteRule ^music-2D-beatPulse$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmJlYXRQdWxzZSI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWJlYXRQdWxzZSIsIm11c2ljIl19fQ [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music-2D-fancy$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music-2D-fancy$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
+RewriteRule ^music-fancy$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_METHOD} ^(GET)$
+RewriteRule ^music-fancy$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL211c2ljUGxheWVyLmZhbmN5LmxhdGVzdC4yRCI6eyJzZXQiOiJpbmRleCIsInNlb1ZhbHVlIjpbIm11c2ljLTJELWZhbmN5IiwibXVzaWMtZmFuY3kiXX19 [N]
 
 
 
@@ -1073,12 +1086,12 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
 RewriteCond %{HTTP:X-Requested-With} XMLHttpRequest
-RewriteRule ^forums$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtcyI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcyJ9fQ [N]
+RewriteRule ^forums-configuration$ /view-content/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtc19fdmlld19pbmRleCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcy1jb25maWd1cmF0aW9uIn19 [N]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_METHOD} ^(GET)$
-RewriteRule ^forums$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtcyI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcyJ9fQ [N]
+RewriteRule ^forums-configuration$ /view/eyJcL05pY2VyQXBwV2ViT1NcL2FwcHNcL05pY2VyQXBwV2ViT1NcL2FwcGxpY2F0aW9uc1wvMkRcL2ZvcnVtc19fdmlld19pbmRleCI6eyJwYWdlIjoiaW5kZXgiLCJzZW9WYWx1ZSI6ImZvcnVtcy1jb25maWd1cmF0aW9uIn19 [N]
 
 
 

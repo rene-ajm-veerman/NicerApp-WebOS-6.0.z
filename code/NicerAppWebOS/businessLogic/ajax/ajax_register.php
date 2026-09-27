@@ -2,7 +2,7 @@
 $rootPathNA = realpath(dirname(__FILE__).'/../../..').'/NicerAppWebOS';
 require_once ($rootPathNA.'/boot.php');
 
-$debug = true;
+$debug = false;
 if ($debug) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -185,11 +185,11 @@ $rec = array(
     'dialogs' => array_merge_recursive(
                             css_to_array (file_get_contents(
                                 realpath(dirname(__FILE__).'/../../')
-                                .'/NicerAppWebOS/themes/nicerapp_default_siteContent-almost-transparent.css'
+                                .'/themes/nicerapp_default_siteContent-almost-transparent.css'
                             )),
                             css_to_array (file_get_contents(
                                 realpath(dirname(__FILE__).'/../../')
-                                .'/NicerAppWebOS/themes/nicerapp_app.2D.musicPlayer.css'
+                                .'/themes/nicerapp_app.2D.musicPlayer.css'
                             ))
             )
 
@@ -213,9 +213,9 @@ try {
         'members' => [ 'names' => [], 'roles' => [] ]
     ];
     $call = $cdb->setSecurity($sec);
-    echo '<pre>'; var_dump ($call);
+    //echo '<pre>'; var_dump ($call);
 } catch (Exception $e) {
-    echo '<pre>'; var_dump ($call);
+    //echo '<pre>'; var_dump ($call);
 }
 
 ?>

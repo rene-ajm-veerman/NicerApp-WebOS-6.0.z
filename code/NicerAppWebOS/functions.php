@@ -5,6 +5,44 @@ require_once(dirname(__FILE__).'/boot.php');
 //use Birke\Rememberme\Storage\FileStorage;
 //use Defuse\Crypto\Key;
 //use Defuse\Crypto\Crypto;
+
+
+
+function na_couchdbUsername_from_plainUsername ($un) {
+    global $naWebOS;
+    $dn = $naWebOS->domainFolderForDB;
+    $un = str_replace($dn.'___', '', $un);
+    return $dn.'___'.str_replace(' ','__',str_replace('.', '_', $un));
+}
+function na_plainUsername_from_couchdbUserName ($un) {
+    if (is_null($un)) return null;
+    $un = preg_replace('/.*___/','', $un);
+    return str_replace('_','.',str_replace('__', ' ', $un));
+}
+
+function na_couchdbGroupname_from_plainGroupname ($gn) {
+    global $naWebOS;
+    $dn = $naWebOS->domainFolderForDB;
+    //echo '<pre style="color:red">'; var_dump ($dn); echo '</pre>';
+    $gn = str_replace($dn.'___', '', $gn);
+    //echo '<pre style="color:purple">'; var_dump ($dn); echo '</pre>';
+    return $dn.'___'.str_replace('.','__',str_replace(' ', '_', $gn));
+}
+function na_plainGroupname_from_couchdbGroupname ($gn) {
+    $gn = preg_replace('/.*___/','', $gn);
+    return str_replace('_',' ',str_replace('__', '.', $gn));
+}
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Safe DateTimeZone constructor – never throws on empty/invalid values.
  */
@@ -168,7 +206,7 @@ function timestampJSmodule2 ($js) {
   $preg = preg_match_all ('/\(\s*[\'"](.*?)[\'"]\s*\)/', $js, $matches);
   $matches[2] = [];
   $matches[3] = [];
-debug_print_backtrace();
+    //debug_print_backtrace();
   foreach ($matches[1] as $idx => $relPath) {
     $rp = str_replace('/NicerAppWebOS/ajax_getModule.php?f=','',$relPath);
     if (strpos($rp,'&')===false) {
@@ -735,6 +773,7 @@ function cdb_login($db, $cdb, $cRec, $username) {
             $r = $cdb->loginByCookie ($_COOKIE['cdb_authSession_cookie']);
             $done = true;
         } catch (Throwable $e) {
+            trigger_error ($fncn.' : could not login by cookie, $e->getMessage()='.$e->getMessage(), E_USER_WARNING);
             try {
                 echo '<h1>Could not login by cookie; '.$e->getMessage().'</h1>';
                 //echo '<pre>';var_dump($cRec);die();
@@ -802,7 +841,7 @@ function cdb_login($db, $cdb, $cRec, $username) {
                 && !is_null($cdb_session->body->userCtx->name)
             ) {
                 $done = true;
-            }
+            // }
         }*/
     } elseif (
         !$done
@@ -879,8 +918,7 @@ function cdb_login($db, $cdb, $cRec, $username) {
 
     //echo 't593:'; var_dump ($done);
     if ($done) {
-        global $naBackupAccountName; global $naBackupAccountPassword;
-        $cdb_session = $cdb->getSession($naBackupAccountName, $naBackupAccountPassword);
+        $cdb_session = $cdb->getSession();
         //echo '<pre>'; var_dump($cdb_session->body->userCtx->name); echo '</pre>';// exit;
 
         global $naLAN;
@@ -899,42 +937,13 @@ function cdb_login($db, $cdb, $cRec, $username) {
 
             $findCommand = [
                 'selector' => [
-                    'name' => $db->translate_plainUserName_to_couchdbUserName('Guest')
+                    'name' => $dba->translate_plainUserName_to_couchdbUserName('Guest')
                 ],
                 'fields' => ['_id', 'name', 'displayName']
             ];
 
-            try {
-                $call = $cdba->find($findCommand);
-            } catch (Exception $e) {
-                //echo '<pre>.../NicerAppWebOS/functions.php::cdb_login() : '; var_dump ($findCommand); echo PHP_EOL.'<br/>'.PHP_EOL.$e->getMessage(); echo '</pre>'; exit;
-                try {
-                    $cdb->login ($db->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest', Sag::$AUTH_COOKIE);
-                    $call = $cdba->find($findCommand);
-                } catch (Throwable $e) {
-                    global $naDebugStartup;
-                    if ($naDebugStartup) {
-                        echo '<h3>Now creating user "'.$db->translate_plainUserName_to_couchdbUserName('Guest').'" in _users database.</h3>';
-                    }
-                    $cdba->setDatabase('_users',true);
-                    $cdba->put ('org.couchdb.user:'.$db->translate_plainUserName_to_couchdbUserName('Guest'),[
-                        'name' => $db->translate_plainUserName_to_couchdbUserName('Guest'),
-                        'type' => 'user',
-                        'roles' => [
-                            $db->translate_plainGroupName_to_couchdbGroupName('Guests')
-                        ],
-                        'password' => 'Guest'
-                    ]);
-                    try {
-                        $cdb->login ($db->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest', Sag::$AUTH_COOKIE);
-                        $call = $cdba->find($findCommand);
-                    } catch (Throwable $e) {
-                        //echo '<pre>.../NicerAppWebOS/functions.php::cdb_login() : Could not create account "Guest"</pre>';
-                        return false;
-                    }
-                }
-            }
-            //echo '<pre>'; var_dump ($findCommand); echo PHP_EOL.'<br/>'.PHP_EOL.json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; exit;
+            $call = $cdba->find($findCommand);
+                echo '<pre>'; var_dump ($findCommand); echo PHP_EOL.'<br/>'.PHP_EOL.json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; exit;
             if (
                 array_key_exists(0,$call->body->docs)
                 && property_exists($call->body->docs[0],'displayName')
@@ -953,8 +962,8 @@ function cdb_login($db, $cdb, $cRec, $username) {
             if ($naDebugStartup) {
                 $msg = '<h2 style="color:green">$naWebOS->dbsAdmin===\''.$naWebOS->dbsAdmin.'\', please run <a href="/NicerAppWebOS/db_init.php">/NicerAppWebOS/db_init.php</a> with .../domains/example.com/databases.username-admin.json properly filled out.</h2>'; echo $msg;
                 //trigger_error('cdb_login() : invalid $naWebOS->dbsAdmin', E_USER_WARNING);
-                return false;
             }
+            return false;
 
             //exit;
         } else {
@@ -2639,12 +2648,15 @@ function negotiateOptions () {
   $r = array();
 
   foreach ($params as $paramIdx => $param) {
-		if ((array)$param!==$param) return badResult (E_USER_WARNING, array(
-			'function' => '/code/sitewide_rv/php_expansion_packs.php::negotiateOptions',
-			'msg' => 'Param with idx '.$paramIdx.' is not an array.',
-			'$paramIdx' => $paramIdx,
-			'$param' => $param
-		));
+		if ((array)$param!==$param) {
+            trigger_error (json_encode(array(
+                'function' => '.../functions.php::negotiateOptions',
+                'msg' => 'Param with idx '.$paramIdx.' is not an array.',
+                '$paramIdx' => $paramIdx,
+                '$param' => $param
+            )), E_USER_WARNING);
+            return false;
+        }
 
 		foreach ($param as $k=>$v) {
 

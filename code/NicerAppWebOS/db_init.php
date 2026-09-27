@@ -145,8 +145,9 @@ function addPrefixes ($dbs) {
 
 global $naWebOS;
 //echo '<pre>t669:'; var_dump($naWebOS);die();
-$db = $naWebOS->dbsAdmin->findConnection('couchdb');
+$db = $naWebOS->dbs->findConnection('couchdb');
 $cdb = $db->cdb;
+var_dump ($cdb->getSession(null,null));
 $cdb->setDatabase('_users', true);
 
 /*
@@ -251,7 +252,7 @@ $dbs2 = addPrefixes($dbs);
 
 
 try {
-    $allDBs = $naWebOS->dbsAdmin->getAllDatabases ();
+    $allDBs = $naWebOS->dbs->getAllDatabases ();
 } catch (Exception $e) {
     $fn = dirname(__FILE__).'/domainConfigs/'.$naWebOS->domainFolder.'/databases.username-admin.json';
     $msg =
@@ -291,14 +292,14 @@ else $groupsFinal = $groups;
 
 //echo '<pre style="color:white;background:navy;margin:10px;padding:10px;border-radius:10px;">'; var_dump($dbs2); echo '</pre>'; ///exit;
 
-$naWebOS->dbsAdmin->clearOutDatabases ($dbs2);
+$naWebOS->dbs->clearOutDatabases ($dbs2);
 
 /*
  * Main()
  */
-$naWebOS->dbsAdmin->createUsers($users, $groupsFinal);
-$naWebOS->dbsAdmin->createDatabases ($dbs);
-$naWebOS->dbsAdmin->resetDatabases ($dbsReset);
+$naWebOS->dbs->createUsers($users, $groupsFinal);
+$naWebOS->dbs->createDatabases ($dbs);
+$naWebOS->dbs->resetDatabases ($dbsReset);
 
 /*
  * Post-init db config-ing

@@ -40,6 +40,8 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
         $this->connectionSettings = $cRec;
         //echo '<pre style="color:green;background:yellow;margin:10px;padding:10px;border-radius:10px;">t3112:'; var_dump ($username); var_dump ($cRec); echo '</pre>';
 
+        //echo '<pre>t9382:'; var_dump($username); var_dump ($cRec); echo json_encode(debug_backtrace(),JSON_PRETTY_PRINT); echo '</pre>';
+
         $admin = (
             $username==$this->translate_plainUserName_to_couchdbUserName($naWebOS->ownerInfo['OWNER_NAME'])
             || $username==$this->translate_plainUserName_to_couchdbUserName('Administrator')
@@ -57,6 +59,7 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
             $this->cdb->setHTTPAdapter($cRec['httpAdapter'], $this->translate_plainUserName_to_couchdbUserName($cRec['username']), $cRec['password']);
             $this->cdb->useSSL($cRec['useSSL']);
         } else {
+            echo '<h1>FALLBACK</h1>';
             $this->cdb = new Sag('127.0.0.1', 5984, $this->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest');
             $this->cdb->setHTTPAdapter('HTTP_CURL', $this->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest');
             $this->cdb->useSSL(false);
@@ -73,12 +76,12 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
                 if ($cRec['username']=='admin') {
                     //echo '<h2 style="color:green;">Logging in as "admin"</h2>'; //exit;
                     $naLoginResult = cdb_login ($this, $this->cdb, $cRec, $cRec['username'], $cRec['password']);
-                    return $this;
                 } else
                     $naLoginResult = cdb_login ($this, $this->cdb, $cRec, $this->translate_plainUserName_to_couchdbUserName($cRec['username']), $cRec['password']);
-            } else
+            } else{
+                echo '<h1>FALLBACK2</h1>';
                 $naLoginResult = cdb_login ($this, $this->cdb, null, null);
-
+            }
             if ($naLoginResult === false) {
                 //echo '<h1>ERROR LOGGING IN AS '.(is_array($cRec)?$cRec['username']:'Guest').'</h1>'; var_dump(is_object($naWebOS->dbsAdmin));
                 if (!is_object($naWebOS->dbsAdmin) && is_array($cRec) && $cRec['username']=='Administrator') { //CHECKED!
@@ -147,12 +150,15 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
 
         // test db connection quality
         global $naBackupAccountName; global $naBackupAccountPassword;
-        if (is_null($this->cdb->getSession($naBackupAccountName,$naBackupAccountPassword)->body->userCtx->name)) {
+        if (is_null($this->cdb->getSession(null,null)->body->userCtx->name)) {
             trigger_error ('Could not log into couchdb database. Reason : Database cookie expired. Please login again.', E_USER_WARNING);
         }
 
-        $u = $this->cdb->getSession($naBackupAccountName,$naBackupAccountPassword)->body->userCtx;
-        //echo '<pre style="color:red">t79;'; var_dump ($u); echo '</pre>'; //exit();
+        $u = $this->cdb->getSession(null,null)->body->userCtx;
+        global $naDebugStartup;
+        if (true || $naDebugStartup) {
+            echo '<pre style="color:red">t79:'; var_dump ([$username,$u]); echo '</pre>'; //exit();
+        }
         $this->username = $u->name;
         $this->roles = $u->roles;
 

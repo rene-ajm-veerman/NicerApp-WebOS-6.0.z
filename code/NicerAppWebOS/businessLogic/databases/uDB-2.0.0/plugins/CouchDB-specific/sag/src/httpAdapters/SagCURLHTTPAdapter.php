@@ -37,7 +37,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
 
   }
 
-  public function procPacket($method, $url, $data = null, $reqHeaders = array(), $specialHost = null, $specialPort = null, $backupAccountName = null, $backupAccountPassword = null) {
+  public function procPacket($method, $url, $data = null, $reqHeaders = array(), $specialHost = null, $specialPort = null) {
     global $na_error_log_filepath_html;
     global $na_error_log_filepath_txt;
 
@@ -51,23 +51,12 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     };
 
     // the base cURL options
-    $url = (
-      /*
-      isset($_SESSION)
-      && array_key_exists('cdb_loginName', $_SESSION)
-      && is_string($_SESSION['cdb_loginName'])
-      && $_SESSION['cdb_loginName']!=''
-      && array_key_exists('cdb_pw', $_SESSION)
-      && is_string($_SESSION['cdb_pw'])
-      && $_SESSION['cdb_pw']!=''
-      ? "{$this->proto}://".$naWebOS->domainFolderForDB.'___'.preg_replace('/.*___/','',
-            str_replace(' ','_',
-              str_replace('.','__', rawurlencode($_SESSION['cdb_loginName'])))).":".rawurlencode($_SESSION['cdb_pw'])."@{$this->host}:{$this->port}{$url}"
-      : */"{$this->proto}://".rawurlencode($this->user).":".rawurlencode($this->pass)."@{$this->host}:{$this->port}{$url}"
-    );
+    $u = $this->user?:$naWebOS->domainFolderForDB.'___Guest';
+    $p = $this->pass?:'Guest';
+    $url = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
     global $naDebugStartup;
 
-    if ($naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3322:'); var_dump ($this); var_dump ($url); echo json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS),JSON_PRETTY_PRINT);echo '</pre>'; } // die();
+    if (true || $naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3322:'); var_dump ($url); echo '</pre>'; } // die();
 
     $opts = array(
       CURLOPT_URL => $url,

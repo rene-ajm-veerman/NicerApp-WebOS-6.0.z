@@ -51,7 +51,7 @@ class newsApp3_class {
         
         $debug = false;//$naDebugAll;
         
-        $this->db = $naWebOS->dbsAdmin->findConnection('couchdb');
+        $this->db = $naWebOS->dbs->findConnection('couchdb');
         $this->cdb = $this->db->cdb;
 
         $dbName = $this->db->dataSetName('app_2D_news__rss_items');

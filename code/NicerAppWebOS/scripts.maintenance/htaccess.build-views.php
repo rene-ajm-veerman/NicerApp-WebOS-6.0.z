@@ -9,9 +9,9 @@ global $filePerms_perms_readonly;
 global $naWebOS;
 
 $dbs = [ 'views' => true ];
-$naWebOS->dbsAdmin->createDatabases($dbs); // also empties database
+$naWebOS->dbs->createDatabases($dbs); // also empties database
 
-$db = $naWebOS->dbsAdmin->findConnection('couchdb');
+$db = $naWebOS->dbs->findConnection('couchdb');
 $cdb = $db->cdb;
 $dataSetName1 = $db->dataSetName('views');
 $dataSetName2 = $db->dataSetName('viewsIDs');

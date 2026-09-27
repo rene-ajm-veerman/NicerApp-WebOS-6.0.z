@@ -142,7 +142,7 @@ abstract class SagHTTPAdapter {
    * @returns stdClass The response object created by makeResponse().
    * @see makeResponse()
    */
-  abstract public function procPacket($method, $url, $data = null, $reqHeaders = array(), $specialHost = null, $specialPort = null, $backupAccountName = null, $backupAccountPasword = null);
+  abstract public function procPacket($method, $url, $data = null, $reqHeaders = array(), $specialHost = null, $specialPort = null);
 
   /**
    * Whether to use HTTPS or not.

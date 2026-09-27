@@ -1,6 +1,6 @@
 <?php 
 // see .../.htaccess for the latest interpretations of content viewing that should get handled by this file.
-echo '<pre style="color:orange;">'; var_dump ($_GET); echo '</pre>'; die();
+//echo '<pre style="color:orange;">'; var_dump ($_GET); echo '</pre>'; die();
 
 if (false) {
     global $naDebugAll;

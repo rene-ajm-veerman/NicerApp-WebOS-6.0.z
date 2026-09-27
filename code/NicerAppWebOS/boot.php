@@ -27,6 +27,8 @@ NicerApp WebOS from Nicer Enterprises
 
     global $naDebugStartup;
     $naDebugStartup = false;
+    global $naDebugThemeLoading;
+    $naDebugThemeLoading = true;
 
     ini_set('memory_limit','2G'); // hacker deterrence by keeping it at 2G.
     set_time_limit(70); // 70 seconds; also for hacker deterrence. can be overridden by individual ajax scripts though!

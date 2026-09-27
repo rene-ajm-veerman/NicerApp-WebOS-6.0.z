@@ -260,8 +260,8 @@ class Sag {
    *
    * @return stdClass
    */
-  public function getSession($backupAccountName, $backupAccountPassword) {
-    return $this->procPacket('GET', '/_session', null, [], $backupAccountName, $backupAccountPassword);
+  public function getSession() {
+    return $this->procPacket('GET', '/_session', null, []);
   }
 
   /**

@@ -1,5 +1,6 @@
 <?php
 class NicerAppWebOS {
+
     public $cn = '.../NicerAppWebOS/businessLogic/business/class.NicerAppWebOS.php::class NicerAppWebOS';
     public $dbs = null;
     public $dbsAdmin = null;
@@ -11,7 +12,7 @@ class NicerAppWebOS {
     public $globals = null;
     public $url = '-url-';
     public $debug = false;
-    public $debugThemeLoading = false;
+    public $debugThemeLoading = true;
     public $browserDebug = false;
     public $showAllErrors = false;
 
@@ -50,6 +51,10 @@ class NicerAppWebOS {
 
         $p1 = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
         $this->webRootPath = $p1; // You'll need this.
+
+        global $naDebugStartup;
+        global $naDebugThemeLoading;
+        $this->debugThemeLoading = $naDebugThemeLoading;
 
         $p3 = '.';
         if (array_key_exists('DOCUMENT_ROOT',$_SERVER) && $_SERVER['DOCUMENT_ROOT']!=='') {
@@ -857,7 +862,7 @@ class NicerAppWebOS {
         $fncn = $this->cn.'::getContent__data_by_users()';
         global $rootPath_na;
         global $naWebOS;
-        $db = $naWebOS->dbs->findConnection('couchdb');
+        $db = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
         $debug = false;
 
@@ -922,7 +927,7 @@ class NicerAppWebOS {
                 // request view settings from database
                 $viewID = $dataRecord['viewID'];
 
-                $db = $this->dbs->findConnection('couchdb');
+                $db = $this->dbsAdmin->findConnection('couchdb');
                 $cdb = $db->cdb;
                 $dataSetName = $db->dataSetName('views'); // i know, couchdb calls a 'table' a 'database'. and that sux.
 
@@ -1444,7 +1449,7 @@ class NicerAppWebOS {
         global $naDebugAll;
         global $naLAN;
         $debug = $this->debugThemeLoading;
-        $db = $this->dbs->findConnection('couchdb');
+        $db = $this->dbsAdmin->findConnection('couchdb');
         $viewFolder = '[UNKNOWN VIEW]';
 
         $selectors2 = $d['selectors'];
@@ -1543,6 +1548,7 @@ class NicerAppWebOS {
         global $naLAN;
         global $naIP;
         global $naUsername;
+        $naUsername = $_COOKIE['cdb_loginName'];
         global $naIsBot;
         $debug = $this->debugThemeLoading;
 
@@ -1944,6 +1950,8 @@ class NicerAppWebOS {
                         $r .= "\tuseVividTexts : ".$useVividTexts.",".PHP_EOL;
                         $r .= "\tbackground : '".$theme['background']."',".PHP_EOL;
                         $r .= "\tbackgroundSearchKey : '".$theme['backgroundSearchKey']."',".PHP_EOL;
+                        $r .= "\tclientIP : '".$naIP."',".PHP_EOL;
+                        $r .= "\tclientUsername : '".$naUsername."',".PHP_EOL;
                         $r .= "\tthemes : ".json_encode($css['themes'], JSON_PRETTY_PRINT).",".PHP_EOL;
                         $r .= "\tthemeName : '".$themeName."',".PHP_EOL;
                         $r .= "\tspecificityName : \"".$mySpecificityName."\",".PHP_EOL;
@@ -2041,7 +2049,7 @@ class NicerAppWebOS {
         global $naDebugAll;
         global $naLAN;
         $debug = $this->debugThemeLoading;
-        $db = $this->dbs->findConnection('couchdb');
+        $db = $this->dbsAdmin->findConnection('couchdb');
         //echo '<pre style="color:purple">'; var_dump($db); echo '</pre>';
         $cdb = $db->cdb;
 
@@ -2312,7 +2320,7 @@ class NicerAppWebOS {
 
 
 
-                //if (true) { echo '<pre style="color:white;background:blue">'; var_dump ($this->dbs->findConnection('couchdb')->roles); echo '</pre>'; }
+            if (true) { echo '<pre style="color:white;background:blue">'; var_dump ($this->dbs->findConnection('couchdb')); echo '</pre>'; }
 
 
             foreach ($this->dbs->findConnection('couchdb')->roles as $roleIdx => $role) {
@@ -2574,6 +2582,7 @@ class NicerAppWebOS {
                     if ($permissionType=='read') {
                         foreach ($permissionsRec as $accountType => $accountsList) {
                             foreach ($accountsList as $idx => $userOrGroupID) {
+                                $un = $db->translate_plainUserName_to_couchdbUserName(array_key_exists('cdb_admin_loginName',$_COOKIE)?$_COOKIE['cdb_loginName']:'Guest');
                                 if ($accountType == 'users') {
                                     $adjustedUserOrGroupID = $db->translate_plainUserName_to_couchdbUserName($userOrGroupID);
                                 } else {
@@ -2582,7 +2591,7 @@ class NicerAppWebOS {
                                 $adjustedUserOrGroupID = $userOrGroupID;
 
 
-                                if ($debug) { echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666c='; var_dump($accountType); var_dump ($this->dbs->findConnection('couchdb')->username); echo '<br/>'.PHP_EOL; var_dump ($userOrGroupID); echo '<br/>$adjustedUserOrGroupID='; var_dump ($adjustedUserOrGroupID); echo '</pre>';}
+                                if ($debug) { echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666c='; var_dump($accountType); var_dump ($_COOKIE); var_dump ($this->dbs->findConnection('couchdb')->username); echo '<br/>'.PHP_EOL; var_dump ($userOrGroupID); echo '<br/>$adjustedUserOrGroupID='; var_dump ($adjustedUserOrGroupID); echo '</pre>';}
 
                                 if ($accountType == 'roles') {
                                     //$adjustedUserOrGroupID = $db->translate_plainGroupName_to_couchdbGroupName($userOrGroupID);
@@ -2590,6 +2599,10 @@ class NicerAppWebOS {
                                     if (is_string($this->dbs)) {
                                         echo $fncn.' : WARNING : invalid database connection ($this->dbs="'.json_encode($this->dbs).'")- this database server, or even the entire webserver, has been hacked by hostiles.';
                                         exit(); // or exit();
+                                    }
+                                    if ($debug) {
+                                        echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666d=$roles='; var_dump ($this->dbs); echo '</pre>';
+
                                     }
                                     if (!is_null($this->dbs->findConnection('couchdb')->roles))
                                     foreach ( $this->dbs->findConnection('couchdb')->roles
@@ -2601,9 +2614,9 @@ class NicerAppWebOS {
                                         }
                                     }
                                 }
-                                if ($accountType == 'users' && $this->dbs->findConnection('couchdb')->username == $adjustedUserOrGroupID) {
+                                if ($accountType == 'users' && $un == $adjustedUserOrGroupID) {
                                     $hasPermission = true;
-                                    if ($debug) { echo 't777 $username='.$this->dbs->findConnection('couchdb')->username.PHP_EOL; }
+                                    if ($debug) { echo 't777 $username='.$un.PHP_EOL; }
                                 }
                             }
                         }
@@ -2616,7 +2629,7 @@ class NicerAppWebOS {
             }
 
             if (!$hasPermission) {
-                $msg = 'class.naContentManagementSystem.php::getPageCSS_specific() : !$hasPermission for username='.$this->dbs->findConnection('couchdb')->username.' - aborting';
+                $msg = 'class.naContentManagementSystem.php::getPageCSS_specific() : !$hasPermission for username='.$un.' - aborting';
                 //if ($debug) trigger_error ($msg, E_USER_NOTICE);
                 if ($debug) echo $msg.'<br/>'.PHP_EOL;
 

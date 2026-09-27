@@ -659,7 +659,7 @@ class class_naComments {
 
 
         global $naWebOS;
-        $db = $naWebOS->dbs->findConnection('couchdb');
+        $db = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
         $in = &$_GET;
         $fields = [
@@ -1256,6 +1256,7 @@ class class_naComments {
         $cdba = $dba->cdb;
         $dbg = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdbg = $dbg->cdb;
+        echo '<pre style="color:green;background:white;margin:10px;padding:10px;border-radius:10px">'; var_dump ($username); var_dump($dba); echo '</pre>'; //die;
 
         $dbName = '_users';
         try {
@@ -1281,7 +1282,7 @@ class class_naComments {
         $oldBM = 'def';
         $results = [];
         $call = $cdba->find($findCommand);
-        //echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; exit;
+        echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
 
         $oldBM = $bm;
         if (
