@@ -1070,7 +1070,10 @@ class class_naComments {
             global $users;
             if (!isset($users[$u])) $users[$u] = [];
             $users[$u] = negotiateOptions ($users[$u], $t->fetchUserRecord($u));
-            //echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
+            global $naDebugStartup;
+            if ($naDebugStartup) {
+                echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
+            }
 
             $html .= "\t".'<span class="naComment_username">'
             . (array_key_exists('displayName',$users[$u])?$users[$u]['displayName']:$users[$u]['userRealName'])
@@ -1256,32 +1259,38 @@ class class_naComments {
         $cdba = $dba->cdb;
         $dbg = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdbg = $dbg->cdb;
-        echo '<pre style="color:green;background:white;margin:10px;padding:10px;border-radius:10px">'; var_dump ($username); var_dump($dba); echo '</pre>'; //die;
+        echo '<pre style="color:green;background:white;margin:10px;padding:10px;border-radius:10px">t4:'; var_dump($cdba); echo '</pre>'; //die;
 
         $dbName = '_users';
         try {
-            $cdba->setDatabase($dbName, true);
-            $cdbg->setDatabase($dbName, true);
+            $cdba->setDatabase($dbName, false);
         } catch (Exception $e) {
-            return $e->getMessage();
+            echo '<h1>'.$e->getMessage().'</h1>';
+            return false;
         }
+        //echo 't3:'.$dbName.'<br/>';
 
         $findCommand = [
             'selector' => [
-                'name' => $dbg->translate_plainUserName_to_couchdbUserName($username)//, // unwrap from ajax call's data field
+                'name' => $dba->translate_plainUserName_to_couchdbUserName($username)//, // unwrap from ajax call's data field
                 //                'parentID' => '#'
             ],
             'fields' => ['username', 'realname', 'displayName'],
             'limit' => 200
         ];
         //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
-        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
+        echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
         //exit();
 
         $bm = 'abc';
         $oldBM = 'def';
         $results = [];
-        $call = $cdba->find($findCommand);
+        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
+        try {
+            $call = $dba->cdb->find($findCommand);
+        } catch (Exception $e) {
+            echo '<h1>'.$e->getMessage().'</h1>';
+        }
         echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
 
         $oldBM = $bm;

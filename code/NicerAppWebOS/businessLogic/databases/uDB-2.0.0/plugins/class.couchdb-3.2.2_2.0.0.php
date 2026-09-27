@@ -156,7 +156,7 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
 
         $u = $this->cdb->getSession(null,null)->body->userCtx;
         global $naDebugStartup;
-        if (true || $naDebugStartup) {
+        if ($naDebugStartup) {
             echo '<pre style="color:red">t79:'; var_dump ([$username,$u]); echo '</pre>'; //exit();
         }
         $this->username = $u->name;

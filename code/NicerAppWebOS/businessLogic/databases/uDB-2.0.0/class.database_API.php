@@ -42,7 +42,7 @@ class class_NicerAppWebOS_database_API {
                 ];
                 $c = $this->connectToDatabase ($cRec['databases']['couchdb']['username'], 'couchdb', $cRec['databases']['couchdb']);
                 $r = cdb_login ($c, $c->cdb, $cRec, null);
-                echo '<pre>t459:'; var_dump ($r); var_dump ($c->cdb->getSession()); echo '</pre>'; //exit;
+                if ($naDebugStartup) { echo '<pre>t459:'; var_dump ($r); var_dump ($c->cdb->getSession()); echo '</pre>'; };//exit;
             } else {
                 $r = true;
                 $un = na_couchdbUsername_from_plainUsername($username);
@@ -130,8 +130,8 @@ class class_NicerAppWebOS_database_API {
             */
 
 
-            if (true || $naDebugStartup) {
-                echo '<pre style="color:white;background:navy;margin:10px;padding:10px;border-radius:10px;">t452:'; var_dump ($c->cdb->name); var_dump ($c->cdb->roles); var_dump ($username); var_dump ($this->connections); echo '</pre>';
+            if ($naDebugStartup) {
+                echo '<pre style="color:white;background:navy;margin:10px;padding:10px;border-radius:10px;">t452:'; var_dump ($c->username); var_dump ($c->roles); var_dump ($username); var_dump ($this->connections); echo '</pre>';
             }
 
             $db = $this->connectToDatabase ( $username, 'couchdb', $cRec['databases']['couchdb'] );

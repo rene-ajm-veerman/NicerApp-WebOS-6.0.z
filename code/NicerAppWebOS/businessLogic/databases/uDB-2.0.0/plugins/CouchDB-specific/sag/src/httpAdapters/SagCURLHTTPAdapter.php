@@ -56,8 +56,6 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     $url = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
     global $naDebugStartup;
 
-    if (true || $naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3322:'); var_dump ($url); echo '</pre>'; } // die();
-
     $opts = array(
       CURLOPT_URL => $url,
       CURLOPT_PORT => $this->port,
@@ -73,10 +71,22 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     if(is_array($reqHeaders) && sizeof($reqHeaders) > 0) {
       $opts[CURLOPT_HTTPHEADER] = array();
 
+      if (
+        is_array($_COOKIE)
+        && array_key_exists('cdb_authSession_cookie',$_COOKIE)
+        && array_key_exists('cdb_loginName',$_COOKIE)
+        && strpos($_COOKIE['cdb_loginName'],'Administrator')===false
+      ) {
+        $opts[CURLOPT_HTTPHEADER][] = 'AuthSession: '.$_COOKIE['cdb_authSession_cookie'];
+        $url = "{$this->proto}://{$this->host}:{$this->port}{$url}";
+      }
+
       foreach($reqHeaders as $k => $v) {
         $opts[CURLOPT_HTTPHEADER][] = "$k: $v";
       }
     }
+
+    if ($naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3210:'); var_dump ($url); var_dump ($_COOKIE); var_dump(strpos($_COOKIE['cdb_loginName'],'Administrator')); echo '</pre>'; } // die();
 
     // send data through cURL's poorly named opt
     //echo '<pre style="color:green">'; var_dump ($data); echo '</pre>'.PHP_EOL;
