@@ -1549,7 +1549,7 @@ class NicerAppWebOS {
         global $naLAN;
         global $naIP;
         global $naUsername;
-        $naUsername = $_COOKIE['cdb_loginName'];
+        $naUsername = $_COOKIE['cdb_loginName']??'Guest';
         global $naIsBot;
         $debug = $this->debugThemeLoading;
 

@@ -5,7 +5,7 @@ global $naIP;
 global $naWebOS;
 
 $useAdminLogin = false; // bugfix when boolean 'true' (NO LONGER NEEDED)
-$debug = true;
+$debug = false;
 if ($debug) {
     echo 'info : '.__FILE__.' : $debug = true.<br/>'.PHP_EOL;
     ini_set('display_errors', 1);
@@ -273,7 +273,7 @@ if (!isset($_SESSION) || !is_array($_SESSION) || !array_key_exists('selectors',$
                                     }
                                 }
                             }
-                            if ($accountType == 'users' && (array_key_exists('cdb_loginName',$_COOKIE)?$_COOKIE['cdb_loginName']:$username101) == $userOrGroupID) {
+                            if ($accountType == 'users' && $username101 == $userOrGroupID) {
                                 $hasPermission = true;
                             }
                         }

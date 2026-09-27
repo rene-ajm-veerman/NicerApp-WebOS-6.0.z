@@ -3236,15 +3236,14 @@ na.site = {
         if (typeof loadBackground=='undefined') loadBackground = true;
         if (typeof saveTheme=='undefined') saveTheme = true;
         if (typeof changeInterval=='undefined') changeInterval = true;
-        //if (dat.specificityName) {
+        if (dat.specificityName) {
             $('.na_themes_dropdown__specificity > .vividDropDownBox_selector > div')
                 .removeClass('selected')
                 .each (function(idx,el) {
-                    /*if (el.innerHTML === dat.specificityName) {
+                    if (el.innerHTML === dat.specificityName) {
                         $(el).addClass('selected');
                         na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
-                    };*/
-                    /*
+                    };
                     var l = Object.keys(na.site.globals.themesDBkeys).length - 1;
                     if (el.innerHTML === na.site.globals.themesDBkeys[l].specificityName) {
                         $(el).parent().find('.vividDropDownBox_selected').html(el.innerHTML);
@@ -3252,10 +3251,9 @@ na.site = {
                         na.site.globals.specificityName = el.innerHTML;
                         na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
                     };
-                    */
 
                 });
-        //};
+        };
 
         if (dat.menusFadingSpeed) {
             $('#menusFadingSpeed').val(dat.menusFadingSpeed);
