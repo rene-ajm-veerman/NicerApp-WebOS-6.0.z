@@ -81,6 +81,7 @@ abstract class SagHTTPAdapter {
       $json = json_decode($response->body);
 
       //$msg = '$response->body=\''.$response->body.'\', trace='.json_encode(debug_backtrace(), JSON_PRETTY_PRINT);
+      //echo '<pre>'.$msg.'</pre>';
       //trigger_error ($msg, E_USER_NOTICE);
       //echo '<pre style="color:red">'; var_dump ($json); echo '</pre>';
       //exit;

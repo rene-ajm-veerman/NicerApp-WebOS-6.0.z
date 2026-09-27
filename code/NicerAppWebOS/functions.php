@@ -12,7 +12,9 @@ function na_couchdbUsername_from_plainUsername ($un) {
     global $naWebOS;
     $dn = $naWebOS->domainFolderForDB;
     $un = str_replace($dn.'___', '', $un);
-    return $dn.'___'.str_replace(' ','__',str_replace('.', '_', $un));
+    $r = $dn.'___'.str_replace(' ','__',str_replace('.', '_', $un));
+    //echo '<h3 style="color:purple">'.$r.'</h3>'; exit;
+    return $r;
 }
 function na_plainUsername_from_couchdbUserName ($un) {
     if (is_null($un)) return null;

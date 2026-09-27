@@ -982,6 +982,7 @@ class class_naComments {
                                                         '', '', '', ''
                     );
                 };
+                //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it, $naUsername]); echo '</pre>';
                 if (array_key_exists('clientUsername',$it) && $it['clientUsername']==$naUsername) {
                     /*$html .= $naWebOS->html_vividButton(
                         1001, 'float:right',
@@ -1252,46 +1253,52 @@ class class_naComments {
             .'</div>'.PHP_EOL;
         return $html;
     }
-
     function fetchUserRecord ($username) {
         global $naWebOS;
         $dba = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdba = $dba->cdb;
-        $dbg = $naWebOS->dbsAdmin->findConnection('couchdb');
+        $dbg = $naWebOS->dbs->findConnection('couchdb');
         $cdbg = $dbg->cdb;
-        echo '<pre style="color:green;background:white;margin:10px;padding:10px;border-radius:10px">t4:'; var_dump($cdba); echo '</pre>'; //die;
-
+        //echo '<pre style="color:green;background:white;margin:10px;padding:10px;border-radius:10px">t4:'; var_dump($cdba); echo '</pre>'; //die;
+        // echo '<pre style="color:green;background:white;">t4A:';
+        // echo "\n--- session ---\n";
+        // var_dump($cdba->getSession());          // look at ->body->userCtx->name
+        // echo "\n--- class username ---\n";
+        // var_dump($dba->username);
+        global $naUsername;
+        $naUsername = $dbg->translate_couchdbUserName_to_plainUserName ($dbg->username);
+        echo '</pre>';
         $dbName = '_users';
         try {
             $cdba->setDatabase($dbName, false);
         } catch (Exception $e) {
-            echo '<h1>'.$e->getMessage().'</h1>';
+            echo '<h1>'.$dbName.' :: '.$e->getMessage().'</h1>';
             return false;
         }
         //echo 't3:'.$dbName.'<br/>';
 
         $findCommand = [
             'selector' => [
-                'name' => $dba->translate_plainUserName_to_couchdbUserName($username)//, // unwrap from ajax call's data field
+                'name' => na_couchdbUsername_from_plainUsername($username)//, // unwrap from ajax call's data field
                 //                'parentID' => '#'
             ],
             'fields' => ['username', 'realname', 'displayName'],
             'limit' => 200
         ];
         //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
-        echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
+        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
         //exit();
 
         $bm = 'abc';
         $oldBM = 'def';
         $results = [];
-        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
+        echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
         try {
             $call = $dba->cdb->find($findCommand);
         } catch (Exception $e) {
-            echo '<h1>'.$e->getMessage().'</h1>';
+            echo '<h1>'.$dbName.' : '.$e->getMessage().'</h1>';
         }
-        echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
+        //echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
 
         $oldBM = $bm;
         if (
@@ -1565,7 +1572,7 @@ class class_naComments {
         $rec['msgHTML'] = str_replace ('<p><span class="backdropped"', '<p class="backdropped"', $rec['msgHTML']);
         $rec['msgHTML'] = str_replace ('</span>', '', $rec['msgHTML']);
         $rec['msgHTML'] = str_replace ('<p>', '<p class="backdropped">', $rec['msgHTML']);
-        $db = $naWebOS->dbs->findConnection('couchdb');
+        $db = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
         $cdb->setDatabase ($dbName);

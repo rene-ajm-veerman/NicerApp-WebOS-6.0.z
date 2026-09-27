@@ -2645,9 +2645,9 @@ class NicerAppWebOS {
             }
 
             // try to fetch the requested cosmetics data
-            $dbName = $this->dbs->findConnection('couchdb')->dataSetName('themes');
+            $dbName = $this->dbsAdmin->findConnection('couchdb')->dataSetName('themes');
             try {
-                $this->dbs->findConnection('couchdb')->cdb->setDatabase($dbName, false);
+                $this->dbsAdmin->findConnection('couchdb')->cdb->setDatabase($dbName, false);
             } catch (Exception $e) {
                 if ($debug) { echo 'status : Failed : could not open database '.$dbName.'<br/>'.PHP_EOL; exit(); }
             }
@@ -2674,7 +2674,7 @@ class NicerAppWebOS {
 
             $findCommand = array (
                 'selector' => $sel,
-                'fields' => [ '_id', 'ip', 'user', 'view', 'role', 'lastUsed', 'theme', 'url', 'themeSettings', 'apps', 'background', 'backgroundSearchKey', 'textBackgroundOpacity', 'changeBackgroundsAutomatically', 'backgroundChange_hours', 'backgroundChange_minutes' ],
+                'fields' => [ 'lastUsed', '_id', 'ip', 'user', 'view', 'role', 'theme', 'url', 'themeSettings', 'apps', 'background', 'backgroundSearchKey', 'textBackgroundOpacity', 'changeBackgroundsAutomatically', 'backgroundChange_hours', 'backgroundChange_minutes' ],
                 'sort' => [['lastUsed'=>'desc']],
                 'use_index' => '_design/ba8cf896bc63459689d9b5637bb39f47dca8298e'
             );
@@ -2688,22 +2688,26 @@ class NicerAppWebOS {
             );
             $findCommand = array (
                 'selector' => $sel,
-                'fields' => [ '_id', 'user', 'role', 'view', 'app', 'url', 'specificityName', 'ip', 'lastUsed' ],
+                'fields' => [ 'lastUsed', '_id', 'theme', 'user', 'role', 'view', 'app', 'url', 'specificityName', 'ua', 'ip' ],
                 'sort' => [['lastUsed'=>'asc']],
-            //'use_index' => 'sortIndex_lastUsed'
-                'use_index' => '_design/ba8cf896bc63459689d9b5637bb39f47dca8298e'
+                //'use_index' => 'sortIndex_lastUsed'
+                'use_index' => '_design/5a5ca56d9824edad32284bf01bc7fb3838fa049c'
+                //'use_index' => '_design/ba8cf896bc63459689d9b5637bb39f47dca8298e'
+                //'use_index' => 'primaryIndex'
             );
             try {
-                $call = $this->dbs->findConnection('couchdb')->cdb->find ($findCommand);
+                $call = $this->dbsAdmin->findConnection('couchdb')->cdb->find ($findCommand);
             } catch (Exception $e) {
-                //$debug = true;
+                $debug = true;
                 if ($debug)     {
                     backtrace();
                     echo '<pre>info : $findCommand2='; var_dump ($findCommand); echo '.<br/>'.PHP_EOL;
-                    if (is_object($call)) { echo 'info : $call='; var_dump ($call); echo '.</pre>'.PHP_EOL; }
+                    if (isset($call) && is_object($call)) { echo 'info : $call='; var_dump ($call); echo '.</pre>'.PHP_EOL; }
+                    //exit;
                 };
 
 
+                /*
                 if (isset($_COOKIE['PHPSESSID'])) { // or your session cookie name
                     setcookie('PHPSESSID', '', [
                         'expires' => time() - 3600, // past time
@@ -2727,10 +2731,11 @@ class NicerAppWebOS {
                 setcookie('cdb_authSession_cookie', '', $co);
                 setcookie('cdb_loginName', $this->dbs->findConnection('couchdb')->translate_plainUserName_to_couchdbUserName('Guest'), $co);
 //var_dump($_COOKIE);
-               $msg = 'NicerAppWebOS FATAL ERROR : while trying to find in \''.$dbName.'\' as user \''.$this->dbs->findConnection('couchdb')->username.'\' : '.$e->getMessage();
+*/
+               $msg = 'NicerAppWebOS FATAL ERROR : while trying to find in \''.$dbName.'\' as user \''.$this->dbsAdmin->findConnection('couchdb')->username.'\' : '.$e->getMessage();
                 echo $msg;
-                $html = '<script type="text/javascript">var delete_cookie = function(name) { document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;"; }; delete_cookie("cdb_authSession_cookie"); delete_cookie("cdb_loginName"); window.location.reload();</script>';
-                echo $html;
+                //$html = '<script type="text/javascript">var delete_cookie = function(name) { document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;"; }; delete_cookie("cdb_authSession_cookie"); delete_cookie("cdb_loginName"); window.location.reload();</script>';
+                //echo $html;
                 exit();
             }
             if ($debug)  {echo 'HTTP status==='.$call->headers->_HTTP->status.', count($call->body->docs)==='.count($call->body->docs).'!<br/>'; };
@@ -2744,7 +2749,7 @@ class NicerAppWebOS {
                     //$debug = true;
                     if ($debug) { echo '$d='; var_dump ($d); }
                     $tn = ( isset($d->theme) ? $d->theme : 'default' );
-                    $d2 = $this->dbs->findConnection('couchdb')->cdb->get($d->_id)->body;
+                    $d2 = $this->dbsAdmin->findConnection('couchdb')->cdb->get($d->_id)->body;
                     //$d2 = &$d;
                     $ret = [
                         $tn => [

@@ -21,7 +21,7 @@ class class_NicerAppWebOS_database_API {
         global $naWebOS;
         global $naDebugStartup;
         $ret = [];
-
+        //echo '<h2 style="color:skyblue;background:navy">'.$username.'</h2>';
         try {
             if (na_plainUsername_from_couchdbUsername($username)!=='Administrator') {
                 if ($naDebugStartup) {
@@ -40,9 +40,22 @@ class class_NicerAppWebOS_database_API {
                         ]
                     ]
                 ];
+                //echo '<h1>T1</h1>';
                 $c = $this->connectToDatabase ($cRec['databases']['couchdb']['username'], 'couchdb', $cRec['databases']['couchdb']);
                 $r = cdb_login ($c, $c->cdb, $cRec, null);
-                if ($naDebugStartup) { echo '<pre>t459:'; var_dump ($r); var_dump ($c->cdb->getSession()); echo '</pre>'; };//exit;
+                //echo '<pre style="font-size:large;font-weight:bold;">'; var_dump ($cRec); var_dump($r); echo '</pre>';
+                if (is_array($r)) {
+                    global $naUsername;
+                    $naUsername = na_plainUsername_from_couchdbUsername($cRec['databases']['couchdb']['username']);
+                }
+                //if (true || $naDebugStartup) { echo '<pre>t459:'; var_dump ($r); var_dump ($c->cdb->getSession()); echo '</pre>'; };
+                $ret[] = [
+                    'ct' => 'couchdb',
+                    'cRec' => $cRec,
+                    'conn' => $c // !! is_null($cRec) inside this call. meaning we use $_COOKIE['cdb_authSession_cookie]
+                ];
+                return $ret;
+                exit;
             } else {
                 $r = true;
                 $un = na_couchdbUsername_from_plainUsername($username);
@@ -224,7 +237,7 @@ class class_NicerAppWebOS_database_API {
         }
 
         $this->connections = $ret;
-        if ($naDebugStartup) { echo '<pre>t801:'; var_dump ($ret); echo '</pre>'; exit();}
+        //if ($naDebugStartup) { echo '<pre>t801:'; var_dump ($ret); echo '</pre>'; }
 
         return $this->connections;
     }

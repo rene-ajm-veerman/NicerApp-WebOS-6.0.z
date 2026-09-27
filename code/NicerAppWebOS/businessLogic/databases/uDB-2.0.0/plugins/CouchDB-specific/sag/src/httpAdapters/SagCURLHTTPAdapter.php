@@ -53,11 +53,13 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     // the base cURL options
     $u = $this->user?:$naWebOS->domainFolderForDB.'___Guest';
     $p = $this->pass?:'Guest';
-    $url = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
+    $url2 = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
     global $naDebugStartup;
 
+    if ($naDebugStartup) { echo ('<pre style="color:blue;background:white;margin:10px;padding:10px;border-radius:10px;">t3210A:'); var_dump ($url2); var_dump ($_COOKIE); var_dump(strpos($_COOKIE['cdb_loginName'],'Administrator')); echo '</pre>'; } // die();
+
     $opts = array(
-      CURLOPT_URL => $url,
+      CURLOPT_URL => $url2,
       CURLOPT_PORT => $this->port,
       CURLOPT_FOLLOWLOCATION => $this->followLocation,
       CURLOPT_HEADER => true,
@@ -68,7 +70,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     );
 
     // cURL wants the headers as an array of strings, not an assoc array
-    if(is_array($reqHeaders) && sizeof($reqHeaders) > 0) {
+    //if(is_array($reqHeaders) && sizeof($reqHeaders) > 0) {
       $opts[CURLOPT_HTTPHEADER] = array();
 
       if (
@@ -78,15 +80,16 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
         && strpos($_COOKIE['cdb_loginName'],'Administrator')===false
       ) {
         $opts[CURLOPT_HTTPHEADER][] = 'AuthSession: '.$_COOKIE['cdb_authSession_cookie'];
-        $url = "{$this->proto}://{$this->host}:{$this->port}{$url}";
+        $url2 = "{$this->proto}://{$this->host}:{$this->port}{$url}";
+        $opts[CURLOPT_URL] = $url2;
       }
 
       foreach($reqHeaders as $k => $v) {
         $opts[CURLOPT_HTTPHEADER][] = "$k: $v";
       }
-    }
+    //}
 
-    if ($naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3210:'); var_dump ($url); var_dump ($_COOKIE); var_dump(strpos($_COOKIE['cdb_loginName'],'Administrator')); echo '</pre>'; } // die();
+    if ($naDebugStartup) { echo ('<pre style="color:blue;background:white;margin:10px;padding:10px;border-radius:10px;">t3210B:'); var_dump ($url2); var_dump ($opts[CURLOPT_HTTPHEADER]); var_dump(strpos($_COOKIE['cdb_loginName'],'Administrator')); echo '</pre>'; } // die();
 
     // send data through cURL's poorly named opt
     //echo '<pre style="color:green">'; var_dump ($data); echo '</pre>'.PHP_EOL;
@@ -159,7 +162,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
       if ($naDebugStartup) { echo ('<pre style="color:white;background:purple;margin:10px;padding:10px;border-radius:10px;">t3322:'); var_dump ($this); var_dump ($url); echo json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS),JSON_PRETTY_PRINT); echo '</pre>'; } // die();
 
       $opts = array(
-        CURLOPT_URL => $url,
+        CURLOPT_URL => $url2,
         CURLOPT_PORT => $this->port,
         CURLOPT_FOLLOWLOCATION => $this->followLocation,
         CURLOPT_HEADER => true,
