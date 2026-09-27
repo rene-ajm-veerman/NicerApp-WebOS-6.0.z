@@ -29,7 +29,7 @@ $security_admin = '{ "admins": { "names": [], "roles": ["'.$an.'"] }, "members":
 $security_guest = '{ "admins": { "names": [], "roles": ["'.$gn.'"] }, "members": { "names": [], "roles": [""] } }';
 
 $cdb->setDatabase($dataSetName,true);
-$cdb->setSecurity($security_admin);
+//$cdb->setSecurity($security_admin);
 $findCommand = [
     'selector' => [
         'url1' => $_POST['url1'],

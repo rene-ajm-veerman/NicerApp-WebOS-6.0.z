@@ -1750,10 +1750,10 @@ class NicerAppWebOS {
                     $r .= "\tisBot : ".($naIsBot ? 'true' : 'false').','.PHP_EOL;
                     $r .= "\tnaLAN : ".($naLAN ? 'true' : 'false').','.PHP_EOL;
                     $r .= "\tnaHasErrors : ".((array_key_exists('naErrors',$_SESSION) && is_string ($_SESSION['naErrors']) && $_SESSION['naErrors']!=='') ? 'true' : 'false').','.PHP_EOL;
-                    //$r .= "\tspecificityName : \"".$specificityName."\",".PHP_EOL;
-                    //$r .= "\tspecificityName_revert : \"".$specificityName."\",".PHP_EOL;
+                    $r .= "\tspecificityName : \"".$specificityName."\",".PHP_EOL;
+                    $r .= "\tspecificityName_revert : \"".$specificityName."\",".PHP_EOL;
                     //echo '<pre style="background:navy;color:lime;border-radius:10px;">'; var_dump ($css); echo '</pre>';
-                    $r .= "\tspecificityName : \"".$mySpecificityName."\",".PHP_EOL;
+                    //$r .= "\tspecificityName : \"".$mySpecificityName."\",".PHP_EOL;
                     $r .= "\tspecificityNames : ".json_encode($selectorNames).",".PHP_EOL;
                     $r .= "\tthemes : ".json_encode($css['themes'], JSON_PRETTY_PRINT).",".PHP_EOL;
                     $r .= "\tthemesDBkeys : ".json_encode($selectors2, JSON_PRETTY_PRINT).",".PHP_EOL;
@@ -1955,10 +1955,10 @@ class NicerAppWebOS {
                         $r .= "\tclientUsername : '".$naUsername."',".PHP_EOL;
                         $r .= "\tthemes : ".json_encode($css['themes'], JSON_PRETTY_PRINT).",".PHP_EOL;
                         $r .= "\tthemeName : '".$themeName."',".PHP_EOL;
-                        $r .= "\tspecificityName : \"".$mySpecificityName."\",".PHP_EOL;
-                        //$r .= "\tspecificityName : \"".$specificityName."\",".PHP_EOL;
-                        //$r .= "\tspecificityName_revert : \"".$specificityName."\",".PHP_EOL;
-                        //$r .= "\tspecificityNames : ".json_encode($selectorNames).",".PHP_EOL;
+                        //$r .= "\tspecificityName : \"".$mySpecificityName."\",".PHP_EOL;
+                        $r .= "\tspecificityName : \"".$specificityName."\",".PHP_EOL;
+                        $r .= "\tspecificityName_revert : \"".$specificityName."\",".PHP_EOL;
+                        $r .= "\tspecificityNames : ".json_encode($selectorNames).",".PHP_EOL;
                         $r .= "\tthemesDBkeys : ".json_encode($selectors2, JSON_PRETTY_PRINT).",".PHP_EOL;
                         $r .= "\tview : ".json_encode($this->view, JSON_PRETTY_PRINT).",".PHP_EOL;
                         $r .= "\tversion : ".file_get_contents(__DIR__.'/../version.json').PHP_EOL.',';

@@ -2879,7 +2879,6 @@ na.site = {
         }, function(evt) {
             clearTimeout(na.site.components.timeout_onmouseover_specificity);
             clearTimeout(na.site.components.timeout_onmouseout_specificity);
-            debugger;
             na.site.components.timeout_onmouseout_specificity = setTimeout(function() {
                 $('.vividDropDownBox_selector', evt.target).fadeOut('normal');
                 $('#btnDeleteSpecificity').css({display:'block'});

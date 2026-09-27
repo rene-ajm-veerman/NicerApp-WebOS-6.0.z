@@ -5,7 +5,7 @@ global $naIP;
 global $naWebOS;
 
 $useAdminLogin = false; // bugfix when boolean 'true' (NO LONGER NEEDED)
-$debug = false;
+$debug = true;
 if ($debug) {
     echo 'info : '.__FILE__.' : $debug = true.<br/>'.PHP_EOL;
     ini_set('display_errors', 1);

@@ -1267,7 +1267,7 @@ class class_naComments {
         // var_dump($dba->username);
         global $naUsername;
         $naUsername = $dbg->translate_couchdbUserName_to_plainUserName ($dbg->username);
-        echo '</pre>';
+        // echo '</pre>';
         $dbName = '_users';
         try {
             $cdba->setDatabase($dbName, false);
@@ -1276,55 +1276,23 @@ class class_naComments {
             return false;
         }
         //echo 't3:'.$dbName.'<br/>';
+        $userId = 'org.couchdb.user:' . na_couchdbUsername_from_plainUsername($username);
 
-        $findCommand = [
-            'selector' => [
-                'name' => na_couchdbUsername_from_plainUsername($username)//, // unwrap from ajax call's data field
-                //                'parentID' => '#'
-            ],
-            'fields' => ['username', 'realname', 'displayName'],
-            'limit' => 200
-        ];
-        //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
-        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
-        //exit();
-
-        $bm = 'abc';
-        $oldBM = 'def';
-        $results = [];
-        echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
         try {
-            $call = $dba->cdb->find($findCommand);
+            $call = $cdba->get($userId);   // GET /_users/org.couchdb.user:…
+            $doc  = $call->body;
         } catch (Exception $e) {
-            echo '<h1>'.$dbName.' : '.$e->getMessage().'</h1>';
+            return [
+                'userRealName' => $username,
+                'displayName'  => $username
+            ];
         }
-        //echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>'; //exit;
 
-        $oldBM = $bm;
-        if (
-            isset($call)
-            && property_exists($call,'body')
-            && property_exists($call->body, 'bookmark')
-            && is_string($call->body->bookmark)
-            && $call->body->bookmark !== ''
-            && $call->body->bookmark !== 'nil'
-        ) {
-            $bm = $call->body->bookmark;
-        } else {
-            $bm = 'abc';
-        };
-
-        $results = array_merge_recursive($results, [
-            'userRealName' => $call->body->docs[0]->realname
-        ]);
-        if (
-            isset($call->body->docs[0])
-            && property_exists($call->body->docs[0], 'displayName')
-        ) $results['displayName'] = $call->body->docs[0]->displayName;
-
-        //exit();
-
-        return $results;
+        return [
+            'userRealName' => $doc->realname    ?? na_plainUsername_from_couchdbUsername($doc->name) ?? $username,
+            'displayName'  => $doc->displayName ?? na_plainUsername_from_couchdbUsername($doc->name) ?? $username,
+            'name'         => na_couchdbUsername_from_plainUsername($doc->name) ?? null
+        ];
     }
 
 
