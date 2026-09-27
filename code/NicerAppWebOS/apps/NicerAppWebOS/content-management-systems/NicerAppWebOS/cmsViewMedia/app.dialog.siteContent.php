@@ -153,19 +153,23 @@ foreach ($files as $idx => $file) {
 //echo '<pre>'.json_encode($files,JSON_PRETTY_PRINT).'</pre>';
 ?>
 <style>
+    #btnBack_fromMediaView, #btnPrevious, #btnNext, #btnSetBackground {
+        z-index : 99999999999999;
+    }
+
     #btnPrevious {
-        position:absolute;
+        position:fixed;
         top : calc(50% - 25px);
         left : 20px;
     }
     #btnNext {
-        position:absolute;
+        position:fixed;
         top : calc(50% - 25px);
         right : 50px;
 
     }
     #btnSetBackground {
-        position:absolute;
+        position:fixed;
         width : 50px;
         left : calc(50% - 25px);
         top : 10px;
@@ -175,7 +179,7 @@ foreach ($files as $idx => $file) {
     }
 </style>
 <script type="text/javascript" src="/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/photoAlbum-4.0.0.source.js?c=<?php echo date('Ymd_His',filemtime($naWebOS->domainPath.'/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/photoAlbum-4.0.0.source.js'));?>"></script>
-<img id="btnBack_fromMediaView" class="tooltip" tooltipTheme="mainTooltipTheme" title="Go back, leave the photo-album viewer." src="/siteMedia/btnBack.png" onclick="window.history.back();" style="position:absolute"/>
+<img id="btnBack_fromMediaView" class="tooltip" tooltipTheme="mainTooltipTheme" title="Go back, leave the photo-album viewer." src="/siteMedia/btnBack.png" onclick="window.history.back();" style="position:fixed"/>
     <img id="viewMedia" src="<?php echo $myPath;?>"/>
 <img id="btnSetBackground" class="tooltip" tooltipTheme="mainTooltipTheme" title="Set as site background" src="/siteMedia/btnBackground.png" onclick="na.backgrounds.next ('#siteBackground', na.site.globals.backgroundSearchKey, '<?php echo $myPath;?>');" style="position:fixed"/>
 <a id="btnPrevious" href="<?php echo $prevURL;?>"><img id="btnImgPrevious" src="/siteMedia/btnPrevious.png" style="position:fixed"/></a>
