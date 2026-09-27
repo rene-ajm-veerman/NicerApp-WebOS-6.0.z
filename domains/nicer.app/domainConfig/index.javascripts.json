@@ -31,7 +31,7 @@
     "{$webPath}/NicerAppWebOS/na.themeEditor-2.y.z.js",
     "{$webPath}/NicerAppWebOS/na.miscellaneous.js",
     "{$webPath}/NicerAppWebOS/na.tinymce.js",
-    "{$webPath}/NicerAppWebOS/site-6.0.0-alpha-2.0.0.js",
+    "{$webPath}/NicerAppWebOS/site-6.0.0-beta-1.0.0.js",
     "{$webPath}/NicerAppWebOS/na.colorGradients-1.2.0.source.js",
     "{$webPath}/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.source.js",
     "{$webPath}/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/ui/vividProgressbar/vividProgressbar-1.0.0.source.js",

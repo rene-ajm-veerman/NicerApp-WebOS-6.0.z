@@ -10,7 +10,7 @@ na.site.globals.app = { "/docs" : { "page" : "todo" }};
 
 <p class="backdropped" style="width:30%"><b>Last modified : <?=json_decode(file_get_contents(__DIR__.'/../version.json'),true)['history']['lastModified']?></b></p>
 <p class="backdropped" style="width:30%">
-The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-5.10.z">stable version</a> of NicerApp WebOS is always Dec 1st - Dec 24th.<br/>
+The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z">stable version</a> of NicerApp WebOS is always Dec 1st - Dec 24th.<br/>
 </p>
 
 <ol class="todoList" style="width:50%; width:content-width;">
@@ -40,7 +40,11 @@ The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/N
 
     <li class="todoList"><div>(2026) Build a VAPID enabled database-updated detection system for browser apps, and release that permanently as open source, based on uDB-2.y.z.</div></li>
 
-    <li class="todoList"><div>(2026) Permanently and completely fix the web-based theme editor for NA.</div></li>
+    <li class="todoList"><div>(2026) Permanently and completely fix the web-based theme editor for NA.
+        <ol class="todoList_l1">
+        <li class="todoList_l1"><div>Add a checkbox in the Theme Editor to select backgrounds and stretch instead of tile them for any DIV.</div></li>
+        </ol>
+    </div></li>
 
     <li class="todoList"><div>(2026) Add database based caching of wikipedia.org output for /wiki on nicer.app (fairly easy to implement these days actually).</div></li>
 
@@ -66,18 +70,12 @@ The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/N
     I promise to bring you all some level of CSS animations in the generation config language :)<br/>
     Maybe even a real translation of CSS animations (they're easy to parse), into SVG color and transparency animations! :D</div></li>
 
-    <li class="todoList"><div>Create a donations button (again, in collaboration with paypal.com), with monthly goal indicator, for the news app.</div></li>
-
-    <li class="todoList"><div>Implement bandwidth throttling in the <a href="https://github.com/NicerEnterprises/NicerApp-WebOS/tree/main/NicerAppWebOS/scripts.install" target="mainBashInstallScript_for_NicerAppWebOS" class="nomod noPushState">main Bash install script</a>.</div></li>
-
-    <li class="todoList"><div>Add a checkbox in the Theme Editor to select backgrounds and stretch instead of tile them for any DIV.</div></li>
 
     <!--<li class="todoList"><div>Restore the automatic retrieval of new backgrounds download routines for nicerapp via free to use methods of delivery at Google image search and (TODO :)Bing image search.</div></li>-->
 
     <li class="todoList"><div>(2027) Upgrade the news app and vividDialog : add siteToolbarLeft functionality :<br/>
         <ol class="todoList_l1">
             <li class="todoList_l1"><div>add a 'translate' dropdown box to the app-specific options menu</div></li>
-            <li class="todoList_l1"><div>add French news sources</div></li>
             <li class="todoList_l1"><div>add/enable/disable/remove any URL to a combination of lists that are each given a name, which get stored in several database-stored dataSubSets (records/documents) inside a dataSet (table/couchdb-database).<br/>
             </li>
             <li class="todoList_l1"><div>the ability to assign specific 'theme' and 'sub-theme' settings to such a URL.</div></li>
