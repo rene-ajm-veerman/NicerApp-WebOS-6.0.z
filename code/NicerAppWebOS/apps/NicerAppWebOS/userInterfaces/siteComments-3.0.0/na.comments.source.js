@@ -416,12 +416,86 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
         window.location.hash = newHash;
         na.comments.scrollToHash();
     },
+    /**
+     * Open full photoAlbum Plupload widget in an iframe dialog.
+     * Provisional path: commentsMedia/{user}/{Y-m-d_H-i-s}
+     */
+    onclick_btnUploadPhotos: function (event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
+        var user = (na.site.globals.clientUsername || 'anonymous').replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+        var now  = new Date();
+        var pad  = function (n) { return (n < 10 ? '0' : '') + n; };
+        var dt   = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+        + '_' + pad(now.getHours()) + '-' + pad(now.getMinutes()) + '-' + pad(now.getSeconds());
+        var codePath = 'commentsMedia/' + user + '/' + dt;
+
+        var editorEl = $('#siteCommentsEditor')[0];
+        if (!editorEl) return;
+        editorEl.mediaCodePath = codePath;
+        editorEl.mediaFiles    = editorEl.mediaFiles || [];
+
+        var src = '/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/jquery_ui_widget.2.3.7.php'
+        + '?codePath=' + encodeURIComponent(codePath);
+
+        $('#naCommentPhotoAlbumDialog').remove();
+        var $dlg = $(
+            '<div id="naCommentPhotoAlbumDialog" class="vividDialog" style="'
+            + 'position:fixed;inset:0;z-index:1000001;background:rgba(0,0,0,0.75);'
+            + 'display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">'
+            + '<div style="background:#1a1a2e;width:90%;height:85%;border-radius:16px;overflow:hidden;'
+            + 'display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6);">'
+            +   '<div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#111;">'
+            +     '<span style="color:#eee;font-weight:600;">Upload photos to comment</span>'
+            +     '<button type="button" id="naCommentPhotoAlbumClose" style="'
+            +       'background:#c0392b;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;">'
+            +       'Close</button>'
+            +   '</div>'
+            +   '<iframe id="naCommentPhotoAlbumFrame" style="flex:1;border:0;width:100%;"></iframe>'
+            + '</div></div>'
+        );
+        $('body').append($dlg);
+        $('#naCommentPhotoAlbumClose').on('click', function () {
+            $('#naCommentPhotoAlbumDialog').remove();
+        });
+        $('#naCommentPhotoAlbumFrame').attr('src', src);
+    },
+
+    /**
+     * Called from the photoAlbum iframe UploadComplete.
+     */
+    mediaUploadComplete: function (up, files) {
+        var editorEl = $('#siteCommentsEditor')[0];
+        if (!editorEl) return;
+        editorEl.mediaFiles = editorEl.mediaFiles || [];
+        (files || []).forEach(function (f) {
+            var name = f.name || f.fileName || '';
+            if (name && editorEl.mediaFiles.indexOf(name) === -1) {
+                editorEl.mediaFiles.push(name);
+            }
+        });
+        var n = editorEl.mediaFiles.length;
+        if (n) {
+            $('#naCommentMediaBadge').text(n + ' photo(s) attached').show();
+        } else {
+            $('#naCommentMediaBadge').text('').hide();
+        }
+    },
     onclick_btnAddComment : function (event) {
         $('#siteCommentsEditor')[0].latestParentID =
             $('.naComment_id',
                 $(event.currentTarget).parents('.naComment_entry')
-            ).html();
+        ).html();
+
+        var editorEl = $('#siteCommentsEditor')[0];
+        editorEl.editID = null;
+        editorEl.mediaCodePath = null;
+        editorEl.mediaFiles = [];
+        $('#naCommentMediaBadge').text('').hide();
+
         $('#siteCommentsEditor').css({
             top : 'calc(50% - 5px)',
             left : 'calc(50% - 5px)',
@@ -499,6 +573,10 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
         // store what we are editing
         $('#siteCommentsEditor')[0].editID = id;
         $('#siteCommentsEditor')[0].latestParentID = null;   // not a reply
+
+        $('#siteCommentsEditor')[0].mediaCodePath = null;
+        $('#siteCommentsEditor')[0].mediaFiles = [];
+        $('#naCommentMediaBadge').text('').hide();
 
         // open the same dialog
         $('#siteCommentsEditor').css({
@@ -639,9 +717,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             na.c.onclick_btnPostComment_afterDataTransfer('[]');
         }
     },
-
-    onclick_btnPostComment : function (event) {          // replace / extend the existing one
-        debugger;
+    onclick_btnPostComment : function (event) {
         var editorEl = $('#siteCommentsEditor')[0];
         var isEdit   = !!editorEl.editID;
         var url      = isEdit
@@ -652,34 +728,42 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
         var dt = new Date();
         var tz = dt.getTimezoneOffset();
 
-        var data = {
-            rec : {
-                id               : isEdit ? editorEl.editID : undefined,
-                parentID         : isEdit ? undefined : (editorEl.latestParentID || '#'),
-                                 rootItemJSON     : JSON.stringify({
-                                     url : document.location.href.replace(document.location.search,'') + document.location.search
-                                 }),
-                                 clientIP         : na.site.globals.clientIP,
-                                 clientUsername   : na.site.globals.clientUsername,
-                                 msgHTML          : c
-            }
+        var rec = {
+            id             : isEdit ? editorEl.editID : undefined,
+            parentID       : isEdit ? undefined : (editorEl.latestParentID || '#'),
+            rootItemJSON   : JSON.stringify({
+                url : document.location.href.replace(document.location.search,'') + document.location.search
+            }),
+            clientIP       : na.site.globals.clientIP,
+            clientUsername : na.site.globals.clientUsername,
+            msgHTML        : c
         };
         if (isEdit) {
-            data.rec.editedDatetime = dt.getTime();
-            data.rec.editedTZoffset = tz;
+            rec.editedDatetime = dt.getTime();
+            rec.editedTZoffset = tz;
         } else {
-            data.rec.clientDatetime = dt.getTime();
-            data.rec.clientTZoffset = tz;
+            rec.clientDatetime = dt.getTime();
+            rec.clientTZoffset = tz;
         }
-        data.rec = JSON.stringify(data.rec);
+
+        // Photo album uploads from this editor session
+        if (editorEl.mediaCodePath && editorEl.mediaFiles && editorEl.mediaFiles.length) {
+            rec.mediaCodePath = editorEl.mediaCodePath;
+            rec.mediaFiles    = editorEl.mediaFiles;
+        }
+
+        var data = { rec : JSON.stringify(rec) };
 
         var ac = {
             type : 'POST',
             url  : url,
             data : data,
             success : function (data) {
-                // clear edit state
                 editorEl.editID = null;
+                editorEl.mediaCodePath = null;
+                editorEl.mediaFiles = [];
+                $('#naCommentMediaBadge').text('').hide();
+                $('#naCommentPhotoAlbumDialog').remove();
                 na.c.onclick_btnPostComment_afterDataTransfer(data);
             },
             error : function (xhr, ts, errorThrown) {
@@ -687,7 +771,10 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             }
         };
 
-        if (c.trim() !== '' && !c.trim().match(/^<p>(\s+|&nbsp;)<\/p>$/)) {
+        // Allow post with only photos (no text) as well
+        var hasText = c.trim() !== '' && !c.trim().match(/^<p>(\s+|&nbsp;)<\/p>$/);
+        var hasMedia = !!(editorEl.mediaFiles && editorEl.mediaFiles.length);
+        if (hasText || hasMedia) {
             $.ajax(ac);
         } else {
             na.c.onclick_btnPostComment_afterDataTransfer('[]');

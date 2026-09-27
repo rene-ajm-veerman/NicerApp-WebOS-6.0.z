@@ -188,3 +188,35 @@
     background: rgba(60, 130, 230, 0.85);
     transform: translateY(-1px);
 }
+
+
+/* Comment photo attachments */
+.naComment_attachments {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+}
+.naComment_attachments a {
+    display: inline-block;
+    line-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.30);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: rgba(0, 0, 0, 0.15);
+}
+.naComment_attachments a:hover {
+    transform: scale(1.06);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
+    z-index: 5;
+}
+.naComment_attachments img {
+    display: block;
+    height: 90px;
+    width: auto;
+    max-width: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+}

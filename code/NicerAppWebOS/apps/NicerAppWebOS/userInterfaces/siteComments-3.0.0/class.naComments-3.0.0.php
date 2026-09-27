@@ -75,6 +75,77 @@ class class_naComments {
         }
     }
 
+    /**
+     * Build the CMS-tree codePath for comment photo uploads.
+     * Example: commentsMedia/rene/2026-09-27_23-45-12
+     */
+    public function getCommentMediaCodePath(?string $username = null, ?int $ts = null): string
+    {
+        global $naUsername;
+        $user = $username ?: ($naUsername ?: 'anonymous');
+        $user = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $user);
+        $ts   = $ts ?: time();
+        $dt   = date('Y-m-d_H-i-s', $ts);
+        return 'commentsMedia/' . $user . '/' . $dt;
+    }
+
+    /**
+     * Turn uploaded file names + codePath into the attachments array stored on the comment.
+     *
+     * @param string $codePath  e.g. commentsMedia/rene/2026-09-27_23-45-12
+     * @param array  $files     list of filenames or [{name: "..."}]
+     * @return array
+     */
+    public function buildAttachmentsArray(string $codePath, array $files): array
+    {
+        global $naWebOS;
+        $codePath = trim($codePath, '/');
+        $baseURL  = '/siteData/' . $naWebOS->domainFolder . '/' . $codePath;
+        $out = [];
+        foreach ($files as $f) {
+            $name = is_array($f) ? ($f['name'] ?? $f['filename'] ?? '') : (string)$f;
+            $name = basename($name);
+            if ($name === '' || preg_match('/\.(php|phtml|phar|cgi|pl|py|sh|bash)$/i', $name)) {
+                continue;
+            }
+            $out[] = [
+                'name'         => $name,
+                'relativePath' => $codePath . '/' . $name,
+                'url'          => $baseURL . '/' . rawurlencode($name),
+                'thumbUrl'     => $baseURL . '/thumbs/' . rawurlencode($name),
+                'uploadedAt'   => time(),
+            ];
+        }
+        return $out;
+    }
+
+    /**
+     * Normalize incoming media fields from the client into a clean attachments array.
+     */
+    public function normalizeAttachmentsFromRec(array $rec): array
+    {
+        if (!empty($rec['attachments']) && is_array($rec['attachments'])) {
+            $clean = [];
+            foreach ($rec['attachments'] as $att) {
+                if (!is_array($att) || empty($att['name'])) continue;
+                $clean[] = [
+                    'name'         => basename((string)$att['name']),
+                    'relativePath' => (string)($att['relativePath'] ?? ''),
+                    'url'          => (string)($att['url'] ?? ''),
+                    'thumbUrl'     => (string)($att['thumbUrl'] ?? ''),
+                    'uploadedAt'   => (int)($att['uploadedAt'] ?? time()),
+                ];
+            }
+            return $clean;
+        }
+        if (!empty($rec['mediaCodePath']) && !empty($rec['mediaFiles']) && is_array($rec['mediaFiles'])) {
+            return $this->buildAttachmentsArray(
+                (string)$rec['mediaCodePath'],
+                                                $rec['mediaFiles']
+            );
+        }
+        return [];
+    }
 
     /**
      * Hide a comment by Government Authorities / Justitie
@@ -666,7 +737,7 @@ class class_naComments {
             '_id', 'parentID', 'datetimeStr',
             'clientDatetime', 'clientTZoffset', 'clientIP', 'clientUsername',
             'editedDatetime', 'editedDatetimeStr', 'editedTZoffset',
-            'msgHTML', 'hidden'
+            'msgHTML', 'hidden', 'attachments'
         ];
 
         $dbName = $db->dataSetName ('cms_comments');
@@ -1211,6 +1282,41 @@ class class_naComments {
                 // Show small screenshots for any URLs mentioned in this comment
                 $mentionedUrls = $t->extractUrlsFromHtml($it['msgHTML'] ?? '');
                 $html .= $t->getLinkedScreenshotsHtml($mentionedUrls);
+
+                // Photo attachments → open via cmsViewMedia /view/… (same as photoAlbum)
+                if (!empty($it['attachments']) && is_array($it['attachments'])) {
+                    $html .= '<div class="naComment_attachments">';
+                    foreach ($it['attachments'] as $att) {
+                        $name  = (string)($att['name'] ?? '');
+                        $rel   = (string)($att['relativePath'] ?? '');
+                        $thumb = htmlspecialchars($att['thumbUrl'] ?? $att['url'] ?? '');
+                        $full  = htmlspecialchars($att['url'] ?? '');
+                        if ($name === '' && $rel === '') continue;
+
+                        // codePath = directory part of relativePath; filename = basename
+                        $codePath = $rel !== ''
+                        ? trim(str_replace('\\', '/', dirname($rel)), '/')
+                        : '';
+                            $filename = $name !== '' ? basename($name) : basename($rel);
+
+                        $viewPayload = [
+                            '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS' => [
+                                'cmsViewMedia' => [
+                                    'appFolder' => '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS',
+                                    'codePath'  => $codePath,
+                                    'filename'  => $filename,
+                                ],
+                            ],
+                        ];
+                        $href = '/view/' . encode_base64_url(json_encode($viewPayload));
+
+                        $html .= '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($href) . '\');" class="nomod" title="' . htmlspecialchars($filename) . '">'
+                        .  '<img src="' . ($thumb !== '' ? $thumb : $full) . '" alt="' . htmlspecialchars($filename) . '" loading="lazy"/>'
+                        .  '</a>';
+                    }
+                    $html .= '</div>';
+                }
+
             };
                 $html .= "\t".'<div class="naComment_subComments">';
                 $html .= "\t".'</div>'.PHP_EOL;
@@ -1540,6 +1646,11 @@ class class_naComments {
         $rec['msgHTML'] = str_replace ('<p><span class="backdropped"', '<p class="backdropped"', $rec['msgHTML']);
         $rec['msgHTML'] = str_replace ('</span>', '', $rec['msgHTML']);
         $rec['msgHTML'] = str_replace ('<p>', '<p class="backdropped">', $rec['msgHTML']);
+
+        // Photo album attachments → structured array on the comment doc
+        $rec['attachments'] = $this->normalizeAttachmentsFromRec($rec);
+        unset($rec['mediaCodePath'], $rec['mediaFiles']);
+
         $db = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
@@ -1603,6 +1714,14 @@ class class_naComments {
             $doc->editedDatetime    = $now;
             $doc->editedTZoffset    = $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0);
             $doc->editedDatetimeStr = naDateTimeStr($now, $doc->editedTZoffset);
+
+            // Photo album attachments (merge / replace)
+            if (array_key_exists('mediaCodePath', $rec) || array_key_exists('mediaFiles', $rec) || array_key_exists('attachments', $rec)) {
+                $incoming = $this->normalizeAttachmentsFromRec($rec);
+                // Replace strategy: new uploads from this edit session replace previous set.
+                // Change to array_merge if you prefer append-only.
+                $doc->attachments = $incoming;
+            }
 
             $cdb->put($doc->_id, $doc);
 

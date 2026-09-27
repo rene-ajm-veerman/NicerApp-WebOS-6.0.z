@@ -120,12 +120,15 @@ $("#uploader").plupload({
             },
             
             UploadComplete : function (up, files) {
-                if (window.top.na.cms)
-                  window.top.na.cms.mediaUploadComplete (up, files);
-                else
-                  window.top.na.blog.mediaUploadComplete (up, files);
+              if (window.top.na.c && typeof window.top.na.c.mediaUploadComplete === 'function')
+                window.top.na.c.mediaUploadComplete(up, files);
+              else if (window.top.na.cms && typeof window.top.na.cms.mediaUploadComplete === 'function')
+                window.top.na.cms.mediaUploadComplete(up, files);
+              else if (window.top.na.blog && typeof window.top.na.blog.mediaUploadComplete === 'function')
+                window.top.na.blog.mediaUploadComplete(up, files);
             }
-        }		
+
+        }
 	});
 
     plupload.addFileFilter('exclude_folders', function(folders, file, cb) {

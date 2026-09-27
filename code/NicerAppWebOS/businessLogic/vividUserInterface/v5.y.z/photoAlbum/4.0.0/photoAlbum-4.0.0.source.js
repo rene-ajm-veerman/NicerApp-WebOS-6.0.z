@@ -36,7 +36,7 @@ if (!na.photoAlbum) na.photoAlbum = {
         } else {
             if (w>iframeWidth) {
                 th = jQueryImg.css({top:0,width:iframeWidth,height:''}).delay(50).height();
-                tw = jQsueryImg.width();
+                tw = jQueryImg.width();
                 s.zoomPercentage = (th*100) / h;
             } else if (h>iframeHeight) {
                 tw = jQueryImg.css({width:'',left:0,height:iframeHeight}).delay(50).width();

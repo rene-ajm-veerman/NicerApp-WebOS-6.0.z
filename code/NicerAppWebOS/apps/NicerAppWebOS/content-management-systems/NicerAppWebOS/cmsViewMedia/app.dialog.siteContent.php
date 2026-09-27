@@ -46,7 +46,7 @@ $fn = $view[$viewFolder]['cmsViewMedia']['filename'];
 if (substr($view[$viewFolder]['cmsViewMedia']['codePath'],0,1)!=='/') {
     $baseURL = '/siteData/'.$naWebOS->domainFolder.'/';
     $baseDir = str_replace('/domainConfig','',$naWebOS->domainPath).'/siteData/'.$naWebOS->domainFolder.'/';
-    echo '<h1>'.$baseDir.'</h1>';
+    //echo '<h1>'.$baseDir.'</h1>';
 } else {
     $baseURL = '/siteData/'.$naWebOS->domainFolder.'/';
     if (
@@ -68,7 +68,7 @@ $dbg = array (
     'fn' => $fn,
     'view' => $view
 );
-//echo '<pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>'; //exit();
+//echo '<pre>t1:'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>'; //exit();
 
 //$baseDir = str_replace ($naWebOS->path.'/code','', $baseDir);
 //$baseDir = str_replace ($naWebOS->path,'', $baseDir);
@@ -94,18 +94,19 @@ $dbg = array (
     'fn' => $fn,
     'view' => $view
 );
-//echo '<pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>'; //exit();
+//echo '<pre>t2:'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>'; //exit();
 
-$files = getFilePathList ($targetDir, false, FILE_FORMATS_photos, null, array('file'), 1, 1, false);
+$files = getFilePathList ($baseDir.'/'.$targetURL, false, FILE_FORMATS_photos, null, array('file'), 1, 1, false);
 usort($files, function($a, $b) {
     return strcmp($a['webPath'], $b['webPath']);
 });
 //echo '<pre>'; var_dump ($files); echo '</pre>'; exit();
 
 foreach ($files as $idx => $file) {
+    //echo '<pre>'; var_dump($file); echo '</pre>';
     $prev = '';
     $next = '';
-    $path = $file['webPath'];
+    $path = $file['realPath'];
     $path = str_replace('/'.$naWebOS->domainPath,'',$path);
     $path = str_replace($naWebOS->domainPath,'',$path);
     $path = str_replace('/domains/'.$naWebOS->domainFolder,'',$path);
@@ -155,12 +156,12 @@ foreach ($files as $idx => $file) {
     #btnPrevious {
         position:absolute;
         top : calc(50% - 25px);
-        left : 10px;
+        left : 20px;
     }
     #btnNext {
         position:absolute;
         top : calc(50% - 25px);
-        right : 10px;
+        right : 50px;
 
     }
     #btnSetBackground {
@@ -176,9 +177,9 @@ foreach ($files as $idx => $file) {
 <script type="text/javascript" src="/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/photoAlbum-4.0.0.source.js?c=<?php echo date('Ymd_His',filemtime($naWebOS->domainPath.'/NicerAppWebOS/businessLogic/vividUserInterface/v5.y.z/photoAlbum/4.0.0/photoAlbum-4.0.0.source.js'));?>"></script>
 <img id="btnBack_fromMediaView" class="tooltip" tooltipTheme="mainTooltipTheme" title="Go back, leave the photo-album viewer." src="/siteMedia/btnBack.png" onclick="window.history.back();" style="position:absolute"/>
     <img id="viewMedia" src="<?php echo $myPath;?>"/>
-<img id="btnSetBackground" class="tooltip" tooltipTheme="mainTooltipTheme" title="Set as site background" src="/siteMedia/btnBackground.png" onclick="na.backgrounds.next ('#siteBackground', na.site.globals.backgroundSearchKey, '<?php echo $myPath;?>');"/>
-<a id="btnPrevious" href="<?php echo $prevURL;?>"><img id="btnImgPrevious" src="/siteMedia/btnPrevious.png"/></a>
-<a id="btnNext" href="<?php echo $nextURL;?>"><img id="btnImgNext" src="/siteMedia/btnNext.png"/></a>
+<img id="btnSetBackground" class="tooltip" tooltipTheme="mainTooltipTheme" title="Set as site background" src="/siteMedia/btnBackground.png" onclick="na.backgrounds.next ('#siteBackground', na.site.globals.backgroundSearchKey, '<?php echo $myPath;?>');" style="position:fixed"/>
+<a id="btnPrevious" href="<?php echo $prevURL;?>"><img id="btnImgPrevious" src="/siteMedia/btnPrevious.png" style="position:fixed"/></a>
+<a id="btnNext" href="<?php echo $nextURL;?>"><img id="btnImgNext" src="/siteMedia/btnNext.png" style="position:fixed"/></a>
 <div id="naPhotoAlbum__control" style="position:absolute;top:5%;width:200px;height:100px;right:1%;z-index:3200;">
     <div class="naPhotoAlbum_control__background" style="position:absolute;width:100%;height:100%;">&nbsp;</div>
 	<div id="naPhotoAlbum__control__naturalWidth" class="naPhotoAlbum_control_element" style="position:absolute;top:1em;"></div>

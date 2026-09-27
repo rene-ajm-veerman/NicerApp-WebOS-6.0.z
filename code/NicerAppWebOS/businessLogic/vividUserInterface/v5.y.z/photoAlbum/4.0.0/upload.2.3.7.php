@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 */
 
+
 // 5 minutes execution time
 @set_time_limit(5 * 60);
 
@@ -59,6 +60,28 @@ $targetDir =
 
 //var_dump ($naWebOS->domain); die();
 $targetDir = str_replace('/domainConfig','',$naWebOS->domainPath).'/siteData/'.$naWebOS->domain.'/'.$relativePath;
+
+// Ensure full chain exists (commentsMedia / user / datetime / thumbs)
+if (!is_dir($targetDir)) {
+    @mkdir($targetDir, 0770, true);
+}
+if (!is_dir($targetDir . '/thumbs')) {
+    @mkdir($targetDir . '/thumbs', 0770, true);
+}
+
+if (!is_dir($targetDir) || !is_writable($targetDir)) {
+    exit(json_encode([
+        'jsonrpc' => '2.0',
+        'error'   => [
+            'code'    => 100,
+            'message' => 'Target dir not writable: ' . $targetDir
+            . ' (user=' . (function_exists('posix_geteuid') ? posix_getpwuid(posix_geteuid())['name'] : get_current_user()) . ')'
+        ],
+        'id' => 'id'
+    ]));
+}
+
+
 if ($debug) { echo '$targetDir='; var_dump ($targetDir); echo PHP_EOL.PHP_EOL; }
     
 $fileName = $_POST['name'];
