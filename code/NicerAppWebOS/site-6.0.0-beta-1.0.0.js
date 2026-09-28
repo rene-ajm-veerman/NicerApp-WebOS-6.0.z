@@ -1147,7 +1147,7 @@ na.site = {
             History.pushState (null, '', document.location.origin+'/view/'+url);
         } else debugger;
 
-        event.preventDefault();
+        if (event && typeof event.preventDefault=='function') event.preventDefault();
     },
 
 	stateChange : function(evt){

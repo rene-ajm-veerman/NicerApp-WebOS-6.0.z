@@ -10,5 +10,5 @@
     }
     //echo '<pre style="color:lime;">'; var_dump ($_GET); echo '</pre><br/>';
     //echo '<pre style="color:yellow;">'; var_dump ($json); echo '</pre><br/>';
-    echo '<center><a href="javascript:window.top.na.s.c.back();"><img src="'.$json['photo']['fileURL'].'" style="max-width:97%;max-height:97%;"/></a></center>';
+    echo '<center><a href="javascript:window.top.na.s.c.back();"><img src="'.$json['photo']['fileURL'].'" style="width:97%;height:97%;max-width:97%;max-height:97%;"/></a></center>';
 ?>
