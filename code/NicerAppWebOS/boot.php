@@ -58,8 +58,8 @@ NicerApp WebOS from Nicer Enterprises
                 $settingsFilePath = $dir.'/../../../domains/'.$bn.'/domainConfig/settings.json';
             }
 	     */
-		$scriptDir = dirname(__FILE__);
-		//var_dump ($scriptDir); exit;
+		$scriptDir = dirname($_SERVER['PWD']);//dirname(__FILE__);
+		//var_dump ($_SERVER); exit;
 
 		if (preg_match('#/domains/([^/]+)/#', $scriptDir, $m)) {
     			$bn = $m[1];

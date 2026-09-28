@@ -38,10 +38,6 @@
         Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.y.z" class="nomod noPushState" target="naGithub">v6.y.z on Github.com</a>,
         and available as <a href="https://nicer.app/downloads" class="nomod noPushState" target="naDownload">full package here</a>,<br/>
         </p>
-        <p>
-        2026-09(September)-14(Monday), 01:00am CEST:<br/>
-        E.T.A. until next alpha/beta release : no longer than 1 week from now.
-        </p>
 
         <iframe src="https://nicer.app/NicerAppWebOS/scripts.install/flowchart.html" style="border:none;width:700px;height:1500px;overflow:hidden;"></iframe>
 
@@ -50,20 +46,6 @@
         Bug-reports as well as legal inquiries may be sent to <a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>.
         </p>
     </div>
-
-    <div class="naFrontpage_headerText naFrontpage_headerText_intro" style="float:left">
-    <p>
-    2026-09-16 12:00CET; Change of plans : I will morph my software via it's photo album and file explorer features into a banking and webshops platform. I want to expand significantly on my own CFO skills rather than rely on -in-my-opinion- shady accountancy firms, small or large. I will try Grok as my teacher in these matters.
-    </p>
-    </div>
-    <div style="height:250px"></div>
-
-    <div class="naFrontpage_headerText naFrontpage_headerText_intro" style="float:left">
-    <p>
-    I've been thinking on how to prevent over-usage of my system, and the answer is a side-module, another human+AI-written statistical algorithm, to compute graphdata of daily usage hours (measured in seconds) per user/IP-address, per app, per NicerApp domain, results also stored in database for quick retrieval upon display or decision-time.
-    </p>
-    </div>
-    <div style="height:300px"></div>
 
     <div class="naFrontpage_headerText naFrontpage_headerText_recentAchievement" style="float:left">
         <p class="backdropped" style="color:lime">
@@ -80,7 +62,7 @@ NL30INGB0007689155
         <p class="backdropped" style="color:lime">
         2026-Aug-10th, 09:44CEST<br/>
         </p>
-        <p class="backdropped">All donations and expenses will be handled in a tax-compliant way.<br/>Please include what specifically you are donating for as part of your money transfer description.<br/>I'm allowed to make about two-thousand Euros extra per year without it getting taken by my country's government outright.</p>
+        <p class="backdropped">All donations and expenses will be handled in a tax-compliant way.<br/>Please include what specifically you are donating for as part of your money transfer description.<br/>Due to medical reasons, I'm only allowed to make about two-thousand Euros extra per year without it getting taken by my country's government outright.</p>
     </div>
 <div style="height:550px"></div>
 

@@ -1,0 +1,1 @@
+because Apple broke support for jQuery and/or other HTML and CSS and Javascript routines that my NicerApp WCS product uses (https://github.com/NicerAppWebOS/nicerapp)

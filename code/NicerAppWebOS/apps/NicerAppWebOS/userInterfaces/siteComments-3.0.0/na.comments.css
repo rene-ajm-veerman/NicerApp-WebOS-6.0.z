@@ -192,7 +192,7 @@
 
 /* Comment photo attachments */
 .naComment_attachments {
-    margin-top: 12px;
+    margin: 12px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;

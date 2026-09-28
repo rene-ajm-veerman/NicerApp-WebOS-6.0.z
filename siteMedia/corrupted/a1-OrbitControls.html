@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Angel • Nicer.app 3D Showcase</title>
+  <style>
+    body { margin:0; overflow:hidden; background:#000; font-family:Arial,Helvetica,sans-serif; }
+    #container { position:absolute; inset:0; }
+    #loading {
+      position: absolute; inset:0; background:rgba(0,0,0,0.85);
+      color:white; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      font-size:1.4rem; transition:opacity 0.8s; pointer-events:none;
+    }
+    #loading.hidden { opacity:0; }
+    #progress { width:40%; height:8px; background:#333; margin:1rem 0; border-radius:4px; overflow:hidden; }
+    #bar { height:100%; width:0%; background:#4fc3f7; transition:width 0.2s; }
+    #info {
+      position: absolute; bottom:20px; left:50%; transform:translateX(-50%);
+      color:#eee; background:rgba(0,0,0,0.5); padding:8px 16px; border-radius:8px;
+      font-size:0.9rem; pointer-events:none; user-select:none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<div id="loading">
+  <div>Loading Angel Model...</div>
+  <div id="progress"><div id="bar"></div></div>
+</div>
+
+<div id="info">Drag to orbit • Scroll / pinch to zoom • Double-click fullscreen</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.168",
+    "three/addons/": "https://esm.sh/three@0.168/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/RGBELoader.js';
+import Stats from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/stats.module.js';
+
+// ── Globals ────────────────────────────────────────────────────────────────
+let camera, scene, renderer, controls, stats;
+let mixer, clock = new THREE.Clock();
+let autoAngle = 0;
+const autoRadius   = 20;
+const autoHeight   = 10;         // slightly above → nice chest/head view
+const autoSpeed    = 0.28;         // slow cinematic orbit (rad/s)
+const lookAtY      = 0.95;         // chest level
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function init() {
+  const container = document.getElementById('container');
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, autoHeight, autoRadius);
+
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111122);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambient);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 3.5);
+  dirLight.position.set(5, 12, 8);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = dirLight.shadow.mapSize.height = 2048;
+  dirLight.shadow.camera.near = 0.1;
+  dirLight.shadow.camera.far = 50;
+  dirLight.shadow.camera.left = dirLight.shadow.camera.bottom = -12;
+  dirLight.shadow.camera.right = dirLight.shadow.camera.top = 12;
+  scene.add(dirLight);
+
+
+  // ── Extra bright spotlight on wings from top-back ──────────────────────────
+  // Add this after loading/adding the model
+
+  const spotLight = new THREE.SpotLight(0xffffff, 12);  // color, intensity (bright!)
+
+  spotLight.position.set(0, 4.5, -2.5);          // high up (y), slightly behind (negative z if camera starts positive z)
+  spotLight.angle = Math.PI / 12;                // narrow cone ~15° for focused beam on wings
+  spotLight.penumbra = 0.4;                      // soft edge (0 = hard, 1 = very soft)
+  spotLight.decay = 1.5;                         // light dims with distance
+  spotLight.distance = 0;                        // 0 = infinite range (or set e.g. 20 if you want cutoff)
+
+  spotLight.castShadow = true;
+  spotLight.shadow.mapSize.width = 1024;         // higher = sharper shadows
+  spotLight.shadow.mapSize.height = 1024;
+  spotLight.shadow.camera.near = 0.5;
+  spotLight.shadow.camera.far = 25;
+  spotLight.shadow.bias = -0.0005;               // helps reduce shadow acne
+
+  // Target the upper back / between wings (adjust y to hit wing height — probably 1.5–2.2)
+  const wingTarget = new THREE.Object3D();
+  wingTarget.position.set(0, 1.8, 0);            // ← tweak this Y! Model's wing base height
+  scene.add(wingTarget);
+
+  spotLight.target = wingTarget;
+
+  // Add to scene
+  scene.add(spotLight);
+
+  // Optional: Visual helper (great for tuning position/angle — comment out later)
+  // const spotHelper = new THREE.SpotLightHelper(spotLight, 0.5);
+  // scene.add(spotHelper);
+
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  container.appendChild(renderer.domElement);
+
+  // Controls (mouse/touch fallback)
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 1.8;
+  controls.maxDistance = 18;
+  controls.minPolarAngle = Math.PI * 0.05;
+  controls.maxPolarAngle = Math.PI * 0.98;
+  controls.autoRotate = false; // we do our own cinematic version
+  controls.target.set(0, lookAtY, 0);
+
+  // Stats
+  stats = new Stats();
+  stats.dom.style.position = 'absolute';
+  stats.dom.style.top = '8px';
+  stats.dom.style.left = '8px';
+  container.appendChild(stats.dom);
+
+  // Resize
+  window.addEventListener('resize', onWindowResize);
+  document.addEventListener('dblclick', () => {
+    if (!document.fullscreenElement) renderer.domElement.requestFullscreen();
+  });
+
+  // Load HDR env (for nice reflections)
+  new RGBELoader().load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr', (texture) => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = texture;
+    // scene.background = texture; // ← uncomment for env as bg too
+  });
+
+  loadModel();
+}
+
+// ── Model Loading with Progress ────────────────────────────────────────────
+function loadModel() {
+  const loadingEl = document.getElementById('loading');
+  const bar = document.getElementById('bar');
+
+  const loader = new GLTFLoader();
+  // Replace with your actual angel model URL (probably something like:)
+  const modelUrl = 'https://nicer.app/siteMedia/backgrounds/iframe/webgl/3D/models/Angels/angel-farmer.glb'; // ← adjust this!!
+
+  loader.load(
+    modelUrl,
+    (gltf) => {
+      const model = gltf.scene;
+      model.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      // Optional: center & scale model if needed
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      model.position.sub(center); // center at origin
+
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 1.8 / maxDim; // tune to taste
+      model.scale.multiplyScalar(scale);
+
+      scene.add(model);
+
+      // Animation (if any)
+      if (gltf.animations?.length) {
+        mixer = new THREE.AnimationMixer(model);
+        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+      }
+
+      // Hide loading
+      loadingEl.classList.add('hidden');
+    },
+    (progress) => {
+      if (progress.lengthComputable) {
+        const percent = Math.round((progress.loaded / progress.total) * 100);
+        bar.style.width = percent + '%';
+      }
+    },
+    (err) => {
+      console.error('Model load error:', err);
+      loadingEl.innerHTML = 'Error loading model… Check console.';
+    }
+  );
+}
+
+// ── Animation Loop (cinematic auto orbit) ──────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+
+  const dt = clock.getDelta();
+
+  // Auto cinematic orbit
+  autoAngle += autoSpeed * dt;
+  camera.position.x = autoRadius * Math.sin(autoAngle);
+  camera.position.z = autoRadius * Math.cos(autoAngle);
+  camera.position.y = autoHeight;
+
+  // Smoothly follow target (chest)
+  controls.target.y = lookAtY; // keep updated
+
+  if (mixer) mixer.update(dt);
+  controls.update();
+  stats.update();
+
+  renderer.render(scene, camera);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// ── Start ──────────────────────────────────────────────────────────────────
+init();
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angel • Nicer.app 3D Showcase</title>
+  <style>
+    body { margin:0; overflow:hidden; background:transparent; }
+    #container { position:absolute; inset:0; }
+    #loading {
+      position: absolute; inset:0; background:rgba(0,0,0,0.7);
+      color:#eee; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      font-size:1.3rem; transition:opacity 1s; pointer-events:none;
+    }
+    #loading.hidden { opacity:0; }
+    #progress { width:50%; height:10px; background:#444; margin:1.2rem 0; border-radius:5px; overflow:hidden; }
+    #bar { height:100%; width:0%; background:#0af; transition:width 0.3s; }
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<div id="loading">
+  <div>Loading Angel Model...</div>
+  <div id="progress"><div id="bar"></div></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.168",
+    "three/addons/": "https://esm.sh/three@0.168/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/RGBELoader.js';
+import Stats from 'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/stats.module.js';
+
+// ── Adjustable constants ───────────────────────────────────────────────────
+const MODEL_URL = 'https://nicer.app/siteMedia/backgrounds/iframe/webgl/3D/models/Angels/angel-farmer.glb';  // ← change to full path if needed, e.g. './angel.glb' or absolute URL
+
+const ORBIT_RADIUS   = 1.5;     // distance from origin
+const CAMERA_HEIGHT  = 1.4;     // hovers around head level (adjust after seeing model)
+const ORBIT_SPEED    = 0.22;    // radians per second — slow cinematic
+const LOOK_AT_Y      = 1.65;    // aim camera roughly at head/upper chest
+
+const SPOT_INTENSITY = 14;
+const SPOT_HEIGHT    = 5.2;     // high above
+const SPOT_BACK      = -3.0;    // behind model
+const WING_TARGET_Y  = 1.9;     // aim spotlight at upper back / wing base
+
+// ── Globals ────────────────────────────────────────────────────────────────
+let camera, scene, renderer, controls;
+let autoAngle = 0;
+const clock = new THREE.Clock();
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function init() {
+  const container = document.getElementById('container');
+
+  camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 50);
+  camera.position.set(ORBIT_RADIUS, CAMERA_HEIGHT, 0);
+
+  scene = new THREE.Scene();
+  scene.background = null;  // transparent background
+
+  // Basic lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+
+  const dirLight = new THREE.DirectionalLight(0xfff8e8, 3.2);
+  dirLight.position.set(8, 14, 6);
+  scene.add(dirLight);
+
+  // Renderer with transparency
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+
+  // Mouse/touch controls (optional fallback)
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.07;
+  controls.minDistance = 0.001;
+  controls.maxDistance = 120;
+  controls.target.set(0, LOOK_AT_Y, 0);
+
+  // HDR environment (reflections)
+  new RGBELoader().load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr', tex => {
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = tex;
+  });
+
+  loadModel();
+
+  window.addEventListener('resize', onResize);
+}
+
+// ── Load & orient model ────────────────────────────────────────────────────
+function loadModel() {
+  const loading = document.getElementById('loading');
+  const bar = document.getElementById('bar');
+
+  const loader = new GLTFLoader();
+  loader.load(
+    MODEL_URL,
+    gltf => {
+      const model = gltf.scene;
+
+      // Center model at [0,0,0]
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+
+      // Face east (+X direction), upright (Y-up)
+      model.rotation.y = Math.PI / 2;  // 90° counterclockwise → faces +X (east)
+
+      // Optional slight scale adjustment — tune after testing
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const desiredHeight = 3.5;  // approximate full height you want
+      const scale = desiredHeight / maxDim;
+      model.scale.multiplyScalar(scale);
+
+      model.traverse(child => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      scene.add(model);
+/*
+      // Extra bright spotlight on wings from top-back
+      const spotLight = new THREE.SpotLight(0xffffff, SPOT_INTENSITY);
+      spotLight.position.set(0, SPOT_HEIGHT, SPOT_BACK);
+      spotLight.angle = Math.PI / 11;
+      spotLight.penumbra = 0.35;
+      spotLight.decay = 1.8;
+      spotLight.distance = 0;
+      spotLight.castShadow = true;
+      spotLight.shadow.mapSize.set(1024, 1024);
+      spotLight.shadow.bias = -0.0004;
+
+      const targetObj = new THREE.Object3D();
+      targetObj.position.set(0, WING_TARGET_Y, 0);
+      scene.add(targetObj);
+      spotLight.target = targetObj;
+      scene.add(spotLight);*/
+
+      loading.classList.add('hidden');
+    },
+    progress => {
+      if (progress.lengthComputable) {
+        const pct = Math.round((progress.loaded / progress.total) * 100);
+        bar.style.width = pct + '%';
+      }
+    },
+    err => {
+      console.error('Model load error:', err);
+      loading.innerHTML = 'Failed to load model — check console & model path';
+    }
+  );
+}
+
+// ── Animation: head-level orbit ────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+
+  autoAngle += ORBIT_SPEED * dt;
+
+  camera.position.x = ORBIT_RADIUS * Math.sin(autoAngle);
+  camera.position.z = ORBIT_RADIUS * Math.cos(autoAngle);
+  camera.position.y = CAMERA_HEIGHT;
+
+  controls.target.y = LOOK_AT_Y;
+  controls.update();
+
+  renderer.render(scene, camera);
+}
+
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// ── Start ──────────────────────────────────────────────────────────────────
+init();
+animate();
+</script>
+</body>
+</html>

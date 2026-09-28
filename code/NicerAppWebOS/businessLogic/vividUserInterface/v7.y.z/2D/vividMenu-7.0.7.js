@@ -3,7 +3,7 @@ class naVividMenu {
     this.menu = document.getElementById(menuElId);
     if (!this.menu) return;
 
-    this.menu.className = 'vividMenu vividMenu_vertical vertical';
+    this.menu.className = 'vividScrollpane vividMenu vividMenu_vertical vertical';
 
     const btn =
     document.getElementById(openBtnId) ||
