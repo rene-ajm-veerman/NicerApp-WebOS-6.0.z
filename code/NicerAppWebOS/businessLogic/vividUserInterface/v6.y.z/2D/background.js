@@ -90,7 +90,14 @@ na.backgrounds = na.background = na.bg = {
     // below here was all written with the free help of grok.com
     showBrowser : function () {
         $('#siteBackgrounds_content').html(`
-        <div id="siteBackgrounds_leftPanel" class="siteBackgrounds_panel vividScrollpane"></div>
+        <div id="siteBackgrounds_leftPanel" class="siteBackgrounds_panel vividScrollpane">
+        <div id="siteBackgrounds_searchBox" style="padding:8px 12px 4px; position:sticky; top:0; background:inherit; z-index:2;">
+        <input type="search" id="siteBackgrounds_filter"
+        placeholder="Filter tags…"
+        style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #666; background:#222; color:#eee; font-size:14px;">
+        </div>
+        <div id="siteBackgrounds_tags"></div>
+        </div>
         <div id="siteBackgrounds_rightPanel" class="siteBackgrounds_panel vividScrollpane"></div>
         `);
         $('#siteBackgrounds').css({
@@ -108,7 +115,23 @@ na.backgrounds = na.background = na.bg = {
         }, function() {
             const totalKeywords = na.background.buildBackgroundsDialogContent(na.background);
 
-            na.background.renderKeywordsIncrementally(na.background, 50);
+            na.background.renderKeywordsIncrementally(na.background, 500);
+
+            const filterInput = document.getElementById('siteBackgrounds_filter');
+            if (filterInput) {
+                filterInput.addEventListener('input', () => {
+                    const q = filterInput.value.trim().toLowerCase();
+                    const tags = document.querySelectorAll('#siteBackgrounds_tags .kw.token');
+
+                    tags.forEach(span => {
+                        const text = span.textContent.toLowerCase();
+                        span.style.display = (!q || text.includes(q)) ? '' : 'none';
+                    });
+                });
+
+                // Optional: clear filter when the dialog is closed / reopened
+                filterInput.value = '';
+            }
         }, 100, 50); // check every 100ms, timeout after 5s
     },
 
@@ -370,15 +393,20 @@ na.backgrounds = na.background = na.bg = {
 
         // ────────────────────────────────────────────────
         // After all loops have finished – prepare sorted list for rendering
-        t.sortedTokens = Object.keys(t.tokenIndex).sort((a, b) => {
-            // Option 1: sort by frequency descending (most useful first)
-            const diff = t.tokenIndex[b].count - t.tokenIndex[a].count;
-            if (diff !== 0) return diff;
-
-            // Option 2: frequency tie → alphabetical
-            return a.localeCompare(b);
-        });
-
+//         t.sortedTokens = Object.keys(t.tokenIndex).sort((a, b) => {
+//             // Option 1: sort by frequency descending (most useful first)
+//             const diff = t.tokenIndex[b].count - t.tokenIndex[a].count;
+//             if (diff !== 0) return diff;
+//
+//             // Option 2: frequency tie → alphabetical
+//             return a.localeCompare(b);
+//         });
+//
+        // ────────────────────────────────────────────────
+        // After all loops have finished – prepare sorted list for rendering
+        t.sortedTokens = Object.keys(t.tokenIndex)
+        .filter(token => t.tokenIndex[token].count >= 3)
+        .sort((a, b) => a.localeCompare(b));
         // Alternative sorts you might want to try:
         // → alphabetical only:   return a.localeCompare(b);
         // → longer tokens last:  return b.length - a.length;
@@ -427,7 +455,7 @@ na.backgrounds = na.background = na.bg = {
     },
 
     renderKeywordsIncrementally : function (t, batchSize = 100) {
-        const container = document.getElementById('siteBackgrounds_leftPanel');
+        const container = document.getElementById('siteBackgrounds_tags');
         if (!container) return;
 
         // Remove old progress bar container if exists
@@ -461,17 +489,15 @@ na.backgrounds = na.background = na.bg = {
             while (i < end) {
                 const token = t.sortedTokens[i];
                 const data = t.tokenIndex[token];
-                if (data.count < 3) { i++; continue; } // ← hide rare tokens (tune threshold)
 
                 const span = document.createElement('span');
                 span.className = 'kw token';
                 span.textContent = `${token} (${data.count}) `;
                 span.title = `${data.files.size} images`;
                 span.onclick = () => {
-                    // Highlight + show images
                     document.querySelectorAll('.kw.token').forEach(el => el.classList.remove('kwSel'));
                     span.classList.add('kwSel');
-                    na.background.showImagesForToken(token); // you'll write this next
+                    na.background.showImagesForToken(token);
                 };
 
                 fragment.appendChild(span);

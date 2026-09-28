@@ -1685,17 +1685,18 @@ class NicerAppWebOS {
             //echo 't22;'; var_dump($css);
 
             $hasData = false;
+
             if (is_array($css) && count($css)>0) {
                 foreach ($css['themes'] as $themeName => $theme) { $hasData = true; break; };
 
-                $specificityName = (
+            /*    $specificityName = (
                     array_key_exists($themeName, $css['themes'])
                     && array_key_exists('specificityName', $css['themes'][$themeName])
                     ? $css['themes'][$themeName]['specificityName']
                     : $selector['specificityName']
-                );
+                );*/
             } else {
-                $specificityName = $selector['specificityName'];
+                // $specificityName = $selector['specificityName'];
                 $hasData = is_string($css);
                 //if ($hasData) {var_dump ($css);exit();};
             }
