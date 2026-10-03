@@ -111,7 +111,19 @@ if (
     <div id="site3D_backgroundsBrowser" class="na3D" theme="<?php echo $theme;?>">
     </div>
     <div id="site3D_label" class="label" theme="<?php echo $theme;?>"></div>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js",
+            "three/webgpu" : "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.webgpu.js",
+            "three/tsl" : "/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.tsl.js",
+            "three/addons" : "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/",
+            "three/examples/jsm/": "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/"
+        }
+    }
+    </script>
     <script type="module" src="/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/dist/3d-force-graph.min.js"></script>
 <!--     <script src="/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/3d-force-graph/src/3d-force-graph.js"></script> -->
 <!-- <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script> -->
 <!--     <script src="//cdn.jsdelivr.net/npm/three-spritetext"></script> -->

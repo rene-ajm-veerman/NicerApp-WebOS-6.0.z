@@ -4,9 +4,10 @@
  * ----- At https://nicer.app/3D and https://nicer.app/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/na3D.js, i have a live copy runniing of https://github.com/rene-ajm-veerman/NicerApp-WebOS-MIT-5.10.z/tree/main/NicerAppWebOS/apps/NicerAppWebOS/applications/3D/app.3D.fileExplorer and https://github.com/rene-ajm-veerman/NicerApp-WebOS-MIT-5.10.z/blob/main/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/na3D.js i have data supplied by https://github.com/rene-ajm-veerman/NicerApp-WebOS-MIT-5.10.z/blob/main/NicerAppWebOS/apps/NicerAppWebOS/applications/3D/app.3D.fileExplorer/ajax_getBackgroundsRecursive.php
  * ---*/
 
-import * as three from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
 import * as THREE from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
-window.THREE = THREE;   // so other libs can find it
+window.THREE = THREE;
+
+
 import { Stats } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/libs/stats.module.js";
 import { GLTFLoader } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/FBXLoader.js";
@@ -21,17 +22,8 @@ import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js";
 import { EffectComposer, BloomEffect, EffectPass, RenderPass } from "https://esm.sh/postprocessing@6.36.3";
 import SpriteText from "https://esm.sh/three-spritetext@1.9.3";
 
-import * as THREE from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
-window.THREE = THREE;
 
-// Load ForceGraph3D and force it onto the global so the existing waitForCondition finds it
-import('https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/+esm')
-.then(mod => {
-    window.ForceGraph3D = mod.default;
-    console.log('✅ ForceGraph3D loaded via dynamic import');
-})
-.catch(err => console.error('Failed to load ForceGraph3D', err));/*
- *  import {
+/*  import {
  *    CSS2DRenderer,
  *    CSS2DObject,
  *  } from "https://unpkg.com/three@0.125.2/examples/jsm/renderers/CSS2DRenderer.js";
@@ -1208,7 +1200,6 @@ export class na3D_fileBrowser {
     async createGraph(t) {
         // --- ensure ForceGraph3D is available ---
         var vm = t.currentViewMode;
-        debugger;
 
         // === Before creating t.graph ===
         const maxLevels = 12; // adjust based on your deepest hierarchy
@@ -1553,21 +1544,11 @@ export class na3D_fileBrowser {
 
 
         // --- ensure ForceGraph3D is available ---
-        if (typeof window.ForceGraph3D === 'undefined') {
-            console.log('Loading ForceGraph3D…');
-            try {
-                const mod = await import('https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/+esm');
-                window.ForceGraph3D = mod.default;
-                console.log('✅ ForceGraph3D loaded');
-            } catch (err) {
-                console.error('Failed to load ForceGraph3D', err);
-                return;
-            }
+        if (typeof ForceGraph3D === 'undefined') {
+            console.error('ForceGraph3D UMD not loaded');
+            return;
         }
-
         t.graph = window.graph = ForceGraph3D()(t.el);
-        // … keep the rest of your original graph configuration here …
-        t.graph(container);  // mount to DOM immediately
 
             t.graph.d3Force('charge', null);
             t.graph.d3Force('center', null);
