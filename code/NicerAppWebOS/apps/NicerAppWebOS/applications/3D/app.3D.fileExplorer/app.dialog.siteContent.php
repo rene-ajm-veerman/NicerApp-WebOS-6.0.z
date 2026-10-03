@@ -123,7 +123,7 @@ if (
     }
     </script>
     <script type="module" src="/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/dist/3d-force-graph.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/dist/3d-force-graph.min.js"></script>-->
 <!--     <script src="/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/3d-force-graph/src/3d-force-graph.js"></script> -->
 <!-- <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script> -->
 <!--     <script src="//cdn.jsdelivr.net/npm/three-spritetext"></script> -->

@@ -17,8 +17,8 @@ import { DragControls } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples
 import { FlyControls } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/controls/FlyControls.js";
 import { FirstPersonControls } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/controls/FirstPersonControls.js";
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js";
-// (unused, removed) postprocessing import
-import SpriteText from "https://esm.sh/three-spritetext@1.9.3?external=three";
+import { EffectComposer, BloomEffect, EffectPass, RenderPass } from "https://esm.sh/postprocessing@6.36.3";
+import SpriteText from "https://esm.sh/three-spritetext@1.9.3";
 
 
 /*  import {

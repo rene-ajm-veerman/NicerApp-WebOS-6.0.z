@@ -1733,7 +1733,7 @@ na.site = {
         $('p, h1, h2, h3').addClass('todoList');
         */
 
-        if (el.tagName=='body') {
+        if (el && el.tagName=='body') {
             na.site.bindTodoListAnimations (
                 '.todoList, '
                 //+'.contentSectionTitle3, contentSectionTitle3_a, '
@@ -3687,7 +3687,6 @@ na.site = {
         // Fetch dialogs properly
         //themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
         themeData = $.extend(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
-        debugger;
         if (
             !themeData.themeSettings
             || !themeData.themeSettings.Dialogs
