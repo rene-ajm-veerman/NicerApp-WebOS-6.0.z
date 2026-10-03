@@ -6,6 +6,7 @@
 
 import * as three from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
 import * as THREE from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
+window.THREE = THREE;   // so other libs can find it
 import { Stats } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/libs/stats.module.js";
 import { GLTFLoader } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/FBXLoader.js";
@@ -19,7 +20,17 @@ import { FirstPersonControls } from "/NicerAppWebOS/3rd-party/3D/libs/three.js/e
 import gsap from "https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js";
 import { EffectComposer, BloomEffect, EffectPass, RenderPass } from "https://esm.sh/postprocessing@6.36.3";
 import SpriteText from "https://esm.sh/three-spritetext@1.9.3";
-/*
+
+import * as THREE from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
+window.THREE = THREE;
+
+// Load ForceGraph3D and force it onto the global so the existing waitForCondition finds it
+import('https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/+esm')
+.then(mod => {
+    window.ForceGraph3D = mod.default;
+    console.log('✅ ForceGraph3D loaded via dynamic import');
+})
+.catch(err => console.error('Failed to load ForceGraph3D', err));/*
  *  import {
  *    CSS2DRenderer,
  *    CSS2DObject,
@@ -1195,13 +1206,10 @@ export class na3D_fileBrowser {
     }
 
     async createGraph(t) {
+        // --- ensure ForceGraph3D is available ---
         var vm = t.currentViewMode;
         debugger;
 
-        if (t.graph) {
-            t.graph._destructor?.();
-            t.graph = null;
-        }
         // === Before creating t.graph ===
         const maxLevels = 12; // adjust based on your deepest hierarchy
         t.dagLevelDistances = new Array(maxLevels).fill(0).map((_, level) => {
@@ -1544,16 +1552,22 @@ export class na3D_fileBrowser {
         }
 
 
-        na.m.waitForCondition('ForceGraph3D JS loaded?', function () {
-            if (typeof ForceGraph3D === 'undefined') {
-                console.error('ForceGraph3D not loaded yet — check script load order');
-                return false;
+        // --- ensure ForceGraph3D is available ---
+        if (typeof window.ForceGraph3D === 'undefined') {
+            console.log('Loading ForceGraph3D…');
+            try {
+                const mod = await import('https://cdn.jsdelivr.net/npm/3d-force-graph@1.73.0/+esm');
+                window.ForceGraph3D = mod.default;
+                console.log('✅ ForceGraph3D loaded');
+            } catch (err) {
+                console.error('Failed to load ForceGraph3D', err);
+                return;
             }
-            return true;
-        }, function () {
+        }
 
-            t.graph = window.graph = ForceGraph3D();
-            t.graph(container);  // mount to DOM immediately
+        t.graph = window.graph = ForceGraph3D()(t.el);
+        // … keep the rest of your original graph configuration here …
+        t.graph(container);  // mount to DOM immediately
 
             t.graph.d3Force('charge', null);
             t.graph.d3Force('center', null);
@@ -1882,7 +1896,7 @@ export class na3D_fileBrowser {
                 t.graph.zoomToFit(1000, 50);  // 1000ms transition, 50px padding
             }, 500);
 
-        }, 200);
+        //}, 200);
     }
 
     positionBushTree(t, levels, nodeMap, childMap, parentMap, goldenAngle) {

@@ -24,6 +24,7 @@
 */
 import * as three from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
 import * as THREE from '/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js';
+import ForceGraph3D from 'https://esm.sh/3d-force-graph@1.73.0?external=three';
 import { Stats } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/KTX2Loader.js';
@@ -31,6 +32,7 @@ import { DRACOLoader } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/
 import { OrbitControls } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/controls/OrbitControls.js';
 import { RGBELoader } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/loaders/RGBELoader.js';
 import { DragControls } from '/NicerAppWebOS/3rd-party/3D/libs/three.js/examples/jsm/controls/DragControls.js';
+window.THREE = THREE;
     
     import { na3D_fileBrowser }
 		from '/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/na3D.js';

@@ -738,7 +738,9 @@ class naThemeEditor {
     }
 
     reApplySelectorsTree  () {
-        var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true });
+        var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
+            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
+            : [];
         $.each(jsonNodes, function (i, val) {
             na.te.applySelector (val);
         });
@@ -2124,8 +2126,6 @@ debugger;
                     */
 
                     na.te.updateTextSettingsControls(evt2);
-
-                    
                 });
             
         });
@@ -2287,6 +2287,7 @@ debugger;
                 $('#textShadowBlurRadius').val(cssExtract.textShadowSliders[0][2]);
             }
         };
+        na.site.saveTheme();
     }
 
     addTextShadow  (evt) {
@@ -2382,7 +2383,7 @@ debugger;
                 .add(el).add(el2).add(el3);
         if (newFontFamily) na.te.s.c.selectedFontFamily = newFontFamily;
 
-        els.css ({
+        na.te.cssChange (els, {
             textShadow : newTextShadow,
             fontWeight : newFontWeight,
             fontSize : newFontSize+'px',
@@ -2440,7 +2441,8 @@ debugger;
         } else {
             var el = el2 = el3 = $(na.te.s.c.forElements);
         };
-        $(el).add(el2).add(el3).css ({ color : color });
+        var els = $(el).add(el2).add(el3);
+        na.te.cssChange (els, { color : color });
         /*if (na.te.s.c.fireSaveTheme) */na.site.saveTheme();
     }
     
@@ -2475,6 +2477,7 @@ debugger;
             });
             */
 
+            /*
             var
             state = History.getState(),
             url = state.url.replace(document.location.origin,'').replace('/apps/', ''),
@@ -2509,6 +2512,7 @@ debugger;
             //setTimeout (function() { 
                 $.ajax(ac2);
             //}, 250);
+            */
         });
         
     }
@@ -2546,7 +2550,6 @@ debugger;
             text : 'New Graphics',
             type : 'naCSS'
         }, 'last');
-        debugger;
         $('#themeEditor_jsTree_selectors').jstree('deselect_all').jstree('select_node', newNodeID);
         $('#themeEditor_jsTree_selectors').jstree(true).edit(na.te.s.c.selectedSelector.node);
     }

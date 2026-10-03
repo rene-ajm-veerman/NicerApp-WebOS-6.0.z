@@ -56,7 +56,9 @@ The entire Copyright (C) and All Rights Reserved (R) status of this Software and
 <h2>Business plan</h2>
 
 <p class="backdropped naComments_onTheSide">
-i will keep NicerApp WebOS (https://nicer.app) as open source  (C)+(R) by myself that can be used commercially at reasonable revenue fees, but without warranty and you'll need your own full stack <a class="nomod noPushState" target="kb" href="https://kubuntu.com">https://kubuntu.com</a> web-development team to work with it.
+i will keep NicerApp WebOS (https://nicer.app) as open source  (C)+(R) by myself that can be used commercially at reasonable revenue fees, but without warranty and you'll need your own full stack <a class="nomod noPushState" target="kb" href="https://kubuntu.com">https://kubuntu.com</a> web-development team to work with it.<br/>
+<br/>
+i'm also open to <a href="https://said.by/Rene-AJM-Veerman/in/hisDiary#naComment_biOKdbVulpATeIFFRiF9" target="naSale" class="nomod noPushState">selling the rights to this software</a> and possibly becoming an employee of the company that buys it.
 </p>
 
 
@@ -67,6 +69,13 @@ i will keep NicerApp WebOS (https://nicer.app) as open source  (C)+(R) by myself
         Owner, Founder, CTO, Senior Coder, CFO :<br/>
         <a href="https://www.youtube.com/watch?v=nO5KNu-Qwcs" target="naReneMemoires" class="nomod noPushState">Rene A.J.M. Veerman</a><br/>[ rene.veerman.netherlands@gmail.com ]<br/>
     </div>
+
+    <p class="backdropped">
+        <a href="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_20251109_145323_1.jpg" class="nomod noPushState" target="selfie001"><img src="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_20251109_145323_1.jpg" style="width:400px"/></a><br/>
+        <a href="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_20260826_082746_1.jpg" class="nomod noPushState" target="selfie002"><img src="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_20260826_082746_1.jpg" style="width:400px"/></a><br/>
+        <a href="/NicerAppWebOS/documentation/rene-ajm-veerman/Rene_at_Airlie_Beach_Australia_2004.jpg" class="nomod noPushState" target="selfie003"><img src="/NicerAppWebOS/documentation/rene-ajm-veerman/Rene_at_Airlie_Beach_Australia_2004.jpg" style="width:400px"/></a><br/>
+        <a href="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_2609.JPG" class="nomod noPushState" target="selfie004"><img src="/NicerAppWebOS/documentation/rene-ajm-veerman/IMG_2609.JPG" style="width:400px"/></a><br/>
+    </p>
 
     <p class="backdropped naComments_onTheSide">
     Should I unexpectedly die for some strange reason, for instance by long standing "dissident" disputes (In addition to a software and graphics developer, i'm also an assertive peace activist who is not without the ability to look at his own ranks with criticism) suddenly becoming lethal in some way, I want my belongings donated to my parents initially, and to the Amsterdam.NL stedelijk museum after their eventual death, who may all do with it all as they please, on condition of keeping copies of https://zoned.at, https://nicer.app and https://said.by up and running, and opensourced entirely as MIT-licensed software.<br/>

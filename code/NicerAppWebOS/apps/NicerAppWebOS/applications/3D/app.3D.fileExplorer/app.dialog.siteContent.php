@@ -113,7 +113,7 @@ if (
     <div id="site3D_label" class="label" theme="<?php echo $theme;?>"></div>
     <script type="module" src="/NicerAppWebOS/3rd-party/3D/libs/three.js/build/three.module.js"></script>
 <!--     <script src="/NicerAppWebOS/businessLogic/vividUserInterface/v6.y.z/3D/3d-force-graph/src/3d-force-graph.js"></script> -->
-    <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+<!-- <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script> -->
 <!--     <script src="//cdn.jsdelivr.net/npm/three-spritetext"></script> -->
     <script type="module" src="/NicerAppWebOS/apps/NicerAppWebOS/applications/3D/app.3D.fileExplorer/main.js"></script>
     <!--<script type="module" src="/NicerAppWebOS/businessLogic/ajax/ajax_loadJSmodule.php?file=/NicerAppWebOS/apps/NicerAppWebOS/applications/3D/app.3D.fileExplorer/main.js"></script>-->

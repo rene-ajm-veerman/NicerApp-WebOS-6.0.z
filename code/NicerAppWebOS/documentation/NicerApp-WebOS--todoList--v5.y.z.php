@@ -3,7 +3,7 @@
     require_once ($naWebOS->domainPath.'/domainConfig/pageHeader.php');
 ?>
 <script type="text/javascript">
-na.site.globals.app = { "/docs" : { "page" : "todo" }};
+na.site.globals.app = { "/todo" };
 </script>
 
 <h1 class="contentSectionTitle2"><span class="contentSectionTitle2_span">NicerApp WebOS Development Direction</span></h1><br/><br/>
@@ -55,7 +55,13 @@ The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/N
 
     <li class="todoList"><div>(2027) Start work on a self-healer component for this WebOS, and a lot more Desktop OS level automated security to be installed via the <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-5.10.z/tree/main/NicerAppWebOS/scripts.install" target="mainBashInstallScript_for_NicerAppWebOS" class="nomod noPushState contentSectionTitle3_a"><span class="contentSectionTitle3_span">main Bash install script</span></a>.</div></li>
 
-    <li class="todoList"><div>(2027) Write forum- and hashtag-features.</div></li>
+    <li class="todoList"><div>(2027-March-and-beyond) Expand on desktop.js to let it be used to dynamically change the size and position of dialogs on the end-user's screen.</div></li>
+
+    <li class="todoList"><div>(2027-March-and-beyond) Expand on the taskbar features; let apps get loaded based on page specificity and theme to include specific apps which are possibly placed either in server-assigned spots on the screen or spots assigned (previously) by the end-user..</div></li>
+
+    <li class="todoList"><div>(2027-May-and-beyond) Rewrite the news app : let most of the actual display code get written by grok.com, and leverage my new comments system as well.</div></li>
+
+    <li class="todoList"><div>(2027-July-and-beyond) Write forum- and hashtag-features.</div></li>
 
     <li class="todoList"><div>(2027) Rewrite the help system and comments system.
         <ol class="todoList_l1">

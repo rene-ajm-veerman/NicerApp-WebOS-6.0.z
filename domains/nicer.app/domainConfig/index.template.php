@@ -83,7 +83,7 @@ global $naWebOS;
         </div>
     </div>
 
-    <div id="siteToolbarRight" class="vividDialog naNoComments">xt
+    <div id="siteToolbarRight" class="vividDialog naNoComments">
 
         <div class="vividDialogContent vividScrollpane">
             {$div_siteToolbarRight}

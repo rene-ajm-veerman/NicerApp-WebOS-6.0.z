@@ -26,11 +26,13 @@ na.site = {
         copyright : '<table style="height:100%;"><tr><td>Copyright (C) 2002-2026 by <a href="mailto:rene.veerman.netherlands@gmail.com" class ="contentSectionTitle3_a"><span class="contentSectionTitle3_span">Rene A.J.M. Veerman</span></a></td><td style="width:40px;"><div class="vividButton" theme="dark" style="position:relative;color:white;height:20px;width:40px;" onclick="na.dismissCopyrightMessage();">Ok</div></td></table>',
         easterEggs : {
             '2023-12(Dec)-13(Tue) 11:34CET (Amsterdam.NL\'s timezone)' : '<p>at a certain point in a soul\'s career,<br/>that soul (learns to) trancend(s) judgement of IQ and EQ of others. this is usually only once enough kung-fu has been practiced though. <a class="noPushState nomod" href="https://youtube.com/@cheetahKungFu" target="ckf">https://youtube.com/@cheetahKungFu</a></p>',
-            '2026-04(April)-18(Saturday) 19:41CET (Amsterdam.NL\'s timezone)' : '<p>Rene AJM Veerman : i realized something just now.<br/>it only takes Time for me to reach Wealthy status.</p>',
-            '2026-04(Apr)-19(Sunday) 12:55CET (Amsterdam.NL\' timezone)' : '<p>women in political groups are like ice breakers; they move slow, but they always reach their goals.</p>',
+            '2026-04(Apr)-19(Sunday) 12:55CET (Amsterdam.NL\' timezone)' : '<p>Women in political groups are like ice breakers; they move slow, but they always reach their goals.</p>',
             '2026-04(Apr)-19(Sunday) 13:07CET (Amsterdam.NL\' timezone)' : '<p>If you want to be a hero, make sure you\'re not a girl!.</p>',
             '2026-04(Apr)-19(Sunday) 13:10CET (Amsterdam.NL\' timezone)' : '<p>Whereas it used to be "dont go breaking hearts", it should become "dont go breaking lifeforms at all".</p>',
-            '2026-05(May)-22(Friday) 09:30CET (Amsterdam.NL\' timezone)' : '<p>There is no strongest, no weakest. There are only strong times, and weak times.</p>'
+            '2026-05(May)-22(Friday) 09:30CET (Amsterdam.NL\' timezone)' : '<p>There is no strongest, no weakest. There are only strong times, and weak times.</p>',
+            '2026-09(Sep)-28(Monday) 16:33CET (Amsterdam.NL\' timezone)' : '<p>It wasn\'t until after the wheel had been invented, and many other products of technology along with it, that the scourge known as tourism became a reality.</p>',
+            '2026-09(Sep)-28(Monday) 16:44CET (Amsterdam.NL\' timezone)' : '<p>Not even coffee can stop the Zen-like forgetfulness of current events, whether imagined or real, of stoned weed or hash.</p>',
+            '2026-09(Sep)-30(Monday) 09:27CET (Amsterdam.NL\' timezone)' : '<p>Look, young martial arts masters and young warriors alike, unless you open up the secrets of your world deeper, wider, and to more than before, this world will never be free of war. This is what *I* (Rene AJM Veerman) believe at least.</p>'
         }
     },
 
@@ -3236,6 +3238,8 @@ na.site = {
         if (typeof loadBackground=='undefined') loadBackground = true;
         if (typeof saveTheme=='undefined') saveTheme = true;
         if (typeof changeInterval=='undefined') changeInterval = true;
+
+
         if (dat.specificityName) {
             $('.na_themes_dropdown__specificity > .vividDropDownBox_selector > div')
                 .removeClass('selected')
@@ -3363,9 +3367,54 @@ na.site = {
             });
         }
         var html = '<style id="cssThemeSettings">';
-        if (dat.themeSettings && dat.themeSettings['.vividDialog']) {
-            html += na.m.cssTranslation ('.vividDialog', dat.themeSettings['.vividDialog']);
-            html += na.m.cssTranslation ('.vividDialog > .vdBackground', dat.themeSettings['.vividDialog > .vdBackground']);
+        if (dat.themeSettings) {
+            // html += na.m.cssTranslation ('.vividDialog', dat.themeSettings['.vividDialog']);
+            // html += na.m.cssTranslation ('.vividDialog > .vdBackground', dat.themeSettings['.vividDialog > .vdBackground']);
+
+            /*
+            var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
+            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
+            : [];
+            $.each(jsonNodes, function (i, val) {
+                if (val.type!=='naElement') return;
+                if (!dat.themeSettings.Dialogs[val.text]) dat.themeSettings.Dialogs[val.text] = { css : {} };
+                dat.themeSettings.Dialogs = $.extend (dat.themeSettings.Dialogs, na.site.fetchTheme (val.text));
+                html += na.m.cssTranslation(val.text,dat.themeSettings.Dialogs[val.text]);
+                debugger;
+            });*/
+            var tree = $('#themeEditor_jsTree_selectors').jstree(true);
+
+            var jsonNodes = tree
+            ? tree.get_json('#', { flat: true })
+            : [];
+
+            $.each(jsonNodes, function (i, val) {
+                if (val.type !== 'naElement') return;
+
+                // parent's text
+                var parentText = null;
+                if (val.parent && val.parent !== '#') {
+                    var parentNode = tree.get_node(val.parent);
+                    if (parentNode) {
+                        parentText = parentNode.text;
+                    }
+                }
+
+                if ($(parentText).is('.vividDialog')) return;
+
+                if (!dat.themeSettings.Dialogs[parentText]) {
+                    dat.themeSettings.Dialogs[parentText] = {};
+                }
+                if (!dat.themeSettings.Dialogs[parentText][val.text]) {
+                    dat.themeSettings.Dialogs[parentText][val.text] = { css : {} };
+                    dat.themeSettings.Dialogs[parentText][val.text] = $.extend(
+                        dat.themeSettings.Dialogs[parentText][val.text],
+                        na.site.fetchTheme(val.text)
+                    );
+                }
+                html += na.m.cssTranslation(val.text, dat.themeSettings.Dialogs[parentText][val.text]);
+            });
+
             //$('.vividDialog').css(dat.themeSettings['.vividDialog']);
             //$('.vividDialog > .vdBackground').css(dat.themeSettings['.vividDialog > .vdBackground']);
         };
@@ -3401,6 +3450,8 @@ na.site = {
             }
         }
         html += '</style>';
+        debugger;
+        if (dat.themeSettings) na.site.globals.themes[na.site.globals.themeName] = dat.themeSettings;
         $('#cssThemeSettings').remove();
         $('#cssPageSpecific').after (html);
         //debugger; // you might want to inspect 'html' at some point..
@@ -3636,6 +3687,7 @@ na.site = {
         // Fetch dialogs properly
         //themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
         themeData = $.extend(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
+        debugger;
         if (
             !themeData.themeSettings
             || !themeData.themeSettings.Dialogs
@@ -3721,24 +3773,23 @@ na.site = {
         try {
             if (!themeData2.themeSettings) themeData2.themeSettings = { Dialogs : {} };
             if (!themeData2.themeSettings.Dialogs) themeData2.themeSettings.Dialogs = {};
-            $('.vividDialog > .vividDialogContent').each (function(idx,el) {
-                var
-                d = $(el).parents('.vividDialog'),
-                cssSelector1 = '#'+d[0].id+'.vividDialog',
-                cssSelector2 = '#'+d[0].id+'.vividDialog > .vdBackground';
 
-                if (!themeData2.themeSettings.Dialogs[d[0].id]) themeData2.themeSettings.Dialogs[d[0].id] = { css : {} };
-                themeData2.themeSettings.Dialogs[d[0].id].css = $.extend (
-                    themeData2.themeSettings.Dialogs[d[0].id].css, na.site.fetchTheme(cssSelector1), na.site.fetchTheme(cssSelector2)
+            var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
+            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
+            : [];
+            $.each(jsonNodes, function (i, val) {
+                if (val.type!=='naElement') return;
+                if (!themeData2.themeSettings.Dialogs[val.text]) themeData2.themeSettings.Dialogs[val.text] = { css : {} };
+                themeData2.themeSettings.Dialogs[val.text].css = $.extend (
+                    themeData2.themeSettings.Dialogs[val.text].css, na.site.fetchTheme(val.text)
                 );
             });
-
         } catch (err) {
             var dbg = {
                 msg : err.message,
                 stack : err.stack
             };
-            na.m.log (6, 'na.site.loadTheme_fetchDialogs(): na.te.transform_jsTree_to_siteGlobalsThemes() failed.', dbg);
+            na.m.log (6, 'na.site.loadTheme_fetchDialogs(): failed.', dbg);
         }
 
         themeData2.changeBackgroundsAutomatically =

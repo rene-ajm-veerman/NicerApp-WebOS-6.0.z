@@ -1595,7 +1595,7 @@ class NicerAppWebOS {
 
         //echo '<pre style="color:lime;background:green">'; var_dump ($selectors); echo '</pre>'; exit();
         $selectorNames = &$d['selectorNames'];
-        $specificityName = 'current page for user '.$db->username.' at the client';
+        $specificityName = 'current page for user '.na_plainUsername_from_couchdbUsername($db->username).' at the client';
 
         $_SESSION['selectors'] = json_encode($selectors);
         //$_SESSION['selectorNames'] = json_encode($selectorNames);

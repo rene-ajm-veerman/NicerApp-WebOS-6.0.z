@@ -63,6 +63,20 @@ na.m = {
         }
         return cssText;
     },
+    cssTranslation_fetchTheme : function (dID, cssObj) {
+        //var cssText = dID+' {\n';
+        var cssText = '';
+        for (var sel in cssObj) {
+            cssText += sel+' {\n';
+            var v1 = cssObj[sel];
+            for (var k in v1) {
+                var v2 = v1[k];
+                cssText += '\t' + k + ' : '+(typeof v2=='string'?'""':'')+v2+(typeof v2=='string'?'""':'')+'\n';
+            }
+            cssText += '}\n';
+        }
+        return cssText;
+    },
 
     showVividDialog : function (containerEl, dialogHTML, dialogWidth, dialogHeight) {
         if (!dialogWidth) dialogWidth = 200;
