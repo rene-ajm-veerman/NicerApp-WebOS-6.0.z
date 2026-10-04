@@ -6,19 +6,19 @@ if (typeof na!=='object') { var NicerApp_WebOS = nicerapp = na = {}; }
  * Implications of this for my project have yet to be guessed at, in quieter times.
  * This comment was entered 2025-06-21 02:01am to 03:43am CEST AMS Amsterdam.NL timezone.
  *
- * import { naMisc, arrayRemove } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.miscellaneous.js';
- * import { naThemeEditor } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.themeEditor-2.y.z.js';
- * import { naLogo } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.canvasLogo-4.y.z.js';
- *
- * import { vividUserInterface_2D_background } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/background.js';
- * import { vividUserInterface_2D_desktop } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/desktop.js';
- * //import { vividUserInterface_3D_button_startMenu_planet } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/3D/button_startMenu-planet.js';
- * import { vividUserInterface_2D_dialog } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/dialog.js';
- * import { vividUserInterface_2D_button } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/button-5.y.z.js';
- * import { vividUserInterface_2D_button_v4 } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/button-4.1.0.js';
- * import { vividUserInterface_2D_menu } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/menu.js';
- * import { naVividMenu__behavior_rainbowPanels as naVividMenu } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/vividMenu-5.y.z--behavior-rainbowPanels-1.1.0.js';
- */
+import { naMisc, arrayRemove } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.miscellaneous.js';
+import { naThemeEditor } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.themeEditor-2.y.z.js';
+import { naLogo } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/na.canvasLogo-4.y.z.js';
+
+import { vividUserInterface_2D_background } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/background.js';
+import { vividUserInterface_2D_desktop } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/desktop.js';
+//import { vividUserInterface_3D_button_startMenu_planet } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/3D/button_startMenu-planet.js';
+import { vividUserInterface_2D_dialog } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/dialog.js';
+import { vividUserInterface_2D_button } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/button-5.y.z.js';
+import { vividUserInterface_2D_button_v4 } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/button-4.1.0.js';
+import { vividUserInterface_2D_menu } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/menu.js';
+import { naVividMenu__behavior_rainbowPanels as naVividMenu } from '/NicerAppWebOS/ajax_getModule.php?f=/NicerAppWebOS/logic.vividUserInterface/v6.y.z/2D/vividMenu-5.y.z--behavior-rainbowPanels-1.1.0.js';
+*/
 
 na.site = {
     about : {
@@ -47,8 +47,8 @@ na.site = {
                 debugLevelMin : 0,
                 debugLevelMax : 9999
                 // debugLevelMin >= 2000 and debugLevelMax < 4000
-                // :    show all core engine errors AND all app level errors for apps native
-                //      to the NicerApp WebOS repository (.../NicerAppWebOS/apps/NicerAppWebOS/*).
+                    // :    show all core engine errors AND all app level errors for apps native
+                    //      to the NicerApp WebOS repository (.../NicerAppWebOS/apps/NicerAppWebOS/*).
             }
         },
 
@@ -113,8 +113,8 @@ na.site = {
     fail : function (msg, xhr, ajaxOptions, errorFunction) {
         //for na.site.setStatusMsg()
         //var html = '<table class="tableFail" style="width:100%;height:100%;"><tr><td style="font-size:1.5em">'
-        //+'<span class="statusFail_nonGlow">'+msg+'</span>'
-        //+ '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
+                //+'<span class="statusFail_nonGlow">'+msg+'</span>'
+                //+ '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
         na.site.error(msg);
         na.m.log ({
             obj : 'na.site',
@@ -143,8 +143,8 @@ na.site = {
 
         var
         html = '<table class="tableFail" style="width:99%;"><tr><td style="font-size:1em">'
-        +'<span class="statusFail">'+msg+'</span>'
-        + '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
+                +'<span class="statusFail">'+msg+'</span>'
+                + '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
         //var msg2 = '<span style="display:table-cell;vertical-align:middle;background:rgba(255,255,255,0.45);color:red;borderRadius:10">'+msg+'</span>';
 
 
@@ -160,8 +160,8 @@ na.site = {
     },
     success : function (msg) {
         var html = '<table class="tableSuccess" style="width:99%;"><tr><td style="font-size:1em">'
-        +'<span class="statusSuccess">'+msg+'</span>'
-        + '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
+                +'<span class="statusSuccess">'+msg+'</span>'
+                + '</td><td style="width:105px;"><div class="vividButton" theme="dark" style="position:relative;color:white;width:100px;" onclick="na.site.setStatusMsg(na.site.settings.defaultStatusMsg);">Ok</div></td></table>';
         //var msg2 = '<span style="display:table-cell;vertical-align:middle;background:rgba(255,255,255,0.45);color:red;borderRadius:10">'+msg+'</span>';
         na.site.setStatusMsg(html, true);
 
@@ -189,9 +189,9 @@ na.site = {
         //na.d.s.visibleDivs.push ('#siteStatusbar');
 
         $('#siteStatusbar .vividDialogContent')
-        .html(msg).delay(50)
-        .stop(true,true)
-        .animate({opacity:1},'fast');
+            .html(msg).delay(50)
+            .stop(true,true)
+            .animate({opacity:1},'fast');
 
         $('#siteStatusbar').animate({height:'auto'}, {
             speed : 'fast'
@@ -199,24 +199,24 @@ na.site = {
 
         na.m.waitForCondition(
             'na.site.setStatusMsg(msg,resize,showMilliseconds) : na.m.HTMLidle()?', na.m.HTMLidle,
-                              function() {
-                                  if (resize) {
-                                      na.site.settings.statusbarVisible = na.desktop.settings.visibleDivs.includes('#siteStatusbar');
-                                      if (!na.site.settings.statusbarVisible) na.desktop.settings.visibleDivs.push('#siteStatusbar');
-                                      $(window).trigger('resize');
-                                  };
+            function() {
+                if (resize) {
+                    na.site.settings.statusbarVisible = na.desktop.settings.visibleDivs.includes('#siteStatusbar');
+                    if (!na.site.settings.statusbarVisible) na.desktop.settings.visibleDivs.push('#siteStatusbar');
+                    $(window).trigger('resize');
+                };
 
-                                  if (
-                                      msg !== na.site.settings.defaultStatusMsg
-                                      && typeof showMilliseconds=='number'
-                                  ) {
-                                      clearTimeout (na.site.settings.timeoutRevertStatusbarMsg);
-                                      na.site.settings.timeoutRevertStatusbarMsg = setTimeout (function (showMilliseconds) {
-                                          na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
-                                          $(window).trigger('resize');
-                                      }, showMilliseconds);
-                                  }
-                              }, 20
+                if (
+                    msg !== na.site.settings.defaultStatusMsg
+                    && typeof showMilliseconds=='number'
+                ) {
+                    clearTimeout (na.site.settings.timeoutRevertStatusbarMsg);
+                    na.site.settings.timeoutRevertStatusbarMsg = setTimeout (function (showMilliseconds) {
+                        na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
+                        $(window).trigger('resize');
+                    }, showMilliseconds);
+                }
+            }, 20
         );
     },
 
@@ -251,10 +251,10 @@ na.site = {
         na.m.waitForCondition (
             'na.site.initialize : desktopIdle()? so we can do na.startUIvisuals()?',function () {
                 var r =
-                na.m.HTMLidle()
-                && typeof jQuery.spectrum=='object'
-                && typeof jQuery.jstree=='object'
-                && typeof $('#themeEditor_jsTree_selectors').jstree('get_json')=='object';
+                    na.m.HTMLidle()
+                    && typeof jQuery.spectrum=='object'
+                    && typeof jQuery.jstree=='object'
+                    && typeof $('#themeEditor_jsTree_selectors').jstree('get_json')=='object';
                 return r;
             }, function() {
                 var fncn = 'na.site.initialize()::desktopIdle()';
@@ -267,17 +267,17 @@ na.site = {
 
                 na.site.reloadMenu({callback:function(){
                     /* obsoleted v6.y.z code :
-                     *                    $('#siteMenu').css ({
-                     *                        top : $(window).height()-100,
-                     *                        left : 10,
-                });
-                $('#siteMenu__0').css ({
-                opacity : 0.0001,
-                zIndex : -1,
-                bottom : 0
-                });
-                $('.vividMenu_item').css({opacity:0.0001});
-                */
+                    $('#siteMenu').css ({
+                        top : $(window).height()-100,
+                        left : 10,
+                    });
+                    $('#siteMenu__0').css ({
+                        opacity : 0.0001,
+                        zIndex : -1,
+                        bottom : 0
+                    });
+                    $('.vividMenu_item').css({opacity:0.0001});
+                    */
 
                     if (!na.site.c.menus) na.site.c.menus = {};
                     const menu = $('#siteMenu')[0];
@@ -304,47 +304,47 @@ na.site = {
                     });
 
                     /*
-                     *                    $('.vividDialog').each(function(idx,el) {
-                     *                        if (!na.site.s.c.zidx) na.site.s.c.zidx = [];
-                     *                        na.site.s.c.zidx.push ({
-                     *                          zIndex : $(el).css('zIndex')
-                })
+                    $('.vividDialog').each(function(idx,el) {
+                        if (!na.site.s.c.zidx) na.site.s.c.zidx = [];
+                        na.site.s.c.zidx.push ({
+                          zIndex : $(el).css('zIndex')
+                        })
 
-                $(el).css({zIndex : 10});
+                        $(el).css({zIndex : 10});
 
-                var d = new vividUserInterface_2D_dialog ({ naSite : t, el : $(el) });
-                switch (el.id) {
-                    case 'siteTaskbar' : c.taskbar = d; break;
-                    case 'siteSettingsMenu' : c.settingsMenu = d; break;
-                }
-                if (
-                    $('#'+el.id+' > .vividDialogContent')[0]
-                    && $('#'+el.id+' > .vividDialogContent').html().trim()
-                !=='{$div_'+el.id+'}'
-                ) { c.dialogs['#'+el.id] = d; }
-                });
-                */
+                        var d = new vividUserInterface_2D_dialog ({ naSite : t, el : $(el) });
+                        switch (el.id) {
+                            case 'siteTaskbar' : c.taskbar = d; break;
+                            case 'siteSettingsMenu' : c.settingsMenu = d; break;
+                        }
+                        if (
+                            $('#'+el.id+' > .vividDialogContent')[0]
+                            && $('#'+el.id+' > .vividDialogContent').html().trim()
+                                !=='{$div_'+el.id+'}'
+                        ) { c.dialogs['#'+el.id] = d; }
+                    });
+                    */
                     /*
-                     *                    $('#btnSettings_container').hover (function() {
-                     *                        clearTimeout(na.site.settings.timeout_showSettingsMenu);
-                     *                        na.site.settings.timeout_showSettingsMenu = setTimeout(function() {
-                     *                            var menu = na.site.components.menus['#siteMenu'];
-                     *                            menu.hideAll( menu, $('#siteMenu__panel__0')[0], 50 );
-                     *                            $('#siteSettingsMenu')
-                     *                                .css({zIndex: na.site.s.c.zidx[0].zIndex})
-                     *                                .removeClass('hidden').addClass('shown');
-                     *
-                     *                            $('siteSettingsMenu').css({bottom:100,zIndex:na.site.s.c.zidx[0].zIndex});
-                }, parseInt(na.d.g.animationSpeed)+500);
-                }, function () {
-                clearTimeout(na.site.settings.timeout_hideSettingsMenu);
-                na.site.settings.timeout_hideSettingsMenu = setTimeout(function() {
-                $('#btnSiteOptions_container, #btnLogin_container').css({display:'flex',zIndex:10});
-                c.settingsMenu.hide({ naSite : t, checkHeldUp : '#siteSettingsMenu' });
-                $('#siteSettingsMenu').removeClass('shown').addClass('hidden');
-                }, parseInt(na.d.g.animationSpeed)+500);
-                });
-                */
+                    $('#btnSettings_container').hover (function() {
+                        clearTimeout(na.site.settings.timeout_showSettingsMenu);
+                        na.site.settings.timeout_showSettingsMenu = setTimeout(function() {
+                            var menu = na.site.components.menus['#siteMenu'];
+                            menu.hideAll( menu, $('#siteMenu__panel__0')[0], 50 );
+                            $('#siteSettingsMenu')
+                                .css({zIndex: na.site.s.c.zidx[0].zIndex})
+                                .removeClass('hidden').addClass('shown');
+
+                            $('siteSettingsMenu').css({bottom:100,zIndex:na.site.s.c.zidx[0].zIndex});
+                        }, parseInt(na.d.g.animationSpeed)+500);
+                    }, function () {
+                        clearTimeout(na.site.settings.timeout_hideSettingsMenu);
+                        na.site.settings.timeout_hideSettingsMenu = setTimeout(function() {
+                            $('#btnSiteOptions_container, #btnLogin_container').css({display:'flex',zIndex:10});
+                            c.settingsMenu.hide({ naSite : t, checkHeldUp : '#siteSettingsMenu' });
+                            $('#siteSettingsMenu').removeClass('shown').addClass('hidden');
+                        }, parseInt(na.d.g.animationSpeed)+500);
+                    });
+                    */
                     $('#siteSettingsMenu, #siteSettingsMenu .vividButton').hover(function() {
                         na.site.settings.heldUp['#siteSettingsMenu'] = true;
                         clearTimeout(na.site.settings.timeout_hideSettingsMenu);
@@ -357,10 +357,10 @@ na.site = {
                     window.onresize  = function(evt) {
                         $ ('#siteBackground, #siteBackground iframe, #siteBackground img, #siteBackground div').css({
                             width : $(window).width(),
-                                                                                                                    height : $(window).height()
+                            height : $(window).height()
                         });
                         //if ($('#siteContent .vividDialogContent').css('opacity')===1)
-                        //  $('#siteContent .vividDialogContent').fadeOut('normal');
+                          //  $('#siteContent .vividDialogContent').fadeOut('normal');
                         na.desktop.resize(function() {
                             //na.site.delayedReloadMenu();
                             na.site.onresize ({ reloadMenu : true }); // BEST WAY : the menu may change it's layout completely based on the possibly changed orientation of your device.
@@ -384,7 +384,7 @@ na.site = {
                     s = na.te.settings.current.specificity,
                     u = na.site.settings.url,
                     apps = na.site.globals.app;
-                    ;
+;
                     if (
                         na.site.globals.themes
                         && na.site.globals.themes[theme]
@@ -394,19 +394,19 @@ na.site = {
                     var
                     themeData = {
                         specificityName : $('.na_themes_dropdown__specificity > .vividDropDownBox_selected').html(),
-                                       theme : theme,
-                                       orientation : na.site.components.orientation,
-                                       backgroundSearchKey : na.site.globals.backgroundSearchKey,
-                                       background : na.site.globals.background,
-                                       changeBackgroundsAutomatically : 'true',//$('#changeBackgroundsAutomatically')[0].checked?'true':'false',
-                                       vdSettings_show : $('#vdSettings_show').val(),
-                                       backgroundChange_hours : $('#backgroundChange_hours').val(),
-                                       backgroundChange_minutes : $('#backgroundChange_minutes').val(),
-                                       menusFadingSpeed : $('#menusFadingSpeed').val(),
-                                       menusUseRainbowPanels : 'true',//$('#menusUseRainbowPanels')[0].checked ? 'true' : 'false',
-                                       apps : tApp,
-                                       view : na.site.globals.view,
-                                       textBackgroundOpacity : 0.4//parseInt($('#textBackgroundOpacity').val()) / 100
+                        theme : theme,
+                        orientation : na.site.components.orientation,
+                        backgroundSearchKey : na.site.globals.backgroundSearchKey,
+                        background : na.site.globals.background,
+                        changeBackgroundsAutomatically : 'true',//$('#changeBackgroundsAutomatically')[0].checked?'true':'false',
+                        vdSettings_show : $('#vdSettings_show').val(),
+                        backgroundChange_hours : $('#backgroundChange_hours').val(),
+                        backgroundChange_minutes : $('#backgroundChange_minutes').val(),
+                        menusFadingSpeed : $('#menusFadingSpeed').val(),
+                        menusUseRainbowPanels : 'true',//$('#menusUseRainbowPanels')[0].checked ? 'true' : 'false',
+                        apps : tApp,
+                        view : na.site.globals.view,
+                        textBackgroundOpacity : 0.4//parseInt($('#textBackgroundOpacity').val()) / 100
                     };
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
@@ -418,7 +418,7 @@ na.site = {
                             if (u) themeData.url = u;
                             if (s.url) themeData.url = s.url;
                             if (!themeData.url) themeData.url = window.location.href.replace('https://'+na.site.globals.domain,'');
-                                //if (themeData.app) delete themeData.app;
+                            //if (themeData.app) delete themeData.app;
                         }
                         if (
                             typeof s.specificityName=='string'
@@ -450,10 +450,10 @@ na.site = {
                     na.backgrounds = na.background;
 
                     /*
-                     *                    for (var i=0; i<na.desktop.globals.divs.length; i++) {
-                     *                        var selector = na.desktop.globals.divs[i];
-                     *                        themeData.dialogs = $.extend (themeData.dialogs, na.fetchTheme (selector));
-                }*/
+                    for (var i=0; i<na.desktop.globals.divs.length; i++) {
+                        var selector = na.desktop.globals.divs[i];
+                        themeData.dialogs = $.extend (themeData.dialogs, na.fetchTheme (selector));
+                    }*/
 
                     t.startTooltips();
 
@@ -484,10 +484,10 @@ na.site = {
                     }
 
                     /*
-                     *                    setInterval (function(){
-                     *                        na.background.next('#siteBackground');
-                }, 1 * 60 * 1000);
-                */
+                    setInterval (function(){
+                        na.background.next('#siteBackground');
+                    }, 1 * 60 * 1000);
+                    */
 
                     na.site.settings.loadingApps = false;
                     na.site.settings.running_loadContent = false;
@@ -498,9 +498,9 @@ na.site = {
                         $('#siteLastModified').html(t.globals.version.version+', last modified : '+t.globals.version.history.lastModified+' CET');
                     } else {
                         var html =
-                        '<span style="margin:10px;padding:10px;border-radius:10px;background:ivory;color:navy;font-weight:bold">'
-                        +'Could not get version information from the server.'
-                        +'</span>';
+                            '<span style="margin:10px;padding:10px;border-radius:10px;background:ivory;color:navy;font-weight:bold">'
+                            +'Could not get version information from the server.'
+                            +'</span>';
                         na.site.setStatusMsg (html);
                         $('#siteLastModified').html(html);
                     }
@@ -519,8 +519,8 @@ na.site = {
                     }
                     //na.site.onresize();
                     //setTimeout (function() {
-                    //na.desktop.resize(na.site.delayedReloadMenu);
-                    //na.site.onresize ({ reloadMenu : true });
+                        //na.desktop.resize(na.site.delayedReloadMenu);
+                        //na.site.onresize ({ reloadMenu : true });
                     //}, 5000);
                     //na.site.loadContent_displayContent ($('#siteContent .vividDialogContent').html());
                 });
@@ -544,7 +544,7 @@ na.site = {
         t.updateSiteDatetime();
 
         t.transformLinks ($('#siteContent')[0]);
-        History.Adapter.bind(window,'statechange', na.site.stateChange); // use HTML5 History API if available:
+		History.Adapter.bind(window,'statechange', na.site.stateChange); // use HTML5 History API if available:
 
         t.s.c = { booted : true };
         na.site.initialized = true;
@@ -559,7 +559,7 @@ na.site = {
     onload_phase2 : function() {
         //TODO : go display an easter egg when it's actually Easter or Christmas
         //TODO : go display tutorial tooltips.
-        $('#siteBackground img.bg_first').fadeIn(2000);
+                $('#siteBackground img.bg_first').fadeIn(2000);
 
     },
 
@@ -583,7 +583,7 @@ na.site = {
     onresize : function(settings) {
         $('#siteBackground, #siteBackground iframe, #siteBackground img, #siteBackground div').css({
             width : $(window).width(),
-                                                                                                   height : $(window).height()
+            height : $(window).height()
         }).delay(50);
         //$('#siteBackground img.bg_first').fadeIn(2000);
 
@@ -668,94 +668,94 @@ na.site = {
         //startLogo('neCompanyLogo', 'countryOfOriginColors');
         return false;
         /*
-         *        if ($(window).width() < na.site.globals.reallySmallDeviceWidth) {
-         *            na.site.settings.current.fontSize_siteContent = $('#siteContent').css('fontSize');
-         *            na.site.settings.current.fontSize_siteStatusbar = $('#siteStatusbar').css('fontSize');
-         *            $('#siteContent, #siteStatusbar').css ({ fontSize : '70%' });
-         *            $('#siteStatusbar').css({height:'5.5rem'});
-         *            $('#siteStatusbar .vividButton').css({width : 40});
-         *            $('#siteStatusbar td:nth-child(2)').css({width:55});
-         *            $('#tdFor_neCompanyLogo').css ({ width : 80, height : 80 });
-         *            $('#tableFor_neCompanyLogo').css ({ width : 80, height : 80 });
-         *            $('#divFor_neCompanyLogo').css ({ width : 70, height : 70, marginLeft : 0 });
-         *            $('#mainCSS').html('.vividMenu_item td { font-size : 11px; }; #siteStatus td { font-weight : bold };');
-         *            $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'0.7rem'});
-         *            na.site.settings.current.menuFontSize = '11px';
-         *            //$('.vividMenu .vividButton').css({ width  : 100, height : 10 });
-         *            $('#neCompanyLogo').attr('width',70).attr('height',70);
-         *            $('.td_spacer').css ({ height : 100 });
-         *            if ($('#headerSite').length===1) {
-         *                $('#headerSite').css ({ height:100, padding : 5, paddingLeft : 5 });
-         *                $('#headerSite, #headerSite h1').css({ fontSize : '1rem' });
-         *                $('#headerSite h2, #headerSite h3').not('.subMenu, .contentMenu').css ({ fontSize : '0.7rem' });
-         *                var w = 200;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
-         *                $('#headerSiteDiv').css ({ height : 80, width : w, paddingTop : 10 });
-         *                $('#headerSiteDiv div').css ({ height : 0, width : w });
-         *                $('.contentSectionTitle1').css({fontSize:'1em'});
-    }
-    $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.7rem'});
-    } else if ($(window).width() < na.site.globals.smallDeviceWidth) {
-        if (na.site.settings.current.fontSize_siteContent) {
-            $('#siteContent').css ({ fontSize : na.site.settings.current.fontSize_siteContent });
-            $('#siteStatusbar').css ({ fontSize : na.site.settings.current.fontSize_siteStatusbar });
-    };
-    $('#siteStatusbar').css({height:'4.5rem'});
-    $('#siteStatusbar .vividButton').css({width : 100});
-    $('#siteStatusbar td:nth-child(2)').css({width:105});
-    $('#mainCSS').html('.vividMenu_item td { font-size : 14px; }; #siteStatus td { font-weight : bold };');
-    na.site.settings.current.menuFontSize = '14px';
-    //$('.vividMenu .vividButton').css({ width : 135, height : 14 });
-    $('#tdFor_neCompanyLogo').css ({ width : 200, height : 200 });
-    $('#tableFor_neCompanyLogo').css ({ width : 200, height : 200 });
-    $('#divFor_neCompanyLogo').css ({ width : 200, height : 200});
-    $('#datetime').css({marginLeft:40,marginTop:20});
-    $('#neCompanyLogo').attr('width',200).attr('height',200);
-    $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'0.85rem'});
-    $('.td_spacer').css ({ height : 100 });
-    if ($('#headerSite').length===1) {
-        $('#headerSite').css ({ height : 100, padding : 5, paddingLeft : 5 });
-        $('#headerSite, #headerSite h1').css({ fontSize : '1rem' });
-        $('#headerSite h2, #headerSite h3').css ({ fontSize : '0.8rem' });
-        $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.8rem'});
-        var w = 250;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
-        $('#headerSiteDiv').css ({ height : 200, width : w, paddingTop : 20 });
-        $('#headerSiteDiv div').css ({ height : 0, width : w });
-        $('.contentSectionTitle1').css({fontSize:'1.5em'});
-    }
-    $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.85rem'});
-    } else {
-        if (na.site.settings.current.fontSize_siteContent) {
-            $('#siteContent').css ({ fontSize : na.site.settings.current.fontSize_siteContent });
-            $('#siteStatusbar').css ({ fontSize : na.site.settings.current.fontSize_siteStatusbar });
-    };
-    $('#siteStatusbar').css({height:'4.5rem'});
-    $('#siteStatusbar .vividButton').css({width : 220});
-    $('#siteStatusbar td:nth-child(2)').css({width:225});
-    $('#mainCSS').html('.vividMenu_item td { font-size : 14px; }; #siteStatus td { font-weight : bold };');
-    na.site.settings.current.menuFontSize = '14px';
-    //$('.vividMenu .vividButton').css({ width : 220, height : 20 });
-    $('#tdFor_neCompanyLogo').css ({ width : 200, height : 200 });
-    $('#tableFor_neCompanyLogo').css ({ width : 200, height : 200 });
-    $('#divFor_neCompanyLogo').css ({ width : 200, height : 200 });
-    $('#datetime').css({marginLeft:40,marginTop:20});
-    $('#neCompanyLogo').attr('width',200).attr('height',200);
-    $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'1rem'});
-    $('.td_spacer').css ({ height : 100 });
-    if ($('#headerSite').length===1) {
-        $('#headerSite').css ({ height : 220, padding : 5, paddingLeft : 5 });
-        $('#headerSite, #headerSite h1').css({ fontSize : '1.4rem' });
-        $('#headerSite h2, #headerSite h3').css ({ fontSize : '1rem' });
-        $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'1.15rem'});
-        var w = 250;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
-        $('#headerSiteDiv').css ({ height : 200, width : w, paddingTop : 20 });
-        $('#headerSiteDiv div').css ({ height : 0, width : w });
-        $('.contentSectionTitle1').css({fontSize:'2em'});
-    }
-    $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'1rem'});
-    };
+        if ($(window).width() < na.site.globals.reallySmallDeviceWidth) {
+            na.site.settings.current.fontSize_siteContent = $('#siteContent').css('fontSize');
+            na.site.settings.current.fontSize_siteStatusbar = $('#siteStatusbar').css('fontSize');
+            $('#siteContent, #siteStatusbar').css ({ fontSize : '70%' });
+            $('#siteStatusbar').css({height:'5.5rem'});
+            $('#siteStatusbar .vividButton').css({width : 40});
+            $('#siteStatusbar td:nth-child(2)').css({width:55});
+            $('#tdFor_neCompanyLogo').css ({ width : 80, height : 80 });
+            $('#tableFor_neCompanyLogo').css ({ width : 80, height : 80 });
+            $('#divFor_neCompanyLogo').css ({ width : 70, height : 70, marginLeft : 0 });
+            $('#mainCSS').html('.vividMenu_item td { font-size : 11px; }; #siteStatus td { font-weight : bold };');
+            $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'0.7rem'});
+            na.site.settings.current.menuFontSize = '11px';
+            //$('.vividMenu .vividButton').css({ width  : 100, height : 10 });
+            $('#neCompanyLogo').attr('width',70).attr('height',70);
+            $('.td_spacer').css ({ height : 100 });
+            if ($('#headerSite').length===1) {
+                $('#headerSite').css ({ height:100, padding : 5, paddingLeft : 5 });
+                $('#headerSite, #headerSite h1').css({ fontSize : '1rem' });
+                $('#headerSite h2, #headerSite h3').not('.subMenu, .contentMenu').css ({ fontSize : '0.7rem' });
+                var w = 200;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
+                $('#headerSiteDiv').css ({ height : 80, width : w, paddingTop : 10 });
+                $('#headerSiteDiv div').css ({ height : 0, width : w });
+                $('.contentSectionTitle1').css({fontSize:'1em'});
+            }
+            $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.7rem'});
+        } else if ($(window).width() < na.site.globals.smallDeviceWidth) {
+            if (na.site.settings.current.fontSize_siteContent) {
+                $('#siteContent').css ({ fontSize : na.site.settings.current.fontSize_siteContent });
+                $('#siteStatusbar').css ({ fontSize : na.site.settings.current.fontSize_siteStatusbar });
+            };
+            $('#siteStatusbar').css({height:'4.5rem'});
+            $('#siteStatusbar .vividButton').css({width : 100});
+            $('#siteStatusbar td:nth-child(2)').css({width:105});
+            $('#mainCSS').html('.vividMenu_item td { font-size : 14px; }; #siteStatus td { font-weight : bold };');
+            na.site.settings.current.menuFontSize = '14px';
+            //$('.vividMenu .vividButton').css({ width : 135, height : 14 });
+            $('#tdFor_neCompanyLogo').css ({ width : 200, height : 200 });
+            $('#tableFor_neCompanyLogo').css ({ width : 200, height : 200 });
+            $('#divFor_neCompanyLogo').css ({ width : 200, height : 200});
+            $('#datetime').css({marginLeft:40,marginTop:20});
+            $('#neCompanyLogo').attr('width',200).attr('height',200);
+            $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'0.85rem'});
+            $('.td_spacer').css ({ height : 100 });
+            if ($('#headerSite').length===1) {
+                $('#headerSite').css ({ height : 100, padding : 5, paddingLeft : 5 });
+                $('#headerSite, #headerSite h1').css({ fontSize : '1rem' });
+                $('#headerSite h2, #headerSite h3').css ({ fontSize : '0.8rem' });
+                $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.8rem'});
+                var w = 250;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
+                $('#headerSiteDiv').css ({ height : 200, width : w, paddingTop : 20 });
+                $('#headerSiteDiv div').css ({ height : 0, width : w });
+                $('.contentSectionTitle1').css({fontSize:'1.5em'});
+            }
+            $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'0.85rem'});
+        } else {
+            if (na.site.settings.current.fontSize_siteContent) {
+                $('#siteContent').css ({ fontSize : na.site.settings.current.fontSize_siteContent });
+                $('#siteStatusbar').css ({ fontSize : na.site.settings.current.fontSize_siteStatusbar });
+            };
+            $('#siteStatusbar').css({height:'4.5rem'});
+            $('#siteStatusbar .vividButton').css({width : 220});
+            $('#siteStatusbar td:nth-child(2)').css({width:225});
+            $('#mainCSS').html('.vividMenu_item td { font-size : 14px; }; #siteStatus td { font-weight : bold };');
+            na.site.settings.current.menuFontSize = '14px';
+            //$('.vividMenu .vividButton').css({ width : 220, height : 20 });
+            $('#tdFor_neCompanyLogo').css ({ width : 200, height : 200 });
+            $('#tableFor_neCompanyLogo').css ({ width : 200, height : 200 });
+            $('#divFor_neCompanyLogo').css ({ width : 200, height : 200 });
+            $('#datetime').css({marginLeft:40,marginTop:20});
+            $('#neCompanyLogo').attr('width',200).attr('height',200);
+            $('html, body, p, span, ul, ol, li, div').not('.vt, .vividButton, .vividMenu_item, .subMenu, .contentMenu').css({fontSize:'1rem'});
+            $('.td_spacer').css ({ height : 100 });
+            if ($('#headerSite').length===1) {
+                $('#headerSite').css ({ height : 220, padding : 5, paddingLeft : 5 });
+                $('#headerSite, #headerSite h1').css({ fontSize : '1.4rem' });
+                $('#headerSite h2, #headerSite h3').css ({ fontSize : '1rem' });
+                $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'1.15rem'});
+                var w = 250;//$('#siteContent .vividDialogContent').width() - $('#headerSite').offset().left;
+                $('#headerSiteDiv').css ({ height : 200, width : w, paddingTop : 20 });
+                $('#headerSiteDiv div').css ({ height : 0, width : w });
+                $('.contentSectionTitle1').css({fontSize:'2em'});
+            }
+            $('#newsApp_title, #newsApp_info, #newsApp_timer').css({fontSize:'1rem'});
+        };
 
-    startLogo('neCompanyLogo', 'countryOfOriginColors');
-    */
+        startLogo('neCompanyLogo', 'countryOfOriginColors');
+        */
     },
 
     changeBackground : function () {
@@ -855,14 +855,14 @@ na.site = {
                                             display : 'block',
                                             opacity : 0.0001,
                                             top : ( $(window).height() - $('#siteLogin').height() ) / 2,
-                                                            left : ( $(window).width() - $('#siteLogin').width() ) / 2
+                                            left : ( $(window).width() - $('#siteLogin').width() ) / 2
                                         }).delay(50).css({
                                             display : 'none',
                                             opacity : 1,
                                             top : -750
                                         }).delay(50).fadeIn('normal').animate({
                                             top : ( $(window).height() - $('#siteLogin').height() ) / 2,
-                                                                              left : ( $(window).width() - $('#siteLogin').width() ) / 2
+                                            left : ( $(window).width() - $('#siteLogin').width() ) / 2
                                         });
                                     });
                                 }, na.site.globals.tims.errorMsgs_short);
@@ -916,7 +916,7 @@ na.site = {
     },
     onclick_btnDeleteThisTheme : function (event) {
         var
-        url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteThisTheme.php',
+         url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteThisTheme.php',
         ajaxCmd = {
             type : 'POST',
             url : url,
@@ -936,7 +936,7 @@ na.site = {
     },
     onclick_btnDeleteAllUserThemes : function (event) {
         var
-        url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteAllUserThemes.php',
+         url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteAllUserThemes.php',
         ajaxCmd = {
             type : 'POST',
             url : url,
@@ -952,7 +952,7 @@ na.site = {
     },
     onclick_btnDeleteAllOfMyThemes : function (event) {
         var
-        url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteAllOfMyThemes.php',
+         url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_deleteAllOfMyThemes.php',
         ajaxCmd = {
             type : 'POST',
             url : url,
@@ -997,10 +997,10 @@ na.site = {
         var show = typeof msg==='string' && msg !== '';
 
         msg =
-        msg
-        .replace(/\\n/g, '<br/>')
-        .replace(/\\"/g, '"')
-        .replace(/\\\//g, '/');
+            msg
+            .replace(/\\n/g, '<br/>')
+            .replace(/\\"/g, '"')
+            .replace(/\\\//g, '/');
         $('#siteErrors_msg').html(msg);
 
         if (show) {
@@ -1009,16 +1009,16 @@ na.site = {
             na.desktop.settings.visibleDivs.remove ('#siteContent');
             na.desktop.settings.visibleDivs.remove ('#siteStatusbar');
             //$('#siteErrors').css({opacity:1,display:'none'}).fadeIn('normal', function() {
-            /*  $('#siteErrors').css({
-             *                    width : $(window).width()-20,
-             *                    height : $(window).height()-20,
-             *                    left : 10,
-             *                    top : 10
-        });
-        $('#tabPagesLog_content').css({
-        height : $(window).height()-102,
-        width : $(window).width()-46
-        });*/
+                /*  $('#siteErrors').css({
+                    width : $(window).width()-20,
+                    height : $(window).height()-20,
+                    left : 10,
+                    top : 10
+                });
+                $('#tabPagesLog_content').css({
+                    height : $(window).height()-102,
+                    width : $(window).width()-46
+                });*/
             //});
         } else {
             //na.site.setStatusMsg ('<div class="naNoErrors">No errors found since you last reloaded this page (F5). There may be errors listed in the operating system logs. You may need to sprinkle the suspected code with extra debugger statements that send an E_NOTICE to PHP\'s trigger_error() function.</div>', true, 10 * 1000);
@@ -1026,14 +1026,14 @@ na.site = {
             if (!na.desktop.settings.visibleDivs.includes('#siteContent'))
                 na.desktop.settings.visibleDivs.push ('#siteContent');
             /*if (!na.desktop.settings.visibleDivs.includes('#siteStatusbar'))
-             *                na.desktop.settings.visibleDivs.push ('#siteStatusbar');*/
+                na.desktop.settings.visibleDivs.push ('#siteStatusbar');*/
             //$('#siteErrors').css({opacity:1,display:'block'}).fadeOut('normal');
         };
         //setTimeout (na.desktop.resize, 2500);
         na.desktop.resize(function () {
             $('#tabPagesLog_content').css({
                 height : $('#siteErrors').height()
-                - $('#siteErrors .vividTabPage_header').height()
+                    - $('#siteErrors .vividTabPage_header').height()
             });
         });
 
@@ -1073,20 +1073,20 @@ na.site = {
         };
         import (url).then((module) => {
             var js =
-            'na.apps["'+appName+'"] = {'
-            +'settings : new module.'+jsClassName+'('+jsVarName+')'
-            +'}';
+                'na.apps["'+appName+'"] = {'
+                +'settings : new module.'+jsClassName+'('+jsVarName+')'
+                +'}';
             eval (js);
         });
     },
 
     // BEGIN na.site.LoadContent()
     loadContent : function (event, url, callback_phase1, callback_phase2) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         na.apps.mustHaveAtLeast_number = 0;
         na.site.settings.url = url;
         //if (na.site.globals.debug['na.site.loadContent']) alert (url);
@@ -1106,12 +1106,12 @@ na.site = {
             root : {
                 labels : { marker : {
                     whatsThis : 'site.loadContent() : url='+url,
-                                stacktrace : na.m.stacktrace(),
-                                HTMLevent : event
+                    stacktrace : na.m.stacktrace(),
+                    HTMLevent : event
                 }},
                 functions : [
                     { callback_phase1 : [na.m.newEventFunction (callback_phase1)] },
-                                { callback_phase2 : [na.m.newEventFunction (callback_phase2)] }
+                    { callback_phase2 : [na.m.newEventFunction (callback_phase2)] }
                 ]
             }
         }),
@@ -1152,13 +1152,13 @@ na.site = {
         if (event && typeof event.preventDefault=='function') event.preventDefault();
     },
 
-    stateChange : function(evt){
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
-        var
+	stateChange : function(evt){
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
+		var
         c = na.site.settings;
         if (!c.loadContent) {
             c.loadContent = {
@@ -1216,8 +1216,8 @@ na.site = {
                 root : {
                     labels : { marker : {
                         whatsThis : 'na.site.stateChange() : url='+state.url,
-                                    stacktrace : na.m.stacktrace(),
-                                    HTMLevent : event
+                        stacktrace : na.m.stacktrace(),
+                        HTMLevent : event
                     }},
                     functions : []
                 }
@@ -1248,15 +1248,15 @@ na.site = {
     },
 
     loadContent_getContent : function (ec, url1) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         var
         fncn = 'na.site.loadContent_getContent()',
         reloadMenu = false,
-        state = History.getState(),
+		state = History.getState(),
         c = na.site.settings,
         lc = c.loadContent,
         lcc = lc.current,
@@ -1270,16 +1270,16 @@ na.site = {
         if (url1.match('/view/')) {
             var
             url2 = url1
-            .replace(document.location.origin,'')
-            .replace(document.location.host,'')
-            .replace('/view/', ''),
+                    .replace(document.location.origin,'')
+                    .replace(document.location.host,'')
+                    .replace('/view/', ''),
             url3 = url1;
         } else if (url1.match('/view/')) {
             var
             url2 = url1
-            .replace(document.location.origin,'')
-            .replace(document.location.host,'')
-            .replace('/view/', ''),
+                    .replace(document.location.origin,'')
+                    .replace(document.location.host,'')
+                    .replace('/view/', ''),
             url3 = url1;
         } else {
             var
@@ -1318,7 +1318,7 @@ na.site = {
                 labels : { marker : {
                     whatsThis : fncn+' : url1='+url1+', url2='+url2+', url3='+url3,
                     stacktrace : na.m.stacktrace(),
-                                     HTMLevent : event
+                    HTMLevent : event
                 }},
                 params : {
                     url : state.url,
@@ -1340,15 +1340,15 @@ na.site = {
         var
         fncn = (
             url2.match(/\/view\//)
-            ? fncn+':: app='+JSON.stringify(app)+', app==valid JSON='+(appValidJSON?'true':'false')+ ', url3='+url3
-            : fncn+':: url2='+url2
+                ? fncn+':: app='+JSON.stringify(app)+', app==valid JSON='+(appValidJSON?'true':'false')+ ', url3='+url3
+                : fncn+':: url2='+url2
         ),
         loadContent_getContent_do = function () {
-            /*
-             * LICENSE : https://opensource.org/license/mit
-             * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-             * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-             */
+        /*
+        * LICENSE : https://opensource.org/license/mit
+        * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+        * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+        */
             $('.lds-facebook').fadeIn('normal');
 
             var
@@ -1388,12 +1388,12 @@ na.site = {
             $.ajax(ac);
 
             /*
-             *            if (!url1.match(/\/view\//) && url1.indexOf('/')===0) {
-             *                na.analytics.logMetaEvent('na.site.loadContent() : url='+url1);
-        } else {
-            na.analytics.logMetaEvent('na.site.loadContent() : url2='+url2);
-        }
-        */
+            if (!url1.match(/\/view\//) && url1.indexOf('/')===0) {
+                na.analytics.logMetaEvent('na.site.loadContent() : url='+url1);
+            } else {
+                na.analytics.logMetaEvent('na.site.loadContent() : url2='+url2);
+            }
+            */
         };
 
         if (app && app.meta && app.meta.mustBeLoggedIn) {
@@ -1407,11 +1407,11 @@ na.site = {
 
 
     loadContent_displayContent (data, ts, xhr) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
 
         $('.lds-facebook').fadeOut('normal');
         $('.vividDialog > .vividDialogContent').css({overflow:'auto'});
@@ -1464,8 +1464,8 @@ na.site = {
         } catch (error) {
             dat = { siteContent : data };
 
-            //var msg = na.m.log (11, fncn+' : JSON decode error in <b>data</b> error='+error.message+', in data='+data, false);
-            //reports.push (msg);
+                //var msg = na.m.log (11, fncn+' : JSON decode error in <b>data</b> error='+error.message+', in data='+data, false);
+                //reports.push (msg);
 
             //var msg = na.m.log (11, fncn+' : JSON decode error in data, error='+error.message, false);
             //na.site.fail (msg, xhr);
@@ -1490,13 +1490,13 @@ na.site = {
             loadContent_displayContent : {
                 //dt : { created : dt, starts : dt, completed : dt },
                 labels : { marker : { whatsThis : fncn+'::lcc.ec.events.push() called' } },
-                                     params : {
-                                         data : data,
-                                         dat : dat
-                                     },
-                                     functions : [
-                                         { ignoreThis : [{completed:true}] }
-                                     ]
+                params : {
+                    data : data,
+                    dat : dat
+                },
+                functions : [
+                    { ignoreThis : [{completed:true}] }
+                ]
             }
         });
 
@@ -1530,8 +1530,8 @@ na.site = {
                 stateChange : {
                     labels : { marker : {
                         whatsThis : 'na.site.stateChange() : url='+state.url,
-                                    stacktrace : na.m.stacktrace(),
-                                    HTMLevent : event
+                        stacktrace : na.m.stacktrace(),
+                        HTMLevent : event
                     }},
                     functions : [
                         { ignoreThis : [{completed:true}] }
@@ -1563,111 +1563,111 @@ na.site = {
         na.m.runFunctions (lcc.ec, na.m.updateEvent (dt, {
             loadContent_displayContent : {
                 labels : { marker : { whatsThis : fncn+'::na.m.runFunctions() called' } },
-                                                     newFunctions : [
-                                                         { initializeScriptsForApps : [na.m.newEventFunction (function(f) {
-                                                             na.m.waitForCondition('loadContent_displayContent::initializeScriptsForApps', function(f) {
-                                                                 return na.m.HTMLidle();
-                                                             }, function (f) {
-                                                                 na.site.initializeScriptsForApps(f);
-                                                             }, null, f);
-                                                         }, { dat : dat })] },
+                newFunctions : [
+                    { initializeScriptsForApps : [na.m.newEventFunction (function(f) {
+                        na.m.waitForCondition('loadContent_displayContent::initializeScriptsForApps', function(f) {
+                            return na.m.HTMLidle();
+                        }, function (f) {
+                            na.site.initializeScriptsForApps(f);
+                        }, null, f);
+                    }, { dat : dat })] },
 
-                                                         { initializeApps : [na.m.newEventFunction(function(f) {
-                                                             na.m.waitForCondition('loadContent_displayContent::initializeApps', function(f) {
-                                                                 var r =
-                                                                 na.m.HTMLidle()
-                                                                 && !na.site.settings.startingApps;
-                                                                 return r;
-                                                             }, function(f) {
-                                                                 //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarLeft');
-                                                                 //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarThemeEditor');
-                                                                 //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteContent');
-                                                                 //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarRight');
-                                                                 //na.d.s.visibleDivs.push ('#siteContent');
-                                                                 na.site.initializeApps(f, function() {
-                                                                     na.site.settings.loadingApps = false;
-                                                                 });
-                                                             }, null, f);
-                                                         }, { dat : dat })] },
+                    { initializeApps : [na.m.newEventFunction(function(f) {
+                        na.m.waitForCondition('loadContent_displayContent::initializeApps', function(f) {
+                            var r =
+                                na.m.HTMLidle()
+                                && !na.site.settings.startingApps;
+                            return r;
+                        }, function(f) {
+                            //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarLeft');
+                            //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarThemeEditor');
+                            //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteContent');
+                            //na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteToolbarRight');
+                            //na.d.s.visibleDivs.push ('#siteContent');
+                            na.site.initializeApps(f, function() {
+                                na.site.settings.loadingApps = false;
+                            });
+                        }, null, f);
+                    }, { dat : dat })] },
 
-                                                         { resizeApps : [na.m.newEventFunction(function(f) {
-                                                             na.m.waitForCondition ('loadContent_displayContent::resizeApps : na.m.HTMLidle() && !na.site.settings.loadingApps?', function (f) {
-                                                                 var r =
-                                                                 na.m.HTMLidle()
-                                                                 && !na.site.settings.loadingApps
-                                                                 && (
-                                                                     na.site.settings.scriptsLoaded===true
-                                                                     || na.site.settings.scriptsToLoad===0
-                                                                 );
-                                                                 return r;
-                                                             }, function (f) {
-                                                                 $('#siteContent > .vividDialogContent').css({
-                                                                     display : 'block',
-                                                                     position : 'relative',
-                                                                     width : '100%', height : '100%'
-                                                                 });
-                                                                 na.desktop.resize (function() {
-                                                                     na.site.resizeApps(f);
-                                                                     na.site.onresize(); //calls na.site.resizeApps too.
-                                                                 })
-                                                             }, null, f);
-                                                         }, { dat : dat })] },
+                    { resizeApps : [na.m.newEventFunction(function(f) {
+                        na.m.waitForCondition ('loadContent_displayContent::resizeApps : na.m.HTMLidle() && !na.site.settings.loadingApps?', function (f) {
+                            var r =
+                                na.m.HTMLidle()
+                                && !na.site.settings.loadingApps
+                                && (
+                                    na.site.settings.scriptsLoaded===true
+                                    || na.site.settings.scriptsToLoad===0
+                                );
+                            return r;
+                        }, function (f) {
+                            $('#siteContent > .vividDialogContent').css({
+                                display : 'block',
+                                position : 'relative',
+                                width : '100%', height : '100%'
+                            });
+                            na.desktop.resize (function() {
+                                na.site.resizeApps(f);
+                                na.site.onresize(); //calls na.site.resizeApps too.
+                            })
+                        }, null, f);
+                    }, { dat : dat })] },
 
-                                                         //{ getPageSpecificSettings : [na.m.newEventFunction (na.site.getPageSpecificSettings)] },
-                                                         { loadTheme : [na.m.newEventFunction (function(f) {
-                                                             na.m.waitForCondition ('loadContent_displayContent::loadTheme : na.m.HTMLidle() && !na.site.settings.running_loadContent?', function () {
-                                                                 var r =
-                                                                 na.m.HTMLidle()
-                                                                 && !na.site.settings.running_loadContent;
-                                                                 return r;
-                                                             }, function (f) {
-                                                                 na.site.loadTheme (null, null, true, true); // calls na.site.getPageSpecificSettings() as well
-                                                             }, null, f);
-                                                         })] },
+                    //{ getPageSpecificSettings : [na.m.newEventFunction (na.site.getPageSpecificSettings)] },
+                    { loadTheme : [na.m.newEventFunction (function(f) {
+                        na.m.waitForCondition ('loadContent_displayContent::loadTheme : na.m.HTMLidle() && !na.site.settings.running_loadContent?', function () {
+                            var r =
+                                na.m.HTMLidle()
+                                && !na.site.settings.running_loadContent;
+                            return r;
+                        }, function (f) {
+                            na.site.loadTheme (null, null, true, true); // calls na.site.getPageSpecificSettings() as well
+                        }, null, f);
+                    })] },
 
-                                                         { reloadMenu : [na.m.newEventFunction (function(f) {
-                                                             na.m.waitForCondition ('loadContent_displayContent::loadTheme : na.m.HTMLidle() && !na.site.settings.running_loadContent?', function () {
-                                                                 var r =
-                                                                 na.m.HTMLidle()
-                                                                 && !na.site.settings.running_loadTheme
-                                                                 && !na.site.settings.running_loadContent;
-                                                                 return r;
-                                                             }, function (f) {
-                                                                 na.site.reloadMenu();
-                                                             }, null, f);
-                                                         })] },
+                    { reloadMenu : [na.m.newEventFunction (function(f) {
+                        na.m.waitForCondition ('loadContent_displayContent::loadTheme : na.m.HTMLidle() && !na.site.settings.running_loadContent?', function () {
+                            var r =
+                                na.m.HTMLidle()
+                                && !na.site.settings.running_loadTheme
+                                && !na.site.settings.running_loadContent;
+                            return r;
+                        }, function (f) {
+                            na.site.reloadMenu();
+                        }, null, f);
+                    })] },
 
-                                                         { loadTheme_cleanup : [na.m.newEventFunction (function() {
-                                                             na.m.waitForCondition ('loadContent_displayContent::loadTheme_cleanup : na.m.HTMLidle() && !na.site.settings.running_loadTheme?', function () {
-                                                                 var r = na.m.HTMLidle() && !na.site.settings.running_loadTheme;
-                                                                 return r;
-                                                             }, function () {
-                                                                 if (!na.site.globals.themes[na.site.globals.themeName].themeSettings)
-                                                                     na.site.globals.themes[na.site.globals.themeName].themeSettings = na.te.transform_jsTree_to_siteGlobalsThemes();
+                    { loadTheme_cleanup : [na.m.newEventFunction (function() {
+                        na.m.waitForCondition ('loadContent_displayContent::loadTheme_cleanup : na.m.HTMLidle() && !na.site.settings.running_loadTheme?', function () {
+                            var r = na.m.HTMLidle() && !na.site.settings.running_loadTheme;
+                            return r;
+                        }, function () {
+                            if (!na.site.globals.themes[na.site.globals.themeName].themeSettings)
+                                na.site.globals.themes[na.site.globals.themeName].themeSettings = na.te.transform_jsTree_to_siteGlobalsThemes();
 
-                                                                 //na.site.globals.themes.default = na.site.loadTheme_fetchDialogs();
-                                                             }, null);
-                                                         })] },
+                            //na.site.globals.themes.default = na.site.loadTheme_fetchDialogs();
+                        }, null);
+                    })] },
 
-                                                         { initializeVivids : [na.m.newEventFunction (function(){
-                                                             na.m.waitForCondition ('loadContent_displayContent::initializeVivids : na.m.HTMLidle()?', function () { return na.m.HTMLidle() && !na.site.settings.running_loadContent}, na.site.startUIvisuals, null);
-                                                         })] },
+                    { initializeVivids : [na.m.newEventFunction (function(){
+                        na.m.waitForCondition ('loadContent_displayContent::initializeVivids : na.m.HTMLidle()?', function () { return na.m.HTMLidle() && !na.site.settings.running_loadContent}, na.site.startUIvisuals, null);
+                    })] },
 
-                                                         { renderAllCustomHeadingsAndLinks : [na.m.newEventFunction (function(){
-                                                             na.m.waitForCondition ('loadContent_displayContent::renderAllCustomHeadingsAndLinks : na.m.HTMLidle()?', function () { return na.m.HTMLidle() && !na.site.settings.running_loadContent}, na.site.renderAllCustomHeadingsAndLinks, null);
-                                                         })] }
-                                                     ]
+                    { renderAllCustomHeadingsAndLinks : [na.m.newEventFunction (function(){
+                        na.m.waitForCondition ('loadContent_displayContent::renderAllCustomHeadingsAndLinks : na.m.HTMLidle()?', function () { return na.m.HTMLidle() && !na.site.settings.running_loadContent}, na.site.renderAllCustomHeadingsAndLinks, null);
+                    })] }
+                ]
             }
         }));
         this.completed = true;
     },
 
     startUIvisuals : function (divID, callback) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         //if (typeof startLogo=='function') startLogo('neCompanyLogo', 'countryOfOriginColors');
 
         if (!divID) var el = $('body')[0]; else var el = $(divID)[0];
@@ -1706,68 +1706,68 @@ na.site = {
                 $menu.css({ display: 'flex', visibility: 'visible', opacity: 1, zIndex: 920000 }).show();
             });        }
 
-            $('.vividMenu'/*, vdc[0]*/).each(function(idx,el){
-                if (!na.site.c.menus) na.site.c.menus = {};
-                if (el.id!='siteMenu' && !na.site.c.menus['#'+el.id]) na.site.c.menus['#'+el.id] = new naVividMenu(el.id);
-            });
+        $('.vividMenu'/*, vdc[0]*/).each(function(idx,el){
+            if (!na.site.c.menus) na.site.c.menus = {};
+            if (el.id!='siteMenu' && !na.site.c.menus['#'+el.id]) na.site.c.menus['#'+el.id] = new naVividMenu(el.id);
+        });
 
-                $('.noPushState').each(function(idx,el) {
-                    if (!el.clickHandler_logging) {
-                        el.clickHandler_logging = true;
-                        $(el).click (function(){
-                            var msg = '.noPushState::click() : #'+this.id+' clicked; browsing to '+this.href;
-                            na.m.addLogEntry(msg, 'naIPlog_externalLink');
-                            na.m.log(2,msg);
-                        })
-                    }
-                });
-
-
-                /* i have no idea anymore what this is supposed to do! ;)
-                 *        var sel = document.querySelectorAll('.contentSectionTitle3_a');
-                 *        if (sel) for (let i = 0; i < sel.length; i++) { var sel2 = sel[i]; sel2.addEventListener('click',na.m.handleGalleryLinkClick); }
-                 */
+        $('.noPushState').each(function(idx,el) {
+            if (!el.clickHandler_logging) {
+                el.clickHandler_logging = true;
+                $(el).click (function(){
+                    var msg = '.noPushState::click() : #'+this.id+' clicked; browsing to '+this.href;
+                    na.m.addLogEntry(msg, 'naIPlog_externalLink');
+                    na.m.log(2,msg);
+                })
+            }
+        });
 
 
-                /*
-                 *        $('p, h1, h2, h3').addClass('todoList');
-                 */
+        /* i have no idea anymore what this is supposed to do! ;)
+        var sel = document.querySelectorAll('.contentSectionTitle3_a');
+        if (sel) for (let i = 0; i < sel.length; i++) { var sel2 = sel[i]; sel2.addEventListener('click',na.m.handleGalleryLinkClick); }
+        */
 
-                if (el && el.tagName=='body') {
-                    na.site.bindTodoListAnimations (
-                        '.todoList, '
-                        //+'.contentSectionTitle3, contentSectionTitle3_a, '
-                        +'p.todoList, h1.todoList, h2.todoList, h3.todoList, '
-                        +'li > a, '
-                        +'.todoList > li, '
-                        +'.todoList > li > div, '
-                        +'.todoList > li > pre, '
-                        +'.todoList_l1 > li, '
-                        +'.todoList_l1 > li > div, '
-                        +'.todoList_l1 > li > pre, '
-                        +'.todoList_l2 > li, '
-                        +'.todoList_l2 > li > div, '
-                        +'.todoList_l2 > li > pre '
-                    );
 
-                    const themeName = na.site.globals.themeName;
-                    const themes = na.site.globals.themes;
-                    if (themes && themeName && themes[themeName]) {
-                        na.site.loadTheme_applySettings(themes[themeName]);
-                    } else {
-                        console.warn('Theme missing:', themeName, themes);
-                    }
-                };
+        /*
+        $('p, h1, h2, h3').addClass('todoList');
+        */
 
-                if (typeof callback=='function') callback(divID);
+        if (el && el.tagName=='body') {
+            na.site.bindTodoListAnimations (
+                '.todoList, '
+                //+'.contentSectionTitle3, contentSectionTitle3_a, '
+                +'p.todoList, h1.todoList, h2.todoList, h3.todoList, '
+                +'li > a, '
+                +'.todoList > li, '
+                +'.todoList > li > div, '
+                +'.todoList > li > pre, '
+                +'.todoList_l1 > li, '
+                +'.todoList_l1 > li > div, '
+                +'.todoList_l1 > li > pre, '
+                +'.todoList_l2 > li, '
+                +'.todoList_l2 > li > div, '
+                +'.todoList_l2 > li > pre '
+            );
+
+            const themeName = na.site.globals.themeName;
+            const themes = na.site.globals.themes;
+            if (themes && themeName && themes[themeName]) {
+                na.site.loadTheme_applySettings(themes[themeName]);
+            } else {
+                console.warn('Theme missing:', themeName, themes);
+            }
+        };
+
+        if (typeof callback=='function') callback(divID);
     },
 
     bindTodoListAnimations : function (selector) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         $(selector).each(function(idx,el) {
             $(el).bind('mouseover', function(evt) {
                 $(evt.currentTarget).removeClass('in-active').addClass('active');
@@ -1785,21 +1785,21 @@ na.site = {
     },
 
     initializeScriptsForApps : function (f) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         // na.site.loadContent()::stage 004 : put all the SCRIPT tags with a src= attribute into the HEAD of the document, IF they're not there already, and let them load properly.
         var
         fncn = 'na.site.initializeScriptsForApps(ec,eventIdx,eventParams)',
         about = {
             activity :
-            na.m.log (1516,
-                      'put all the SCRIPT tags with a src= attribute into the HEAD of the document, '
-                      +'IF they\'re not there already, and let them load properly.',
-                      false
-            )
+                na.m.log (1516,
+                    'put all the SCRIPT tags with a src= attribute into the HEAD of the document, '
+                    +'IF they\'re not there already, and let them load properly.',
+                    false
+                )
         },
         vd = na.desktop.settings.visibleDivs,
         c = na.site.settings,
@@ -1808,10 +1808,10 @@ na.site = {
         dat = f.params.dat;
 
         /*
-         *        c.loadingApps = true;
-         *        c.startingScripts = false;
-         *        c.startingApps = true;
-         */
+        c.loadingApps = true;
+        c.startingScripts = false;
+        c.startingApps = true;
+        */
         c.divsInitializing = [];
 
         eventData.fncn = fncn;
@@ -1882,11 +1882,11 @@ na.site = {
                             na.site.renderAllCustomHeadingsAndLinks();
 
                             /* handled by vdc.html() above here in this code block instead
-                             *                            var inlineScripts = $('script:not([src])', vdc);
-                             *                            for (var i=0; i<inlineScripts.length; i++) {
-                             *                                eval (inlineScripts[i].innerText);
-                        }
-                        */
+                            var inlineScripts = $('script:not([src])', vdc);
+                            for (var i=0; i<inlineScripts.length; i++) {
+                                eval (inlineScripts[i].innerText);
+                            }
+                            */
 
                             var
                             scripts = dat[divID2].match(/\/NicerAppWebOS\/.*?\.js.*?"/g),
@@ -1937,11 +1937,11 @@ na.site = {
     },
 
     initializeApps : function (f, callback) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         if (f) {
             var
             fncn = 'na.site.loadContent():::5::na.site.initializeApps()',
@@ -1970,12 +1970,12 @@ na.site = {
 
         na.m.waitForCondition (fncn+' : are the apps loaded, and their scripts fully loaded into the page\'s <HEAD>? na.m.HTMLidle()?', function () {
             var r = na.m.desktopIdle();//na.m.WebOSidle===too restrictive,
-                               return r;
+            return r;
         }, function () { //[1]
-            var c = na.site.settings;
+                var c = na.site.settings;
 
-            if (dat) for (var divID in dat) {
-                if (divID!=='head')
+                if (dat) for (var divID in dat) {
+                    if (divID!=='head')
                     for (var appID in na.apps.loaded) {
                         var app = na.apps.loaded[appID];
                         var handlers = app.settings.loadedIn['#'+divID];
@@ -1984,57 +1984,57 @@ na.site = {
                                 c.divsInitializing.push ({appID:appID,divID:divID});
                                 na.m.log (1516, fncn+' : #'+divID+' : Now calling na.apps.loaded["'+appID+'"].settings.loadedIn["#'+divID+'"].onload();');
                                 //setTimeout(function(){
-                                handlers.onload ({
-                                    callbackParams : [ divID ],
-                                    callback : function (divID) {
-                                        na.site.appDivLoaded (appID, divID, f, callback);
-                                    }
-                                });
+                                    handlers.onload ({
+                                        callbackParams : [ divID ],
+                                        callback : function (divID) {
+                                            na.site.appDivLoaded (appID, divID, f, callback);
+                                        }
+                                    });
                                 //}, 2500);
                             }
                         } else {
                             na.site.appDivLoaded(appID, divID, f, callback);
                         }
                     }
-            } else {
-                for (var appID in na.apps.loaded) {
-                    var app = na.apps.loaded[appID];
-                    for (var divID in app.settings.loadedIn) {
-                        divID = divID.replace('#','');
-                        var handlers = app.settings.loadedIn['#'+divID];
-                        if (handlers) {
-                            if (typeof handlers.onload == 'function') {
-                                c.divsInitializing.push({divID:divID});
-                                na.m.log (1516, fncn+' : #'+divID+' : Now calling na.apps.loaded["'+appID+'"].settings.loadedIn["#'+divID+'"].onload();');
-                                handlers.onload ({
-                                    callbackParams : [ divID ],
-                                    callback : function (divID) {
-                                        na.site.appDivLoaded (appID, divID, f, callback);
-                                    }
-                                });
+                } else {
+                    for (var appID in na.apps.loaded) {
+                        var app = na.apps.loaded[appID];
+                        for (var divID in app.settings.loadedIn) {
+                            divID = divID.replace('#','');
+                            var handlers = app.settings.loadedIn['#'+divID];
+                            if (handlers) {
+                                if (typeof handlers.onload == 'function') {
+                                    c.divsInitializing.push({divID:divID});
+                                    na.m.log (1516, fncn+' : #'+divID+' : Now calling na.apps.loaded["'+appID+'"].settings.loadedIn["#'+divID+'"].onload();');
+                                    handlers.onload ({
+                                        callbackParams : [ divID ],
+                                        callback : function (divID) {
+                                            na.site.appDivLoaded (appID, divID, f, callback);
+                                        }
+                                    });
+                                }
+                            } else {
+                                na.site.appDivLoaded(appID, divID, f, callback);
                             }
-                        } else {
-                            na.site.appDivLoaded(appID, divID, f, callback);
                         }
                     }
-                }
-            };
+                };
 
-            if (c.divsInitializing.length === 0) {
-                c.startingApps = false;
-                c.loadingApps = false;
-            }
-        },
+                if (c.divsInitializing.length === 0) {
+                    c.startingApps = false;
+                    c.loadingApps = false;
+                }
+            },
         100, callback);
         return false;
     },
 
     appDivLoaded : function (appID, divID, f, cb) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         var c = na.site.settings;
         for (var i=0; i < c.divsInitializing.length; i++) {
             var it = c.divsInitializing[i];
@@ -2060,11 +2060,11 @@ na.site = {
     },
 
     resizeApps : function (f) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         var fncn = 'na.site.resizeApps()';
         if (typeof f=='object') {
             var
@@ -2086,19 +2086,19 @@ na.site = {
 
         na.m.waitForCondition (fncn+' : na.m.HTMLidle() && !na.site.settings.loadingApps?', function(f) {
             var r =
-            na.m.HTMLidle()
-            //&& !na.site.settings.startingApps // DON'T! messes up initial-page loads.
-            && !na.site.settings.loadingApps;
+                na.m.HTMLidle()
+                //&& !na.site.settings.startingApps // DON'T! messes up initial-page loads.
+                && !na.site.settings.loadingApps;
 
             if (r)
-                for (var appID in na.apps.loaded) {
-                    var app = na.apps.loaded[appID];
-                    if (
-                        app.settings
-                        && typeof app.settings.loaded == 'boolean'
-                        && !app.settings.loaded
-                    ) r = false;
-                };
+            for (var appID in na.apps.loaded) {
+                var app = na.apps.loaded[appID];
+                if (
+                    app.settings
+                    && typeof app.settings.loaded == 'boolean'
+                    && !app.settings.loaded
+                ) r = false;
+            };
             return r;
         }, function (f) {
             na.site.settings.numAppsResizing = 0;
@@ -2129,20 +2129,20 @@ na.site = {
                 f.runningNow = false;
                 f.completed = true;
                 /*
-                 *                setTimeout(function() {
-                 *                    $('.vividDialog').css({overflow:'visible'});
-            }, 300);
-        */
+                setTimeout(function() {
+                    $('.vividDialog').css({overflow:'visible'});
+                }, 300);
+                */
             }
         }, 100, f);
     },
 
     appResized : function (appID, f) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         var c = na.site.settings;
         c.numAppsResized++;
         c.appsResizing[appID] = false;
@@ -2160,11 +2160,11 @@ na.site = {
     },
 
     getPageSpecificSettings : function (ec, eventIdx, eventParams, f) {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         if (
             !ec
             || !ec.events
@@ -2221,28 +2221,28 @@ na.site = {
                             if (!na.site.c.dialogs['#'+el.id]) na.site.c.dialogs['#'+el.id] = new naVividDialog(el);
                         });
 
-                            // seems total nonsense :
-                            //var btn = $('#'+na.te.settings.selectedButtonID)[0];
-                            //na.te.onclick(btn, false);
+                        // seems total nonsense :
+                        //var btn = $('#'+na.te.settings.selectedButtonID)[0];
+                        //na.te.onclick(btn, false);
 
-                            /*
-                             *                        if (
-                             *                            typeof $.cookie('cdb_loginName')=='string'
-                             *                            && $.cookie('cdb_loginName')=='Guest'
-                ) {
-                na.site.globals.backgroundSearchKey = $.cookie('siteBackground_search');
-                na.site.globals.background = $.cookie('siteBackground_url');
-                    };
-                    na.backgrounds.next (
-                        '#siteBackground',
-                        na.site.globals.backgroundSearchKey,
-                        na.site.globals.background,
-                        false
-                );
-                */
+                        /*
+                        if (
+                            typeof $.cookie('cdb_loginName')=='string'
+                            && $.cookie('cdb_loginName')=='Guest'
+                        ) {
+                            na.site.globals.backgroundSearchKey = $.cookie('siteBackground_search');
+                            na.site.globals.background = $.cookie('siteBackground_url');
+                        };
+                        na.backgrounds.next (
+                            '#siteBackground',
+                            na.site.globals.backgroundSearchKey,
+                            na.site.globals.background,
+                            false
+                        );
+                        */
 
-                            /*if (typeof na.site.settings.loadContent_callback_phase1=='function')
-                             *                            na.site.settings.loadContent_callback_phase1 (themeData, data);*/
+                        /*if (typeof na.site.settings.loadContent_callback_phase1=='function')
+                            na.site.settings.loadContent_callback_phase1 (themeData, data);*/
                     };//);
                 }, 50); // na.site.setSpecificity() needs to run first, which is called from $('head').append(data).
             },
@@ -2251,109 +2251,109 @@ na.site = {
             }
         };
         //setTimeout (function() {
-        $.ajax(ac2);
+            $.ajax(ac2);
         //}, 50);
     },
 
     renderAllCustomHeadingsAndLinks : function () {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
 
         return false;
 
         // LEGACY JS-ONLY COLOR GRADIENT HORIZONTAL ANIMATIONS (PRE-CSS3) FOLLOWS:
         /*
-         *        if (!na.site.globals.useVividTexts) return false;
-         *        if (jQuery('#pageTitle')[0]) {
-         *            if (!$('#pageTitle')[0].el) {
-         *                $('#pageTitle')[0].vividTextCmd = {
-         *                        el : $('#pageTitle')[0],
-         *                        theme : na.cg.themes.naColorgradientScheme_OrangeYellow,//naColorgradientScheme_GreenWhiteBlue_classics,
-         *                        animationType : na.vividText.globals.animationTypes[0],
-         *                        animationSpeed : 4 * 1000
-    };
-    na.vividText.initElement ($('#pageTitle')[0].vividTextCmd);
-    }
-    };
-    if ($('.contentSectionTitle1')[0]) {
-        $('.contentSectionTitle1').each (function(idx,el) {
-        //setTimeout (function() {
-        el.vividTextCmd = {
-        el : el,
-        theme : na.cg.themes.naColorgradientScheme_OrangeYellow,
-        animationType : na.vividText.globals.animationTypes[0],
-        animationSpeed : 4 * 1000
-    };
-    na.vividText.initElement (el.vividTextCmd);
-    //}, 20 * (idx + 1) );
-    });
-    };
-    if ($('.contentSectionTitle2')[0]) {
-        $('.contentSectionTitle2').each (function(idx,el) {
-        //setTimeout (function() {
-        el.vividTextCmd = {
-        el : el,
-        theme : na.cg.themes.naColorgradientSchemeMagicalBlue,
-        animationType : na.vividText.globals.animationTypes[0],
-        animationSpeed : 4 * 1000
-    };
-    na.vividText.initElement (el.vividTextCmd);
-    //}, 20 * (idx + 1) );
-    });
-    };
-    if ($('.contentSectionTitle3')[0]) {
-        $('.contentSectionTitle3').each (function(idx,el) {
-        //setTimeout (function() {
-        el.vividTextCmd = {
-        el : el,
-        theme : na.cg.themes.naColorgradientSchemeGreenVividText2,//naColorgradientSchemeGreenVividText,
-        animationType : na.vividText.globals.animationTypes[0],
-        animationSpeed : 4 * 1000
-    };
-    if ($(el).parent().is('span')) $(el).css({padding:0,margin:0});
-    na.vividText.initElement (el.vividTextCmd);
-    //}, 20 * idx);
-    });
-    };
-    setTimeout (function() {
-    var noGo = $('ul > li > a, div > center > a, .newsApp__item__outer a');
-    if ($('a').not(noGo)[0]) {
-        $('a').not(noGo).each (function(idx,el) {
-        //setTimeout (function() {
-        if (!el.vividTextCmd) {
-            el.vividTextCmd = {
-            el : el,
-            theme : na.cg.themes.naColorgradientSchemeGreenVividText2,//naColorgradientSchemeGreenVividText,
-            animationType : na.vividText.globals.animationTypes[0],
-            animationSpeed : 4 * 1000
-    };
-    if ($(el).parent().is('span')) $(el).css({padding:0,margin:0});
-    na.vividText.initElement (el.vividTextCmd);
-    }
-    //}, 20 * idx);
-    });
-    };
-    }, 500);
-    */
+        if (!na.site.globals.useVividTexts) return false;
+        if (jQuery('#pageTitle')[0]) {
+            if (!$('#pageTitle')[0].el) {
+                $('#pageTitle')[0].vividTextCmd = {
+                        el : $('#pageTitle')[0],
+                        theme : na.cg.themes.naColorgradientScheme_OrangeYellow,//naColorgradientScheme_GreenWhiteBlue_classics,
+                        animationType : na.vividText.globals.animationTypes[0],
+                        animationSpeed : 4 * 1000
+                };
+                na.vividText.initElement ($('#pageTitle')[0].vividTextCmd);
+            }
+        };
+        if ($('.contentSectionTitle1')[0]) {
+            $('.contentSectionTitle1').each (function(idx,el) {
+                //setTimeout (function() {
+                    el.vividTextCmd = {
+                            el : el,
+                            theme : na.cg.themes.naColorgradientScheme_OrangeYellow,
+                            animationType : na.vividText.globals.animationTypes[0],
+                            animationSpeed : 4 * 1000
+                    };
+                    na.vividText.initElement (el.vividTextCmd);
+                //}, 20 * (idx + 1) );
+            });
+        };
+        if ($('.contentSectionTitle2')[0]) {
+            $('.contentSectionTitle2').each (function(idx,el) {
+                //setTimeout (function() {
+                    el.vividTextCmd = {
+                            el : el,
+                            theme : na.cg.themes.naColorgradientSchemeMagicalBlue,
+                            animationType : na.vividText.globals.animationTypes[0],
+                            animationSpeed : 4 * 1000
+                    };
+                    na.vividText.initElement (el.vividTextCmd);
+                //}, 20 * (idx + 1) );
+            });
+        };
+        if ($('.contentSectionTitle3')[0]) {
+            $('.contentSectionTitle3').each (function(idx,el) {
+                //setTimeout (function() {
+                    el.vividTextCmd = {
+                            el : el,
+                            theme : na.cg.themes.naColorgradientSchemeGreenVividText2,//naColorgradientSchemeGreenVividText,
+                            animationType : na.vividText.globals.animationTypes[0],
+                            animationSpeed : 4 * 1000
+                    };
+                    if ($(el).parent().is('span')) $(el).css({padding:0,margin:0});
+                    na.vividText.initElement (el.vividTextCmd);
+                //}, 20 * idx);
+            });
+        };
+        setTimeout (function() {
+            var noGo = $('ul > li > a, div > center > a, .newsApp__item__outer a');
+            if ($('a').not(noGo)[0]) {
+                $('a').not(noGo).each (function(idx,el) {
+                    //setTimeout (function() {
+                        if (!el.vividTextCmd) {
+                            el.vividTextCmd = {
+                                    el : el,
+                                    theme : na.cg.themes.naColorgradientSchemeGreenVividText2,//naColorgradientSchemeGreenVividText,
+                                    animationType : na.vividText.globals.animationTypes[0],
+                                    animationSpeed : 4 * 1000
+                            };
+                            if ($(el).parent().is('span')) $(el).css({padding:0,margin:0});
+                            na.vividText.initElement (el.vividTextCmd);
+                        }
+                    //}, 20 * idx);
+                });
+            };
+        }, 500);
+        */
     },
 
     closeAll_2D_apps : function() {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
 
     },
     closeAll_3D_apps : function() {
-        /*
-         * LICENSE : https://opensource.org/license/mit
-         * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
-         * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
-         */
+    /*
+     * LICENSE : https://opensource.org/license/mit
+     * (C) +-2020AD to 2025AD (possibly later, see https://nicer.app/NicerAppWebOS/version.json or https://github.com/Rene-AJM-Veerman/NicerApp-WebOS-5.10.z/blob/main/NicerAppWebOS/version.json)
+     * (C) 2025 "Rene A.J.M. Veerman" <rene.veerman.netherlands@gmail.com>
+     */
         for (var elID in na.site.settings.na3D) {
             var el = na.site.settings.na3D[elID];
             if (el.settings.loadedIn) {
@@ -2370,7 +2370,7 @@ na.site = {
     onresize : function(settings) {
         $('#siteBackground, #siteBackground iframe, #siteBackground img, #siteBackground div').css({
             width : $(window).width(),
-                                                                                                   height : $(window).height()
+            height : $(window).height()
         });
         //$('#siteBackground img.bg_first').fadeIn(2000);
 
@@ -2464,31 +2464,31 @@ na.site = {
         + ' ' + na.m.padNumber(d.getHours(), 2, '0') + ':' + na.m.padNumber(d.getMinutes(), 2, '0')
         + ':' + na.m.padNumber(d.getSeconds(), 2, '0'), // + '+' + na.m.padNumber(d.getMilliseconds(), 3, 0);
         html =
-        '<div class="datetime time animatedText-orangeYellow">'+na.m.padNumber(d.getHours(), 2, '0')
-        + ':' + na.m.padNumber(d.getMinutes(), 2, '0')
-        + ':' + na.m.padNumber(d.getSeconds(), 2, '0')+'</div>'
-        + '<div class="datetime date animatedText-blue">'
-        + d.getFullYear()
-        + '-' + na.m.padNumber((d.getMonth()+1),2,'0')
-        + '-' + na.m.padNumber(d.getDate(), 2, '0')
-        + '(' + Date.locale.en.day_names_short[d.getDay()] + ')'
-        +'</div>';
+            '<div class="datetime time animatedText-orangeYellow">'+na.m.padNumber(d.getHours(), 2, '0')
+            + ':' + na.m.padNumber(d.getMinutes(), 2, '0')
+            + ':' + na.m.padNumber(d.getSeconds(), 2, '0')+'</div>'
+            + '<div class="datetime date animatedText-blue">'
+            + d.getFullYear()
+            + '-' + na.m.padNumber((d.getMonth()+1),2,'0')
+            + '-' + na.m.padNumber(d.getDate(), 2, '0')
+            + '(' + Date.locale.en.day_names_short[d.getDay()] + ')'
+            +'</div>';
         $('#siteDatetime').html(html);
 
 
         $('.naComment_entry').each(function(idx,el){
             var
             dt = parseInt($('.naComment_clientDatetime',el).html()),
-                                   tz = parseInt($('.naComment_clientTZoffset',el).html());
-                                   if (!dt || !tz) debugger;
-                                   $('.naComment_datetime .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
+            tz = parseInt($('.naComment_clientTZoffset',el).html());
+            if (!dt || !tz) debugger;
+            $('.naComment_datetime .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
             var
             dt = parseInt($('.naComment_editedDatetime',el).html()),
-                                   tz = parseInt($('.naComment_editedTZoffset',el).html());
-                                   if (dt && tz) {
-                                       $('.naComment_edited .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
-                                       $('.naComment_edited .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
-                                   }
+            tz = parseInt($('.naComment_editedTZoffset',el).html());
+            if (dt && tz) {
+            	$('.naComment_edited .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
+            	$('.naComment_edited .naDateTimeHeader',el).html (na.m.dateTimeHeader(dt,tz));
+	    }
         });
     },
 
@@ -2504,73 +2504,73 @@ na.site = {
         //na.m.waitForCondition ('na.reloadMenu() : na.m.HTMLidle() && !na.site.components.startingApps?', function() {
         na.m.waitForCondition ('na.reloadMenu() : na.m.HTMLidle()?', function() {
             var r =
-            na.m.HTMLidle();
-            //&& !na.site.components.startingApps;
+                na.m.HTMLidle();
+                //&& !na.site.components.startingApps;
             return r;
         }, function() {
             var
             callback3x = (settings ? settings.callback : null),
-                               callback2b = function () {
-                                   na.m.log (1010, '<UL> & <LI> DATA LOADED FOR #siteMenu - starting to re-intialize it.', false);
+            callback2b = function () {
+                na.m.log (1010, '<UL> & <LI> DATA LOADED FOR #siteMenu - starting to re-intialize it.', false);
 
 
-                                   const $root = $('#siteMenu > .vividMenu_mainUL').first();
-                                   $root.removeClass('submenu').css({
-                                       display: 'flex',
-                                       visibility: 'visible',
-                                       opacity: 1
-                                   });
-                                   $('#siteMenu').css({
-                                       display: 'flex',
-                                       visibility: 'visible',
-                                       opacity: 1,
-                                       zIndex: 920000,
-                                       // geometry — display alone is not enough
-                                       position: 'fixed',
-                                       left: '12px',
-                                       bottom: '70px',
-                                       top: 'auto'
-                                   });
-                                   if (typeof callback3x === 'function') callback3x(settings);
+                const $root = $('#siteMenu > .vividMenu_mainUL').first();
+                $root.removeClass('submenu').css({
+                    display: 'flex',
+                    visibility: 'visible',
+                    opacity: 1
+                });
+                $('#siteMenu').css({
+                    display: 'flex',
+                    visibility: 'visible',
+                    opacity: 1,
+                    zIndex: 920000,
+                    // geometry — display alone is not enough
+                    position: 'fixed',
+                    left: '12px',
+                    bottom: '70px',
+                    top: 'auto'
+                });
+                if (typeof callback3x === 'function') callback3x(settings);
 
 
-                                   setTimeout (function() {
-                                       $('#siteMenu').css({zIndex:800*1000});
-                                       /*
-                                        *                    na.site.components.menus['#siteMenu'] = new naVividMenu($('#siteMenu')[0], function(menu) {
-                                        *                        $('#siteMenu').css ({
-                                        *                            top : $(window).height()+100,
-                                        *                            left : 10,
-                                   });
-                                   $('#siteMenu__0').css ({
-                                   opacity : 0.00001,
-                                   zIndex : -1,
-                                   bottom : -100
-                                   });
+                setTimeout (function() {
+                    $('#siteMenu').css({zIndex:800*1000});
+                    /*
+                    na.site.components.menus['#siteMenu'] = new naVividMenu($('#siteMenu')[0], function(menu) {
+                        $('#siteMenu').css ({
+                            top : $(window).height()+100,
+                            left : 10,
+                        });
+                        $('#siteMenu__0').css ({
+                            opacity : 0.00001,
+                            zIndex : -1,
+                            bottom : -100
+                        });
 
-                                   na.m.log (1010, 'DONE RE-INITIALIZING #siteMenu', false);
-                                   var topLevelItemCount = $('.vividMenu_mainUL > li', menu).length;
-                                   //debugger;
+                        na.m.log (1010, 'DONE RE-INITIALIZING #siteMenu', false);
+                        var topLevelItemCount = $('.vividMenu_mainUL > li', menu).length;
+                        //debugger;
 
-                                   if (settings) settings.naVividMenu_menuInitialized = menu;
-                                   });*/
-                                       //$('#siteMenu > .vividMenu_mainUL').addClass('submenu');
-                                       if (typeof callback3x=='function') callback3x (settings);
-                                   }, 50);
-                               };
+                        if (settings) settings.naVividMenu_menuInitialized = menu;
+                    });*/
+                    //$('#siteMenu > .vividMenu_mainUL').addClass('submenu');
+                        if (typeof callback3x=='function') callback3x (settings);
+                }, 50);
+            };
 
-                               na.site.reloadMenu_reOrganise (callback2b);
+            na.site.reloadMenu_reOrganise (callback2b);
 
-                               const $root = $('#siteMenu > .vividMenu_mainUL').first();
-                               $root.removeClass('submenu').css({
-                                   display: 'flex',      // or 'block' — match your intended layout
-                                   visibility: 'visible',
-                                   opacity: 1
-                               });
-                               $('#siteMenu').css({ display: 'flex', visibility: 'visible', opacity: 1, zIndex: 920000 });
+            const $root = $('#siteMenu > .vividMenu_mainUL').first();
+            $root.removeClass('submenu').css({
+                display: 'flex',      // or 'block' — match your intended layout
+                visibility: 'visible',
+                opacity: 1
+            });
+            $('#siteMenu').css({ display: 'flex', visibility: 'visible', opacity: 1, zIndex: 920000 });
 
-                               $('#siteMenu > .vividMenu_mainUL').removeClass('submenu')
-                               .css({ display: 'flex', visibility: 'visible', opacity: 1 });
+            $('#siteMenu > .vividMenu_mainUL').removeClass('submenu')
+            .css({ display: 'flex', visibility: 'visible', opacity: 1 });
         }, 50);
     },
 
@@ -2656,35 +2656,35 @@ na.site = {
             var theme = $(el).attr('tooltipTheme');
             if (!theme) theme = 'mainTooltipTheme';
             /*if (el.id=='btnLoginLogout' && parseInt($.cookie('haveShownTutorial'))<3) {
-             *                na.site.components.btnLoginLogout = this;
-             *                var ptSettings = {
-             *                    theme : theme,
-             *                    contentAsHTML : true,
-             *                    content : $(el).attr('title'),
-             *                    animation : 'grow',
-             *                    alignTo : 'target',
-             *                    alignX : 'inner-left',
-             *                    offsetX : 10,
-             *                    offsetY : 10,
-             *                    fade : !na.m.userDevice.isPhone,
-             *                    slide : !na.m.userDevice.isPhone,
-             *                    slideOffset : 25
-        };
-        if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
-        if (ptSettings.content!=='') {
-            $(el).tooltipster(ptSettings);
-        $(el).tooltipster('show');
-        $(el).tooltipster('hide');
-        $(el).addClass('started');
-        setTimeout (function() {
-        $(na.site.components.btnLoginLogout).tooltipster('show');
-        setTimeout(function() {
-        $(na.site.components.btnLoginLogout).tooltipster('hide');
-        }, 2000);
-        }, 500);
-        }
+                na.site.components.btnLoginLogout = this;
+                var ptSettings = {
+                    theme : theme,
+                    contentAsHTML : true,
+                    content : $(el).attr('title'),
+                    animation : 'grow',
+                    alignTo : 'target',
+                    alignX : 'inner-left',
+                    offsetX : 10,
+                    offsetY : 10,
+                    fade : !na.m.userDevice.isPhone,
+                    slide : !na.m.userDevice.isPhone,
+                    slideOffset : 25
+                };
+                if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
+                if (ptSettings.content!=='') {
+                    $(el).tooltipster(ptSettings);
+                    $(el).tooltipster('show');
+                    $(el).tooltipster('hide');
+                    $(el).addClass('started');
+                    setTimeout (function() {
+                        $(na.site.components.btnLoginLogout).tooltipster('show');
+                        setTimeout(function() {
+                            $(na.site.components.btnLoginLogout).tooltipster('hide');
+                        }, 2000);
+                    }, 500);
+                }
 
-        } else */
+            } else */
 
             if (el.id=='btnChangeBackground' /*&& parseInt($.cookie('haveShownTutorial'))<3*/) {
                 na.site.components.btnChangeBackground = el;
@@ -2730,24 +2730,24 @@ na.site = {
             } else /*if (
                 el.id!=='btnChangeBackground'
                 && el.id!=='btnLoginLogout'
-        ) */{
-            try {
-                var html = $(el).attr('title');
-            } catch (error) {
-                var html = $(el).attr('title');
+            ) */{
+                try {
+                    var html = $(el).attr('title');
+                } catch (error) {
+                    var html = $(el).attr('title');
+                }
+                var
+                ptSettings = {
+                    theme : theme,
+                    contentAsHTML : true,
+                    content : html
+                };
+                if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
+                if (!el.id) el.id='tooltip_'+na.m.randomString();
+                if (el && el.id && $.tooltipster && ptSettings.content!=='') $(el).tooltipster(ptSettings);
             }
-            var
-            ptSettings = {
-                theme : theme,
-                contentAsHTML : true,
-                content : html
-            };
-            if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
-            if (!el.id) el.id='tooltip_'+na.m.randomString();
-            if (el && el.id && $.tooltipster && ptSettings.content!=='') $(el).tooltipster(ptSettings);
-        }
-        //console.log ('startTooltips : el.id=='+el.id+', cookie::haveShownTutorial='+$.cookie('haveShownTutorial'));
-        $(el).attr('title','');
+            //console.log ('startTooltips : el.id=='+el.id+', cookie::haveShownTutorial='+$.cookie('haveShownTutorial'));
+            $(el).attr('title','');
         });
         //$.cookie('haveShownTutorial', parseInt($.cookie('haveShownTutorial'))+1, na.m.cookieOptions());
     },
@@ -2759,19 +2759,19 @@ na.site = {
         $('.na_themes_dropdown').html('<div class="vividDropDownBox_selected vividScrollpane" style="white-space:normal;overflow:visible;"></div><div class="vividDropDownBox_selector"><div class="vividScrollpane" style="padding:0px;height:400px;"></div></div>').delay(50);
         $('.vividDropDownBox_selected, .vividDropDownBox_selector').each(function(idx,el) {
             /* junk :
-             *            var w = 0;
-             *            $('.vividButton4, .vividButton, .vividButton_icon_50x50', $(el).parent().parent() ).each(function(idx2, el2) {
-             *                w += $(el2).width();
-             *                $(el2).css ({display : 'inline-block', position:'relative'});
-        });
-        var w3 = $(this).parent().parent().width();
-        var w2 = w3
-        - $('.siteToolbarThemeEditor__label__specificity, .siteToolbarThemeEditor__label__themes, .btnOptions_menu__label__specificity_dropdown, .btnOptions_menu__label__themes_dropdown',
-                                                                         $(this).parent().parent()
-        ).width()
-        - w
-        - 20;
-        */
+            var w = 0;
+            $('.vividButton4, .vividButton, .vividButton_icon_50x50', $(el).parent().parent() ).each(function(idx2, el2) {
+                w += $(el2).width();
+                $(el2).css ({display : 'inline-block', position:'relative'});
+            });
+            var w3 = $(this).parent().parent().width();
+            var w2 = w3
+                    - $('.siteToolbarThemeEditor__label__specificity, .siteToolbarThemeEditor__label__themes, .btnOptions_menu__label__specificity_dropdown, .btnOptions_menu__label__themes_dropdown',
+                        $(this).parent().parent()
+                    ).width()
+                    - w
+                    - 20;
+            */
 
             $(this).css({
                 width: 'auto',
@@ -2799,8 +2799,8 @@ na.site = {
             //l = Object.keys(na.site.globals.themesDBkeys).length - 1;
 
             $(divEl)
-            .html(na.site.globals.themesDBkeys[i].specificityName)
-            .attr('value',i);
+                .html(na.site.globals.themesDBkeys[i].specificityName)
+                .attr('value',i);
 
             if (na.site.globals.themesDBkeys[i].hasData) {
                 $(divEl).addClass('hasData');
@@ -2811,16 +2811,16 @@ na.site = {
 
             selectMe = (
                 simple
-                ? (
-                    na.site.globals.themeSpecificityName === na.site.globals.themesDBkeys[i].specificityName
-                    || na.site.globals.specificityName === na.site.globals.themesDBkeys[i].specificityName
-                )
-                : b && b.state == b.btnCode.selectedState
-                ? (
-                    na.site.globals.themeSpecificityName === na.site.globals.themesDBkeys[i].specificityName
-                    || na.site.globals.specificityName === na.site.globals.themesDBkeys[i].specificityName
-                )
-                : i == l
+                    ? (
+                        na.site.globals.themeSpecificityName === na.site.globals.themesDBkeys[i].specificityName
+                        || na.site.globals.specificityName === na.site.globals.themesDBkeys[i].specificityName
+                    )
+                    : b && b.state == b.btnCode.selectedState
+                        ? (
+                            na.site.globals.themeSpecificityName === na.site.globals.themesDBkeys[i].specificityName
+                            || na.site.globals.specificityName === na.site.globals.themesDBkeys[i].specificityName
+                        )
+                        : i == l
             );
 
             if (selectMe) var lastSelected = i;
@@ -2900,53 +2900,53 @@ na.site = {
             na.te.specificitySelected(evt);
         });
 
-        na.te.settings.current.selectedThemeName = na.site.globals.themeName;
-        $('.themeItem').removeClass('onfocus');
+            na.te.settings.current.selectedThemeName = na.site.globals.themeName;
+            $('.themeItem').removeClass('onfocus');
 
 
-        $('.na_themes_dropdown__themes').hover(function() {
-            clearTimeout(na.site.components.timeout_onmouseout_themes);
-            $('.na_themes_dropdown__themes > .vividDropDownBox_selector').fadeIn('normal');
-        }, function() {
-            clearTimeout(na.site.components.timeout_onmouseout_themes);
-            na.site.components.timeout_onmouseout_themes = setTimeout (function() {
-                $('.na_themes_dropdown__themes > .vividDropDownBox_selector').fadeOut('normal');
-            }, 500);
-        });
-        $('.na_themes_dropdown__themes > .vividDropDownBox_selector').mouseover(function() {
-            clearTimeout(na.site.components.timeout_onmouseout_themes);
-        });
-        $('.na_themes_dropdown__themes > .vividDropDownBox_selector > .vividScrollpane > div').click(function(evt) {
-            $('.na_themes_dropdown__themes > .vividDropDownBox_selected').html($(this).html());
-            $('.na_themes_dropdown__themes > .vividDropDownBox_selector > .vividScrollpane > div').removeClass('selected');
-            $(this).addClass('selected');
-            na.te.themeSelected(evt);
-        });
+            $('.na_themes_dropdown__themes').hover(function() {
+                clearTimeout(na.site.components.timeout_onmouseout_themes);
+                $('.na_themes_dropdown__themes > .vividDropDownBox_selector').fadeIn('normal');
+            }, function() {
+                clearTimeout(na.site.components.timeout_onmouseout_themes);
+                na.site.components.timeout_onmouseout_themes = setTimeout (function() {
+                    $('.na_themes_dropdown__themes > .vividDropDownBox_selector').fadeOut('normal');
+                }, 500);
+            });
+            $('.na_themes_dropdown__themes > .vividDropDownBox_selector').mouseover(function() {
+                clearTimeout(na.site.components.timeout_onmouseout_themes);
+            });
+            $('.na_themes_dropdown__themes > .vividDropDownBox_selector > .vividScrollpane > div').click(function(evt) {
+                $('.na_themes_dropdown__themes > .vividDropDownBox_selected').html($(this).html());
+                $('.na_themes_dropdown__themes > .vividDropDownBox_selector > .vividScrollpane > div').removeClass('selected');
+                $(this).addClass('selected');
+                na.te.themeSelected(evt);
+            });
 
 
 
 
 
-        $('#nb_url1_dropdown').html('<div id="nb_url1_dropdown_selected" class="vividDropDownBox_selected"></div><div id="nb_url1_dropdown_selector" class="vividDropDownBox_selector"></div>');
-        $('#url1_dropdown').html('<div id="url1_dropdown_selected" class="vividDropDownBox_selected"></div><div id="url1_dropdown_selector" class="vividDropDownBox_selector"></div>');
+            $('#nb_url1_dropdown').html('<div id="nb_url1_dropdown_selected" class="vividDropDownBox_selected"></div><div id="nb_url1_dropdown_selector" class="vividDropDownBox_selector"></div>');
+            $('#url1_dropdown').html('<div id="url1_dropdown_selected" class="vividDropDownBox_selected"></div><div id="url1_dropdown_selector" class="vividDropDownBox_selector"></div>');
 
-        var optEls = $('#nb_url1_select option');
-        optEls.each(function(idx,el) {
-            var optEl2 = document.createElement('option');
-            optEl2.value = JSON.stringify(it);
-            optEl2.innerHTML = el.innerHTML;
-            if (optEl2.innerHTML==$('.themeItem.onfocus').val()) {
-                $(optEl2)[0].selected = true;
-                $(optEl2).addClass('onfocus');
-            };
+            var optEls = $('#nb_url1_select option');
+            optEls.each(function(idx,el) {
+                var optEl2 = document.createElement('option');
+                optEl2.value = JSON.stringify(it);
+                optEl2.innerHTML = el.innerHTML;
+                if (optEl2.innerHTML==$('.themeItem.onfocus').val()) {
+                    $(optEl2)[0].selected = true;
+                    $(optEl2).addClass('onfocus');
+                };
 
-            var divEl2 = document.createElement('div');
-            $(divEl2).html(el.innerHTML);
+                var divEl2 = document.createElement('div');
+                $(divEl2).html(el.innerHTML);
 
-            //$('#url1_select')[0].appendChild(optEl2);
-            $('#nb_url1_dropdown_selector, url1_dropdown_selector').append(divEl2);
-            if ($(optEl2)[0].selected) $('#nb_url1_dropdown_selected, #url1_dropdown_selected').html(el.innerHTML);
-        });
+                //$('#url1_select')[0].appendChild(optEl2);
+                $('#nb_url1_dropdown_selector, url1_dropdown_selector').append(divEl2);
+                if ($(optEl2)[0].selected) $('#nb_url1_dropdown_selected, #url1_dropdown_selected').html(el.innerHTML);
+            });
 
             $('#url0').html('/'+(($.cookie&&$.cookie('cdb_loginName'))||'Guest').replace(/.*___/g,'').replace(/__/g,'-')+'/');
 
@@ -3025,34 +3025,34 @@ na.site = {
     loadTheme_initializeExtras : function () {
         // gets called at the end of a chain started by onload_phase2()
 
-        /*
-         *        if (
-         *            na.site.globals.themes.default.themeSettings
-         *            && (
-         *                typeof na.site.globals.themes.default.themeSettings['Extras']!=='object'
-         *                || typeof na.site.globals.themes.default.themeSettings['Extras'].length==='number'
-         *            )
-         *        ) {
-         */
+/*
+        if (
+            na.site.globals.themes.default.themeSettings
+            && (
+                typeof na.site.globals.themes.default.themeSettings['Extras']!=='object'
+                || typeof na.site.globals.themes.default.themeSettings['Extras'].length==='number'
+            )
+        ) {
+*/
 
 
-        /*
-         *            for (var themeID in na.site.globals.themes) break;
-         *            na.site.globals.themes.default.themeSettings.Extras = {
-         *                'texts' : {
-         *                    'css' : {
-         *                        '#siteContent > .vividDialogContent > li > a, p:not(.backdropped, .vividTextCSS), h1:not(.backdropped, .vividTextCSS), h2:not(.backdropped, .vividTextCSS), h3:not(.backdropped, .vividTextCSS)' : { opacity : // CULPRIT for blogging app na.site.globals.themes[themeID].textBackgroundOpacity, backgroundClip:'text' },
-         *                        '#siteContent .newsApp__item__outer p' : { opacity : 1, backgroundClip:'none' }
-    }
-    },
-    'menus' : {
-    'css' : {
-    '.vividMenu_item' : { opacity : 1 }
-    }
-    }
-    };
-    //      };
-    */
+                        /*
+            for (var themeID in na.site.globals.themes) break;
+            na.site.globals.themes.default.themeSettings.Extras = {
+                'texts' : {
+                    'css' : {
+                        '#siteContent > .vividDialogContent > li > a, p:not(.backdropped, .vividTextCSS), h1:not(.backdropped, .vividTextCSS), h2:not(.backdropped, .vividTextCSS), h3:not(.backdropped, .vividTextCSS)' : { opacity : // CULPRIT for blogging app na.site.globals.themes[themeID].textBackgroundOpacity, backgroundClip:'text' },
+                        '#siteContent .newsApp__item__outer p' : { opacity : 1, backgroundClip:'none' }
+                    }
+                },
+                'menus' : {
+                    'css' : {
+                        '.vividMenu_item' : { opacity : 1 }
+                    }
+                }
+            };
+  //      };
+                        */
 
     },
     loadTheme_doGetPageSpecificSettings : function (callback, doSwitchSpecificities, includeClientOnlyThemes, specificityName, theme, ct, stickToCurrentSpecificity) {
@@ -3126,147 +3126,107 @@ na.site = {
             || specificityName===null
             || specificityName===false
         ) specificityName = na.te.s.c.specificity.specificityName;
-        ;
+;
         if (typeof apps=='object')
             for (var app in apps) break;
-            else app = apps;
-            //if (app) acData.app = app;
+        else app = apps;
+        //if (app) acData.app = app;
 
 
-            if (s) {
-                if (s.view) acData.view = s.view;
-                if (s.role) acData.role = s.role;
-                if (s.user) acData.user = s.user;
-                //if (s.specificityName) acData.specificityName = s.specificityName;
-                acData.specificityName = specificityName;
-                if (specificityName.match('current page')) {
-                    if (u) acData.url = u;
-                    if (s.url) acData.url = s.url;
-                    if (!acData.url) acData.url = window.location.href.replace('https://'+na.site.globals.domain,'');
-                }
-                if (specificityName.match('app \'')) {
-                    if (app) acData.app = app;
-                }
-                if (specificityName.match(/^site /)) {
-                    delete acData.view;
-                    delete acData.app;
-                    delete acData.url;
-                }
-            } else debugger;
+        if (s) {
+            if (s.view) acData.view = s.view;
+            if (s.role) acData.role = s.role;
+            if (s.user) acData.user = s.user;
+            //if (s.specificityName) acData.specificityName = s.specificityName;
+            acData.specificityName = specificityName;
+            if (specificityName.match('current page')) {
+                if (u) acData.url = u;
+                if (s.url) acData.url = s.url;
+                if (!acData.url) acData.url = window.location.href.replace('https://'+na.site.globals.domain,'');
+            }
+            if (specificityName.match('app \'')) {
+                if (app) acData.app = app;
+            }
+            if (specificityName.match(/^site /)) {
+                delete acData.view;
+                delete acData.app;
+                delete acData.url;
+            }
+        } else debugger;
 
-            var
-            url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_loadTheme.php',
-            ac = {
-                type : 'POST',
-                url : url,
-                data : acData,
-                success : function (data, ts, xhr) {
-                    // reload #cssPageSpecific and #jsPageSpecific
-                    if (data=='status : Failed.') {
-                        na.m.log (1510, 'na.loadTheme() : FAILED (HTTP SUCCESS, but no theme was found)');
-                        na.site.populateSelectorsTree(); // fall back to the theme already in na.site.globals.themes
-                        na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
-                        na.site.settings.running_loadTheme = false;
-                        if (typeof callback=='function') callback(true);
-                        return false;
-                    } else if (data==='') {
-                        na.m.log (1510, 'na.loadTheme() : FAILED (HTTP SUCCESS, but no data returned at all)');
-                        na.site.populateSelectorsTree(); // fall back to the theme already in na.site.globals.themes
-                        na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
-                        na.site.loadTheme_initializeExtras();
-                        na.site.settings.running_loadTheme = false;
-                        if (typeof callback=='function') callback(true);
-                        return false;
+        var
+        url = '/NicerAppWebOS/businessLogic/ajax/ajax_database_loadTheme.php',
+        ac = {
+            type : 'POST',
+            url : url,
+            data : acData,
+            success : function (data, ts, xhr) {
+                // reload #cssPageSpecific and #jsPageSpecific
+                if (data=='status : Failed.') {
+                    na.m.log (1510, 'na.loadTheme() : FAILED (HTTP SUCCESS, but no theme was found)');
+                    na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
+                    na.site.settings.running_loadTheme = false;
+                    if (typeof callback=='function') callback(true);
+                    return false;
+                } else if (data==='') {
+                    na.m.log (1510, 'na.loadTheme() : FAILED (HTTP SUCCESS, but no data returned at all)');
+                    na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
+                    na.site.loadTheme_initializeExtras();
+                    na.site.settings.running_loadTheme = false;
+                    if (typeof callback=='function') callback(true);
+                    return false;
+                }
+                try {
+                    var themes = JSON.parse(data);
+                } catch (error) {
+                    na.m.log (1510, 'na.loadTheme() : FAILED (could not decode JSON data - '+error.message+')+');
+                    na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
+                    na.site.settings.running_loadTheme = false;
+                    if (typeof callback=='function') callback(true);
+
+                    // only significantly slows down startup for new viewers :
+                    //na.fail (fncn+' : AJAX decode error in data returned for url='+url+', error='+error.message+', in data='+data, xhr, function () {
+                    //    na.error (data);
+                    //});
+                    return false;
+                }
+                na.site.globals.themes = themes;
+                na.site.components.theme = themes[theme];
+
+                /*
+                var html = ''; idx = 0;
+                for (var themeName in themes) {
+                    var dit = themes[themeName];
+
+                    if (themeName==theme) {
+                        html += '<div id="theme_'+idx+'" class="selected onfocus">'+themeName+'</div>';
+                    } else {
+                        html += '<div id="theme_'+idx+'">'+themeName+'</div>';
                     }
-                    try {
-                        var themes = JSON.parse(data);
-                    } catch (error) {
-                        na.m.log (1510, 'na.loadTheme() : FAILED (could not decode JSON data - '+error.message+')+');
-                        na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName]);
-                        na.site.settings.running_loadTheme = false;
-                        if (typeof callback=='function') callback(true);
-
-                        // only significantly slows down startup for new viewers :
-                        //na.fail (fncn+' : AJAX decode error in data returned for url='+url+', error='+error.message+', in data='+data, xhr, function () {
-                        //    na.error (data);
-                        //});
-                        return false;
-                    }
-                    na.site.globals.themes = themes;
-                    na.site.components.theme = themes[theme];
-                    na.site.populateSelectorsTree(); // before loadTheme_applySettings() below
-
-                    /*
-                     *                var html = ''; idx = 0;
-                     *                for (var themeName in themes) {
-                     *                    var dit = themes[themeName];
-                     *
-                     *                    if (themeName==theme) {
-                     *                        html += '<div id="theme_'+idx+'" class="selected onfocus">'+themeName+'</div>';
-                } else {
-                    html += '<div id="theme_'+idx+'">'+themeName+'</div>';
-                }
                 }
                 $('.na_themes_dropdown__themes > .vividDropDownBox_selector > .vividScrollpane').html(html);
                 debugger;
                 $('.na_themes_dropdown__themes > .vividDropDownBox_selected').html(theme);
                 */
 
-                    var dat = themes[theme];
-                    /*
-                     *                for (var themeName in themes) {
-                     *                    var dat = themes[themeName];
-                     *                    na.site.components.theme = dat;
-                     *                    break;
+                var dat = themes[theme];
+                /*
+                for (var themeName in themes) {
+                    var dat = themes[themeName];
+                    na.site.components.theme = dat;
+                    break;
                 };*/
-                    //na.setSpecificity (true);
-                    na.site.loadTheme_applySettings (dat, callback, loadBackground);
-                    //na.te.onload('siteContent');
-                },
-                error : function (xhr, textStatus, errorThrown) {
-                    debugger;
-                    //only significantly slows down startup for new viewers :
-                    //na.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
-                }
-            };
-            $.ajax(ac);
-    },
-
-    populateSelectorsTree : function (force) {
-        /*
-         * Initially populates #themeEditor_jsTree_selectors from na.site.globals.themes[na.site.globals.themeName],
-         * via na.te.transform_siteGlobalsThemes_to_jsTree(). Runs once per page load unless force===true.
-         * Must run BEFORE loadTheme_applySettings() replaces themes[themeName] with its .themeSettings (see 'dat.themeSettings' below),
-         * because the transform reads themes[themeName].themeSettings.
-         */
-        var fncn = 'na.site.populateSelectorsTree()';
-        if (na.site.settings.selectorsTreePopulated && !force) return false;
-        if (!na.te || typeof na.te.transform_siteGlobalsThemes_to_jsTree!=='function') return false;
-
-        var theme = na.site.globals.themes && na.site.globals.themes[na.site.globals.themeName];
-        if (!theme || !theme.themeSettings) {
-            na.m.log (1510, fncn+' : no themeSettings in na.site.globals.themes["'+na.site.globals.themeName+'"], nothing to populate with.', false);
-            return false;
-        }
-
-        var tree = na.te.transform_siteGlobalsThemes_to_jsTree();
-        if (!tree || !tree.dat || tree.dat.length===0) {
-            na.m.log (1510, fncn+' : transform_siteGlobalsThemes_to_jsTree() returned no nodes.', false);
-            return false;
-        }
-
-        na.site.settings.selectorsTreePopulated = true;
-        na.te.s.c.dbSelectors = tree;
-        na.te.initSelectorsTree (tree.dat); // waits for $.jstree, then (re)creates the jstree
-
-        if (tree.did) na.m.waitForCondition (fncn+' : jstree ready for select_node?', function () {
-            var inst = $.jstree && $.jstree.reference('#themeEditor_jsTree_selectors');
-            return !!(inst && inst.get_node(tree.did));
-        }, function () {
-            $('#themeEditor_jsTree_selectors').jstree('deselect_all').jstree('select_node', tree.did);
-        }, 100);
-
-        return true;
+                //na.setSpecificity (true);
+                na.site.loadTheme_applySettings (dat, callback, loadBackground);
+                //na.te.onload('siteContent');
+            },
+            error : function (xhr, textStatus, errorThrown) {
+                debugger;
+                //only significantly slows down startup for new viewers :
+                //na.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+            }
+        };
+        $.ajax(ac);
     },
 
     loadTheme_applySettings : function (dat, callback, loadBackground, saveTheme, changeInterval) {
@@ -3282,21 +3242,21 @@ na.site = {
 
         if (dat.specificityName) {
             $('.na_themes_dropdown__specificity > .vividDropDownBox_selector > div')
-            .removeClass('selected')
-            .each (function(idx,el) {
-                if (el.innerHTML === dat.specificityName) {
-                    $(el).addClass('selected');
-                    na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
-                };
-                var l = Object.keys(na.site.globals.themesDBkeys).length - 1;
-                if (el.innerHTML === na.site.globals.themesDBkeys[l].specificityName) {
-                    $(el).parent().find('.vividDropDownBox_selected').html(el.innerHTML);
-                    $(el).addClass('selected');
-                    na.site.globals.specificityName = el.innerHTML;
-                    na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
-                };
+                .removeClass('selected')
+                .each (function(idx,el) {
+                    if (el.innerHTML === dat.specificityName) {
+                        $(el).addClass('selected');
+                        na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
+                    };
+                    var l = Object.keys(na.site.globals.themesDBkeys).length - 1;
+                    if (el.innerHTML === na.site.globals.themesDBkeys[l].specificityName) {
+                        $(el).parent().find('.vividDropDownBox_selected').html(el.innerHTML);
+                        $(el).addClass('selected');
+                        na.site.globals.specificityName = el.innerHTML;
+                        na.te.settings.current.specificity = na.site.globals.themesDBkeys[$(el).attr('value')];
+                    };
 
-            });
+                });
         };
 
         if (dat.menusFadingSpeed) {
@@ -3308,14 +3268,14 @@ na.site = {
         }
 
         /*
-         *        $('#menusUseRainbowPanels')[0].checked = dat.menusUseRainbowPanels !== 'false';
-         *        if (dat.menusUseRainbowPanels) {
-         *            for (var menuID in na.site.components.menus) {
-         *                var m = na.site.components.menus[menuID];
-         *                m.percentageFor_rainbowPanels = dat.menusUseRainbowPanels === 'false' ? 0 : 100;
-    }
+        $('#menusUseRainbowPanels')[0].checked = dat.menusUseRainbowPanels !== 'false';
+        if (dat.menusUseRainbowPanels) {
+            for (var menuID in na.site.components.menus) {
+                var m = na.site.components.menus[menuID];
+                m.percentageFor_rainbowPanels = dat.menusUseRainbowPanels === 'false' ? 0 : 100;
+            }
 
-    }*/
+        }*/
         if (loadBackground && dat.background /*&& dat.background!==na.site.globals.background*/) { /* doesn't jive with na.loadContent() */
             na.background.next (
                 '#siteBackground',
@@ -3338,19 +3298,19 @@ na.site = {
                 $('#changeBackgroundsAutomatically')[0].checked = true;
 
             /*
-             *            var m = $('#backgroundChange_minutes').val();
-             *            var h = $('#backgroundChange_hours').val();
-             *            var ms = ((h * 60)+1) * (m * 60) * 1000;
-             *            clearTimeout(na.site.components.backgroundChangeInterval);
-             *            na.site.components.backgroundChangeTimeout = setInterval (function() {
-             *                na.backgrounds.next (
-             *                    '#siteBackground',
-             *                    na.site.globals.backgroundSearchKey,
-             *                    null,
-             *                    true
-             *                );
-        }, ms);
-        */
+            var m = $('#backgroundChange_minutes').val();
+            var h = $('#backgroundChange_hours').val();
+            var ms = ((h * 60)+1) * (m * 60) * 1000;
+            clearTimeout(na.site.components.backgroundChangeInterval);
+            na.site.components.backgroundChangeTimeout = setInterval (function() {
+                na.backgrounds.next (
+                    '#siteBackground',
+                    na.site.globals.backgroundSearchKey,
+                    null,
+                    true
+                );
+            }, ms);
+            */
         } else {
             if ($('#changeBackgroundsAutomatically')[0])
                 $('#changeBackgroundsAutomatically')[0].checked = false;
@@ -3365,8 +3325,8 @@ na.site = {
             $('#vdSettings_show').val()=='hidden'
             ? 0.000001
             : $('#vdSettings_show').val()=='transparent'
-            ? 0.5
-            : 1
+                ? 0.5
+                : 1
         );
         setTimeout (function() {
             $('.vdSettings, .vdTools').delay(50).css({ opacity : opacity });
@@ -3384,7 +3344,7 @@ na.site = {
         if (changeInterval) {
             clearInterval (na.site.settings.backgroundChangeInterval);
             if ($('#changeBackgroundsAutomatically')[0] && $('#changeBackgroundsAutomatically')[0].checked)
-                //if (false)
+            //if (false)
                 na.site.settings.backgroundChangeInterval = setInterval (function() {
                     na.background.next ( '#siteBackground', na.site.globals.backgroundSearchKey, null, true);
                     na.m.log (91, "na.site.components.backgroundChangeInterval() : this website's backgroundChangeInterval is currently turned on to occur every "+(ms/1000)+" seconds.");
@@ -3396,11 +3356,11 @@ na.site = {
             na.te.settings.textBackgroundOpacity = dat.textBackgroundOpacity;
             $('#btnOptions_menu input.sliderOpacityRange').val(dat.textBackgroundOpacity * 100);
             /*
-             *            $('li span, p, h1, h2, h3').css({
-             *                background : 'rgba(0,0,0,'+dat.textBackgroundOpacity+')'
-        });
-        */
-            //debugger;
+            $('li span, p, h1, h2, h3').css({
+                background : 'rgba(0,0,0,'+dat.textBackgroundOpacity+')'
+            });
+            */
+//debugger;
             $('#siteContent > .vividDialogContent > li > a, p, h1, h2, h3').not('.naVividTextCSS, .contentSectionTitle1, .contentSectionTitle1_a, .contentSectionTitle1_span, .contentSectionTitle2, .contentSectionTitle2_a, .contentSectionTitle2_span, .contentSectionTitle3, .contentSectionTitle3_a, .contentSectionTitle3_span, .backdropped, .animatedText_orangeYellow, .animatedText_blue, .animatedText_ivory, .naExternalLink, .naInternalLink, .naText').each (function(idx,el) {
                 var bg = na.m.adjustColorOpacity(el, dat.textBackgroundOpacity);
                 if (bg) $(el).css({background:bg});
@@ -3412,16 +3372,16 @@ na.site = {
             // html += na.m.cssTranslation ('.vividDialog > .vdBackground', dat.themeSettings['.vividDialog > .vdBackground']);
 
             /*
-             *            var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
-             *            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
-             *            : [];
-             *            $.each(jsonNodes, function (i, val) {
-             *                if (val.type!=='naElement') return;
-             *                if (!dat.themeSettings.Dialogs[val.text]) dat.themeSettings.Dialogs[val.text] = { css : {} };
-             *                dat.themeSettings.Dialogs = $.extend (dat.themeSettings.Dialogs, na.site.fetchTheme (val.text));
-             *                html += na.m.cssTranslation(val.text,dat.themeSettings.Dialogs[val.text]);
-             *                debugger;
-        });*/
+            var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
+            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
+            : [];
+            $.each(jsonNodes, function (i, val) {
+                if (val.type!=='naElement') return;
+                if (!dat.themeSettings.Dialogs[val.text]) dat.themeSettings.Dialogs[val.text] = { css : {} };
+                dat.themeSettings.Dialogs = $.extend (dat.themeSettings.Dialogs, na.site.fetchTheme (val.text));
+                html += na.m.cssTranslation(val.text,dat.themeSettings.Dialogs[val.text]);
+                debugger;
+            });*/
             var tree = $('#themeEditor_jsTree_selectors').jstree(true);
 
             var jsonNodes = tree
@@ -3499,136 +3459,136 @@ na.site = {
 
 
         /*
-         *        for (var category in dat.themeSettings) {
-         *            if (
-         *                dID=='.vividDialog'
-         *                || dID=='.vividDialog > .vdBackground'
-         *                || dID=='.vdBackground'
-         *            ) continue;
-         *            var categoryItems = dat.themeSettings[category];
-         *            switch (category) {
-         *                case 'Dialogs' :
-         *                    for (var dID in categoryItems) {
-         *                        var dit = categoryItems[dID].css;
-         *                        for (var divSel in dit) {
-         *                            var dit2 = dit[divSel];
-         *                            if (divSel=='#siteToolbarThemeEditor') dit2.opacity = 1; // dirty hack
-         *                            $(divSel).css (dit2);
-         *                            if (dit2.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-         *                                var
-         *                                del = $(dID)[0],
-         *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-         *                                test = rgbaRegEx.test(dit.background),
-         *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-         *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-         *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-         *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-         *                                        color:dit.background,
-         *                                        type:'flat',
-         *                                        clickoutFiresChange : false,
-         *                                        change : function (color) {
-         *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-         *                                            $(bg).css({ background : color, opacity : 1 });
-         *                                            na.te.settings.fireSaveTheme = true;
-         *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }
-    }
-    }
-    break;
-    case 'Apps' :
-        for (var appName in categoryItems) {
-            var appItem = categoryItems[appName].css;
-            for (var divSel in appItem) {
-                var dit = appItem[divSel];
+        for (var category in dat.themeSettings) {
+            if (
+                dID=='.vividDialog'
+                || dID=='.vividDialog > .vdBackground'
+                || dID=='.vdBackground'
+            ) continue;
+            var categoryItems = dat.themeSettings[category];
+            switch (category) {
+                case 'Dialogs' :
+                    for (var dID in categoryItems) {
+                        var dit = categoryItems[dID].css;
+                        for (var divSel in dit) {
+                            var dit2 = dit[divSel];
+                            if (divSel=='#siteToolbarThemeEditor') dit2.opacity = 1; // dirty hack
+                            $(divSel).css (dit2);
+                            if (dit2.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
+                                var
+                                del = $(dID)[0],
+                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
+                                test = rgbaRegEx.test(dit.background),
+                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
+                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
+                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
+                                    $('#colorpicker').css({display:'block'}).spectrum ({
+                                        color:dit.background,
+                                        type:'flat',
+                                        clickoutFiresChange : false,
+                                        change : function (color) {
+                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
+                                            $(bg).css({ background : color, opacity : 1 });
+                                            na.te.settings.fireSaveTheme = true;
+                                            na.saveTheme();
+                                        }
+                                    }).css({display:'none'});
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 'Apps' :
+                    for (var appName in categoryItems) {
+                        var appItem = categoryItems[appName].css;
+                        for (var divSel in appItem) {
+                            var dit = appItem[divSel];
 
-                /* messes up theme loading :
-                 *                            for (var prop in dit) {
-                 *                                var v = dit[prop];
-                 *                                if (typeof v=='string' && !v.match(/\!important/)) {
-                 *                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
-                 *                                    dit[prop] += ' !important';
-    }
-    }
-    * /
+                            /* messes up theme loading :
+                            for (var prop in dit) {
+                                var v = dit[prop];
+                                if (typeof v=='string' && !v.match(/\!important/)) {
+                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
+                                    dit[prop] += ' !important';
+                                }
+                            }
+                            * /
 
-    $(divSel).css(dit);
+                            $(divSel).css(dit);
 
-    /*
-     *                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-     *                                var
-     *                                del = $(dID)[0],
-     *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-     *                                test = rgbaRegEx.test(dit.background),
-     *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-     *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-     *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-     *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-     *                                        color:dit.background,
-     *                                        type:'flat',
-     *                                        clickoutFiresChange : false,
-     *                                        change : function (color) {
-     *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-     *                                            $(bg).css({ background : color, opacity : 1 });
-     *                                            na.te.settings.fireSaveTheme = true;
-     *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }* /
-    }
-    }
-    break;
-    case 'Extras' :
-        for (var btnAddGraphics_jsTreeText in categoryItems) {
-            var it = categoryItems[btnAddGraphics_jsTreeText].css;
-            for (var divSel in it) {
-                var dit = it[divSel];
+                            /*
+                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
+                                var
+                                del = $(dID)[0],
+                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
+                                test = rgbaRegEx.test(dit.background),
+                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
+                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
+                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
+                                    $('#colorpicker').css({display:'block'}).spectrum ({
+                                        color:dit.background,
+                                        type:'flat',
+                                        clickoutFiresChange : false,
+                                        change : function (color) {
+                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
+                                            $(bg).css({ background : color, opacity : 1 });
+                                            na.te.settings.fireSaveTheme = true;
+                                            na.saveTheme();
+                                        }
+                                    }).css({display:'none'});
+                                }
+                            }* /
+                        }
+                    }
+                    break;
+                case 'Extras' :
+                    for (var btnAddGraphics_jsTreeText in categoryItems) {
+                        var it = categoryItems[btnAddGraphics_jsTreeText].css;
+                        for (var divSel in it) {
+                            var dit = it[divSel];
 
-                /* messes up theme loading :
-                 *                            for (var prop in dit) {
-                 *                                var v = dit[prop];
-                 *                                if (typeof v=='string' && !v.match(/\!important/)) {
-                 *                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
-                 *                                    dit[prop] += ' !important';
-    }
-    }
-    * /
+                            /* messes up theme loading :
+                            for (var prop in dit) {
+                                var v = dit[prop];
+                                if (typeof v=='string' && !v.match(/\!important/)) {
+                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
+                                    dit[prop] += ' !important';
+                                }
+                            }
+                            * /
 
-    $(divSel).css(dit);
-    /*
-     *                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-     *                                var
-     *                                del = $(dID)[0],
-     *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-     *                                test = rgbaRegEx.test(dit.background),
-     *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-     *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-     *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-     *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-     *                                        color:dit.background,
-     *                                        type:'flat',
-     *                                        clickoutFiresChange : false,
-     *                                        change : function (color) {
-     *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-     *                                            $(bg).css({ background : color, opacity : 1 });
-     *                                            na.te.settings.fireSaveTheme = true;
-     *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }* /
-    }
-    }
-    break;
-    }
-    };*/
+                            $(divSel).css(dit);
+                            /*
+                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
+                                var
+                                del = $(dID)[0],
+                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
+                                test = rgbaRegEx.test(dit.background),
+                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
+                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
+                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
+                                    $('#colorpicker').css({display:'block'}).spectrum ({
+                                        color:dit.background,
+                                        type:'flat',
+                                        clickoutFiresChange : false,
+                                        change : function (color) {
+                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
+                                            $(bg).css({ background : color, opacity : 1 });
+                                            na.te.settings.fireSaveTheme = true;
+                                            na.saveTheme();
+                                        }
+                                    }).css({display:'none'});
+                                }
+                            }* /
+                        }
+                    }
+                    break;
+            }
+        };*/
 
-    na.m.log (1510, 'na.loadTheme_applySettings() : FINISHED.', false);
-    na.site.settings.running_loadTheme = false;
-    if (typeof callback=='function') callback(true);
+        na.m.log (1510, 'na.loadTheme_applySettings() : FINISHED.', false);
+        na.site.settings.running_loadTheme = false;
+        if (typeof callback=='function') callback(true);
     },
 
     saveTheme : function (callback, theme, loadBackground) {
@@ -3691,7 +3651,7 @@ na.site = {
             if (u) themeData.url = u;
             if (s.url) themeData.url = s.url;
             if (!themeData.url) themeData.url = window.location.href.replace('https://'+na.site.globals.domain,'');
-                //if (themeData.app) delete themeData.app;
+            //if (themeData.app) delete themeData.app;
         }
         if (
             typeof s.specificityName=='string'
@@ -3719,10 +3679,10 @@ na.site = {
 
 
         /*
-         *        for (var i=0; i<na.desktop.globals.divs.length; i++) {
-         *            var selector = na.desktop.globals.divs[i];
-         *            themeData.dialogs = $.extend (themeData.dialogs, na.fetchTheme (selector));
-    }*/
+        for (var i=0; i<na.desktop.globals.divs.length; i++) {
+            var selector = na.desktop.globals.divs[i];
+            themeData.dialogs = $.extend (themeData.dialogs, na.fetchTheme (selector));
+        }*/
 
         // Fetch dialogs properly
         //themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
@@ -3771,21 +3731,21 @@ na.site = {
                     msg = na.site.formatFailMsg(msg);
 
                     $('#siteLoginFailed')
-                    .css({opacity:0.0001,display:'block',visibility:'visible'})
-                    .delay(50)
-                    .html(msg)
-                    .css({
-                        top : ($(window).height()/2) - ($('#siteLoginFailed').height()/2),
-                         left : ($(window).width()/2) - ($('#siteLoginFailed').width()/2),
-                         opacity : 1,
-                         display : 'none'
-                    })
-                    .fadeIn('normal', 'swing', function () {
-                        setTimeout (function() {
-                            $('#siteLoginFailed').fadeOut('normal', 'swing');
-                        }, 2 * 1000);
+                        .css({opacity:0.0001,display:'block',visibility:'visible'})
+                        .delay(50)
+                        .html(msg)
+                        .css({
+                            top : ($(window).height()/2) - ($('#siteLoginFailed').height()/2),
+                            left : ($(window).width()/2) - ($('#siteLoginFailed').width()/2),
+                             opacity : 1,
+                             display : 'none'
+                        })
+                        .fadeIn('normal', 'swing', function () {
+                            setTimeout (function() {
+                                $('#siteLoginFailed').fadeOut('normal', 'swing');
+                            }, 2 * 1000);
 
-                    });
+                        });
                     na.m.log (1451, 'na.saveTheme() : FAILED.');
 
                 } else {
@@ -3832,9 +3792,9 @@ na.site = {
         }
 
         themeData2.changeBackgroundsAutomatically =
-        $('#changeBackgroundsAutomatically')[0]
-        ? $('#changeBackgroundsAutomatically')[0].checked
-        : false;
+            $('#changeBackgroundsAutomatically')[0]
+            ? $('#changeBackgroundsAutomatically')[0].checked
+            : false;
 
         themeData2.backgroundChange_hours = $('#backgroundChange_hours').val();
         themeData2.backgroundChange_minutes = $('#backgroundChange_minutes').val();
@@ -3856,23 +3816,23 @@ na.site = {
             //opacity : $(selector).css('opacity')
         };
         ret[selector].border = // firefox work-around
-        $(selector).css('borderTopWidth')+' '
-        //+$(selector).css('borderRightWidth')+' '
-        //+$(selector).css('borderBottomWidth')+' '
-        //+$(selector).css('borderLeftWidth')+' '
-        +$(selector).css('borderTopStyle')+' '
-        //+$(selector).css('borderRightStyle')+' '
-        //+$(selector).css('borderBottomStyle')+' '
-        //+$(selector).css('borderLeftStyle')+' '
-        +$(selector).css('borderTopColor')+' '
-        //+$(selector).css('borderRightColor')+' '
-        //+$(selector).css('borderBottomColor')+' '
-        //+$(selector).css('borderLeftColor')+' ';
+            $(selector).css('borderTopWidth')+' '
+            //+$(selector).css('borderRightWidth')+' '
+            //+$(selector).css('borderBottomWidth')+' '
+            //+$(selector).css('borderLeftWidth')+' '
+            +$(selector).css('borderTopStyle')+' '
+            //+$(selector).css('borderRightStyle')+' '
+            //+$(selector).css('borderBottomStyle')+' '
+            //+$(selector).css('borderLeftStyle')+' '
+            +$(selector).css('borderTopColor')+' '
+            //+$(selector).css('borderRightColor')+' '
+            //+$(selector).css('borderBottomColor')+' '
+            //+$(selector).css('borderLeftColor')+' ';
         ret[selector].borderRadius = // firefox work-around
-        $(selector).css("borderTopLeftRadius")+' '
-        +$(selector).css("borderTopRightRadius")+' '
-        +$(selector).css("borderBottomRightRadius")+' '
-        +$(selector).css("borderBottomLeftRadius")+' ';
+            $(selector).css("borderTopLeftRadius")+' '
+            +$(selector).css("borderTopRightRadius")+' '
+            +$(selector).css("borderBottomRightRadius")+' '
+            +$(selector).css("borderBottomLeftRadius")+' ';
 
         if (!$(selector+' > .vdBackground')[0]) {
             if ($(selector).css('opacity')!=='') {
@@ -3950,23 +3910,23 @@ na.site = {
             //opacity : $(selector).css('opacity')
         };
         ret[selector].border = // firefox work-around
-        $(selector).css('borderTopWidth')+' '
-        //+$(selector).css('borderRightWidth')+' '
-        //+$(selector).css('borderBottomWidth')+' '
-        //+$(selector).css('borderLeftWidth')+' '
-        +$(selector).css('borderTopStyle')+' '
-        //+$(selector).css('borderRightStyle')+' '
-        //+$(selector).css('borderBottomStyle')+' '
-        //+$(selector).css('borderLeftStyle')+' '
-        +$(selector).css('borderTopColor')+' '
-        //+$(selector).css('borderRightColor')+' '
-        //+$(selector).css('borderBottomColor')+' '
-        //+$(selector).css('borderLeftColor')+' ';
+            $(selector).css('borderTopWidth')+' '
+            //+$(selector).css('borderRightWidth')+' '
+            //+$(selector).css('borderBottomWidth')+' '
+            //+$(selector).css('borderLeftWidth')+' '
+            +$(selector).css('borderTopStyle')+' '
+            //+$(selector).css('borderRightStyle')+' '
+            //+$(selector).css('borderBottomStyle')+' '
+            //+$(selector).css('borderLeftStyle')+' '
+            +$(selector).css('borderTopColor')+' '
+            //+$(selector).css('borderRightColor')+' '
+            //+$(selector).css('borderBottomColor')+' '
+            //+$(selector).css('borderLeftColor')+' ';
         ret[selector].borderRadius = // firefox work-around
-        $(selector).css("borderTopLeftRadius")+' '
-        +$(selector).css("borderTopRightRadius")+' '
-        +$(selector).css("borderBottomRightRadius")+' '
-        +$(selector).css("borderBottomLeftRadius")+' ';
+            $(selector).css("borderTopLeftRadius")+' '
+            +$(selector).css("borderTopRightRadius")+' '
+            +$(selector).css("borderBottomRightRadius")+' '
+            +$(selector).css("borderBottomLeftRadius")+' ';
 
 
 
@@ -3982,11 +3942,11 @@ na.site = {
 
             if ($(selector).css('backgroundImage') && $(selector).css('backgroundImage')!=='' && !$(selector).css('backgroundImage').match(/none/)) {
                 ret[selector].background =
-                $(selector).css('backgroundImage').match(/url\(.*\).*%/)
-                ? $(selector).css('backgroundImage')
-                : $(selector).css('backgroundImage').replace(')',') 0% 0% / ')
-                +$(selector).css('backgroundSize')+' '
-                +$(selector).css('backgroundRepeat');
+                    $(selector).css('backgroundImage').match(/url\(.*\).*%/)
+                        ? $(selector).css('backgroundImage')
+                        : $(selector).css('backgroundImage').replace(')',') 0% 0% / ')
+                    +$(selector).css('backgroundSize')+' '
+                    +$(selector).css('backgroundRepeat');
             } else if ($(selector).css('backgroundColor') !== '') {
                 ret[selector].background = $(selector).css('backgroundColor');
             }
@@ -3997,11 +3957,11 @@ na.site = {
             ret[selector+' > .vdBackground'] = {
                 opacity : $(selector+' > .vdBackground').css('opacity'),
                 background :
-                $(selector+' > .vdBackground').css('background') && $(selector+' > .vdBackground').css('background') !==''
-                ? $(selector+' > .vdBackground').css('background').match(/url\(.*\).*%/)
-                ? $(selector+' > .vdBackground').css('background')
-                : $(selector+' > .vdBackground').css('background').replace(')',') 0% 0% / ')
-                : 'none',
+                    $(selector+' > .vdBackground').css('background') && $(selector+' > .vdBackground').css('background') !==''
+                    ? $(selector+' > .vdBackground').css('background').match(/url\(.*\).*%/)
+                        ? $(selector+' > .vdBackground').css('background')
+                        : $(selector+' > .vdBackground').css('background').replace(')',') 0% 0% / ')
+                    : 'none',
                 borderRadius : $(selector).css('borderRadius'),
                 backgroundSize : $(selector+' > .vdBackground').css('backgroundSize'),
                 boxShadow : $(selector+' > .vdBackground').css('boxShadow')
@@ -4013,9 +3973,9 @@ na.site = {
                 ret[selector+' > .vdBackground'].background===''
                 && $(selector+' > .vdBackground').css('backgroundImage') !== ''
             ) ret[selector+' > .vdBackground'].background =
-            $(selector+' > .vdBackground').css('backgroundImage').replace(/http.*?\/\/.*?\//,'')+' '
-            +$(selector+' > .vdBackground').css('backgroundSize')+' '
-            +$(selector+' > .vdBackground').css('backgroundRepeat');
+                $(selector+' > .vdBackground').css('backgroundImage').replace(/http.*?\/\/.*?\//,'')+' '
+                +$(selector+' > .vdBackground').css('backgroundSize')+' '
+                +$(selector+' > .vdBackground').css('backgroundRepeat');
 
             if (
                 ret[selector+' > .vdBackground'].background
@@ -4033,13 +3993,13 @@ na.site = {
 
 
         /*
-         *        ret[selector+' td'] = {
-         *            fontSize : $(selector+' td').css('fontSize'),
-         *            fontWeight : $(selector+' td').css('fontWeight'),
-         *            fontFamily : $(selector+' td').css('fontFamily'),
-         *            textShadow : $(selector+' td').css('textShadow')
-    };
-    */
+        ret[selector+' td'] = {
+            fontSize : $(selector+' td').css('fontSize'),
+            fontWeight : $(selector+' td').css('fontWeight'),
+            fontFamily : $(selector+' td').css('fontFamily'),
+            textShadow : $(selector+' td').css('textShadow')
+        };
+        */
         if (ret[selector].fontFamily) ret[selector].fontFamily = ret[selector].fontFamily.replace(/"/g, '');
         //if (ret[selector+' td'].fontFamily) ret[selector+' td'].fontFamily = ret[selector+' td'].fontFamily.replace(/"/g, '');
         return ret;

@@ -934,9 +934,10 @@ return array_merge($job, $update);
                 global $naWebOS;
 
                 $this->table = (str_replace('.','_',$naWebOS->domainFolder) ?? 'default') . '___screenshots';
-                $this->cdb = (property_exists($old, 'cdb') && is_object($old->cdb))
-                ? $old->cdb
-                : $old;
+                //echo '<h1>'.$this->table.'</h1>';
+                $this->cdb = $naWebOS->dbs->findConnection('couchdb')->cdb;//(property_exists($old, 'cdb') && is_object($old->cdb))
+                //? $old->cdb
+                //: $old;
 
                 if ($this->cdb instanceof class_NicerAppWebOS_database_API) {
                     $this->cdb->connections[0]['conn']->cdb->setDatabase($this->table);
@@ -1036,7 +1037,12 @@ return array_merge($job, $update);
                     $docs = $result->body->docs ?? [];
                     return json_decode(json_encode($docs), true) ?: [];
                 } catch (Throwable $e) {
-                    echo "<p class=\"phpError\">find() EXCEPTION: " . $e->getMessage() . "</p>";
+                    global $naLAN;
+                    if (!$naLAN) {
+                        echo "<p class=\"phpError\">find() EXCEPTION: " . $e->getMessage() . "</p>";
+                    } else {
+                        echo "<div class=\"phpError\">find() EXCEPTION: " . $e->getMessage() . ", backtrace=<pre class='backdropped'>".json_encode($e->getTraceAsString(), JSON_PRETTY_PRINT)."</pre></div>";
+                    }
                     return [];
                 }
             }
