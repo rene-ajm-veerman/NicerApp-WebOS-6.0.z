@@ -37,7 +37,7 @@
     </div>
     <div>
     <div>
-        <h1 class="contentSectionTitle1" title="Said.by" style="text-shadow:1px 1px 5px skyblue;">Said.by Social Media</h1>
+        <h1 class="contentSectionTitle1" title="Said.by" style="text-shadow:1px 1px 5px skyblue;">Said.by Web Content Hosting</h1>
     </div>
     <div>
         <h1 class="contentSectionTitle1" title="a nicer.app company" style="font-size:small">a <a href="https://nicer.app" target="na" class="noPushState nomod">nicer.app</a> company.</h1>

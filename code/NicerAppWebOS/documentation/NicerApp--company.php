@@ -66,7 +66,7 @@ i'm also open to <a href="https://said.by/Rene-AJM-Veerman/in/hisDiary#naComment
 
 <div class="backdropped naComments_onTheSide">
     <div class="backdropped naComments_onTheSide">
-        Owner, Founder, CTO, Senior Coder, CFO :<br/>
+        Owner, Founder, CEO, CTO, Senior Coder, CFO :<br/>
         <a href="https://www.youtube.com/watch?v=nO5KNu-Qwcs" target="naReneMemoires" class="nomod noPushState">Rene A.J.M. Veerman</a><br/>[ rene.veerman.netherlands@gmail.com ]<br/>
     </div>
 

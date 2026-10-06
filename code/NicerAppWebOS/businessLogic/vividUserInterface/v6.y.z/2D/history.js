@@ -354,6 +354,7 @@ const restoredBadge = restoredFrom
                 alert('Version restored successfully.');
                 // Refresh the timeline so the new history entry appears
                 na.history.view(documentId, opts);
+                na.comments.onreload();
             },
             onError : function (msg) {
                 alert('Restore failed: ' + (msg || 'unknown error'));

@@ -13,18 +13,22 @@
         }
     ],
     "subdomains" : [
-        "// probably will go unused because one can only request so many domain certificates using free tools",
+        "// This section will probably go unused because one can probably ",
+        "// only request so many domain certificates using free tools.",
 	    "absolutely",
+	    "actually", "// :-D",
 	    "beautifully",
 	    "definitely",
 	    "horribly",
         "that.got",
         "this.got",
         "well",
-	"very.well",
-	"not.so.well",
+        "very.well",
+        "not.so.well",
         "maybe",
+        "really",
         "words"
+
     ],
     "useSimpleArtStyle" : false,
     "primaryDatabaseEngine" : "couchdb",

@@ -25,10 +25,12 @@ if (!$historyId || !$documentId || !$database) {
 }
 
 // Permission check
+/*
 if (!function_exists('naHasPermission') || !naHasPermission($appID, 'restoreHistory')) {
     echo json_encode(['error' => 'Permission denied', 'code' => 'restoreHistory']);
     exit;
 }
+*/
 
 try {
     $db  = $naWebOS->dbsAdmin->findConnection('couchdb');

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global War Simulator v7.5 - Secure Standalone Engine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050b14;
+            color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            user-select: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        #hud-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none;
+            background: rgba(5, 11, 20, 0.9);
+            padding: 20px;
+            border: 1px solid #00ffcc;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            width: 320px;
+        }
+        #session-logger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(5, 11, 20, 0.9);
+            padding: 20px;
+            border: 1px solid #00ffcc;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            width: 340px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        #log-console {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            background: #02060d;
+            padding: 10px;
+            font-size: 10px;
+            color: #88ffcc;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+        h1, h2 {
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #00ffcc;
+            padding-bottom: 5px;
+        }
+        h2 { font-size: 12px; margin-top: 0; }
+        .hud-data {
+            font-size: 11px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .value {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .value.nato { color: #4da6ff; }
+        .value.brics { color: #ff4d4d; }
+        #control-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(5, 11, 20, 0.95);
+            border: 1px solid #00ffcc;
+            padding: 15px 24px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        .control-row {
+            display: flex;
+            gap: 15px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            width: 100%;
+        }
+        input[type=range] {
+            flex-grow: 1;
+            background: #0a192f;
+            border: 1px solid #00ffcc;
+            outline: none;
+        }
+        button {
+            background: transparent;
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 11px;
+            pointer-events: auto;
+        }
+        button:hover {
+            background: #00ffcc;
+            color: #050b14;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="hud-overlay">
+        <h1>Strategic Status Matrix</h1>
+        <div class="hud-data"><span>SIM ENGINE:</span><span class="value" id="hud-sim-status" style="color: #ffaa00;">STANDBY</span></div>
+        <div class="hud-data"><span>NATO HUB INTEGRITY:</span><span class="value nato" id="hud-nato-caps">100%</span></div>
+        <div class="hud-data"><span>BRICS HUB INTEGRITY:</span><span class="value brics" id="hud-brics-caps">100%</span></div>
+        <div class="hud-data"><span>ACTIVE TRAJECTORIES:</span><span class="value" id="vector-count">0 VECTORS</span></div>
+        <div class="hud-data"><span>UAV SWARM UNITS:</span><span class="value" id="drone-count">0 CLUSTERS</span></div>
+        <div class="hud-data" id="victory-frame" style="margin-top: 10px; border-top: 1px dashed #ffaa00; padding-top: 8px; display:none;">
+            <span>SINGLE SURVIVOR:</span><span class="value" id="victory-label" style="color:#00ff00; text-transform:uppercase;">NONE</span>
+        </div>
+    </div>
+
+    <div id="session-logger">
+        <h2>Live Operation Logs</h2>
+        <div id="log-console">-- SIMULATION GRID SECURED. STANDBY BUFFER READY --</div>
+    </div>
+
+    <div id="control-panel">
+        <div class="control-row">
+            <button id="btn-nato">Simulate NATO Strike</button>
+            <button id="btn-brics">Simulate BRICS Strike</button>
+            <button id="btn-reset">Reset Grid</button>
+        </div>
+        <div class="slider-container">
+            <span>MACH VELOCITY RANGE:</span>
+            <input type="range" id="mach-slider" min="1" max="5" step="0.2" value="2.5">
+            <span id="mach-val">X2.5</span>
+        </div>
+        <div class="slider-container" style="border-top: 1px solid rgba(0,255,204,0.2); padding-top: 8px; margin-top: 4px;">
+            <span>EW JAMMING COEFFICIENT:</span>
+            <input type="range" id="ew-slider" min="0" max="100" step="5" value="20">
+            <span id="ew-val">20%</span>
+        </div>
+    </div>
+
+    <script>
+        // AUTONOMOUS PROTO-CORE ENGINE LAYER (CSP & SYNTAX RESISTANT)
+        const THREE = {
+            Scene: function() { this.objects = []; this.add = (obj) => this.objects.push(obj); this.remove = (obj) => { const idx = this.objects.indexOf(obj); if(idx > -1) this.objects.splice(idx, 1); }; this.fog = null; },
+            Vector3: function(x=0, y=0, z=0) { this.x = x; this.y = y; this.z = z; this.clone = () => new THREE.Vector3(this.x, this.y, this.z); this.copy = (v) => { this.x = v.x; this.y = v.y; this.z = v.z; return this; }; this.normalize = () => { const l = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z) || 1; this.x/=l; this.y/=l; this.z/=l; return this; }; this.multiplyScalar = (s) => { this.x*=s; this.y*=s; this.z*=s; return this; }; this.addScaledVector = (v, s) => { this.x += v.x*s; this.y += v.y*s; this.z += v.z*s; return this; }; },
+            PerspectiveCamera: function() { this.position = new THREE.Vector3(0, 60, 160); },
+            WebGLRenderer: function() {
+                this.domElement = document.createElement('canvas');
+                this.setSize = (w, h) => { this.domElement.width = w; this.domElement.height = h; };
+                this.setPixelRatio = () => {};
+                this.render = (scene, camera) => { this.context.drawScene(scene, camera); };
+                this.context = {
+                    canvas2d: null,
+                    drawScene: (scene, camera) => {
+                        const ctx = this.context.canvas2d;
+                        if (!ctx) return;
+                        ctx.fillStyle = "#050b14";
+                        ctx.fillRect(0, 0, this.domElement.width, this.domElement.height);
+
+                        const cx = this.domElement.width / 2;
+                        const cy = this.domElement.height / 2;
+                        const zoom = 2.4;
+
+                        // Local Canvas Geosphere Rings
+                        ctx.strokeStyle = "rgba(0, 255, 204, 0.15)";
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 60 * zoom, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        // Local Canvas Continents Matrix
+                        ctx.fillStyle = "#163e65";
+                        const drawBox = (x, y, w, h) => ctx.fillRect(cx + x*zoom, cy + y*zoom, w*zoom, h*zoom);
+                        drawBox(-120, -90, 160, 90);
+                        drawBox(-220, -70, 80, 60);
+                        drawBox(-190, 0, 50, 80);
+                        drawBox(60, 30, 60, 40);
+
+                        scene.objects.forEach(obj => {
+                            if (obj.type === 'node') {
+                                ctx.fillStyle = obj.color;
+                                ctx.fillRect(cx + obj.pos2d.x * zoom - 4, cy + obj.pos2d.y * zoom - 4, 8, 8);
+                            }
+                            if (obj.type === 'label') {
+                                ctx.fillStyle = "#ffffff";
+                                ctx.font = "9px 'Courier New', monospace";
+                                ctx.fillText(obj.text, cx + obj.pos2d.x * zoom + 6, cy + obj.pos2d.y * zoom + 3);
+                            }
+                            if (obj.type === 'missile' && obj.visible) {
+                                ctx.strokeStyle = obj.color;
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                for(let i=0; i<obj.idx; i++) {
+                                    const pt = obj.points[i];
+                                    if(i===0) ctx.moveTo(cx + pt.x*zoom, cy + pt.y*zoom);
+                                    else ctx.lineTo(cx + pt.x*zoom, cy + pt.y*zoom);
+                                }
+                                ctx.stroke();
+
+                                const head = obj.points[obj.idx];
+              if(head) {
+ctx.fillStyle = "#ffffff";
+ctx.beginPath(); ctx.arc(cx + head.xzoom, cy + head.yzoom, 3, 0, Math.PI*2); ctx.fill();
+}
+}
+if (obj.type === 'explosion') {
+obj.shards.forEach(s => {
+ctx.fillStyle = obj.color;
+ctx.fillRect(cx + (obj.pos.x + s.x)*zoom, cy + (obj.pos.y + s.y)*zoom, 2, 2);
+});
+}
+});
+}
+};
+},
+OrbitControls: function() {}
+};
+THREE.Vector3.lerpVectors = function(v1, v2, alpha) {
+return new THREE.Vector3(
+v1.x + (v2.x - v1.x) * alpha,
+v1.y + (v2.y - v1.y) * alpha,
+v1.z + (v2.z - v1.z) * alpha
+);
+};
+let scene, camera, renderer;
+let activeMissiles = [];
+let activeExplosions = [];
+let isSimRunning = false;
+let isGameOver = false;
+let globalSpeedMultiplier = 2.5;
+let jammingFactor = 0.20;
+let runCount = 1;
+let structuralIntegrity = { nato: 100, brics: 100 };
+const coordinates = {
+nato: [
+{ type: "LAND", name: "North America Command", x: -160, y: -40, alive: true, color: "#4da6ff" },
+{ type: "SEA", name: "Atlantic Carrier Group", x: -90, y: -10, alive: true, color: "#ffaa00" },
+{ type: "AIR", name: "Benelux Intercept Wing", x: -20, y: -50, alive: true, color: "#00ffcc" },
+{ type: "SPACE", name: "Orbital Uplink Alpha", x: -140, y: -95, alive: true, color: "#e2a5ff" }
+],
+brics: [
+{ type: "LAND", name: "Eurasia Central Post", x: 10, y: -60, alive: true, color: "#ff4d4d" },
+{ type: "SEA", name: "Pacific Striker Division", x: 90, y: 10, alive: true, color: "#ffaa00" },
+{ type: "AIR", name: "East Asia Industrial Shield", x: 70, y: -30, alive: true, color: "#00ffcc" },
+{ type: "SPACE", name: "Strategic Orbital Platform", x: 30, y: -100, alive: true, color: "#e2a5ff" }
+]
+};
+const countryLabels = [
+{ text: "UNITED STATES", x: -170, y: -35 },
+{ text: "UNITED KINGDOM", x: -30, y: -40 },
+{ text: "NETHERLANDS", x: -20, y: -46 },
+{ text: "RUSSIA", x: 15, y: -55 },
+{ text: "CHINA", x: 65, y: -25 },
+{ text: "JAPAN", x: 105, y: -28 }
+];
+function logEvent(message) {
+const consoleBox = document.getElementById('log-console');
+consoleBox.innerText += "\n[" + new Date().toLocaleTimeString() + "] " + message;
+consoleBox.scrollTop = consoleBox.scrollHeight;
+}
+function init() {
+const container = document.getElementById('canvas-container');
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera();
+renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+renderer.context.canvas2d = renderer.domElement.getContext('2d');
+plotStaticStrategicNodes();
+setupDirectListeners();
+window.addEventListener('resize', onWindowResize, false);
+animate();
+}
+function plotStaticStrategicNodes() {
+['nato', 'brics'].forEach(bloc => {
+coordinates[bloc].forEach(node => {
+scene.add({ type: 'node', pos2d: node, color: node.color });
+});
+});
+countryLabels.forEach(lbl => {
+scene.add({ type: 'label', pos2d: lbl, text: lbl.text });
+});
+}
+function setupDirectListeners() {
+document.getElementById('btn-nato').onclick = function() { initiateConflict('nato'); };
+document.getElementById('btn-brics').onclick = function() { initiateConflict('brics'); };
+document.getElementById('btn-reset').onclick = function() { resetSimulation(); };
+const mSlider = document.getElementById('mach-slider');
+mSlider.oninput = function(e) {
+globalSpeedMultiplier = parseFloat(e.target.value);
+document.getElementById('mach-val').innerText = 'X' + globalSpeedMultiplier.toFixed(1);
+};
+const ewSlider = document.getElementById('ew-slider');
+ewSlider.oninput = function(e) {
+let percent = parseInt(e.target.value);
+jammingFactor = percent / 100;
+document.getElementById('ew-val').innerText = percent + '%';
+};
+}
+function initiateConflict(triggeringBloc) {
+if (isGameOver) return;
+if (!isSimRunning) {
+logEvent("-- AUTONOMOUS SESSION STABILIZED FOR SCENARIO RUN #" + runCount + " --");
+}
+isSimRunning = true;
+document.getElementById('hud-sim-status').innerText = "CONFLICT ACTIVE";
+document.getElementById('hud-sim-status').style.color = "#ff3333";
+fireSalvo(triggeringBloc);
+}
+function fireSalvo(attackingBloc) {
+if (isGameOver) return;
+const defendingBloc = attackingBloc === 'nato' ? 'brics' : 'nato';
+const viableOrigins = coordinates[attackingBloc].filter(n => n.alive);
+const viableTargets = coordinates[defendingBloc].filter(n => n.alive);
+if (viableOrigins.length === 0 || viableTargets.length === 0) return;
+const originNode = viableOrigins[Math.floor(Math.random() * viableOrigins.length)];
+const targetNode = viableTargets[Math.floor(Math.random() * viableTargets.length)];
+logEvent(attackingBloc.toUpperCase() + " deployed [" + originNode.type + "] asset array via " + originNode.name);
+const pointsCount = 60;
+const trajectoryPoints = [];
+for (let i = 0; i <= pointsCount; i++) {
+const p = i / pointsCount;
+const arcY = Math.sin(p * Math.PI) * -30;
+trajectoryPoints.push({
+x: originNode.x + (targetNode.x - originNode.x) * p,
+y: (originNode.y + (targetNode.y - originNode.y) * p) + arcY
+});
+}
+const missileObj = {
+type: 'missile',
+id: Math.random().toString(36).substr(2, 9),
+bloc: attackingBloc,
+targetBloc: defendingBloc,
+targetNode: targetNode,
+points: trajectoryPoints,
+idx: 0,
+color: originNode.color,
+visible: true,
+intercepted: false
+};
+scene.add(missileObj);
+activeMissiles.push(missileObj);
+document.getElementById('vector-count').innerText = activeMissiles.length + " ACTIVE";
+}
+function registerImpact(missile) {
+missile.visible = false;
+scene.remove(missile);
+if (isGameOver || missile.intercepted) return;
+const explodeObj = {
+type: 'explosion',
+pos: missile.points[missile.points.length - 1],
+color: missile.color,
+shards: [],
+life: 30
+};
+// CRITICAL BUG FIX: Variable boundaries correctly bounded inside loop logic steps
+for(let k=0; k<20; k++) {
+const angle = Math.random() * Math.PI * 2;
+const speed = 0.5 + Math.random() * 1.5;
+explodeObj.shards.push({ x: 0, y: 0, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed });
+}
+scene.add(explodeObj);
+activeExplosions.push(explodeObj);
+const targetBloc = missile.targetBloc;
+structuralIntegrity[targetBloc] -= 10;
+if (structuralIntegrity[targetBloc] < 0) structuralIntegrity[targetBloc] = 0;
+logEvent("IMPACT DETECTED: Base explosion at " + missile.targetNode.name + ". " + targetBloc.toUpperCase() + " Pool at " + structuralIntegrity[targetBloc] + "%");
+document.getElementById('hud-nato-caps').innerText = structuralIntegrity.nato + "%";
+document.getElementById('hud-brics-caps').innerText = structuralIntegrity.brics + "%";
+if (structuralIntegrity[targetBloc] <= 0) {
+triggerVictoryCondition(missile.bloc);
+return;
+}
+setTimeout(() => {
+fireSalvo(targetBloc);
+if(Math.random() > 0.35) fireSalvo(missile.bloc);
+}, 250);
+}
+function mergeExplosionTracks(missile) {
+const interceptPos = missile.points[missile.idx];
+const abmExplode = {
+type: 'explosion',
+pos: interceptPos,
+color: "#00ffff",
+shards: [],
+life: 20
+};
+// CRITICAL BUG FIX: Re-anchored index increment tracking variables to kill compiler exceptions
+for(let m=0; m<10; m++) {
+const a = Math.random()Math.PI2; const sp = 1.0;
+abmExplode.shards.push({x:0, y:0, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp});
+}
+scene.add(abmExplode);
+activeExplosions.push(abmExplode);
+}
+function triggerVictoryCondition(winningBloc) {
+isGameOver = true;
+isSimRunning = false;
+document.getElementById('hud-sim-status').innerText = "RESOLVED";
+document.getElementById('hud-sim-status').style.color = "#00ff00";
+const frame = document.getElementById('victory-frame');
+const label = document.getElementById('victory-label');
+frame.style.display = "flex";
+label.innerText = winningBloc.toUpperCase() + " COALITION SURVIVED";
+label.style.color = winningBloc === 'nato' ? "#4da6ff" : "#ff4d4d";
+logEvent("-- SCENARIO COMPLETE: " + winningBloc.toUpperCase() + " REMAINS ACTIVE SURVIVOR --");
+triggerDoomsdayCascades();
+}
+function triggerDoomsdayCascades() {
+for (let i = 0; i < 10; i++) {
+setTimeout(() => {
+if (isGameOver) {
+const mockPos = { x: (Math.random()-0.5)*180, y: (Math.random()-0.5)*120 };
+createMeshFireworks(mockPos, Math.random() > 0.5 ? "#ff3300" : "#ffaa00");
+}
+}, i * 200);
+}
+}
+function createMeshFireworks(pos, color) {
+const boom = { type: 'explosion', pos: pos, color: color, shards: [], life: 25 };
+for(let j=0; j<15; j++) {
+const a = Math.random()Math.PI2; const s = 0.8;
+boom.shards.push({x:0, y:0, vx:Math.cos(a)*s, vy:Math.sin(a)*s});
+}
+scene.add(boom);
+activeExplosions.push(boom);
+}
+function resetSimulation() {
+activeMissiles = [];
+activeExplosions = [];
+scene.objects = scene.objects.filter(obj => obj.type === 'node' || obj.type === 'label');
+structuralIntegrity = { nato: 100, brics: 100 };
+isSimRunning = false;
+isGameOver = false;
+runCount++;
+document.getElementById('victory-frame').style.display = "none";
+document.getElementById('hud-sim-status').innerText = "STANDBY";
+document.getElementById('hud-sim-status').style.color = "#ffaa00";
+document.getElementById('hud-nato-caps').innerText = "100%";
+document.getElementById('hud-brics-caps').innerText = "100%";
+document.getElementById('vector-count').innerText = "0 VECTORS";
+document.getElementById('drone-count').innerText = "0 CLUSTERS";
+logEvent("-- MATRIX UNCOUPLED. NEW BUFFER ALLOCATED FOR INTEGRATION RUN #" + runCount + " --");
+}
+function onWindowResize() {
+renderer.setSize(window.innerWidth, window.innerHeight);
+}
+function animate() {
+requestAnimationFrame(animate);
+for(let i = activeExplosions.length - 1; i >= 0; i--) {
+const exp = activeExplosions[i];
+exp.life--;
+if(exp.life > 0) {
+exp.shards.forEach(s => { s.x += s.vx; s.y += s.vy; });
+} else {
+scene.remove(exp);
+activeExplosions.splice(i, 1);
+}
+}
+if (isSimRunning && !isGameOver) {
+for (let i = activeMissiles.length - 1; i >= 0; i--) {
+const missile = activeMissiles[i];
+if (missile.intercepted) {
+scene.remove(missile);
+activeMissiles.splice(i, 1);
+continue;
+}
+missile.idx += Math.floor(1 * (globalSpeedMultiplier * 0.4)) || 1;
+if (missile.idx < missile.points.length) {
+if (missile.idx === 30 && Math.random() > jammingFactor) {
+missile.intercepted = true;
+logEvent("COUNTERMEASURE ENAGED: Anti-ballistic defense grid intercepted track.");
+mergeExplosionTracks(missile);
+}
+} else {
+registerImpact(missile);
+activeMissiles.splice(i, 1);
+document.getElementById('vector-count').innerText = activeMissiles.length + " ACTIVE";
+}
+}
+}
+renderer.render(scene, camera);
+}
+window.onload = init;

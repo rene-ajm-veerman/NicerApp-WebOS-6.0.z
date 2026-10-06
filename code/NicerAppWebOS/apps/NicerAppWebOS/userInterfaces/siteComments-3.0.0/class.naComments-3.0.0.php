@@ -1679,7 +1679,7 @@ class class_naComments {
             return;
         }
 
-        $db     = $naWebOS->dbs->findConnection('couchdb');
+        $db     = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb    = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
         $cdb->setDatabase($dbName);

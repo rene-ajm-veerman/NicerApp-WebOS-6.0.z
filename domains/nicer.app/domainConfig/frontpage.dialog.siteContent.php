@@ -82,17 +82,7 @@ NL30INGB0007689155
     </p>
     </div>
 
-    <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
-    <p class="backdropped">
-    2026-Aug-8th, 15:36CEST
-    </p>
-    <p class="backdropped">
-    During 2027, I plan to create and release feature upgrades that will be known as 'phpTasksManager' and 'phpRegionalCloud'.
-    </p>
-    <p class="backdropped">
-    Services may go down temporarily on any of my servers for seemingly unexplainable reasons during that year too.
-    </p>
-    </div>
+
 
     </div>
 
