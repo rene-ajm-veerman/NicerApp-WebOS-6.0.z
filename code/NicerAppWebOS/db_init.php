@@ -145,10 +145,10 @@ function addPrefixes ($dbs) {
 
 global $naWebOS;
 //echo '<pre>t669:'; var_dump($naWebOS);die();
-$db = $naWebOS->dbs->findConnection('couchdb');
+$db = $naWebOS->dbsAdmin->findConnection('couchdb');
 $cdb = $db->cdb;
-var_dump ($cdb->getSession(null,null));
-$cdb->setDatabase('_users', true);
+echo '<pre>'; var_dump ($cdb->getSession(null,null)); echo '</pre>';
+$cdb->setDatabase('_users');
 
 /*
  * Fetch users into array
@@ -168,7 +168,7 @@ try {
     $call = $cdb->find ($findCommand);
 } catch (Exception $e) {
     $fncn = 'db_init.php';
-    $msg = $fncn.' FAILED while trying to find in \''.$prefix.'\' : '.$e->getMessage();
+    $msg = $fncn.' FAILED while trying to find in \'_users\' : '.$e->getMessage();
     trigger_error ($msg, E_USER_NOTICE);
     echo $msg;
     return false;

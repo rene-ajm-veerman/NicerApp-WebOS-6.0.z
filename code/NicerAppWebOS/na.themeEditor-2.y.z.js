@@ -197,10 +197,10 @@ class naThemeEditor {
 
     //let dat2 = na.te.transformHTMLandCSS_to_jsTree();
 
-    na.site.globals.themes[na.site.globals.themeName] = $.extend(
-        na.site.loadTheme_fetchDialogs(),
-                                                                 na.site.globals.themes[na.site.globals.themeName]
-    );
+    // na.site.globals.themes[na.site.globals.themeName] = $.extend(
+    //     na.site.loadTheme_fetchDialogs(),
+    //                                                              na.site.globals.themes[na.site.globals.themeName]
+    // );
     let dat3 = na.te.transform_siteGlobalsThemes_to_jsTree();
     let dat4 = dat3;
     na.te.s.c.dbSelectors = dat4;
@@ -817,7 +817,7 @@ class naThemeEditor {
         if (!inputData) inputData = na.site.globals.themes.default;
 
         if (sourceData && sourceData.themeSettings) inputData = $.extend(inputData,sourceData);
-        inputData = inputData.themeSettings;
+        //inputData = inputData.themeSettings;
 
         var
         outputData = na.te.transform_siteGlobalsThemes_to_jsTree__recurse(
@@ -831,6 +831,7 @@ class naThemeEditor {
     transform_siteGlobalsThemes_to_jsTree__recurse  (inputData, outputData, parentName, parentID, type) {
         var did = inputData.did;
 
+        debugger;
         for (var key in inputData.dat) {
             var value = inputData.dat[key], newID = na.m.randomString();
             //if (typeof value.length!=='undefined') continue;
