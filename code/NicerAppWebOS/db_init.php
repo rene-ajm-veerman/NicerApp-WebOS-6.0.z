@@ -8,6 +8,15 @@ error_reporting(E_ALL);
 
 
 global $naBypassMainErrorHandler; $naBypassMainErrorHandler = false;
+
+// Temporary: force clean admin login for db_init
+unset($_COOKIE['cdb_authSession_cookie']);
+unset($_COOKIE['cdb_loginName']);
+unset($_SESSION['cdb_authSession_cookie']);
+unset($_SESSION['cdb_loginName']);
+setcookie('cdb_authSession_cookie', '', time() - 3600, '/');
+setcookie('cdb_loginName', '', time() - 3600, '/');
+
 require_once (realpath(dirname(__FILE__)).'/boot.php');
 
 $debug = true; 
@@ -147,6 +156,16 @@ global $naWebOS;
 //echo '<pre>t669:'; var_dump($naWebOS);die();
 $db = $naWebOS->dbsAdmin->findConnection('couchdb');
 $cdb = $db->cdb;
+echo '<pre style="background:#111;color:#0f0;padding:1em;">';
+echo 'domainFolderForDB = '; var_dump($naWebOS->domainFolderForDB);
+echo 'dbsAdmin type     = '; var_dump(gettype($naWebOS->dbsAdmin));
+if (is_object($naWebOS->dbsAdmin)) {
+    $conn = $naWebOS->dbsAdmin->findConnection('couchdb');
+    echo 'admin username    = '; var_dump($conn ? $conn->username : 'NO CONNECTION');
+    echo 'admin roles       = '; var_dump($conn ? $conn->roles : null);
+}
+echo '</pre>';
+
 echo '<pre>'; var_dump ($cdb->getSession(null,null)); echo '</pre>';
 $cdb->setDatabase('_users');
 
@@ -252,7 +271,7 @@ $dbs2 = addPrefixes($dbs);
 
 
 try {
-    $allDBs = $naWebOS->dbs->getAllDatabases ();
+    $allDBs = $naWebOS->dbsAdmin->getAllDatabases ();
 } catch (Exception $e) {
     $fn = dirname(__FILE__).'/domainConfigs/'.$naWebOS->domainFolder.'/databases.username-admin.json';
     $msg =
@@ -292,14 +311,14 @@ else $groupsFinal = $groups;
 
 //echo '<pre style="color:white;background:navy;margin:10px;padding:10px;border-radius:10px;">'; var_dump($dbs2); echo '</pre>'; ///exit;
 
-$naWebOS->dbs->clearOutDatabases ($dbs2);
+$naWebOS->dbsAdmin->clearOutDatabases ($dbs2);
 
 /*
  * Main()
  */
-$naWebOS->dbs->createUsers($users, $groupsFinal);
-$naWebOS->dbs->createDatabases ($dbs);
-$naWebOS->dbs->resetDatabases ($dbsReset);
+$naWebOS->dbsAdmin->createUsers($users, $groupsFinal);
+$naWebOS->dbsAdmin->createDatabases ($dbs);
+$naWebOS->dbsAdmin->resetDatabases ($dbsReset);
 
 /*
  * Post-init db config-ing

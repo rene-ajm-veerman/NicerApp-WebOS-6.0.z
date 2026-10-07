@@ -21,7 +21,7 @@ class class_NicerAppWebOS_database_API {
         global $naWebOS;
         global $naDebugStartup;
         $ret = [];
-        //echo '<h2 style="color:skyblue;background:navy">'.$username.'</h2>';
+        if ($naDebugStartup) { echo '<h2 style="color:skyblue;background:navy">'.na_plainUsername_from_couchdbUsername($username).'</h2>'; };
         try {
             if (na_plainUsername_from_couchdbUsername($username)!=='Administrator') {
                 if ($naDebugStartup) {

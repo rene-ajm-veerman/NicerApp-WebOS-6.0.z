@@ -80,7 +80,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
         && strpos($_COOKIE['cdb_loginName'],'Administrator')===false
       ) {
         $opts[CURLOPT_HTTPHEADER][] = 'AuthSession: '.$_COOKIE['cdb_authSession_cookie'];
-        $url2 = "{$this->proto}://{$this->host}:{$this->port}{$url}";
+        $url2 = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
         $opts[CURLOPT_URL] = $url2;
       }
 

@@ -54,7 +54,7 @@ class naThemeEditor {
             theme[key] = $.extend (theme[key] || {}, css);
         }
 
-        if (opts.save !== false && Object.keys(keys).length > 0) na.site.saveTheme();
+        //BAD Grok : if (opts.save !== false && Object.keys(keys).length > 0) na.site.saveTheme();
         return $t;
     }
 
@@ -811,13 +811,16 @@ class naThemeEditor {
     }
 
     transform_siteGlobalsThemes_to_jsTree (sourceData) {
-        var
-        themeName = na.site.globals.themeName,
-        inputData = na.site.globals.themes[themeName];
-        if (!inputData) inputData = na.site.globals.themes.default;
+        if (na.site.globals.themes) {
+            var
+            themeName = na.site.globals.themeName ?? 'default',
+            inputData = na.site.globals.themes[themeName];
+        } else {
+            return;
+        }
 
         if (sourceData && sourceData.themeSettings) inputData = $.extend(inputData,sourceData);
-        //inputData = inputData.themeSettings;
+        inputData = inputData.themeSettings;
 
         var
         outputData = na.te.transform_siteGlobalsThemes_to_jsTree__recurse(
@@ -831,96 +834,26 @@ class naThemeEditor {
     transform_siteGlobalsThemes_to_jsTree__recurse  (inputData, outputData, parentName, parentID, type) {
         var did = inputData.did;
 
-        debugger;
+        if (!inputData.dat.background && !inputData.dat.border)
         for (var key in inputData.dat) {
             var value = inputData.dat[key], newID = na.m.randomString();
             //if (typeof value.length!=='undefined') continue;
-            if (key=='css') {
-                for (var key2 in value) break;
-                outputData.dat.push ({
-                    id : newID,
-                    parent : parentID,
-                    text : 'main',
-                    state : {
-                        opened : true,
-                        selected : (
-                            'site'+parentName==na.te.s.c.forDialogID
-                        )
-                    },
-                    type : 'naCSS'
-                });
-                if ('site'+parentName==na.te.s.c.forDialogID) outputData.did = newID;
-                for (var divSel in value) {
-                    //if (divSel.match(/\> .vividDialogBackground1/)) continue;
-                    var newID2 = na.m.randomString();
-                    outputData.dat.push ({
-                        id : newID2,
-                        parent : newID,
-                        text : divSel,
-                        state : {
-                            opened : true
-                        },
-                        type : 'naElement'
-                    });
-                    if (divSel=='#'+na.te.s.c.forDialogID) outputData.did = newID2;
-                }
-            } else if (key=='Extras' || key=='Apps') {
-                outputData.dat.push ({
-                    id : newID,
-                    parent : parentID,
-                    text : key,
-                    state : {
-                        opened : true
-                    },
-                    type : type
-                });
-                for (var cssText in value) {
-                    if (cssText.match(/\> .vividDialogBackground1/)) continue;
-                    var vdata = value[cssText].css;
-                    var newID2 = na.m.randomString();
-                    outputData.dat.push ({
-                        id : newID2,
-                        parent : newID,
-                        text : cssText,
-                        state : {
-                            opened : true
-                        },
-                        type : 'naCSS'
-                    });
-                    if (divSel=='#'+na.te.s.c.forDialogID) outputData.did = newID2;
 
-                    for (var divSel in vdata) {
-                        var newID3 = na.m.randomString();
-                        outputData.dat.push ({
-                            id : newID3,
-                            parent : newID2,
-                            text : divSel,
-                            state : {
-                                opened : true
-                            },
-                            type : 'naElement'
-                        });
-                        na.te.s.c.elementsCSS[newID3] = vdata[divSel];
-                        if (divSel=='#'+na.te.s.c.forDialogID) outputData.did = newID3;
-                    }
-                }
-            } else {
-                outputData.dat.push ({
-                    id : newID,
-                    parent : parentID,
-                    text : key,
-                    state : {
-                        opened : true
-                    },
-                    type : type
-                });
-                if (typeof value=='object') {
-                    var call = na.te.transform_siteGlobalsThemes_to_jsTree__recurse (
-                        {dat:value,did:outputData.did}, outputData, key, newID, type
-                    );
-                    $.extend (outputData.dat, call.dat)
-                    if (call.did) outputData.did = call.did;
-                };
+            outputData.dat.push ({
+                id : newID,
+                parent : parentID,
+                text : key,
+                state : {
+                    opened : true
+                },
+                type : (key=='Dialogs'?'naSelectorSet':'naElement')
+            });
+            if (typeof value=='object') {
+                var call = na.te.transform_siteGlobalsThemes_to_jsTree__recurse (
+                    {dat:value,did:outputData.did}, outputData, key, newID, type
+                );
+                $.extend (outputData.dat, call.dat)
+                if (call.did) outputData.did = call.did;
             };
         };
         //if (outputData.dat.length > 50) debugger;
@@ -1036,10 +969,9 @@ class naThemeEditor {
                                             && !it.text.match(/Dialog/)
                                             //&& !it.text.match(/Extras/)
                                         ) {
-                                            if (!themeSettings[parent.text]) themeSettings[parent.text] = { css : {} };
-                                            if (!themeSettings[parent.text].css) themeSettings[parent.text].css = {};
-                                            themeSettings[parent.text].css = $.extend (
-                                                themeSettings[parent.text].css, na.site.fetchTheme(it.text)
+                                            if (!themeSettings[parent.text]) themeSettings[parent.text] = {};
+                                            themeSettings[parent.text] = $.extend (
+                                                themeSettings[parent.text], na.site.fetchTheme(it.text)
                                             );
                                         }
                                         break;

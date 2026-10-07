@@ -1449,7 +1449,7 @@ class NicerAppWebOS {
         global $naDebugAll;
         global $naLAN;
         $debug = $this->debugThemeLoading;
-        $db = $this->dbsAdmin->findConnection('couchdb');
+        $db = $this->dbs->findConnection('couchdb');
         //echo '<pre style="color:orange;background:darkred;margin:10px;padding:8px;border-radius:10px;">$db='; var_dump ($db); echo '</pre>';
         $viewFolder = '[UNKNOWN VIEW]';
 
@@ -2051,7 +2051,7 @@ class NicerAppWebOS {
         global $naDebugAll;
         global $naLAN;
         $debug = $this->debugThemeLoading;
-        $db = $this->dbsAdmin->findConnection('couchdb');
+        $db = $this->dbs->findConnection('couchdb');
         //echo '<pre style="color:purple">'; var_dump($db); echo '</pre>';
         $cdb = $db->cdb;
 
@@ -2542,7 +2542,7 @@ class NicerAppWebOS {
         $fncn = $this->cn.'::getPageCSS_specific()';
         //$fncn = $this->cn.'::getPageCSS_specific("'.json_encode($selector).'")';
 
-        $db = $this->dbsAdmin->findConnection('couchdb');
+        $db = $this->dbs->findConnection('couchdb');
 
         //if ($debug)
         //{ echo '$selector='; var_dump ($selector); echo '<br/><br/>'.PHP_EOL.PHP_EOL; exit(); };
@@ -2603,11 +2603,11 @@ class NicerAppWebOS {
                                         exit(); // or exit();
                                     }
                                     if ($debug) {
-                                        echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666d=$roles='; var_dump ($this->dbsAdmin->findConnection('couchdb')->cdb->getSession()); echo '</pre>';
+                                        echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666d=$roles='; var_dump ($this->dbs->findConnection('couchdb')->cdb->getSession()); echo '</pre>';
 
                                     }
-                                    if (!is_null($this->dbsAdmin->findConnection('couchdb')->roles))
-                                    foreach ( $this->dbsAdmin->findConnection('couchdb')->roles
+                                    if (!is_null($this->dbs->findConnection('couchdb')->roles))
+                                    foreach ( $this->dbs->findConnection('couchdb')->roles
                                         as $roleIdx => $groupID
                                     ) {
                                         if ($debug) { echo 't667A='; var_dump($groupID); var_dump ($adjustedUserOrGroupID);};

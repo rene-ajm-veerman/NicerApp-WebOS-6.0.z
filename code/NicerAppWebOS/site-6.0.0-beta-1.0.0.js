@@ -376,7 +376,6 @@ na.site = {
                         if ($(div).css('display')==='none') $(div).css({display:'block',opacity:1});
                     });
                     $('.lds-facebook').fadeOut('normal');
-                    t.setSpecificity(true,false);
 
                     var
                     tApp = null,
@@ -394,20 +393,36 @@ na.site = {
                     var
                     themeData = {
                         specificityName : $('.na_themes_dropdown__specificity > .vividDropDownBox_selected').html(),
-                                       theme : theme,
-                                       orientation : na.site.components.orientation,
-                                       backgroundSearchKey : na.site.globals.backgroundSearchKey,
-                                       background : na.site.globals.background,
-                                       changeBackgroundsAutomatically : 'true',//$('#changeBackgroundsAutomatically')[0].checked?'true':'false',
-                                       vdSettings_show : $('#vdSettings_show').val(),
-                                       backgroundChange_hours : $('#backgroundChange_hours').val(),
-                                       backgroundChange_minutes : $('#backgroundChange_minutes').val(),
-                                       menusFadingSpeed : $('#menusFadingSpeed').val(),
-                                       menusUseRainbowPanels : 'true',//$('#menusUseRainbowPanels')[0].checked ? 'true' : 'false',
-                                       apps : tApp,
-                                       view : na.site.globals.view,
-                                       textBackgroundOpacity : 0.4//parseInt($('#textBackgroundOpacity').val()) / 100
+                        theme : theme,
+                        orientation : na.site.components.orientation,
+                        backgroundSearchKey : na.site.globals.backgroundSearchKey,
+                        background : na.site.globals.background,
+                        changeBackgroundsAutomatically : 'true',//$('#changeBackgroundsAutomatically')[0].checked?'true':'false',
+                        vdSettings_show : $('#vdSettings_show').val(),
+                        backgroundChange_hours : $('#backgroundChange_hours').val(),
+                        backgroundChange_minutes : $('#backgroundChange_minutes').val(),
+                        menusFadingSpeed : $('#menusFadingSpeed').val(),
+                        menusUseRainbowPanels : 'true',//$('#menusUseRainbowPanels')[0].checked ? 'true' : 'false',
+                        //apps : tApp,
+                        view : na.site.globals.view,
+                        textBackgroundOpacity : 0.4,//parseInt($('#textBackgroundOpacity').val()) / 100
+                        themeSettings : { Dialogs : {} }
                     };
+
+                    for (var i=0; i<na.desktop.globals.divs.length; i++) {
+                        var selector = na.desktop.globals.divs[i];
+                        if (!themeData.themeSettings.Dialogs[selector])
+                            themeData.themeSettings.Dialogs = $.extend (themeData.themeSettings.Dialogs, na.site.fetchTheme (selector));
+                    }
+                    debugger;
+
+                    na.site.globals.themes[na.site.globals.themeName] = _.merge (
+                        themeData,
+                        na.site.globals.themes[na.site.globals.themeName]
+                    );
+
+                    debugger;
+                    t.setSpecificity(true,false);
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
                     if (s) {
@@ -448,12 +463,6 @@ na.site = {
 
                     na.background.initialize({naSite : t});
                     na.backgrounds = na.background;
-
-                    /*
-                     *                    for (var i=0; i<na.desktop.globals.divs.length; i++) {
-                     *                        var selector = na.desktop.globals.divs[i];
-                     *                        themeData.dialogs = $.extend (themeData.dialogs, na.fetchTheme (selector));
-                }*/
 
                     t.startTooltips();
 
@@ -1752,6 +1761,7 @@ na.site = {
 
                     const themeName = na.site.globals.themeName;
                     const themes = na.site.globals.themes;
+                    debugger;
                     if (themes && themeName && themes[themeName]) {
                         na.site.loadTheme_applySettings(themes[themeName]);
                     } else {
@@ -3461,37 +3471,14 @@ na.site = {
 
         if (dat.themeSettings) {
             loop1:
-            for (var category in dat.themeSettings) {
-                var categoryItems = dat.themeSettings[category];
-                loop2:
-                switch (category) {
-                    case 'Dialogs' :
-                        for (var dID in categoryItems) {
-                            var dit = categoryItems[dID].css;
-                            html += na.m.cssTranslation (dID, dit);
-                        }
-                        break loop2;
-                    case 'Apps':
-                        for (var appName in categoryItems) {
-                            var dit = categoryItems[appName].css;
-                            html += na.m.cssTranslation (appName, dit);
-                        }
-                        break loop2;
-                    case 'Extras' :
-                        for (var btnAddGraphics_jsTreeText in categoryItems) {
-                            var it = categoryItems[btnAddGraphics_jsTreeText];
-                            for (var divSel in it) {
-                                var dit = it[divSel].css;
-                                html += na.m.cssTranslation (btnAddGraphics_jsTreeText, dit);
-                            }
-                        }
-                        break loop2;
-                }
+            for (var selector in dat.themeSettings) {
+                if (selector=='css') continue;
+                html += na.m.cssTranslation (selector, dat.themeSettings);
             }
         }
         html += '</style>';
         debugger;
-        if (dat.themeSettings) na.site.globals.themes[na.site.globals.themeName] = dat.themeSettings;
+        //if (dat.themeSettings) na.site.globals.themes[na.site.globals.themeName] = dat.themeSettings;
         $('#cssThemeSettings').remove();
         $('#cssPageSpecific').after (html);
         //debugger; // you might want to inspect 'html' at some point..
@@ -3734,7 +3721,9 @@ na.site = {
         ) themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
 
         //IS THIS NECESSARY?? na.site.loadTheme_applySettings (themeData, null, false); // apply theme changes, all except .background in this case.
-        na.site.globals.themes[na.site.globals.themeName] = $.extend({}, themeData);
+        na.site.globals.themes[na.site.globals.themeName] = $.extend(
+            na.site.globals.themes[na.site.globals.themeName] , themeData
+        );
         na.site.loadTheme_applySettings (themeData, null, false); // apply theme changes, all except .background in this case.
 
         // ENCAPSULATE (ENCODE) json objects for HTTP transport
@@ -3808,6 +3797,7 @@ na.site = {
     },
 
     loadTheme_fetchDialogs : function (themeData) {
+        debugger;
         var themeData2 = $.extend ({}, na.site.globals.themes[na.site.globals.themeName], themeData);
         try {
             if (!themeData2.themeSettings) themeData2.themeSettings = { Dialogs : {} };
@@ -3818,9 +3808,9 @@ na.site = {
             : [];
             $.each(jsonNodes, function (i, val) {
                 if (val.type!=='naElement') return;
-                if (!themeData2.themeSettings.Dialogs[val.text]) themeData2.themeSettings.Dialogs[val.text] = { css : {} };
-                themeData2.themeSettings.Dialogs[val.text].css = $.extend (
-                    themeData2.themeSettings.Dialogs[val.text].css, na.site.fetchTheme(val.text)
+                if (!themeData2.themeSettings[val.text]) themeData2.themeSettings[val.text] = {};
+                themeData2.themeSettings[val.text] = $.extend (
+                    themeData2.themeSettings[val.text], na.site.fetchTheme(val.text)[val.text]
                 );
             });
         } catch (err) {

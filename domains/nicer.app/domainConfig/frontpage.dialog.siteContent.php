@@ -78,7 +78,7 @@ NL30INGB0007689155
     Services may go down temporarily on any of my servers for seemingly unexplainable reasons over the next few weeks.
     </p>
     <p class="backdropped">
-    In addition, the <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/dump_by_prefix.php" class="nomod noPushState" target="ghDumpScript">PHP database backup-to-filesystem scripts</a> have been written now (yes, there is a <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/restore_by_prefix.php" class="nomod noPushState" target="ghRestoreScript">restore script</a> too), and put on 10-minute intervals of execution into folders which automatically get backed up whenever i update my sourcecode backups. The backups are retained in their original location for 2 days.
+    In addition, the <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/dump_by_prefix.php" class="nomod noPushState" target="ghDumpScript">PHP database backup-to-filesystem scripts</a> have been written now (yes, there is a <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/restore_by_prefix.php" class="nomod noPushState" target="ghRestoreScript">restore script</a> too), and put on 10-minute intervals of execution into folders which automatically get backed up whenever i update my sourcecode backups. The backups are saved on disk for 2 days.
     </p>
     </div>
 

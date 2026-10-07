@@ -53,11 +53,12 @@ na.m = {
         //var cssText = dID+' {\n';
         var cssText = '';
         for (var sel in cssObj) {
+            if (sel=='css') continue;
             cssText += sel+' {\n';
             var v1 = cssObj[sel];
             for (var k in v1) {
                 var v2 = v1[k];
-                cssText += '\t' + k + ' : '+(typeof v2=='string'?'""':'')+v2+(typeof v2=='string'?'""':'')+'\n';
+                cssText += '\t' + k + ' : '+v2+';\n';
             }
             cssText += '}\n';
         }
@@ -70,6 +71,7 @@ na.m = {
             cssText += sel+' {\n';
             var v1 = cssObj[sel];
             for (var k in v1) {
+                if (k=='css') continue;
                 var v2 = v1[k];
                 cssText += '\t' + k + ' : '+(typeof v2=='string'?'""':'')+v2+(typeof v2=='string'?'""':'')+'\n';
             }
