@@ -1,0 +1,7 @@
+{
+    "about" : {
+        "author" : "Rene AJM Veerman and Grok.com",
+        "copyright" : "(C) 2026 by Rene AJM Veerman and grok.com",
+        "license" : "MIT"
+    }
+}

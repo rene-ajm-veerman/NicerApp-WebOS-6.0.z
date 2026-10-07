@@ -1,5 +1,10 @@
 na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] = na.comments = na.c = {
     //settings : { current : { mediaFolderView : 'view' } },
+    about : {
+        author : 'Rene AJM Veerman and Grok.com',
+        copyright : '(C) 2026 by Rene AJM Veerman and grok.com',
+        license : 'MIT'
+    },
     settings : {
         initialized : false,
         reloading : true,
