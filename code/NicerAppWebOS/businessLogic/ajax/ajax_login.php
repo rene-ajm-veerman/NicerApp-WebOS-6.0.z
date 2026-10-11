@@ -4,7 +4,7 @@ global $useRememberMe; $useRememberMe = true;
 $rootPathNA = realpath(dirname(__FILE__).'/../../..').'/NicerAppWebOS';
 require_once ($rootPathNA.'/boot.php');
 
-$debug = false;
+$debug = true;
 if ($debug) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -44,7 +44,7 @@ try {
 
     $xec = 'curl -vD - -X POST http://'.rawurlencode($username).':'.rawurlencode($_POST['pw']).'@127.0.0.1:5984/_session -d \'name='.$username.'&password='.$_POST['pw'].'\'';
     exec ($xec, $output, $result);
-    if ($debug) { echo '<pre>'; var_dump ($xec); echo PHP_EOL; var_dump ($output); echo '</pre>'; };
+    //if ($debug) { echo '<pre>'; var_dump ($xec); echo PHP_EOL; var_dump ($output); echo '</pre>'; };
     preg_match_all('/=(.*?);/', $output[6], $output2);
     if (count($output2[1])>0) {
         //echo '<pre>'; var_dump ($output2); echo '</pre>'.PHP_EOL;

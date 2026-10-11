@@ -44,6 +44,7 @@ RewriteRule ^multi-amarous-church$ https://drive.google.com/drive/folders/1CQDxq
 RewriteRule ^r$ https://said.by/Refirenda?pw=inS3rvice0fHumanity [L]
 #RewriteRule ^shrinks$ https://said.by/mrPatient/in/openingRemarks [L]
 #RewriteRule ^rv$ https://x.com/GavanVeers [L]
+RewriteRule ^vs$ https://nicer.app/NicerAppWebOS/voicesSynthesizer.php [L]
 #RewriteRule ^z$ https://said.by/GavanHoverswell/in/MethodActing [L]
 
 

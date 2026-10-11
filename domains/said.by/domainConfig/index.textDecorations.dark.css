@@ -62,6 +62,10 @@ li:not(.jstree-node), span:is(.backdropped), p:is(.backdropped) {
   box-shadow : 0px 0px 3px 1px rgba(0,0,0,0.7), 3px 3px 5px 2px rgba(0,0,0,0.8);
   line-height:3em;
 }
+p.backdropped, span.backdropped {
+  display : block;
+  margin : 30px;
+}
 
 
 /* doesn't work :
@@ -106,9 +110,6 @@ li.todoList::before {
 }
 
 
-
-
-
 h3, h2 {
   margin-left : 30px;
 }
@@ -127,7 +128,6 @@ h3 a:visited, h2 a:visited {
   color : yellow;
   text-shadow : 0 0 8px black, 0 0 4px yellow, 2px 2px 3px black;
 }
-
 
 .contentSectionTitle1_span, .animatedText_orangeYellow, .naPageTitle { color : yellow; }
 

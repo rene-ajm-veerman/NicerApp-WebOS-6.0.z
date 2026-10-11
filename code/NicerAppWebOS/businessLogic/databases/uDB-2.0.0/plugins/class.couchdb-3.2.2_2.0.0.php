@@ -1232,7 +1232,7 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
             'textBackgroundOpacity' => 0.38,
             'lastUsed' => time(),
             'themeSettings' => array_merge_recursive(
-                cssArray_seperate('Dialogs', [
+                cssArray_seperate('Elements', [
                         '/\.vivid([\w]+)[\s\.\>\#\w]*/' ,
                         '/#site([\w]+)[\s\.\>\#\w]*/'
                     ], css_to_array (file_get_contents(
@@ -1269,7 +1269,7 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
             'vdSettings_show' => 'transparent',
             'lastUsed' => time(),
             'themeSettings' => array_merge_recursive(
-                cssArray_seperate('Dialogs', [
+                cssArray_seperate('Elements', [
                     '/\.vivid([\w]+)[\s\.\>\#\w]*/' ,
                     '/#site([\w]+)[\s\.\>\#\w]*/' ], css_to_array (file_get_contents(
                         realpath(dirname(__FILE__).'/../../../../..')

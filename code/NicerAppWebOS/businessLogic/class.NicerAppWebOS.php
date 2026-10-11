@@ -316,6 +316,11 @@ class NicerAppWebOS {
                 $this->dbsAdmin->findConnection('couchdb')->createGuestUser();
             }
             */
+
+
+
+
+
             try {
                 /*
                 if (array_key_exists('cdb_'.$naWebOS->domainFolder.'__loginName',$_COOKIE)) $un = $_COOKIE['cdb_'.$naWebOS->domainFolder.'__loginName']; else $un = 'Guest';
@@ -332,10 +337,11 @@ class NicerAppWebOS {
                     $un = $_COOKIE['cdb_loginName'];
                     $dn = $naWebOS->domainFolderForDB;
                     $un = preg_replace('/.*___/','', $un);
-                    $un = $dn.'___'.str_replace('_','.',str_replace('__', ' ', $un));
+                    $un = $dn.'___'.str_replace(' ','__',str_replace('_', '.', $un));
                 } else {
                     $un = 'Guest';
                 }
+                //echo '<pre>t432:';var_dump ($un); var_dump ($_COOKIE); echo '</pre>'; exit;
                 try {
                     $this->dbs = new class_NicerAppWebOS_database_API ($un);
                 } catch (Throwable $e) {

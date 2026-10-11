@@ -27,12 +27,12 @@ global $naWebOS;
         "password" : "Guest",
         "realname" : "<?php echo $naWebOS->domainFolder.' Guest user';?>"
     },
-    "timo" : {
+    "Website" : {
         "groups" : [
-            "Guests", "Users"
+            "Guests", "Users", "Moderators"
         ],
-        "email" : "1871a09375@sinenomine.email",
-        "password" : "fordtimelord",
+        "email" : "[NO EMAIL]",
+        "password" : "vjfDJeuff883hak32shfFJEusjrFejsWEF48342ls3JefnveiFEQf0dej4832",
         "realname" : "<?php echo $naWebOS->domainFolder.' Guest user';?>"
     }
 }

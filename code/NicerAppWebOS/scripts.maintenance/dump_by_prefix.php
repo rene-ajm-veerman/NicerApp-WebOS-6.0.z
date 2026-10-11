@@ -1,5 +1,6 @@
 <?php
 /**
+ *
  * NicerApp WebOS – Database dump by prefix
  * Supports CouchDB + SQL, pagination, gzip compression,
  * timestamped output folders and automatic retention.

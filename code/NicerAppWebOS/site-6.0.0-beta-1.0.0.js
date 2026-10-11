@@ -406,20 +406,35 @@ na.site = {
                         //apps : tApp,
                         view : na.site.globals.view,
                         textBackgroundOpacity : 0.4,//parseInt($('#textBackgroundOpacity').val()) / 100
-                        themeSettings : { Dialogs : {} }
+                        themeSettings : { Elements : {} }
                     };
 
                     for (var i=0; i<na.desktop.globals.divs.length; i++) {
                         var selector = na.desktop.globals.divs[i];
-                        if (!themeData.themeSettings.Dialogs[selector])
-                            themeData.themeSettings.Dialogs = $.extend (themeData.themeSettings.Dialogs, na.site.fetchTheme (selector));
+                        if (!themeData.themeSettings.Elements[selector])
+                            themeData.themeSettings.Elements = $.extend (themeData.themeSettings.Elements, na.site.fetchTheme (selector));
                     }
+                    delete themeData.themeSettings.Dialogs;
+                    delete themeData.Dialogs;
                     debugger;
 
-                    na.site.globals.themes[na.site.globals.themeName] = _.merge (
-                        themeData,
-                        na.site.globals.themes[na.site.globals.themeName]
-                    );
+
+                    var dc = 0;
+                    for (var x in na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements) dc++;
+                    if (dc === 0) {
+                        na.site.globals.themes[na.site.globals.themeName] = _.merge (
+                            na.site.globals.themes[na.site.globals.themeName],
+                            themeData
+                        );
+                    } else {
+                        na.site.globals.themes[na.site.globals.themeName] = _.merge (
+                            themeData,
+                            na.site.globals.themes[na.site.globals.themeName]
+                        );
+                    }
+                    delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Dialogs;
+                    delete na.site.globals.themes[na.site.globals.themeName].Dialogs;
+                    delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements.Dialogs;
 
                     debugger;
                     t.setSpecificity(true,false);
@@ -3427,9 +3442,9 @@ na.site = {
              *            : [];
              *            $.each(jsonNodes, function (i, val) {
              *                if (val.type!=='naElement') return;
-             *                if (!dat.themeSettings.Dialogs[val.text]) dat.themeSettings.Dialogs[val.text] = { css : {} };
-             *                dat.themeSettings.Dialogs = $.extend (dat.themeSettings.Dialogs, na.site.fetchTheme (val.text));
-             *                html += na.m.cssTranslation(val.text,dat.themeSettings.Dialogs[val.text]);
+             *                if (!dat.themeSettings.Elements[val.text]) dat.themeSettings.Elements[val.text] = { css : {} };
+             *                dat.themeSettings.Elements = $.extend (dat.themeSettings.Elements, na.site.fetchTheme (val.text));
+             *                html += na.m.cssTranslation(val.text,dat.themeSettings.Elements[val.text]);
              *                debugger;
         });*/
             var tree = $('#themeEditor_jsTree_selectors').jstree(true);
@@ -3448,32 +3463,33 @@ na.site = {
                     if (parentNode) {
                         parentText = parentNode.text;
                     }
-                }
+                } else return;
 
+                if (parentText=='Elements') return;
                 if ($(parentText).is('.vividDialog')) return;
 
-                if (!dat.themeSettings.Dialogs[parentText]) {
-                    dat.themeSettings.Dialogs[parentText] = {};
+                if (!dat.themeSettings.Elements[parentText]) {
+                    dat.themeSettings.Elements[parentText] = {};
                 }
-                if (!dat.themeSettings.Dialogs[parentText][val.text]) {
-                    dat.themeSettings.Dialogs[parentText][val.text] = { css : {} };
-                    dat.themeSettings.Dialogs[parentText][val.text] = $.extend(
-                        dat.themeSettings.Dialogs[parentText][val.text],
+                if (!dat.themeSettings.Elements[parentText][val.text]) {
+                    dat.themeSettings.Elements[parentText][val.text] = { };
+                    dat.themeSettings.Elements[parentText][val.text] = $.extend(
+                        dat.themeSettings.Elements[parentText][val.text],
                         na.site.fetchTheme(val.text)
                     );
                 }
-                html += na.m.cssTranslation(val.text, dat.themeSettings.Dialogs[parentText][val.text]);
+                html += na.m.cssTranslation(val.text, dat.themeSettings.Elements[parentText][val.text]);
             });
 
             //$('.vividDialog').css(dat.themeSettings['.vividDialog']);
             //$('.vividDialog > .vdBackground').css(dat.themeSettings['.vividDialog > .vdBackground']);
         };
 
-        if (dat.themeSettings) {
+        if (dat.themeSettings.Elements) {
             loop1:
-            for (var selector in dat.themeSettings) {
+            for (var selector in dat.themeSettings.Elements) {
                 if (selector=='css') continue;
-                html += na.m.cssTranslation (selector, dat.themeSettings);
+                html += na.m.cssTranslation (selector, dat.themeSettings.Elements);
             }
         }
         html += '</style>';
@@ -3716,8 +3732,8 @@ na.site = {
         themeData = $.extend(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
         if (
             !themeData.themeSettings
-            || !themeData.themeSettings.Dialogs
-            || !themeData.themeSettings.Dialogs['#siteContent']
+            || !themeData.themeSettings.Elements
+            || !themeData.themeSettings.Elements['#siteContent']
         ) themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
 
         //IS THIS NECESSARY?? na.site.loadTheme_applySettings (themeData, null, false); // apply theme changes, all except .background in this case.
@@ -3797,20 +3813,19 @@ na.site = {
     },
 
     loadTheme_fetchDialogs : function (themeData) {
-        debugger;
         var themeData2 = $.extend ({}, na.site.globals.themes[na.site.globals.themeName], themeData);
         try {
             if (!themeData2.themeSettings) themeData2.themeSettings = { Dialogs : {} };
-            if (!themeData2.themeSettings.Dialogs) themeData2.themeSettings.Dialogs = {};
+            if (!themeData2.themeSettings.Elements) themeData2.themeSettings.Elements = {};
 
             var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
             ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
             : [];
             $.each(jsonNodes, function (i, val) {
                 if (val.type!=='naElement') return;
-                if (!themeData2.themeSettings[val.text]) themeData2.themeSettings[val.text] = {};
-                themeData2.themeSettings[val.text] = $.extend (
-                    themeData2.themeSettings[val.text], na.site.fetchTheme(val.text)[val.text]
+                if (!themeData2.themeSettings.Elements[val.text]) themeData2.themeSettings.Elements[val.text] = {};
+                themeData2.themeSettings.Elements[val.text] = $.extend (
+                    themeData2.themeSettings.Elements[val.text], na.site.fetchTheme(val.text)[val.text]
                 );
             });
         } catch (err) {

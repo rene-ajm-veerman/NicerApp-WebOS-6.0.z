@@ -202,7 +202,7 @@ foreach ($files as $idx => $file) {
             return nw > 0 && na.m.desktopIdle();
         },
         function () {
-            na.photoAlbum.onload();
+            setTimeout (na.photoAlbum.onload, 1500);
         },
         100
     );
