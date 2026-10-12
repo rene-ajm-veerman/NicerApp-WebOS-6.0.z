@@ -624,7 +624,7 @@ class naThemeEditor {
                     var d = data.selected[i], rec2 = data.instance.get_node(d);
                     if (rec2 && rec2.original) rec = rec2;
                 }
-                if (rec && rec.type=='naSelectorSet' && rec.text!=='Dialogs' && rec.text!=='App') {
+                if (rec && rec.type=='naSelectorSet' && rec.text!=='Elements' && rec.text!=='App') {
                     na.te.enableButtons ([ '#btnAddCSS' ]);
                 }
                 if (rec && rec.type=='naCSS' && rec.text!=='main') {
@@ -665,7 +665,7 @@ class naThemeEditor {
             }
             if (data.action=='select_node') {
                 na.te.disableAllButtons();
-                if (data.node && data.node.type=='naSelectorSet' && data.node.text!=='Dialogs' && data.node.text!=='App') {
+                if (data.node && data.node.type=='naSelectorSet' && data.node.text!=='Elements' && data.node.text!=='App') {
                     na.te.enableButtons ([ '#btnAddGraphics' ]);
                 }
                 if (data && data.node.type=='naCSS' && data.node.text!=='main') {
@@ -846,7 +846,7 @@ class naThemeEditor {
                 state : {
                     opened : true
                 },
-                type : (key=='Dialogs'?'naSelectorSet':'naElement')
+                type : (key=='Elements'?'naSelectorSet':'naElement')
             });
             if (typeof value=='object') {
                 var call = na.te.transform_siteGlobalsThemes_to_jsTree__recurse (
@@ -869,7 +869,7 @@ class naThemeEditor {
                                             dat : [{
                                                 id : newIDa,
                                                 parent : '#',
-                                                text : 'Dialogs',
+                                                text : 'Elements',
                                                 state : {
                                                     opened : true
                                                 },
@@ -938,7 +938,7 @@ class naThemeEditor {
 
         /*
          * na.site.loadTheme(), .saveTheme() and .fetchTheme() distribute and collect the settings under the
-         * 'Dialogs' and 'Apps' nodes of the Theme Editor's main tree view (the selectors jstree).
+         * 'Elements' and 'Apps' nodes of the Theme Editor's main tree view (the selectors jstree).
          *
          * that leaves us with only the custom built selectors to pick up here,
          * to be used in na.site.saveTheme() and na.site.loadTheme()
@@ -960,21 +960,25 @@ class naThemeEditor {
             case 'naElement' :
                 var
                 parent = $('#themeEditor_jsTree_selectors').jstree(true).get_node(it.parent),
-                                        regExDialogs = /#site(.*)[\s\w\.\#\d\>]*/,
-                                        regExApps = /#app__(.*)__(.*)$/;
+                regExDialogs = /#site(.*)[\s\w\.\#\d\>]*/,
+                regExApps = /#app__(.*)__(.*)$/;
 
-                                        if (
-                                            !it.text.match(regExDialogs)
-                                            && !it.text.match(regExApps)
-                                            && !it.text.match(/Dialog/)
-                                            //&& !it.text.match(/Extras/)
-                                        ) {
-                                            if (!themeSettings[parent.text]) themeSettings[parent.text] = {};
-                                            themeSettings[parent.text] = $.extend (
-                                                themeSettings[parent.text], na.site.fetchTheme(it.text)
-                                            );
-                                        }
-                                        break;
+                if (
+                    it.text!=='Elements'
+                    && !it.text.match(regExDialogs)
+                    && !it.text.match(regExApps)
+                    && !it.text.match(/Dialog/)
+                    //&& !it.text.match(/Extras/)
+                ) {
+                    if (!themeSettings[it.text]) themeSettings[it.text] = {};
+                    themeSettings[it.text] = $.extend (
+                        themeSettings[it.text], na.site.fetchTheme(it.text)
+                    );
+                }
+                break;
+
+
+
         }
         return themeSettings;
     }
@@ -2341,8 +2345,8 @@ class naThemeEditor {
         if (na.te.s.c.forDialogID) {
             var
             el = $('#'+na.te.s.c.forDialogID),
-                                                            el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent'),
-                                                            el3 = $('#'+na.te.s.c.forDialogID+' td');
+            el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent'),
+            el3 = $('#'+na.te.s.c.forDialogID+' td');
         } else {
             var el = el2 = el3 = $(na.te.s.c.forElements);
         };
@@ -2353,57 +2357,62 @@ class naThemeEditor {
         +$('#textShadowBlurRadius').val()+'px '
         +na.te.s.c.textShadowColor,
         newFontSize = $('#textSize').val(),
-                                                            newFontWeight = parseInt($('#textWeight').val()) * 100,
-                                                            newFontFamily = newFontFamily ? newFontFamily : na.te.s.c.selectedFontFamily, //$('#textFontFamily').val(),//.replace(/ /g, '+'),
-                                                            els = $('#'+na.te.s.c.selectedTextShadowID+' > div')
-                                                            .add(el).add(el2).add(el3);
-                                                            if (newFontFamily) na.te.s.c.selectedFontFamily = newFontFamily;
+        newFontWeight = parseInt($('#textWeight').val()) * 100,
+        newFontFamily = newFontFamily ? newFontFamily : na.te.s.c.selectedFontFamily, //$('#textFontFamily').val(),//.replace(/ /g, '+'),
+        els = $('#'+na.te.s.c.selectedTextShadowID+' > div')
+        .add(el).add(el2).add(el3);
+        if (newFontFamily) na.te.s.c.selectedFontFamily = newFontFamily;
 
-                                                            na.te.cssChange (els, {
-                                                                textShadow : newTextShadow,
-                                                                fontWeight : newFontWeight,
-                                                                fontSize : newFontSize+'px',
-                                                                fontFamily : newFontFamily
-                                                            });
-                                                            na.site.saveTheme();
+        na.te.cssChange (els, {
+            textShadow : newTextShadow,
+            fontWeight : newFontWeight,
+            fontSize : newFontSize+'px',
+            fontFamily : newFontFamily
+        });
+        debugger;
+        na.site.saveTheme();
 
-                                                            $('.textShadow_containerDiv').removeClass('selected');
-                                                            $('#'+na.te.s.c.selectedTextShadowID+'_containerDiv').addClass('selected');
-                                                            //na.te.s.c.textShadowColor = cssExtract.textShadowColor[0];
-                                                            if ($('#textShadowSettings .sp-container').length > 0)
-                                                                if ($.spectrum) $('#textShadowColorpicker').spectrum('set', na.te.s.c.textShadowColor);
-                                                                else if ($.spectrum) $('#textShadowColorpicker').spectrum ({
-                                                                    color : na.te.s.c.textShadowColor,
-                                                                    type: "flat",
-                                                                    showAlpha : true,
-                                                                    showPalette : false,
-                                                                    clickoutFiresChange : false,
-                                                                    change : na.te.boxSettingsChanged_shadowColor
-                                                                });
+        $('.textShadow_containerDiv').removeClass('selected');
+        $('#'+na.te.s.c.selectedTextShadowID+'_containerDiv').addClass('selected');
+        //na.te.s.c.textShadowColor = cssExtract.textShadowColor[0];
+        if ($('#textShadowSettings .sp-container').length > 0)
+            if ($.spectrum) $('#textShadowColorpicker').spectrum('set', na.te.s.c.textShadowColor);
+            else if ($.spectrum) $('#textShadowColorpicker').spectrum ({
+                color : na.te.s.c.textShadowColor,
+                type: "flat",
+                showAlpha : true,
+                showPalette : false,
+                clickoutFiresChange : false,
+                change : na.te.boxSettingsChanged_shadowColor
+            });
 
-                                                            na.te.textSettingsSelected_updateDialog(evt);
+        na.te.textSettingsSelected_updateDialog(evt);
+    }
+
+    cssChange (els, props) {
+        $(els).css(props);
     }
 
     textSettingsSelected_updateDialog  () {
         var
         el = $('#'+na.te.s.c.forDialogID),
-                                                            el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent, #'+na.te.s.c.forDialogID+' td'),
-                                                            newFontSize = $('#textSize').val(),
-                                                            newFontWeight = parseInt($('#textWeight').val()) * 100,
-                                                            newFontFamily = na.te.s.c.selectedFontFamily,//$('#textFontFamily').val(),//.replace(/ /g, '+'),
-                                                            newTextShadow = '';
+        el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent, #'+na.te.s.c.forDialogID+' td'),
+        newFontSize = $('#textSize').val(),
+        newFontWeight = parseInt($('#textWeight').val()) * 100,
+        newFontFamily = na.te.s.c.selectedFontFamily,//$('#textFontFamily').val(),//.replace(/ /g, '+'),
+        newTextShadow = '';
 
-                                                            $('.textShadow')
-                                                            //.css({ fontWeight : newFontWeight, fontSize : newFontSize+'px', fontFamily : newFontFamily })
-                                                            .each(function(idx,el) {
-                                                                if (newTextShadow!=='') newTextShadow+=', ';
-                                                                newTextShadow += $('#'+el.id+' > div').css('textShadow');
-                                                            });
+        $('.textShadow')
+        //.css({ fontWeight : newFontWeight, fontSize : newFontSize+'px', fontFamily : newFontFamily })
+        .each(function(idx,el) {
+            if (newTextShadow!=='') newTextShadow+=', ';
+            newTextShadow += $('#'+el.id+' > div').css('textShadow');
+        });
 
-                                                            na.te.cssUpdate($(el).add(el2), { fontWeight : newFontWeight, fontSize : newFontSize+'px', fontFamily : newFontFamily });
-                                                            na.te.cssUpdate($(el).add(el2), { textShadow : newTextShadow });
-                                                            /*if (na.te.s.c.fireSaveTheme) */na.site.saveTheme();
-                                                            window.dispatchEvent(new Event('resize'));
+        na.te.cssUpdate($(el).add(el2), { fontWeight : newFontWeight, fontSize : newFontSize+'px', fontFamily : newFontFamily });
+        na.te.cssUpdate($(el).add(el2), { textShadow : newTextShadow });
+        /*if (na.te.s.c.fireSaveTheme) */na.site.saveTheme();
+        window.dispatchEvent(new Event('resize'));
     }
 
     textSettingsSelected_textColor  (color) {
@@ -2412,8 +2421,8 @@ class naThemeEditor {
         if (na.te.s.c.forDialogID) {
             var
             el = $('#'+na.te.s.c.forDialogID),
-                                                            el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent'),
-                                                            el3 = $('#'+na.te.s.c.forDialogID+' td');
+            el2 = $('#'+na.te.s.c.forDialogID+' > .vividDialogContent'),
+            el3 = $('#'+na.te.s.c.forDialogID+' td');
         } else {
             var el = el2 = el3 = $(na.te.s.c.forElements);
         };
@@ -2608,6 +2617,7 @@ class naThemeEditor {
             event.preventDefault();
 
             na.te.s.c.newElementID = na.m.randomString();
+            debugger;
             $('#themeEditor_jsTree_selectors').jstree().create_node(na.te.s.c.selectedSelector.node, {
                 id : na.te.s.c.newElementID,
                 text : 'New Element',

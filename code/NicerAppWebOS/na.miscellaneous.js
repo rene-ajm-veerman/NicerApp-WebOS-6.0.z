@@ -36,6 +36,13 @@ na.m = {
 		}
     },
 
+    camelToKebab(str) {
+        return str
+        .replace(/([a-z0-9])([A-Z])/g, '$1-$2')  // insert hyphen between lower/number and upper
+        .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2') // handle consecutive capitals (e.g. XMLHttp → xml-http)
+        .toLowerCase();
+    },
+
     encodeUnicodePath(path) {
         try {
             var r = path.replace('/filesAtRoot','').split('/').map(segment =>
@@ -51,18 +58,17 @@ na.m = {
 
     cssTranslation : function (dID, cssObj) {
         //var cssText = dID+' {\n';
-        var cssText = '';
-        for (var sel in cssObj) {
-            if (sel=='css') continue;
-            cssText += sel+' {\n';
-            var v1 = cssObj[sel];
+        if (dID!==undefined && dID!=='undefined') {
+            var cssText = dID + ' {';
+            var v1 = cssObj[dID];
             for (var k in v1) {
                 var v2 = v1[k];
-                cssText += '\t' + k + ' : '+v2+';\n';
+                cssText += '\t' + na.m.camelToKebab(k) + ' : '+v2+';\n';
             }
             cssText += '}\n';
-        }
-        return cssText;
+            return cssText;
+        } else return '';
+
     },
     cssTranslation_fetchTheme : function (dID, cssObj) {
         //var cssText = dID+' {\n';
