@@ -72,12 +72,12 @@ class naThemeEditor {
     }
 
     onload (forDialogID) {
-        /*na.m.waitForCondition ('na.te.onload(): $.spectrum()?', function () {
-         *            return jQuery.spectrum=='function'
-    }, function() {
-    na.te.onload_do(forDialogID);
-    }, 200);*/
-        na.te.onload_do(forDialogID);
+        na.m.waitForCondition ('na.te.onload(): $.spectrum()?', function () {
+            return jQuery.spectrum;
+        }, function() {
+            na.te.onload_do(forDialogID);
+        }, 200);
+        //na.te.onload_do(forDialogID);
     }
 
     onload_do  (forDialogID) {
