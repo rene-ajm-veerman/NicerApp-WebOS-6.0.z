@@ -54,7 +54,7 @@ class naThemeEditor {
             theme[key] = $.extend (theme[key] || {}, css);
         }
 
-        //BAD Grok : if (opts.save !== false && Object.keys(keys).length > 0) na.site.saveTheme();
+        //failed, Grok.. : if (opts.save !== false && Object.keys(keys).length > 0) na.site.saveTheme();
         return $t;
     }
 
@@ -69,6 +69,22 @@ class naThemeEditor {
         base = cls || (el.tagName||'').toLowerCase(),
         p = el.parentElement;
         return (p && p.id) ? '#'+p.id+' > '+base : base;
+    }
+
+    initFlatSpectrum($el, options) {
+        if (!$.spectrum) return;
+        if ($el.data('spectrum')) {
+            $el.spectrum('destroy');
+        }
+        $el.spectrum($.extend({
+            flat: true,
+            showAlpha: true,
+            showPalette: false,
+            clickoutFiresChange: false,
+            // optional but often useful for a pure dialog look:
+            // showInput: false,
+            // showButtons: false
+        }, options || {}));
     }
 
     onload (forDialogID) {
@@ -465,33 +481,40 @@ class naThemeEditor {
     var x = $('#colorpicker').css('display'), y = 'abc';
     if (typeof c==='undefined') c = 'rgba(0,0,0,0.5)';
     //debugger;
-    if ($.spectrum) na.te.cssUpdate($('#colorpicker'), {display:'block'}).spectrum ({
-        color:c,
-        type:'flat',
-        showAlpha : true,
-        showPalette : false,
-        clickoutFiresChange : false,
-        change  (color) {
-            if (typeof color=='object') color = 'rgba('+color._r+', '+color._g+', '+color._b+', '+color._a+')';
-                                                                                    if (na.te.s.c.forDialogID) {
-                                                                                        var bg = $('#'+na.te.s.c.forDialogID+' > .vividDialogBackground1')[0];
-                                                                                    } else {
-                                                                                        var bg = $(na.te.s.c.forElements);
-                                                                                    };
-            na.te.cssUpdate($(bg), { background : color, opacity : 1 });
-            na.site.saveTheme();
-        }});
+    if ($.spectrum) {
+        na.te.cssUpdate($('#colorpicker'), {display:'block'})
+        na.te.initFlatSpectrum($('#colorpicker'), {
+            color:c,
+            type:'flat',
+            showAlpha : true,
+            showPalette : false,
+            clickoutFiresChange : false,
+            change : function (color) {
+                debugger;
+                if (typeof color=='object') color = 'rgba('+color._r+', '+color._g+', '+color._b+', '+color._a+')';
+                if (na.te.s.c.forDialogID) {
+                    var bg = $('#'+na.te.s.c.forDialogID+' > .vividDialogBackground1')[0];
+                } else {
+                    var bg = $(na.te.s.c.forElements);
+                };
+                na.te.cssUpdate($(bg), { background : color, opacity : 1 });
+                na.site.saveTheme();
+            }});
+    }
     //if (na.te.s.c.selectedButtonID!=='btnSelectBackgroundColor') $('#colorpicker').next().css({display:x});
     var x = $('#borderColorpicker').css('display');
     if (typeof c2==='undefined') c2 = 'black';
-    if ($.spectrum) na.te.cssUpdate($('#borderColorpicker'), {display:'block'}).spectrum ({
-        color:c2,
-        type: "flat",
-        showAlpha : true,
-        showPalette : false,
-        clickoutFiresChange : false,
-        change : na.te.borderSettingsSelected
-    });
+    if ($.spectrum) {
+        na.te.cssUpdate($('#borderColorpicker'), {display:'block'})
+        na.te.initFlatSpectrum($('#borderColorpicker'), {
+            color:c2,
+            flat: true,
+            showAlpha : true,
+            showPalette : false,
+            clickoutFiresChange : false,
+            change : na.te.borderSettingsSelected
+        });
+    }
     //if (na.te.s.c.selectedButtonID!=='btnSelectBorderSettings') $('#borderColorpicker').next().css({display:x});
 
     //if ($(window).width() < na.site.globals.reallySmallDeviceWidth) $('.sp-container').css({width:$(window).width()-35});
@@ -864,62 +887,62 @@ class naThemeEditor {
 
         var
         newIDa = na.m.randomString(),
-                                        newIDb = na.m.randomString(),
-                                        outputData = {
-                                            dat : [{
-                                                id : newIDa,
-                                                parent : '#',
-                                                text : 'Elements',
-                                                state : {
-                                                    opened : true
-                                                },
-                                                type : 'naSelectorSet'
-                                            }],
-                                            did : null
-                                        };
+        newIDb = na.m.randomString(),
+        outputData = {
+            dat : [{
+                id : newIDa,
+                parent : '#',
+                text : 'Elements',
+                state : {
+                    opened : true
+                },
+                type : 'naSelectorSet'
+            }],
+            did : null
+        };
 
-                                        $('.vividDialog > .vividDialogContent').each(function (idx,el) {
-                                            var pd = $(el).parents('.vividDialog')[0];
+        $('.vividDialog > .vividDialogContent').each(function (idx,el) {
+            var pd = $(el).parents('.vividDialog')[0];
 
-                                            var newID2 = na.m.randomString();
-                                            outputData.dat.push ({
-                                                id : newID2,
-                                                parent : newIDa,
-                                                text : pd.id,
-                                                state : {
-                                                    opened : true
-                                                },
-                                                type : 'naSelectorSet'
-                                            });
-                                            if (pd.id==na.te.s.c.forDialogID) outputData.did = newID2;
+            var newID2 = na.m.randomString();
+            outputData.dat.push ({
+                id : newID2,
+                parent : newIDa,
+                text : pd.id,
+                state : {
+                    opened : true
+                },
+                type : 'naSelectorSet'
+            });
+            if (pd.id==na.te.s.c.forDialogID) outputData.did = newID2;
 
-                                            var
-                                            divSel = '#'+pd.id,
-                                            newID3 = na.m.randomString();
-                                            outputData.dat.push ({
-                                                id : newID3,
-                                                parent : newID2,
-                                                text : divSel,
-                                                state : {
-                                                    opened : true
-                                                },
-                                                type : 'naCSS'
-                                            });
+            var
+            divSel = '#'+pd.id,
+            newID3 = na.m.randomString();
+            outputData.dat.push ({
+                id : newID3,
+                parent : newID2,
+                text : divSel,
+                state : {
+                    opened : true
+                },
+                type : 'naCSS'
+            });
 
-                                            divSel = '#'+pd.id+' > .vdBackground';
-                                            newID3 = na.m.randomString();
-                                            outputData.dat.push ({
-                                                id : newID3,
-                                                parent : newID2,
-                                                text : divSel,
-                                                state : {
-                                                    opened : true
-                                                },
-                                                type : 'naCSS'
-                                            });
-                                        });
+            divSel = '#'+pd.id+' > .vdBackground';
+            newID3 = na.m.randomString();
+            outputData.dat.push ({
+                id : newID3,
+                parent : newID2,
+                text : divSel,
+                state : {
+                    opened : true
+                },
+                type : 'naCSS'
+            });
+        });
 
-                                        return outputData;
+        return outputData;
 
     }
 
@@ -996,57 +1019,57 @@ class naThemeEditor {
         var
         t = this,
         display = $('#themeEditor_photoAlbum').css('display'),
-                                        doc = $('#themeEditor_photoAlbum')[0].contentWindow.document;
-                                        na.te.cssUpdate($('.vividScrollpane div', doc), {width:100,height:130});
-                                        na.te.cssUpdate($('.vividScrollpane div img', doc), {width:90,height:100}).each(function(idx,el){
-                                            el.onclick = function () {
-                                                na.te.imageSelected(el);
-                                            };
-                                        });
-                                        /*$('#themeEditor_photoOpacity')[0].oninput = function () {
-                                         *            if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
-    };
-    $('#themeEditor_photoScale')[0].oninput = function () {
-    na.te.s.c.scale = parseInt($('#themeEditor_photoScale').val());
-                        if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
-    };*/
-                                        na.te.cssUpdate($('#themeEditor_jsTree_backgrounds'), {
-                                            width : $('#siteToolbarThemeEditor > .vividDialogContent').width(),
-                                                        height :
-                                                        $('#siteToolbarThemeEditor > .vividDialogContent').height()
-                                                        - $('#themeEditor_jsTree_backgrounds').position().top
-                                                        + 10
-                                        });
+        doc = $('#themeEditor_photoAlbum')[0].contentWindow.document;
+        na.te.cssUpdate($('.vividScrollpane div', doc), {width:100,height:130});
+        na.te.cssUpdate($('.vividScrollpane div img', doc), {width:90,height:100}).each(function(idx,el){
+            el.onclick = function () {
+                na.te.imageSelected(el);
+            };
+        });
+        /*$('#themeEditor_photoOpacity')[0].oninput = function () {
+            *            if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
+};
+$('#themeEditor_photoScale')[0].oninput = function () {
+na.te.s.c.scale = parseInt($('#themeEditor_photoScale').val());
+if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
+};*/
+        na.te.cssUpdate($('#themeEditor_jsTree_backgrounds'), {
+            width : $('#siteToolbarThemeEditor > .vividDialogContent').width(),
+                        height :
+                        $('#siteToolbarThemeEditor > .vividDialogContent').height()
+                        - $('#themeEditor_jsTree_backgrounds').position().top
+                        + 10
+        });
 
-                                        na.te.cssUpdate($('.themeEditor_colorPicker').next(), { width : 230, zIndex : 1100  });
-                                        //$('#siteToolbarThemeEditor label', t.el).not('.specificityCB').css ({ float : 'left' });
+        na.te.cssUpdate($('.themeEditor_colorPicker').next(), { width : 230, zIndex : 1100  });
+        //$('#siteToolbarThemeEditor label', t.el).not('.specificityCB').css ({ float : 'left' });
 
-                                        na.te.cssUpdate($('.themeEditorComponent, .themeEditorComponent_containerDiv2'), {
-                                            height :
-                                            $('#siteToolbarThemeEditor > .vividDialogContent').height()
-                                            - $('.nate_dialogTitle').height() - 10
-                                            - $('#specificitySettings').height() - 8
-                                            - 18
-                                        });
-                                        /*
-                                         *        $('.boxSettings_label_containerDiv, .textSettings_label_containerDiv, .textShadowSettings_label_containerDiv').css ({
-                                         *            width : '60px'
-    });
-                        */
-                                        na.te.cssUpdate($('.boxSettings_input_containerDiv, .textSettings_input_containerDiv, .textShadowSettings_input_containerDiv'), {
-                                            //width : 'calc(100%)',
-                                        });
+        na.te.cssUpdate($('.themeEditorComponent, .themeEditorComponent_containerDiv2'), {
+            height :
+            $('#siteToolbarThemeEditor > .vividDialogContent').height()
+            - $('.nate_dialogTitle').height() - 10
+            - $('#specificitySettings').height() - 8
+            - 18
+        });
+        /*
+            *        $('.boxSettings_label_containerDiv, .textSettings_label_containerDiv, .textShadowSettings_label_containerDiv').css ({
+            *            width : '60px'
+});
+*/
+        na.te.cssUpdate($('.boxSettings_input_containerDiv, .textSettings_input_containerDiv, .textShadowSettings_input_containerDiv'), {
+            //width : 'calc(100%)',
+        });
 
-                                        var psy = $('#label_themeEditor_photoScaleY')[0];
-                                        var psyn = $(psy).position().top + $(psy).height() + na.d.g.margin;
-                                        na.te.cssUpdate(na.te.cssUpdate($('#themeEditor_photoAlbum'), {
-                                            display : 'flex',
-                                            //width : $('#siteToolbarThemeEditor > .vividDialogContent').width(),
-                                            height : '100%',
-                                            //$('#siteToolbarThemeEditor > .vividDialogContent').height()
-                                            //- $('#themeEditor_photoAlbum').position().top,
-                                            top : 'auto'
-                                        }), {display:display});
+        var psy = $('#label_themeEditor_photoScaleY')[0];
+        var psyn = $(psy).position().top + $(psy).height() + na.d.g.margin;
+        na.te.cssUpdate(na.te.cssUpdate($('#themeEditor_photoAlbum'), {
+            display : 'flex',
+            //width : $('#siteToolbarThemeEditor > .vividDialogContent').width(),
+            height : '100%',
+            //$('#siteToolbarThemeEditor > .vividDialogContent').height()
+            //- $('#themeEditor_photoAlbum').position().top,
+            top : 'auto'
+        }), {display:display});
     }
 
     onclick  (el) {
@@ -1154,62 +1177,62 @@ class naThemeEditor {
     deleteSpecificity  (event, callback) {
         var
         fncn = 'na.te.deleteSpecificity(event, callback)',
-                                        s = na.te.s.c.specificity,
-                                        themeData = {};
+        s = na.te.s.c.specificity,
+        themeData = {};
 
-                                        if (s.url) themeData.url = s.url;
-                                        if (s.role) themeData.role = s.role;
-                                        if (s.user) themeData.user = s.user;
+        if (s.url) themeData.url = s.url;
+        if (s.role) themeData.role = s.role;
+        if (s.user) themeData.user = s.user;
 
-                                        var
-                                        url = '/NicerAppWebOS/businessLogic/ajax/ajax_delete_vividDialog_settings.php',
-                                        ac = {
-                                            type : 'POST',
-                                        url : url,
-                                        data : themeData,
-                                        success  (data, ts, xhr) {
-                                            var
-                                            state = History.getState(),
-                                        url = state.url.replace(document.location.origin,'').replace('/apps/', ''),
-                                        url2 = url.replace(document.location.origin,'').replace(document.location.host,'').replace('/apps/', '');
+        var
+        url = '/NicerAppWebOS/businessLogic/ajax/ajax_delete_vividDialog_settings.php',
+        ac = {
+            type : 'POST',
+        url : url,
+        data : themeData,
+        success  (data, ts, xhr) {
+            var
+            state = History.getState(),
+        url = state.url.replace(document.location.origin,'').replace('/apps/', ''),
+        url2 = url.replace(document.location.origin,'').replace(document.location.host,'').replace('/apps/', '');
 
-                                        var ac2 = {
-                                            type : 'GET',
-                                        url : '/NicerAppWebOS/businessLogic/ajax/ajax_get_pageSpecificSettings.php',
-                                        data : {
-                                            apps : url2
-                                        },
-                                        success  (data, ts, xhr) {
-                                            $('#cssPageSpecific, #jsPageSpecific').remove();
-                                            $('head').append(data);
-                                            setTimeout(function () {
-                                                na.site.loadTheme (function () {
-                                                    var
-                                                    btn = $('#'+na.te.s.c.selectedButtonID)[0],
-                                                                   evt = { currentTarget : $('#specificity')[0] };
+        var ac2 = {
+            type : 'GET',
+        url : '/NicerAppWebOS/businessLogic/ajax/ajax_get_pageSpecificSettings.php',
+        data : {
+            apps : url2
+        },
+        success  (data, ts, xhr) {
+            $('#cssPageSpecific, #jsPageSpecific').remove();
+            $('head').append(data);
+            setTimeout(function () {
+                na.site.loadTheme (function () {
+                    var
+                    btn = $('#'+na.te.s.c.selectedButtonID)[0],
+                                    evt = { currentTarget : $('#specificity')[0] };
 
-                                                                   na.te.specificitySelected(evt);
-                                                                   //na.te.onclick(btn, false);
-                                                                   var tabPage = na.te.s.c.selectedSetting;
-                                                                   na.te.whichSettingSelected(tabPage);
+                                    na.te.specificitySelected(evt);
+                                    //na.te.onclick(btn, false);
+                                    var tabPage = na.te.s.c.selectedSetting;
+                                    na.te.whichSettingSelected(tabPage);
 
-                                                                   if (typeof callback=='function') callback (themeData, data);
-                                                });
-                                            }, 250);
-                                        },
-                                        failure  (xhr, ajaxOptions, thrownError) {
-                                        }
-                                        };
-                                        //setTimeout (function() {
-                                        $.ajax(ac2);
-                                        //}, 250);
+                                    if (typeof callback=='function') callback (themeData, data);
+                });
+            }, 250);
+        },
+        failure  (xhr, ajaxOptions, thrownError) {
+        }
+        };
+        //setTimeout (function() {
+        $.ajax(ac2);
+        //}, 250);
 
-                                        },
-                                        error  (xhr, textStatus, errorThrown) {
-                                            na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
-                                        }
-                                        };
-                                        $.ajax(ac);
+        },
+        error  (xhr, textStatus, errorThrown) {
+            na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+        }
+        };
+        $.ajax(ac);
     }
 
     cbSelected  (event) {
@@ -1617,14 +1640,16 @@ class naThemeEditor {
                         .not('.boxSettings_label_containerDiv, #borderColorpicker, .sp-container')
                         .css({width:320-135,verticalAlign:'middle',display:'inline-block'});
     });*/
-    if ($.spectrum) $('#borderColorpicker').spectrum ({
-        color : na.te.s.c.borderColor,
-        type: "flat",
-        showAlpha : true,
-        showPalette : false,
-        clickoutFiresChange : false,
-        change : na.te.borderSettingsSelected
-    });
+    if ($.spectrum) {
+        na.te.initFlatSpectrum($('#borderColorpicker'), {
+            color : na.te.s.c.borderColor,
+            flat: true,
+            showAlpha : true,
+            showPalette : false,
+            clickoutFiresChange : false,
+            change : na.te.borderSettingsSelected
+        });
+    }
     var evt2 = { currentTarget : $('#'+na.te.s.c.forDialogID)[0] };
     na.te.borderSettingsSelected (evt2, false); //event.currentTarget === ct
     }
@@ -1742,71 +1767,75 @@ class naThemeEditor {
 
         var
         bs = $('div.boxShadow_label', event.currentTarget).css('boxShadow'),
-                                        b = $('div.boxShadow_label', event.currentTarget).css('border');
+        b = $('div.boxShadow_label', event.currentTarget).css('border');
 
-                                        if (b && b.indexOf('none')!==-1)
-                                            b = $(event.currentTarget).css('borderTopWidth')+' '
-                                            +$(event.currentTarget).css('borderTopStyle')+' '
-                                            +$(event.currentTarget).css('borderTopColor');
+        if (b && b.indexOf('none')!==-1)
+            b = $(event.currentTarget).css('borderTopWidth')+' '
+            +$(event.currentTarget).css('borderTopStyle')+' '
+            +$(event.currentTarget).css('borderTopColor');
 
-                                        if (bs == 'none') {
-                                            var
-                                            cssExtract = {
-                                                boxShadowSliders : [ [ 2, 2, 4, 2 ] ],
-                                        boxShadowColor : [ '2px 2px 4px 2px rgba(0, 0, 0, 0.7)' ]
-                                            },
-                                        ctI = 0;
-                                        $('#boxShadowInset')[0].checked = false;
-                                        } else {
-                                            if (bs && b) {
-                                                if (bs.match('inset')) $('#boxShadowInset')[0].checked = true; else $('#boxShadowInset')[0].checked = false;
+        if (bs == 'none') {
+            var
+            cssExtract = {
+                boxShadowSliders : [ [ 2, 2, 4, 2 ] ],
+            boxShadowColor : [ '2px 2px 4px 2px rgba(0, 0, 0, 0.7)' ]
+                },
+            ctI = 0;
+            $('#boxShadowInset')[0].checked = false;
+        } else {
+            if (bs && b) {
+                if (bs.match('inset')) $('#boxShadowInset')[0].checked = true; else $('#boxShadowInset')[0].checked = false;
 
-                                                if (na.te.s.c.forDialogID)
-                                                    var
-                                                    cssExtract = na.te.cssExtract(na.te.s.c.forDialogID),
-                                        ctI = parseInt($(event.currentTarget).attr('i'));
-                                        else
-                                            var
-                                            cssExtract = na.te.cssExtract(na.te.s.c.forElements),
-                                        ctI = parseInt($(event.currentTarget).attr('i'));
+                if (na.te.s.c.forDialogID)
+                    var
+                    cssExtract = na.te.cssExtract(na.te.s.c.forDialogID),
+                    ctI = parseInt($(event.currentTarget).attr('i'));
+                else
+                    var
+                    cssExtract = na.te.cssExtract(na.te.s.c.forElements),
+                    ctI = parseInt($(event.currentTarget).attr('i'));
+            }
 
-                                        na.te.s.c.boxShadowColor = cssExtract.boxShadowColor[ctI];
-                                        $('#boxShadowXoffset').val(cssExtract.boxShadowSliders[ctI][0]);
-                                        $('#boxShadowYoffset').val(cssExtract.boxShadowSliders[ctI][1]);
-                                        $('#boxShadowSpreadRadius').val(cssExtract.boxShadowSliders[ctI][2]);
-                                        $('#boxShadowBlurRadius').val(cssExtract.boxShadowSliders[ctI][3]);
-                                        if ($.spectrum) $('#boxShadowColorpicker').spectrum ({
-                                            color : na.te.s.c.boxShadowColor
-                                        });
-                                            }
-                                        };
+            na.te.s.c.boxShadowColor = cssExtract.boxShadowColor[ctI];
+            $('#boxShadowXoffset').val(cssExtract.boxShadowSliders[ctI][0]);
+            $('#boxShadowYoffset').val(cssExtract.boxShadowSliders[ctI][1]);
+            $('#boxShadowSpreadRadius').val(cssExtract.boxShadowSliders[ctI][2]);
+            $('#boxShadowBlurRadius').val(cssExtract.boxShadowSliders[ctI][3]);
+            if ($.spectrum) {
+                na.te.initFlatSpectrum($('#boxShadowColorpicker'), {
+                    color : na.te.s.c.boxShadowColor
+                });
+            };
 
-                                        na.te.s.c.boxShadowColor = cssExtract.boxShadowColor[ctI];
-                                        if ($('#boxShadowSettings .sp-container').length > 0)
-                                            if ($.spectrum) $('#boxShadowColorpicker').spectrum('set', na.te.s.c.boxShadowColor);
-                                            else if ($.spectrum) $('#boxShadowColorpicker').spectrum ({
-                                                color : na.te.s.c.boxShadowColor,
-                                                type: "flat",
-                                                showAlpha : true,
-                                                showPalette : false,
-                                                clickoutFiresChange : false,
-                                                change : na.te.boxSettingsChanged_shadowColor
-                                            });
+            na.te.s.c.boxShadowColor = cssExtract.boxShadowColor[ctI];
+            if ($('#boxShadowSettings .sp-container').length > 0)
+                if ($.spectrum) {
+                    $('#boxShadowColorpicker').spectrum('set', na.te.s.c.boxShadowColor);
+                }
+            else if ($.spectrum) na.te.initFlatSpectrum($('#boxShadowColorpicker'), {
+                    color : na.te.s.c.boxShadowColor,
+                    flat: true,
+                    showAlpha : true,
+                    showPalette : false,
+                    clickoutFiresChange : false,
+                    change : na.te.boxSettingsChanged_shadowColor
+                });
 
-                                        if (saveTheme) na.te.boxSettingsChanged (na.te.s.c.boxShadowColor);
-                                        /*
-                                         *        var
-                                         *        b = $('div.boxShadow_bg', event.currentTarget).css('border'),
-                                         *        br = $('div.boxShadow_bg', event.currentTarget).css('borderRadius');
-                                         *        if (!b)
-                                         *            b = $('div.boxShadow_bg', event.currentTarget).css('borderTopWidth')+' '
-                                         *            +$('div.boxShadow_bg', event.currentTarget).css('borderTopStyle')+' '
-                                         *            +$('div.boxShadow_bg', event.currentTarget).css('borderTopColor');
-                                         *
-                                         *        if (b.indexOf('none')!==-1) {
-                                         *            var bw = b.match(/^\d+/)[0];
-                                         *            $('#borderWidth').val(parseInt(bw));
-    }
+            if (saveTheme) na.te.boxSettingsChanged (na.te.s.c.boxShadowColor);
+            /*
+                *        var
+                *        b = $('div.boxShadow_bg', event.currentTarget).css('border'),
+                *        br = $('div.boxShadow_bg', event.currentTarget).css('borderRadius');
+                *        if (!b)
+                *            b = $('div.boxShadow_bg', event.currentTarget).css('borderTopWidth')+' '
+                *            +$('div.boxShadow_bg', event.currentTarget).css('borderTopStyle')+' '
+                *            +$('div.boxShadow_bg', event.currentTarget).css('borderTopColor');
+                *
+                *        if (b.indexOf('none')!==-1) {
+                *            var bw = b.match(/^\d+/)[0];
+                *            $('#borderWidth').val(parseInt(bw));*/
+        }
+    /*
     if (br!=='') {
         $('#borderRadius').val(parseInt(br));
     }*/
@@ -1926,9 +1955,9 @@ class naThemeEditor {
                         if (bg1)
                             if ($('#themeEditor_backgroundColor  .sp-container').length > 0)
                                 if ($.spectrum) $('#colorpicker').spectrum('set', bg1);
-                                else if ($.spectrum) $('#colorpicker').spectrum ({
+                                else if ($.spectrum) na.te.initFlatSpectrum($('#colorpicker'), {
                                     color : bg1,
-                                    type: "flat",
+                                    flat: true,
                                     showAlpha : true,
                                     showPalette : false,
                                     clickoutFiresChange : false,
@@ -2090,9 +2119,9 @@ class naThemeEditor {
                 $('#textSettings').fadeIn('fast', 'swing', function () {
 
                     na.te.s.c.textColor = $('#'+na.te.s.c.forDialogID).css('color');
-                    if ($.spectrum) $('#textColorpicker').spectrum ({
+                    if ($.spectrum) na.te.initFlatSpectrum($('#textColorpicker'), {
                         color:na.te.s.c.textColor,
-                        type: "flat",
+                        flat: true,
                         showAlpha : true,
                         showPalette : false,
                         clickoutFiresChange : false,
@@ -2158,9 +2187,9 @@ class naThemeEditor {
                                                         na.te.s.c.selectedTextShadowID = 'textShadow_0';
                     var cssExtract = na.te.cssExtract(na.te.s.c.forDialogID);
                     na.te.s.c.textShadowColor = cssExtract.textShadowColor;
-                    if ($.spectrum) $('#textShadowColorpicker').spectrum ({
+                    if ($.spectrum) na.te.initFlatSpectrum($('#textShadowColorpicker'), {
                         color:na.te.s.c.textShadowColor,
-                        type: "flat",
+                        flat: true,
                         showPalette : false,
                         showAlpha : true,
                         clickoutFiresChange : false,
@@ -2377,9 +2406,9 @@ class naThemeEditor {
         //na.te.s.c.textShadowColor = cssExtract.textShadowColor[0];
         if ($('#textShadowSettings .sp-container').length > 0)
             if ($.spectrum) $('#textShadowColorpicker').spectrum('set', na.te.s.c.textShadowColor);
-            else if ($.spectrum) $('#textShadowColorpicker').spectrum ({
+            else if ($.spectrum) na.te.initFlatSpectrum($('#textShadowColorpicker'), {
                 color : na.te.s.c.textShadowColor,
-                type: "flat",
+                flat: true,
                 showAlpha : true,
                 showPalette : false,
                 clickoutFiresChange : false,
