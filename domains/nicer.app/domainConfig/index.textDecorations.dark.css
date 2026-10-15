@@ -1,4 +1,4 @@
-body, p { color : white; }
+body { color : white; }
 blockquote, div > span:not(.newsApp__item__date, .newsApp__item__copy), p > span, li > span, div > p:(.backdropped) {
   background : rgba(0,0,0,0.45) !important;
 }

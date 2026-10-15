@@ -3652,7 +3652,7 @@ na.site = {
         clearTimeout (na.site.settings.timeout_saveTheme);
         na.site.settings.timeout_saveTheme = setTimeout(function (callback, theme, loadBackground) {
             na.site.saveTheme_do (callback, theme, loadBackground);
-        }, 333, callback, theme, loadBackground);
+        }, 800, callback, theme, loadBackground);
     },
 
     saveTheme_do : function (callback, theme, loadBackground) {

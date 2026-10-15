@@ -2457,6 +2457,8 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
         };
         var els = $(el).add(el2).add(el3);
         na.te.cssChange (els, { color : color });
+        debugger;
+
         /*if (na.te.s.c.fireSaveTheme) */na.site.saveTheme();
     }
 

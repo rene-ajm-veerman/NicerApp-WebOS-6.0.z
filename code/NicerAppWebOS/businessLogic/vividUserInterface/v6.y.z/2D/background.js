@@ -87,9 +87,17 @@ na.backgrounds = na.background = na.bg = {
         return this;
     },
 
-    // below here was all written with the free help of grok.com
+    // ------------------------------------------------------------------
+    // 1.  Replace / extend showBrowser()
+    // ------------------------------------------------------------------
     showBrowser : function () {
-        $('#siteBackgrounds_content').html(`
+        const html = `
+        <div id="siteBackgrounds_tabs" style="padding:8px 12px 0; display:flex; gap:8px;">
+        <button class="bgTab active" data-tab="images">Images</button>
+        <button class="bgTab" data-tab="youtube">YouTube Videos</button>
+        </div>
+
+        <div id="siteBackgrounds_tab_images" class="bgTabContent">
         <div id="siteBackgrounds_leftPanel" class="siteBackgrounds_panel vividScrollpane">
         <div id="siteBackgrounds_searchBox" style="padding:8px 12px 4px; position:sticky; top:0; background:inherit; z-index:2;">
         <input type="search" id="siteBackgrounds_filter"
@@ -99,7 +107,30 @@ na.backgrounds = na.background = na.bg = {
         <div id="siteBackgrounds_tags"></div>
         </div>
         <div id="siteBackgrounds_rightPanel" class="siteBackgrounds_panel vividScrollpane"></div>
-        `);
+        </div>
+
+        <div id="siteBackgrounds_tab_youtube" class="bgTabContent" style="display:none;">
+        <div style="padding:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <input type="search" id="ytSearchInput" placeholder="Search YouTube or paste video URL / ID…"
+        style="flex:1; min-width:220px; padding:8px 12px; border-radius:6px; border:1px solid #666; background:#222; color:#eee;">
+        <button id="ytSearchBtn" class="vividButton">Search</button>
+        </div>
+        <div id="ytResults" class="vividScrollpane" style="padding:8px; height:calc(100% - 70px); overflow:auto;"></div>
+        </div>
+        `;
+
+        $('#siteBackgrounds_content').html(html);
+
+        // basic tab switching
+        $('#siteBackgrounds_tabs .bgTab').on('click', function () {
+            const tab = $(this).data('tab');
+            $('#siteBackgrounds_tabs .bgTab').removeClass('active');
+            $(this).addClass('active');
+            $('.bgTabContent').hide();
+            $(`#siteBackgrounds_tab_${tab}`).show();
+        });
+
+        // existing image logic
         $('#siteBackgrounds').css({
             position : 'absolute',
             top : '4%',
@@ -108,31 +139,123 @@ na.backgrounds = na.background = na.bg = {
             height : 'calc(96% - 100px)'
         }).fadeIn('normal');
 
-
-        // Wait for metaInfo if not ready yet
         na.m.waitForCondition('metaInfo ready', function() {
             return na.background.metaInfo && Object.keys(na.background.metaInfo).length > 0;
         }, function() {
-            const totalKeywords = na.background.buildBackgroundsDialogContent(na.background);
-
+            na.background.buildBackgroundsDialogContent(na.background);
             na.background.renderKeywordsIncrementally(na.background, 500);
 
             const filterInput = document.getElementById('siteBackgrounds_filter');
             if (filterInput) {
                 filterInput.addEventListener('input', () => {
                     const q = filterInput.value.trim().toLowerCase();
-                    const tags = document.querySelectorAll('#siteBackgrounds_tags .kw.token');
-
-                    tags.forEach(span => {
+                    document.querySelectorAll('#siteBackgrounds_tags .kw.token').forEach(span => {
                         const text = span.textContent.toLowerCase();
                         span.style.display = (!q || text.includes(q)) ? '' : 'none';
                     });
                 });
-
-                // Optional: clear filter when the dialog is closed / reopened
                 filterInput.value = '';
             }
-        }, 100, 50); // check every 100ms, timeout after 5s
+        }, 100, 50);
+
+        // YouTube search wiring
+        $('#ytSearchBtn').on('click', () => na.background.doYouTubeSearch());
+        $('#ytSearchInput').on('keydown', e => {
+            if (e.key === 'Enter') na.background.doYouTubeSearch();
+        });
+    },
+
+    // ------------------------------------------------------------------
+    // 2.  New helpers
+    // ------------------------------------------------------------------
+    doYouTubeSearch : function () {
+        const q = $('#ytSearchInput').val().trim();
+        if (!q) return;
+
+        const $results = $('#ytResults').html('<div style="padding:20px; color:#aaa;">Searching…</div>');
+
+        // Prefer the server proxy
+        const url = '/NicerAppWebOS/businessLogic/ajax/ajax_youtubeSearch_innertube.byGrok.php?' + $.param({
+            q          : q,
+            maxResults : 24
+        });
+        $.getJSON(url)
+        .done(data => {
+            if (data.error) {
+                $results.html(`<div style="color:#f66; padding:20px;">${data.error}</div>`);
+                return;
+            }
+            this.renderYouTubeResults(data.items || []);
+
+            // optional status line
+            if (data._quota) {
+                const q = data._quota;
+                $('#ytResults').prepend(
+                    `<div style="padding:6px 12px; color:#8a8; font-size:12px;">
+                    YouTube searches today: ${q.used} / ${q.limit}
+                    (resets ${q.resetsAt})
+                    </div>`
+                );
+            }
+        })
+        .fail((xhr) => {
+            let msg = 'Search failed';
+            try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e){}
+            $results.html(`<div style="color:#f66; padding:20px;">${msg}</div>`);
+        });
+    },
+
+    extractYouTubeId : function (str) {
+        // covers watch?v=, youtu.be/, embed/, shorts/, etc.
+        const m = str.match(/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+        || str.match(/^([a-zA-Z0-9_-]{11})$/);
+        return m ? m[1] : null;
+    },
+
+    renderYouTubeResults : function (items) {
+        const $results = $('#ytResults').empty();
+        if (!items.length) {
+            $results.html('<div style="padding:20px; color:#aaa;">No videos found</div>');
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+        items.forEach(item => {
+            const id   = item.id.videoId || item.id;
+            const sn   = item.snippet || {};
+            const thumb = (sn.thumbnails && (sn.thumbnails.medium || sn.thumbnails.default))
+            ? sn.thumbnails.medium.url
+            : `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+
+            const card = document.createElement('div');
+            card.className = 'ytResultCard';
+            card.style.cssText = `
+            display:inline-block; width:220px; margin:8px; vertical-align:top;
+            background:#1a1a1a; border-radius:8px; overflow:hidden; cursor:pointer;
+            border:1px solid #333; transition:border-color .15s;
+            `;
+            card.innerHTML = `
+            <img src="${thumb}" style="width:100%; height:124px; object-fit:cover; display:block;">
+            <div style="padding:8px 10px; font-size:13px; color:#eee; line-height:1.3;">
+            <div style="font-weight:600; margin-bottom:4px;">${sn.title || id}</div>
+            <div style="color:#999; font-size:12px;">${sn.channelTitle || ''}</div>
+            </div>
+            `;
+            card.onmouseenter = () => card.style.borderColor = '#6af';
+            card.onmouseleave = () => card.style.borderColor = '#333';
+            card.onclick = () => {
+                // re-use your existing YouTube path
+                const fakeUrl = `https://www.youtube.com/watch?v=${id}`;
+                // or if you prefer the txt-file style:
+                // const fakeUrl = `/siteMedia/backgrounds/iframe/youtube/${id}.txt`;
+                na.background.next('#siteBackground', null, fakeUrl, true);
+                $('#siteBackgrounds').fadeOut('normal');
+                $('#btnSiteBackground')[0]?.vividUserInterface_2D_button?.deselect();
+                $('#changeBackgroundsAutomatically')[0] && ($('#changeBackgroundsAutomatically')[0].checked = false);
+            };
+            frag.appendChild(card);
+        });
+        $results.append(frag);
     },
 
     processMetaInfoAsync : function (metaInfo, onComplete) {
@@ -636,7 +759,6 @@ na.backgrounds = na.background = na.bg = {
             var url = hits[Math.floor(Math.random() * Math.floor(hits.length))];
         };
         na.m.log (10, fncn+' : url='+url, true);
-        //debugger;
         t.settings.div = div;
 
         /*
@@ -646,6 +768,7 @@ na.backgrounds = na.background = na.bg = {
             url : url,
             success : function (data, ts, xhr) {
         */
+
                 var
                 currentTime = performance.timeOrigin + performance.now(),
                 div = t.settings.div,
@@ -658,7 +781,7 @@ na.backgrounds = na.background = na.bg = {
 
                //debugger;
 
-                if (url.match('tiled')) {
+                if (url.match(/tiled/i)) {
                     if (na.bg.settings.useFading) {
                         $(bgf).add(bgl).fadeOut('slow');
                         $(bgDiv2).css ({
@@ -692,35 +815,22 @@ na.backgrounds = na.background = na.bg = {
                         if (typeof callback == 'function') callback();
                     }
 
+                } else if (url.match('youtube.com/')) {
+                    $(bgDiv).add(bgDiv2).css({display:'none'});
+                    $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
+
+                    na.bg.loadYoutubeBackground (url, callback);
+
                 } else if (url.match('youtube')) {
                     $(bgDiv).add(bgDiv2).css({display:'none'});
                     $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
+
 
                     var ac = {
                         type : 'GET',
                         url : url,
                         success : function (data, ts, xhr) {
-                            var
-                            outsideURL = data;
-
-                            var vidID = /embed\/(.*)\?/.exec(outsideURL);
-                            if (vidID) {
-                                vidID = vidID[1];
-                            } else {
-                                vidID = /watch\?v\=(.*)\&/.exec(outsideURL);
-                                if (vidID) vidID = vidID[1];
-                            };
-
-                            var html = 'var player; function onYouTubeIframeAPIReady() {  player = new YT.Player("siteBackground_iframe", { height: "100%", width: "100%", videoId: "'+vidID+'", playerVars: { "playsinline": 1 }, events: { "onReady": na.backgrounds.onPlayerReady, "onStateChange": na.backgrounds.onPlayerStateChange } }); }';
-                            $('#siteBackground_iframe_js').html (html);
-
-                            outsideURL = 'https://youtube.com/embed/'+vidID+'?autoplay=1&vq=hd2160&wmode=transparent&enablejsapi=1&html5=1&origin='+document.location.href;
-
-                            $('#siteBackground_iframe').css({display:'block',width:'100%',height:'100%'});
-                            $('#siteBackground_iframe')[0].src = outsideURL;
-                            $(bgDiv).add(bgDiv2).add(bgl).add(bgf).css({display:'none'});
-
-                            if (typeof callback == 'function') callback();
+                            na.bg.loadYoutubeBackground (data, callback);
                         },
                         error : function (xhr, textStatus, errorThrown) {
                             na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
@@ -769,6 +879,39 @@ na.backgrounds = na.background = na.bg = {
         //debugger;
         $.ajax(ajaxCommand);
 */
+    },
+
+    loadYoutubeBackground : function (ytURL, callback) {
+        var
+        t = na.background,
+        currentTime = performance.timeOrigin + performance.now(),
+        div = t.settings.div,
+        bgf = $(div+' img.bg_first')[0],
+        bgl = $(div+' img.bg_last')[0],
+        bgDiv = $(div+'_bg')[0],
+        bgDiv2 = $(div+'_bg2')[0],
+        outsideURL = ytURL;
+        if (!bgl) debugger;
+
+        var vidID = /embed\/(.*)\?/.exec(outsideURL);
+        if (vidID) {
+            vidID = vidID[1];
+        } else {
+            vidID = /watch\?v\=(.*)\&/.exec(outsideURL);
+            if (!vidID) vidID = /watch\?v\=(.*)$/.exec(outsideURL);
+            if (vidID) vidID = vidID[1];
+        };
+
+        var html = 'var player; function onYouTubeIframeAPIReady() {  player = new YT.Player("siteBackground_iframe", { height: "100%", width: "100%", videoId: "'+vidID+'", playerVars: { "playsinline": 1 }, events: { "onReady": na.backgrounds.onPlayerReady, "onStateChange": na.backgrounds.onPlayerStateChange } }); }';
+        $('#siteBackground_iframe_js').html (html);
+
+        outsideURL = 'https://youtube.com/embed/'+vidID+'?autoplay=1&vq=hd2160&wmode=transparent&enablejsapi=1&html5=1&origin='+document.location.href;
+
+        $('#siteBackground_iframe').css({display:'block',width:'100%',height:'100%'});
+        $('#siteBackground_iframe')[0].src = outsideURL;
+        $(bgDiv).add(bgDiv2).add(bgl).add(bgf).css({display:'none'});
+
+        if (typeof callback == 'function') callback();
     },
 
     onPlayerReady : function (a,b,c,d,e,f,g) {
