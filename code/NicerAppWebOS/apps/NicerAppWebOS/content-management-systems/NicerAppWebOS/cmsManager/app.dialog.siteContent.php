@@ -148,7 +148,7 @@ $ip = (array_key_exists('X-Forwarded-For',apache_request_headers())?apache_reque
 
 
 <!-- The Dialog Main Frame Window -->
-<div id="siteYoutubeContentManager" class="naVividTabPage" style="display:none; position:absolute; flex-direction:row; z-index:9850000000000;width:100%;">
+<div id="siteYoutubeContentManager" class="naVividTabPage" style="display:none; position:absolute; flex-direction:row; z-index:9850000000000;width:100%;height:100%">
 
 <!-- Left Pane Viewports -->
 <div id="siteYoutubeContentManager_left" style="float:left;width:35%; height:100%; display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.2); padding:10px; box-sizing:border-box;">
@@ -223,12 +223,12 @@ echo $naWebOS->html_vividButton (
 );
 ?>
 </div>
+<iframe id="ytContentPlayer" style="position:relative; float:left; width:100%; height:auto; aspect-ratio:16/9;" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Right Pane Results Viewports -->
 <div id="siteYoutubeContentManager_right" style="width:65%; height:100%; display:flex; flex-direction:column; padding:10px; box-sizing:border-box; overflow-y:auto;">
-<iframe id="ytContentPlayer" style="position:relative; float:left; width:100%; height:100%;" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-<div id="ytManagerSearchResults" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px;">
+<div id="ytManagerSearchResults" class="vividScrollpane" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px;">
 <div class="placeholder-notice" style="color:#aaa; text-align:center; grid-column: 1/-1; padding-top:40px;">Results will populate here...</div>
 </div>
 </div>

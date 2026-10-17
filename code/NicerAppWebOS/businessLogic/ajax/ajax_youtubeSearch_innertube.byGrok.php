@@ -116,13 +116,13 @@ file_put_contents($burstFile, json_encode([
 // ------------------------------------------------------------------
 // 3. Input
 // ------------------------------------------------------------------
-$q = trim($_REQUEST['q'] ?? '');
-$maxResults = max(1, min(30, intval($_REQUEST['maxResults'] ?? 20)));
-$maxResults = intval($_REQUEST['maxResults'] ?? 20);
+$q           = trim($_REQUEST['q'] ?? '');
+$maxResults  = max(1, min(50, intval($_REQUEST['maxResults'] ?? 20)));
+$continuation = trim($_REQUEST['continuation'] ?? '');   // ← NEW
 
-if ($q === '') {
+if ($q === '' && $continuation === '') {
     http_response_code(400);
-    echo json_encode(['error' => 'Missing or empty parameter: q']);
+    echo json_encode(['error' => 'Missing or empty parameter: q (or continuation)']);
     exit;
 }
 
@@ -135,13 +135,20 @@ $payload = [
     'context' => [
         'client' => [
             'clientName'    => 'WEB',
-'clientVersion' => '2.20241001.00.00',   // keep reasonably recent
+'clientVersion' => '2.20241001.00.00',
 'hl'            => 'en',
 'gl'            => 'US',
         ]
     ],
-'query' => $q,
 ];
+
+if ($continuation !== '') {
+    // Pagination request
+    $payload['continuation'] = $continuation;
+} else {
+    // Fresh search
+    $payload['query'] = $q;
+}
 
 $ch = curl_init($innertubeUrl);
 curl_setopt_array($ch, [
@@ -163,10 +170,8 @@ curl_setopt_array($ch, [
 $raw = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlErr  = curl_error($ch);
-// curl_close() is deprecated in PHP 8.5 and has been a no-op since 8.0
 
 if ($raw === false || $httpCode !== 200) {
-    // optional: refund daily count on hard failure
     $dailyCount = max(0, $dailyCount - 1);
     file_put_contents($dailyFile, json_encode([
         'count' => $dailyCount, 'last' => date('c'),
@@ -190,64 +195,82 @@ if (!is_array($data)) {
 }
 
 // ------------------------------------------------------------------
-// 5. Parse video results from the (quite nested) response
+// 5. Parse video results + extract next continuation token
 // ------------------------------------------------------------------
 $items = [];
+$nextContinuation = null;
 
-$contents = $data['contents']['twoColumnSearchResultsRenderer']['primaryContents']
-['sectionListRenderer']['contents'] ?? [];
+/**
+ * Walk any nested array looking for videoRenderer + continuationItemRenderer
+ */
+function na_yt_walk($node, &$items, &$nextContinuation, $maxResults) {
+    if (!is_array($node) || count($items) >= $maxResults) return;
 
-foreach ($contents as $section) {
-    $sectionItems = $section['itemSectionRenderer']['contents'] ?? [];
-    foreach ($sectionItems as $entry) {
-        if (!isset($entry['videoRenderer'])) continue;
-        $v = $entry['videoRenderer'];
-
+    // Video card
+    if (isset($node['videoRenderer'])) {
+        $v = $node['videoRenderer'];
         $videoId = $v['videoId'] ?? null;
-        if (!$videoId) continue;
-
-        $title = '';
-        if (isset($v['title']['runs'][0]['text'])) {
-            $title = $v['title']['runs'][0]['text'];
-        } elseif (isset($v['title']['simpleText'])) {
-            $title = $v['title']['simpleText'];
-        }
-
-        $channel = '';
-        if (isset($v['ownerText']['runs'][0]['text'])) {
-            $channel = $v['ownerText']['runs'][0]['text'];
-        } elseif (isset($v['longBylineText']['runs'][0]['text'])) {
-            $channel = $v['longBylineText']['runs'][0]['text'];
-        }
-
-        $thumb = "https://i.ytimg.com/vi/{$videoId}/mqdefault.jpg";
-        if (isset($v['thumbnail']['thumbnails']) && is_array($v['thumbnail']['thumbnails'])) {
-            $last = end($v['thumbnail']['thumbnails']);
-            if (!empty($last['url'])) $thumb = $last['url'];
-        }
-
-        // Build a shape that is almost identical to the official API
-        // so your existing renderYouTubeResults() keeps working
-        $items[] = [
-            'id' => ['videoId' => $videoId],
-            'snippet' => [
-                'title'         => $title,
-                'channelTitle'  => $channel,
-                'thumbnails'    => [
-                    'medium' => ['url' => $thumb]
+        if ($videoId) {
+            $title = $v['title']['runs'][0]['text']
+            ?? $v['title']['simpleText']
+            ?? '';
+            $channel = $v['ownerText']['runs'][0]['text']
+            ?? $v['longBylineText']['runs'][0]['text']
+            ?? '';
+            $thumb = "https://i.ytimg.com/vi/{$videoId}/mqdefault.jpg";
+            if (!empty($v['thumbnail']['thumbnails']) && is_array($v['thumbnail']['thumbnails'])) {
+                $last = end($v['thumbnail']['thumbnails']);
+                if (!empty($last['url'])) $thumb = $last['url'];
+            }
+            $items[] = [
+                'id' => ['videoId' => $videoId],
+                'snippet' => [
+                    'title'        => $title,
+                    'channelTitle' => $channel,
+                    'thumbnails'   => ['medium' => ['url' => $thumb]]
                 ]
-            ]
-        ];
-
-        if (count($items) >= $maxResults) break 2;
+            ];
+        }
+        return;
     }
+
+    // Continuation token (for next page)
+    if (isset($node['continuationItemRenderer'])) {
+        $token = $node['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']
+        ?? $node['continuationItemRenderer']['continuationEndpoint']['command']['token']
+        ?? null;
+        if ($token) $nextContinuation = $token;
+        return;
+    }
+
+    // Recurse
+    foreach ($node as $child) {
+        if (is_array($child)) {
+            na_yt_walk($child, $items, $nextContinuation, $maxResults);
+            if (count($items) >= $maxResults) return;
+        }
+    }
+}
+
+// First-page path
+$contents = $data['contents']['twoColumnSearchResultsRenderer']['primaryContents']
+['sectionListRenderer']['contents'] ?? null;
+
+// Continuation-page path
+if (!$contents) {
+    $contents = $data['onResponseReceivedCommands'] ?? $data['onResponseReceivedActions'] ?? null;
+}
+
+if ($contents) {
+    na_yt_walk($contents, $items, $nextContinuation, $maxResults);
 }
 
 // ------------------------------------------------------------------
 // 6. Return
 // ------------------------------------------------------------------
 echo json_encode([
-    'items'  => $items,
+    'items'         => $items,
+    'continuation'  => $nextContinuation,   // ← null when no more pages
     '_quota' => [
         'used'      => $dailyCount,
         'limit'     => YT_DAILY_LIMIT,

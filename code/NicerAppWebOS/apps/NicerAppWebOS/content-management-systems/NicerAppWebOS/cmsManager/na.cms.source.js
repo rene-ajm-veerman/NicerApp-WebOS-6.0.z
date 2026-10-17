@@ -230,16 +230,26 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/Nic
 
                 }).on('changed.jstree', function (e, data) {
 
-                    na.cms.settings.current.refresh = (new Date()).getTime();
-debugger;
-                    if (
+                    // var tree = $('#jsTree').jstree(true);
+                    // tree.deselect_all();
+                    console.log ('changed.jstree',data,na.cms.settings.current.refresh,(new Date()).getTime()-1000);
+
+                     if (
                         //data.action!=='ready'
                         //&&
                         /*data.action!=='model'
                         &&*/ data.action!=='select_node'
+                        //|| data.selected.length!==1
                     ) return false;
 
-                    $('#siteContent .vividTabPage').fadeOut('fast');
+                    if ( na.cms.settings.current.refresh && na.cms.settings.current.refresh-(new Date()).getTime()<1000) {
+                        na.cms.settings.current.refresh = (new Date()).getTime();
+                        return false;
+                    } else {
+                        //na.cms.settings.current.refresh = (new Date()).getTime();
+                    }
+                    //debugger;
+                    $('#siteContent .naVividTabPage').stop().fadeOut('fast');
                     na.m.waitForCondition ('cms::changed.jstree() : HTMLidle()?', na.m.HTMLidle, function(data) {
                         var l = data.selected.length, rec = null;
                         for (var i=0; i<l; i++) {
@@ -249,7 +259,7 @@ debugger;
                                 na.cms.settings.current.selectedTreeNode = rec;
                             }
                         }
-
+debugger;
                         if (
                             na.cms.settings.current.selectedTreeNode
                             && rec
@@ -265,10 +275,14 @@ debugger;
                                 });
                             //}
                         })
-                        else if (rec) { na.cms.onchange_jsTreeNode(settings, data, rec); };
+                        else if (
+                            rec
+                            && na.cms.settings.current.selectedTreeNode.id == rec.id
+                            && rec.state.selected
+                        ) { na.cms.onchange_jsTreeNode(settings, data, rec); };
 
-                        if (rec && rec.type=='naDocument') $('#document').fadeIn('slow');
-                        if (rec && rec.type=='naMediaAlbum') $('#upload').fadeIn('slow');
+                        if (rec && rec.type=='naDocument') $('#document').stop().fadeIn('slow');
+                        if (rec && rec.type=='naMediaAlbum') $('#upload').stop().fadeIn('slow');
                         if (
                             rec
                             && (
@@ -438,7 +452,7 @@ debugger;
         l = data.selected.length,
         tree = $('#jsTree').jstree(true);
 
-        if (l!==1 || data.node.id!==data.selected[0]) {
+        if (data.node.id!==data.selected[0]) {
             tree.deselect_all();
             tree.select_node(data.node.id);
             return false;
@@ -458,8 +472,6 @@ debugger;
                 if (p.type == 'naGroupRootFolder') url0 = p.text;
             }
             url0 = url0.replace(/.*?___/, '').replace(/__/g,' ');
-            debugger;
-
 
             if (rec
                 && (

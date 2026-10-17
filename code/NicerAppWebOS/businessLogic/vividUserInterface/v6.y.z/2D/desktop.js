@@ -1093,61 +1093,132 @@ na.desktop = na.d = {
 
 na.ytManager = {
     currentVideoId: null,
+    lastQuery: '',
+    nextContinuation: null,
+    isLoadingMore: false,
 
     init() {
-        // Trigger search via Enter key bind
-        $('#txtYoutubeManagerSearch').on('keydown', function(e) {
-            if(e.which === 13) na.ytManager.search();
+        $('#txtYoutubeManagerSearch').off('keydown.ytMgr').on('keydown.ytMgr', function(e) {
+            if (e.which === 13) na.ytManager.search(true); // true = fresh search
         });
+
+            // Infinite-scroll style: load more when user scrolls near bottom of results
+            let resultsPane = $('#ytManagerSearchResults');
+            resultsPane.off('scroll.ytMgr').on('scroll.ytMgr', function() {
+                let el = this;
+                if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) {
+                    na.ytManager.loadMore();
+                }
+            });
     },
 
-    async search() {
+    async search(isFresh = true) {
         let query = $('#txtYoutubeManagerSearch').val().trim();
-        if (!query) return;
+        if (!query && isFresh) return;
+
+        if (isFresh) {
+            this.lastQuery = query;
+            this.nextContinuation = null;
+        }
 
         let targetUrl = '/NicerAppWebOS/businessLogic/ajax/ajax_youtubeSearch_innertube.byGrok.php';
         let resultsPane = $('#ytManagerSearchResults');
-        resultsPane.html('<div style="color:yellow; text-align:center; grid-column:1/-1;">Searching Innertube nodes...</div>');
+
+        if (isFresh) {
+            resultsPane.html('<div style="color:yellow; text-align:center; grid-column:1/-1;">Searching Innertube nodes...</div>');
+        } else {
+            // show a small loading indicator at the bottom
+            if (!$('#ytMgrLoadMoreSpinner').length) {
+                resultsPane.append('<div id="ytMgrLoadMoreSpinner" style="grid-column:1/-1; text-align:center; color:#aaa; padding:12px;">Loading more…</div>');
+            }
+        }
+
+        let data = { maxResults: 50 };
+        if (isFresh) {
+            data.q = this.lastQuery;
+        } else {
+            data.q = this.lastQuery;          // still send q (harmless)
+            data.continuation = this.nextContinuation;
+        }
 
         try {
             let response = await $.ajax({
                 url: targetUrl,
                 type: 'GET',
-                data: { q: query, maxResults: 50 },
+                data: data,
                 dataType: 'json'
             });
-            debugger;
 
-            resultsPane.empty();
+            $('#ytMgrLoadMoreSpinner').remove();
+
+            if (isFresh) resultsPane.empty();
+
             if (!response.items || response.items.length === 0) {
-                resultsPane.html('<div style="color:red; grid-column:1/-1;">No results found.</div>');
+                if (isFresh) {
+                    resultsPane.html('<div style="color:red; grid-column:1/-1;">No results found.</div>');
+                }
+                this.nextContinuation = null;
+                this._updatePagerUI(false);
                 return;
             }
 
             response.items.forEach(item => {
-                let vId = item.id.videoId;
-                let title = item.snippet.title;
-                let thumb = item.snippet.thumbnails.medium.url;
+                let vId     = item.id.videoId;
+                let title   = item.snippet.title;
+                let thumb   = item.snippet.thumbnails.medium.url;
                 let channel = item.snippet.channelTitle;
 
                 let itemHtml = `
-                <div class="ytResultCard" onclick="na.ytManager.playVideo('${vId}')" style="cursor:pointer; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px; transition:background 0.2s;">
+                <div class="ytResultCard" onclick="na.ytManager.playVideo('${vId}')"
+                style="cursor:pointer; background:rgba(255,255,255,0.2); padding:8px; border-radius:6px; transition:background 0.2s;">
                 <img src="${thumb}" style="width:100%; border-radius:4px; aspect-ratio:16/9; object-fit:cover;" />
-                <div style="font-size:12px; font-weight:bold; margin-top:6px; color:#fff; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; height:34px;">${title}</div>
-                <div style="font-size:10px; color:#aaa; margin-top:2px;">${channel}</div>
-                </div>
-                `;
+                <div style="font-size:x-large; font-weight:bold; margin-top:6px; color:#fff; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; height:auto;">${title}</div>
+                <div style="font-size:large; color:cyan; margin-top:2px;">${channel}</div>
+                </div>`;
                 resultsPane.append(itemHtml);
             });
-        } catch (err) {
+
+            this.nextContinuation = response.continuation || null;
             debugger;
-            resultsPane.html('<div style="color:red; grid-column:1/-1;">Error querying source endpoint.</div>');
+            this._updatePagerUI(!!this.nextContinuation);
+
+        } catch (err) {
+            console.error(err);
+            $('#ytMgrLoadMoreSpinner').remove();
+            if (isFresh) {
+                resultsPane.html('<div style="color:red; grid-column:1/-1;">Error querying source endpoint.</div>');
+            }
+        } finally {
+            this.isLoadingMore = false;
         }
+    },
+
+    loadMore() {
+        if (this.isLoadingMore || !this.nextContinuation) return;
+        this.isLoadingMore = true;
+        this.search(false); // false = continuation request
+    },
+
+    _updatePagerUI(hasMore) {
+        // Optional explicit "Load more" button (works even without scroll)
+        let btn = $('#ytMgrLoadMoreBtn');
+        if (!btn.length) {
+            $('#ytManagerSearchResults').after(
+                '<button id="ytMgrLoadMoreBtn" type="button" ' +
+                'style="display:none; margin:10px auto; padding:8px 18px; border-radius:6px; border:1px solid #555; background:rgba(255,255,255,0.555); color:cyan; text-shadow:0px 0px 3px rgba(0,0,0,0.555), 2px 2px 4px rgba(0,0,0,0.7); cursor:pointer;">' +
+                'Load more results</button>'
+            );
+            btn = $('#ytMgrLoadMoreBtn');
+            btn.on('click', () => na.ytManager.loadMore());
+        }
+        btn.toggle(hasMore);
+        this.loadMore();
     },
 
     playVideo(videoId) {
         this.currentVideoId = videoId;
-        $('#ytContentPlayer').attr('src', `https://youtube.com/embed/`+videoId+`?autoplay=1`);
+        $('#ytContentPlayer').attr('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`);
+        // … keep the rest of your existing playVideo logic …
     },
 
     addCurrentVideoToPlaylist() {
