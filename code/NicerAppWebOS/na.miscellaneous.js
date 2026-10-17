@@ -187,7 +187,7 @@ na.m = {
             url : url,
             data : data,
             success : function (data, ts, xhr) {
-
+                debugger;
             },
             error : function (xhr, textStatus, errorThrown) {
                 na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);

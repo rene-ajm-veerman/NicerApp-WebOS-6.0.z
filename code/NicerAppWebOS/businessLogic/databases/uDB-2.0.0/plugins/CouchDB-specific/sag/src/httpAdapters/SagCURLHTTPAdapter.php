@@ -141,10 +141,10 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
 
     global $naDebugStartup;
 
-    if ($naDebugStartup) { echo '<pre style="color:purple;background:yellow;">t444:'; var_dump($chResponse); echo '</pre>'; }
+    if (false) { echo '<pre style="color:purple;background:yellow;">t444:'; var_dump($chResponse); echo '</pre>'; }
 
 
-    if (strpos('401 Unauthorized',$chResponse)!==false) {
+    if (is_string($chResponse) && strpos('401 Unauthorized',$chResponse)!==false) {
       // the base cURL options
       $url = (
         /*
