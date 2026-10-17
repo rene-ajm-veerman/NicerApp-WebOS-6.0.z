@@ -118,6 +118,7 @@ file_put_contents($burstFile, json_encode([
 // ------------------------------------------------------------------
 $q = trim($_REQUEST['q'] ?? '');
 $maxResults = max(1, min(30, intval($_REQUEST['maxResults'] ?? 20)));
+$maxResults = intval($_REQUEST['maxResults'] ?? 20);
 
 if ($q === '') {
     http_response_code(400);

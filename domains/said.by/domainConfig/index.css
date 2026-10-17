@@ -488,10 +488,10 @@ left : calc(50% - 350px);
 .vividButton_icon_borderCSS_100x100.grouped {
     display : flex;
     position : relative;
-    top : -2px;
-    left : -2px;
-    width : 96px;
-    height : 96px;
+    top : 0px;
+    left : 0px;
+    width : 100px;
+    height : 100px;
     z-index : 2011;
     border-radius : 16px;
 }
@@ -499,24 +499,26 @@ left : calc(50% - 350px);
     display : flex;
     position : relative;
     z-index : 2014;
-    top : calc(-100px + 6px);
+    top : calc(-100px + 3px);
+    left : 3px;
     width : 88px;
     height : 88px;
 }
 .vividButton_icon_imgTile_100x100.grouped {
     position : relative;
     display : flex;
-    top : calc(-200px + 6px + 6px + 2px);
-    width : 88px;
-    height : 88px;
+    top : calc(-200px + 6px + 6px + 3px + 2px);
+    left : 3px;
+    width : 85px;
+    height : 85px;
     z-index : 2012;
     box-shadow : 4px 4px 4px 4px rgba(0,0,0,0.7);
     border-radius : 10px;
 }
 .vividButton_icon_imgButtonIconBG_100x100.grouped {
     position : relative;
-    left : 2px;
-    top : calc(-300px + 6px + 6px + 2px + 8px);
+    left : 3px;
+    top : calc(-300px + 6px + 6px + 3px + 2px + 8px);
     display : flex;
     width : 84px;
     height : 84px;
@@ -527,7 +529,7 @@ left : calc(50% - 350px);
     width : 64px;
     height : 64px;
     left : calc(10px + 2px);
-    top : calc(-400px + 6px + 6px + 3px + 2px + 8px + 18px);
+    top : calc(-300px + 6px + 6px + 3px + 2px + 8px + 18px);
     position : relative;
     display : flex;
     z-index : 2020;

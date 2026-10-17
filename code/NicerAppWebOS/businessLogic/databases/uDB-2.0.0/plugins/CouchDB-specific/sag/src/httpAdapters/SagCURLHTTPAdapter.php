@@ -77,10 +77,11 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
         is_array($_COOKIE)
         && array_key_exists('cdb_authSession_cookie',$_COOKIE)
         && array_key_exists('cdb_loginName',$_COOKIE)
-        && strpos($_COOKIE['cdb_loginName'],'Administrator')===false
+        //&& strpos($_COOKIE['cdb_loginName'],'Administrator')===false
       ) {
         $opts[CURLOPT_HTTPHEADER][] = 'AuthSession: '.$_COOKIE['cdb_authSession_cookie'];
         $url2 = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
+        //var_dump ($url2); echo '<pre>'.json_encode(debug_backtrace(),JSON_PRETTY_PRINT).'</pre>';
         $opts[CURLOPT_URL] = $url2;
       }
 

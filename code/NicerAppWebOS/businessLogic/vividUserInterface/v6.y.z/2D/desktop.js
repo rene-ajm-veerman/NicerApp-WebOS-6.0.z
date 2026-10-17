@@ -209,6 +209,19 @@ na.desktop = na.d = {
             calculationResults_visible : cr
         };
 
+        cr[1001] = {// Append inside your desktop layout configurations or inside initialization definitions
+            "#siteYoutubeContentManager" : {
+                "mode" : 1,
+                "snapTo" : [
+                    { "element" : "body", "edge" : "top" },
+                    { "element" : "body", "edge" : "left" }
+                ],
+                "growTo" : "max", // Forces it to match dimensions of #siteBackground
+                "growToLimits" : [
+                    { "element" : "#siteTaskbar", "edge" : "top" }
+                ]
+            }
+        };
        cr.order = [];
        if (na.d.s.visibleDivs.includes('#siteStatusbar')) cr.order.push ('#siteStatusbar');
        cr.order.push ('#siteTaskbar');
@@ -218,6 +231,7 @@ na.desktop = na.d = {
        if (na.d.s.visibleDivs.includes('#siteToolbarThemeEditor')) cr.order.push('#siteToolbarThemeEditor');
        if (na.d.s.visibleDivs.includes('#siteToolbarRight')) cr.order.push('#siteToolbarRight');
        if (na.d.s.visibleDivs.includes('#siteComments')) cr.order.push('#siteComments');
+       if (na.d.s.visibleDivs.includes('#siteYoutubeContentManager')) cr.order.push('#siteYoutubeContentManager');
        cr.order.push ('#siteContent');
        //debugger;
 
@@ -1076,4 +1090,132 @@ na.desktop = na.d = {
         return a;
     }
 }
+
+na.ytManager = {
+    currentVideoId: null,
+
+    init() {
+        // Trigger search via Enter key bind
+        $('#txtYoutubeManagerSearch').on('keydown', function(e) {
+            if(e.which === 13) na.ytManager.search();
+        });
+    },
+
+    async search() {
+        let query = $('#txtYoutubeManagerSearch').val().trim();
+        if (!query) return;
+
+        let targetUrl = '/NicerAppWebOS/businessLogic/ajax/ajax_youtubeSearch_innertube.byGrok.php';
+        let resultsPane = $('#ytManagerSearchResults');
+        resultsPane.html('<div style="color:yellow; text-align:center; grid-column:1/-1;">Searching Innertube nodes...</div>');
+
+        try {
+            let response = await $.ajax({
+                url: targetUrl,
+                type: 'GET',
+                data: { q: query, maxResults: 50 },
+                dataType: 'json'
+            });
+            debugger;
+
+            resultsPane.empty();
+            if (!response.items || response.items.length === 0) {
+                resultsPane.html('<div style="color:red; grid-column:1/-1;">No results found.</div>');
+                return;
+            }
+
+            response.items.forEach(item => {
+                let vId = item.id.videoId;
+                let title = item.snippet.title;
+                let thumb = item.snippet.thumbnails.medium.url;
+                let channel = item.snippet.channelTitle;
+
+                let itemHtml = `
+                <div class="ytResultCard" onclick="na.ytManager.playVideo('${vId}')" style="cursor:pointer; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px; transition:background 0.2s;">
+                <img src="${thumb}" style="width:100%; border-radius:4px; aspect-ratio:16/9; object-fit:cover;" />
+                <div style="font-size:12px; font-weight:bold; margin-top:6px; color:#fff; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; height:34px;">${title}</div>
+                <div style="font-size:10px; color:#aaa; margin-top:2px;">${channel}</div>
+                </div>
+                `;
+                resultsPane.append(itemHtml);
+            });
+        } catch (err) {
+            debugger;
+            resultsPane.html('<div style="color:red; grid-column:1/-1;">Error querying source endpoint.</div>');
+        }
+    },
+
+    playVideo(videoId) {
+        this.currentVideoId = videoId;
+        $('#ytContentPlayer').attr('src', `https://youtube.com/embed/`+videoId+`?autoplay=1`);
+    },
+
+    addCurrentVideoToPlaylist() {
+        if (!this.currentVideoId) {
+            alert('Please select and play a video first.');
+            return;
+        }
+        let refTree = $('#ytManagerTreeContainer').jstree(true);
+        let selectedNode = refTree.get_selected(true)[0];
+
+        if (!selectedNode) {
+            alert('Please highlight a playlist destination node inside the CMS database tree layout.');
+            return;
+        }
+
+        // Logic action execution post back handler routine destination payload
+        console.log(`Mapping Video ${this.currentVideoId} inside Target Location Container context:`, selectedNode.id);
+
+        // Execute AJAX call to save node allocation record data structure to back-end here
+        alert(`Saved video directly into container: ${selectedNode.text}`);
+    },
+
+    treeAction(actionType) {
+        let refTree = $('#ytManagerTreeContainer').jstree(true);
+        let selected = refTree.get_selected(true)[0];
+
+        if (actionType !== 'addFolder' && actionType !== 'addPlaylist' && !selected) {
+            alert('Select target node tracking row entry item component context layer loop reference framework node execution points.');
+            return;
+        }
+
+        switch(actionType) {
+            case 'addFolder':
+                refTree.create_node(selected || null, { "text": "New Folder", "type": "default" }, "last");
+                break;
+            case 'addPlaylist':
+                refTree.create_node(selected || null, { "text": "New Playlist", "type": "file" }, "last");
+                break;
+            case 'delete':
+                if(confirm(`Remove entry node "${selected.text}" entirely from operational context layers?`)) {
+                    refTree.delete_node(selected);
+                }
+                break;
+        }
+    }
+};
+
+// Global management routine toggle hook injected alongside desktop.js context handlers
+na.desktop.toggleYoutubeContentManager = function () {
+    let dialog = $('#siteYoutubeContentManager');
+    if (dialog.is(':visible')) {
+        dialog.fadeOut('fast');
+        // Delete item out of calculation visibility checks index references
+        let idx = na.desktop.settings.visibleDivs.indexOf('#siteYoutubeContentManager');
+        if (idx !== -1) na.desktop.settings.visibleDivs.splice(idx, 1);
+    } else {
+        dialog.fadeIn('fast', function() {
+            dialog.css({display:'flex'});
+            // Lazy load dependencies mapping hookups only when opened
+            if(!$('#ytManagerTreeContainer').data('jstree')) {
+                na.ytManager.init();
+            }
+        });
+        na.desktop.settings.visibleDivs.push('#siteYoutubeContentManager');
+    }
+    na.desktop.resize();
+};
+
+
 na.d.s = na.d.settings;
+na.ytManager.init();

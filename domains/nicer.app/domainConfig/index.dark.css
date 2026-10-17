@@ -431,7 +431,7 @@ background : url(/siteMedia/backgrounds/Tiled/Blue/blue170.jpg) repeat;
 opacity : 0.37;
 z-index : -1;
 }
-#btnSettings, #btnSiteBackground, #btnNewRandomSiteBackground, #btnShowStartMenu {
+#btnSettings, #btnSiteBackground, #btnNewRandomSiteBackground, #btnShowStartMenu, #btnYoutubeContentManager {
 position : relative;
 display : inline-block;
 margin-top : 15px;

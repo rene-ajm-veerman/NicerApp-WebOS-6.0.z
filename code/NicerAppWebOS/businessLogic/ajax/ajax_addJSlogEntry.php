@@ -6,7 +6,7 @@ global $naIP;
 global $naIPforDB;
 global $naBrowserInfo;
 global $naIsBot;
-if ($naLAN) exit ('HTTP ERROR 403 Forbidden - naLAN===true');
+//if ($naLAN) exit ('HTTP ERROR 403 Forbidden - naLAN===true');
 if ($naIsBot) exit ('HTTP ERROR 403 Forbidden - naIsBot===true');
 
 
@@ -70,7 +70,7 @@ while (!$foundGoodID) {
 };
 
 // find geoIP data if we got it already
-$dataSetName = $cdbDomain.'___ipinfo';
+$dataSetName = $cdbDomain.'___ip_info';
 //echo $dataSetName; exit();
 $cdb->setDatabase($dataSetName, true);
 try {

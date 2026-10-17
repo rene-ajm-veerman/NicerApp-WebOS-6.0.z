@@ -229,6 +229,21 @@ global $naWebOS;
             null,
             null
         );
+
+        echo $naWebOS->html_vividButton (
+            0, 'position:relative; margin:0;float:left;', // $relativeIndentLevel, $containerStyle
+            'btnYoutubeContentManager', // $id
+            'vividButton_icon_50x50 siteTaskbar_btn', '_50x50', 'grouped', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+            '', 'na.desktop.toggleYoutubeContentManager()', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                         100, 'YT Manager', // $buttonTabIndex, $buttonTitleAlt
+                                         null,//'btnCssVividButton_outerBorder.png',
+                                         null,//'btnCssVividButton.png',
+                                         null,
+                                         'btnMusic.png',
+                                         null, // $buttonOverlayHTML
+                                         '', '', '' // $buttonText, $buttonText_class, $buttonText_style
+        );
+
         echo $naWebOS->html_vividButton (
             7, 'margin:0;position:relative;float:left;',
 
@@ -552,9 +567,6 @@ echo $naWebOS->html_vividButton (
             if (file_exists($fn)) echo require_return($fn);
         ?>
     </div>
-
-
-
 
 
 

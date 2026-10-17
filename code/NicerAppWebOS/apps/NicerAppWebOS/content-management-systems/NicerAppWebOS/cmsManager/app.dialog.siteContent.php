@@ -70,12 +70,178 @@ $ip = (array_key_exists('X-Forwarded-For',apache_request_headers())?apache_reque
 <div id="folder" class="naVividTabPage"></div>
 <div id="upload" class="naVividTabPage">
     <div id="mediaFolder_navBar" class="navbar" style="display:flex;justify-items:center">
-        <img id="btnUpload" class="navbar_button" src="/siteMedia/btnInsertMedia2.png" onclick="na.cms.onclick_btnUpload(event);"/>
-        <img id="btnViewMedia" class="navbar_button" src="/siteMedia/btnViewMedia.png" onclick="na.cms.onclick_btnViewMedia(event);"/>
+    <?php
+    global $naWebOS;
+    echo $naWebOS->html_vividButton (
+        1, 'width:100%;height:50px;',
+
+        'btnUpload',
+        'vividButton_icon_50x50 grouped btnOptions', '_50x50', 'grouped',
+        '',
+        'na.cms.onclick_btnUpload(event)',
+                                     '',
+                                     '',
+
+                                     403, 'Upload',
+
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.blue1a.png',
+                                     null,//'btnCssVividButton_iconBackground.png',
+                                     'folderIcon_original.png',//.$naWebOS->dbs->userIDicon,
+
+                                     '<img class="vividButton_icon_imgButtonIcon_50x50_sup1" srcPreload="/siteMedia/btnPlus_shaded.png" style="position:absolute;left:calc(50px - 25px);width:25px;z-index:2021;"/>',
+
+                                     null, null, null
+    );
+    echo $naWebOS->html_vividButton (
+        1, 'width:100%;height:50px;',
+
+        'btnSearchYoutube',
+        'vividButton_icon_50x50 grouped btnOptions', '_50x50', 'grouped',
+        '',
+        '$(\'.naVividTabPage\').hide(); $(\'#siteYoutubeContentManager\').show()',
+                                     '',
+                                     '',
+
+                                     403, 'Search Youtube',
+
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.blue1a.png',
+                                     null,//'btnCssVividButton_iconBackground.png',
+                                     'btnYoutube.png',//.$naWebOS->dbs->userIDicon,
+
+                                     '<img class="vividButton_icon_imgButtonIcon_50x50_sup1" srcPreload="/siteMedia/btnPlus_shaded.png" style="position:absolute;left:calc(50px - 25px);width:25px;z-index:2021;"/>',
+
+                                     null, null, null
+    );
+    echo $naWebOS->html_vividButton (
+        1, 'width:100%;height:50px;',
+
+        'btnViewMedia',
+        'vividButton_icon_50x50 grouped btnOptions', '_50x50', 'grouped',
+        '',
+        'na.cms.onclick_btnViewMedia(event)',
+                                     '',
+                                     '',
+
+                                     403, 'View Media',
+
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.blue1a.png',
+                                     null,//'btnCssVividButton_iconBackground.png',
+                                     'btnViewMedia.png',//.$naWebOS->dbs->userIDicon,
+
+                                     '',
+
+                                     null, null, null
+    );
+    ?>
+        <!--<img id="btnUpload" class="navbar_button" src="/siteMedia/btnInsertMedia2.png" onclick="na.cms.onclick_btnUpload(event);"/>-->
+        <!--<img id="btnViewMedia" class="navbar_button" src="/siteMedia/btnViewMedia.png" onclick="na.cms.onclick_btnViewMedia(event);"/>-->
         <input id="mediaFolderLabel" class="vividTheme_input_urls" type="text" onchange="na.cms.onchange_mediaFolderLabel(event);"></input>
     </div>
     <iframe id="jQueryFileUpload" class="jQueryFileUpload" src="" style="overflow:hidden;width:100%;height:100%" allowtransparency="true"></iframe>
 </div>
+
+
+
+
+
+<!-- The Dialog Main Frame Window -->
+<div id="siteYoutubeContentManager" class="naVividTabPage" style="display:none; position:absolute; flex-direction:row; z-index:9850000000000;width:100%;">
+
+<!-- Left Pane Viewports -->
+<div id="siteYoutubeContentManager_left" style="float:left;width:35%; height:100%; display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.2); padding:10px; box-sizing:border-box;">
+
+<!-- Video Player Display Overlay atop Toolbar Left Content Area -->
+<div id="siteYoutubeContentManager_playerArea" style="width:100%; margin-bottom:15px;">
+<div style="margin-top:8px; display:flex; justify-content:center;">
+<?php
+echo $naWebOS->html_vividButton (
+    1, 'width:100%;', // $relativeIndentLevel, $containerStyle
+    'btnAssignToPlaylist', // $id
+    'vividButton_icon', '', '', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    '', 'na.ytManager.addCurrentVideoToPlaylist()', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                    101, 'Add Video to Selected Playlist', // $buttonTabIndex, $buttonTitleAlt
+                                    null, null, null, null, // $borderImgSrc, $tileImgSrc, $buttonBGimgSrc, $buttonImgSrc
+                                    null, // $buttonOverlayHTML
+                                    'Add Video to Selected Playlist', '', '' // $buttonText, $buttonText_class, $buttonText_style
+);
+?>
+</div>
+</div>
+
+<!-- Search Controls -->
+<div class="searchBoxContainer" style="display:flex; margin-bottom:10px; gap:5px; align-items:center;">
+<input type="text" id="txtYoutubeManagerSearch" placeholder="Search YouTube Videos..." style="flex-grow:1; padding:8px; border-radius:4px; border:1px solid #444; background:#222; color:#fff; height:34px; box-sizing:border-box;" />
+<?php
+echo $naWebOS->html_vividButton (
+    1, 'height:34px;', // $relativeIndentLevel, $containerStyle
+    'btnExecuteYTSearch', // $id
+    'vividButton_icon', '', '', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    '', 'na.ytManager.search()', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                    102, 'Search', // $buttonTabIndex, $buttonTitleAlt
+                                    null, null, null, null, // $borderImgSrc, $tileImgSrc, $buttonBGimgSrc, $buttonImgSrc
+                                    null, // $buttonOverlayHTML
+                                    'Search', '', '' // $buttonText, $buttonText_class, $buttonText_style
+);
+?>
+</div>
+
+<!-- Tree Item Management Operations Bar -->
+<div class="treeActionBar" style="display:flex; justify-content:space-between; margin-bottom:8px; gap:4px;">
+<?php
+echo $naWebOS->html_vividButton (
+    1, 'flex:1;', // $relativeIndentLevel, $containerStyle
+    'btnAddFolder', // $id
+    'vividButton_icon', '', '', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    '', 'na.ytManager.treeAction("addFolder")', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                    103, '+ Folder', // $buttonTabIndex, $buttonTitleAlt
+                                    null, null, null, null, // $borderImgSrc, $tileImgSrc, $buttonBGimgSrc, $buttonImgSrc
+                                    null, // $buttonOverlayHTML
+                                    '+ Folder', '', '' // $buttonText, $buttonText_class, $buttonText_style
+);
+echo $naWebOS->html_vividButton (
+    1, 'flex:1;', // $relativeIndentLevel, $containerStyle
+    'btnAddPlaylist', // $id
+    'vividButton_icon', '', '', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    '', 'na.ytManager.treeAction("addPlaylist")', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                    104, '+ Playlist', // $buttonTabIndex, $buttonTitleAlt
+                                    null, null, null, null, // $borderImgSrc, $tileImgSrc, $buttonBGimgSrc, $buttonImgSrc
+                                    null, // $buttonOverlayHTML
+                                    '+ Playlist', '', '' // $buttonText, $buttonText_class, $buttonText_style
+);
+echo $naWebOS->html_vividButton (
+    1, 'flex:1;', // $relativeIndentLevel, $containerStyle
+    'btnDeleteTreeItem', // $id
+    'vividButton_icon', '', '', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    '', 'na.ytManager.treeAction("delete")', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+                                    105, '- Delete', // $buttonTabIndex, $buttonTitleAlt
+                                    null, null, null, null, // $borderImgSrc, $tileImgSrc, $buttonBGimgSrc, $buttonImgSrc
+                                    null, // $buttonOverlayHTML
+                                    '- Delete', '', '' // $buttonText, $buttonText_class, $buttonText_style
+);
+?>
+</div>
+</div>
+
+<!-- Right Pane Results Viewports -->
+<div id="siteYoutubeContentManager_right" style="width:65%; height:100%; display:flex; flex-direction:column; padding:10px; box-sizing:border-box; overflow-y:auto;">
+<iframe id="ytContentPlayer" style="position:relative; float:left; width:100%; height:100%;" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<div id="ytManagerSearchResults" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:15px;">
+<div class="placeholder-notice" style="color:#aaa; text-align:center; grid-column: 1/-1; padding-top:40px;">Results will populate here...</div>
+</div>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
 <div id="document" class="naVividTabPage" style="height:calc(100% - 70px)">
     <div id="document_navBar" class="navbar" style="display:flex">
         <div class="sections" style="display:flex;">
