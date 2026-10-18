@@ -167,6 +167,18 @@ na.m = {
     },
 
 
+    deepMerge : function (target, source) {
+        const result = { ...target };
+        for (const key in source) {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                result[key] = deepMerge(result[key] || {}, source[key]);
+            } else {
+                result[key] = source[key];
+            }
+        }
+        return result;
+    },
+
     addLogEntry : function (msg, htmlClasses) {
         if (na.site.globals.isBot || na.site.globals.naLAN) return false;
         var
@@ -187,7 +199,6 @@ na.m = {
             url : url,
             data : data,
             success : function (data, ts, xhr) {
-                debugger;
             },
             error : function (xhr, textStatus, errorThrown) {
                 na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
@@ -1842,6 +1853,38 @@ require('fs').writeFileSync('full_unicode_js.base64', base64);
 
 
 
+
+    enterTrueFullscreen : async function() {
+        const elem = document.documentElement; // or document.body
+
+        try {
+            if (elem.requestFullscreen) {
+                await elem.requestFullscreen({ navigationUI: "hide" });
+            } else if (elem.webkitRequestFullscreen) { // older Safari
+                elem.webkitRequestFullscreen();
+            }
+        } catch (err) {
+            console.warn("Fullscreen failed:", err);
+        }
+    },
+
+    // Exit
+    exitFullscreen : function() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    },
+
+    // Optional: toggle
+    toggleFullscreen : function() {
+        if (!document.fullscreenElement) {
+            enterTrueFullscreen();
+        } else {
+            exitFullscreen();
+        }
+    },
 
 
     extensionsLoaded : function () {

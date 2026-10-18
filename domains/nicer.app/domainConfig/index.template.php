@@ -20,7 +20,8 @@ global $naWebOS;
     <meta property="og:image" content="/NicerAppWebOS/screenshot_small.png">
     <meta property="og:description" content="{$description}">
     <meta name="description" content="{$description}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.5, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, user-scalable=yes, viewport-fit=cover">
+
     <title>{$title}</title>
     <!-- see fonts.google.com (thanks, Google!) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,15 +61,203 @@ global $naWebOS;
 {$customerSpecificBodyContent}
 
     <blockquote style="z-index:-10;position:absolute;opacity:0.001;">
-        <img src="/NicerAppWebOS/screenshot_small.png"/>
+        <img src="/NicerAppWebOS/screenshot_small.png" style="width:250px"/>
     </blockquote>
+    <div id="paintable-canvas">
     <div id="siteContent" class="vividDialog naHas_btnComments">
 
         <div class="vividDialogContent vividScrollpane" style="display:inline-block;position:relative;">
             {$div_siteContent}
         </div>
     </div>
+    <div class="lds-facebook"><!-- loading icon, thanks for allowing CC0 license usage : https://loading.io/css/ --><div></div><div></div><div></div></div>
 
+    <div id="siteBackground">
+    <div id="siteBackground_bg"></div>
+    <div id="siteBackground_bg2"></div>
+    <script id="siteBackground_iframe_js" type="text/javascript"></script>
+    <iframe id="siteBackground_iframe"></iframe>
+    <img class="bg_first" alt=""/>
+    <img class="bg_last" alt=""/>
+    </div>
+
+    <div id="siteTaskbar" class="vividDialog naTaskbar naNoSettings naNoComments" style="max-height:80px;">
+
+    <no-video-yet-here class="naBorder"
+    autoplay
+    loop
+    muted
+    playsinline
+    webkit-playsinline
+    type="video/webm"
+    >
+    <source src="https://said.by/siteMedia/videos/output1.webm" type="video/webm"></source>
+    </no-video-yet-here>
+    <canvas class="naBorder"></canvas>
+    <no-video-yet-here class="naBackground"
+    autoplay
+    loop
+    muted
+    playsinline
+    webkit-playsinline
+    type="video/webm"
+    >
+    <source src="https://said.by/siteMedia/videos/output3.webm" type="video/webm"></source>
+    </no-video-yet-here>
+    <canvas class="naBackground"></canvas>
+    <?php
+
+    $desktopSettings = [
+        'handlers' => [
+            '#btnShowStartMenu' => [
+                'onmouseover' => '',
+'onmouseout' => '',
+'onclick' => ''
+            ],
+'#btnSettings' => [
+    'onmouseover' => '',
+'onmouseout' => '',
+'onclick' => ''
+]
+        ]
+    ];
+
+
+    echo $naWebOS->html_vividButton (
+        4, 'margin:0;position:relative;float:left;',
+
+        'btnShowStartMenu', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
+        '',
+        'na.m.enterTrueFullscreen()',//'if (!$(this).is(\'.disabled\')) { $(\'#siteLogin\').fadeOut(\'fast\').delay(20).animate({top:-750}); }',
+                                     '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
+                                     '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
+
+                                     4, null,
+
+                                     null,//'btnCssVividButton_outerBorder.png',
+                                     null,//'btnCssVividButton.png',
+                                     null,//'btnCssVividButton.grey2a.png',
+                                     'btnStartMenu.png',
+
+                                     '',
+
+                                     null,
+                                     null,
+                                     null
+    );
+    global $naLAN;
+    echo $naWebOS->html_vividButton (
+        5, 'margin:0;position:relative;float:left;',
+
+        'btnNewRandomSiteBackground', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
+        '',
+        'na.backgrounds.next(\'#siteBackground\', \'Landscape\');',
+                                     '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
+                                     '',
+
+                                     5, null,
+
+                                     null,//'btnCssVividButton_outerBorder.png',
+                                     null,//'btnCssVividButton.png',
+                                     null,//'btnCssVividButton..png',
+                                     'btnBackground.png',
+
+                                     '',
+
+                                     null,
+                                     null,
+                                     null
+    );
+    echo $naWebOS->html_vividButton (
+        6, 'margin:0;position:relative;float:left;',
+
+        'btnSiteBackground', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
+        '',
+        "if ($('#siteBackgrounds').css('display')==='none') { $('#btnSiteBackground')[0].vividUserInterface_2D_button.select(); na.backgrounds.showBrowser(); } else { $('#btnSiteBackground')[0].vividUserInterface_2D_button.deselect(); $('#siteBackgrounds').fadeOut('normal'); }",
+                                     '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
+                                     '',
+
+                                     6, null,
+
+                                     null,//'btnCssVividButton_outerBorder.png',
+                                     null,//'btnCssVividButton.png',
+                                     null,//'btnCssVividButton..png',
+                                     'btnMedia.png',
+
+                                     '',
+
+                                     null,
+                                     null,
+                                     null
+    );
+
+    // echo $naWebOS->html_vividButton (
+    //     0, 'position:relative; margin:0;float:left;', // $relativeIndentLevel, $containerStyle
+    //     'btnYoutubeContentManager', // $id
+    //     'vividButton_icon_50x50 siteTaskbar_btn', '_50x50', 'grouped', // $class, $subClassSuffix, $iconComponents_subClassSuffix
+    //     '', 'na.desktop.toggleYoutubeContentManager()', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
+    //                                  100, 'YT Manager', // $buttonTabIndex, $buttonTitleAlt
+    //                                  null,//'btnCssVividButton_outerBorder.png',
+    //                                  null,//'btnCssVividButton.png',
+    //                                  null,
+    //                                  'btnMusic.png',
+    //                                  null, // $buttonOverlayHTML
+    //                                  '', '', '' // $buttonText, $buttonText_class, $buttonText_style
+    // );
+
+    echo $naWebOS->html_vividButton (
+        7, 'margin:0;position:relative;float:left;',
+
+        'btnSettings', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
+        '',
+        'na.site.settings.heldUp[\'#siteSettingsMenu\'] = true; $(\'#siteSettingsMenu\').removeClass(\'hidden\').addClass(\'shown\').css({opacity:\'inherit\'})',
+                                     '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
+                                     '',
+
+                                     7, null,
+
+                                     null,//'btnCssVividButton_outerBorder.png',
+                                     null,//'btnCssVividButton.png',
+                                     'btnCssVividButton.purple3a.png',
+                                     'btnSettings2.png',
+
+                                     '',
+
+                                     null,
+                                     null,
+                                     null
+    );
+    ?>
+    <div id="siteDatetime"></div>
+    <?php
+    echo $naWebOS->html_vividButton (
+        4, 'position:absolute;right:-8px;top:-8px;z-index:9000000',
+
+        'btnInformation', 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+        '',
+        'if (!$(this).is(\'.disabled\')) { $(\'#siteLogin\').fadeOut(\'fast\').delay(20).animate({top:-750}); }',
+                                     '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
+                                     '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
+
+                                     7, null,
+
+                                     null,//'btnCssVividButton_outerBorder.png',
+                                     null,//'btnCssVividButton.png',
+                                     null,//'btnCssVividButton.grey2a.png',
+                                     'btnInformation.png',
+
+                                     '',
+
+                                     null,
+                                     null,
+                                     null
+    );
+    ?>
+    </div>
+
+    </div>
+
+    <div id="dialog-cache-layer">
     <div id="siteToolbarTop" class="vividDialog naNoComments">
 
         <div class="vividDialogContent vividScrollpane">
@@ -102,17 +291,6 @@ global $naWebOS;
         </div>
     </div>
 
-    <div class="lds-facebook"><!-- loading icon, thanks for allowing CC0 license usage : https://loading.io/css/ --><div></div><div></div><div></div></div>
-
-    <div id="siteBackground">
-        <div id="siteBackground_bg"></div>
-        <div id="siteBackground_bg2"></div>
-        <script id="siteBackground_iframe_js" type="text/javascript"></script>
-        <iframe id="siteBackground_iframe"></iframe>
-        <img class="bg_first" alt=""/>
-        <img class="bg_last" alt=""/>
-    </div>
-
     <div id="siteStatusbar" class="vividDialog naStatusbar naNoComments naNoSettings">
 
         <div class="vividDialogContent vividScrollpane">
@@ -120,179 +298,6 @@ global $naWebOS;
         </div>
     </div>
 
-    <div id="siteTaskbar" class="vividDialog naTaskbar naNoSettings naNoComments" style="max-height:80px;">
-
-      <no-video-yet-here class="naBorder"
-        autoplay
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        type="video/webm"
-        >
-        <source src="https://said.by/siteMedia/videos/output1.webm" type="video/webm"></source>
-      </no-video-yet-here>
-      <canvas class="naBorder"></canvas>
-      <no-video-yet-here class="naBackground"
-        autoplay
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        type="video/webm"
-        >
-        <source src="https://said.by/siteMedia/videos/output3.webm" type="video/webm"></source>
-      </no-video-yet-here>
-      <canvas class="naBackground"></canvas>
-        <?php
-
-        $desktopSettings = [
-            'handlers' => [
-                '#btnShowStartMenu' => [
-                    'onmouseover' => '',
-                    'onmouseout' => '',
-                    'onclick' => ''
-                ],
-                '#btnSettings' => [
-                    'onmouseover' => '',
-                    'onmouseout' => '',
-                    'onclick' => ''
-                ]
-            ]
-        ];
-
-
-        echo $naWebOS->html_vividButton (
-            4, 'margin:0;position:relative;float:left;',
-
-            'btnShowStartMenu', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
-            '',
-            'if (!$(this).is(\'.disabled\')) { $(\'#siteLogin\').fadeOut(\'fast\').delay(20).animate({top:-750}); }',
-            '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
-            '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
-
-            4, null,
-
-            null,//'btnCssVividButton_outerBorder.png',
-            null,//'btnCssVividButton.png',
-            null,//'btnCssVividButton.grey2a.png',
-            'btnStartMenu.png',
-
-            '',
-
-            null,
-            null,
-            null
-        );
-        global $naLAN;
-        echo $naWebOS->html_vividButton (
-            5, 'margin:0;position:relative;float:left;',
-
-            'btnNewRandomSiteBackground', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
-            '',
-            'na.backgrounds.next(\'#siteBackground\', \'Landscape\');',
-            '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
-            '',
-
-            5, null,
-
-            null,//'btnCssVividButton_outerBorder.png',
-            null,//'btnCssVividButton.png',
-            null,//'btnCssVividButton..png',
-            'btnBackground.png',
-
-            '',
-
-            null,
-            null,
-            null
-        );
-        echo $naWebOS->html_vividButton (
-            6, 'margin:0;position:relative;float:left;',
-
-            'btnSiteBackground', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
-            '',
-            "if ($('#siteBackgrounds').css('display')==='none') { $('#btnSiteBackground')[0].vividUserInterface_2D_button.select(); na.backgrounds.showBrowser(); } else { $('#btnSiteBackground')[0].vividUserInterface_2D_button.deselect(); $('#siteBackgrounds').fadeOut('normal'); }",
-            '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
-            '',
-
-            6, null,
-
-            null,//'btnCssVividButton_outerBorder.png',
-            null,//'btnCssVividButton.png',
-            null,//'btnCssVividButton..png',
-            'btnMedia.png',
-
-            '',
-
-            null,
-            null,
-            null
-        );
-
-        echo $naWebOS->html_vividButton (
-            0, 'position:relative; margin:0;float:left;', // $relativeIndentLevel, $containerStyle
-            'btnYoutubeContentManager', // $id
-            'vividButton_icon_50x50 siteTaskbar_btn', '_50x50', 'grouped', // $class, $subClassSuffix, $iconComponents_subClassSuffix
-            '', 'na.desktop.toggleYoutubeContentManager()', '', '', // $buttonStyle, $button_event_onclick, onmouseover, onmouseout
-                                         100, 'YT Manager', // $buttonTabIndex, $buttonTitleAlt
-                                         null,//'btnCssVividButton_outerBorder.png',
-                                         null,//'btnCssVividButton.png',
-                                         null,
-                                         'btnMusic.png',
-                                         null, // $buttonOverlayHTML
-                                         '', '', '' // $buttonText, $buttonText_class, $buttonText_style
-        );
-
-        echo $naWebOS->html_vividButton (
-            7, 'margin:0;position:relative;float:left;',
-
-            'btnSettings', 'vividButton_icon_50x50 btnCloseWindow grouped', '_50x50', 'grouped',
-            '',
-            'na.site.settings.heldUp[\'#siteSettingsMenu\'] = true; $(\'#siteSettingsMenu\').removeClass(\'hidden\').addClass(\'shown\').css({opacity:\'inherit\'})',
-            '',//'$(\'#siteSettingsMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteSettingsMenu\'});',
-            '',
-
-            7, null,
-
-            null,//'btnCssVividButton_outerBorder.png',
-            null,//'btnCssVividButton.png',
-            'btnCssVividButton.purple3a.png',
-            'btnSettings2.png',
-
-            '',
-
-            null,
-            null,
-            null
-        );
-        ?>
-        <div id="siteDatetime"></div>
-        <?php
-        echo $naWebOS->html_vividButton (
-            4, 'position:absolute;right:-8px;top:-8px;z-index:9000000',
-
-            'btnInformation', 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-            '',
-            'if (!$(this).is(\'.disabled\')) { $(\'#siteLogin\').fadeOut(\'fast\').delay(20).animate({top:-750}); }',
-            '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
-            '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
-
-            7, null,
-
-            null,//'btnCssVividButton_outerBorder.png',
-            null,//'btnCssVividButton.png',
-            null,//'btnCssVividButton.grey2a.png',
-            'btnInformation.png',
-
-            '',
-
-            null,
-            null,
-            null
-        );
-        ?>
-    </div>
 
     <div id="siteSettingsMenu" class="vividDialog naStartMenu naNoSettings naNoComments hidden">
 

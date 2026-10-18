@@ -2004,7 +2004,7 @@ class NicerAppWebOS {
         };
         if (!is_array($css) && !is_string($css)) {
             $ret .=
-            '<script>var m = "Could not load theme settings."; na.site.setStatusMsg(m, true); na.m.log (1,m);</script>';
+            '<script>var m = "Could not load theme settings."; na.site.setStatusMsg(m); na.m.log (1,m);</script>';
         }
 
 

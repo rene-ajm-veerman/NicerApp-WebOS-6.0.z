@@ -1934,6 +1934,8 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
             na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'], g = na1.globals, s = na1.settings,
             c = s.current, db = c.db;
 
+            if (!na.site.globals.themes) return false;
+
             var theme = na.site.globals.themes[na.site.globals.themeName];
             if (!theme.apps) theme.apps = { '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news' : { } };
             else if (!theme.apps['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
@@ -1948,6 +1950,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
             tApp.delayNewItemsMax = $('#delayNewItemsMax').val();
             na.site.saveTheme();
             na1.themeAppsChanged();
+            return true;
         },
 
         themeAppsChanged : function () {

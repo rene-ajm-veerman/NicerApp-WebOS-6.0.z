@@ -33,68 +33,68 @@ na.desktop = na.d = {
                 '#siteDateTime' : {
                     top : -100,
                     left : 10,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteContent' : {
                     top : ($(window).height()/2)-50,
                     left : ($(window).width()/2)-50,
                     width : 100,
                     height : $(window).height()-120,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteErrors' : {
                     top : -1 * ( $(window).height() * 2),
                     left : ($(window).width()/2) - ( $(window).width()/10/2 ),
                     width : $(window).width()/10,
                     height : $(window).height()/10,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteYoutubePlayer' : {
                     top : $('#siteDateTime').height()+20,
                     left : $(window).width()+100,
                     height : $(window).height()-120,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteYoutubeSearch' : {
                     top : $('#siteDateTime').height()+20+$('#siteYoutubePlayer').height()+10,
                     left : $(window).width()+100,
                     width : !na.m.userDevice.isPhone ? 300 : $(window).width() - 50,
                     height : $(window).height()-120,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteComments' : {
                     top : $('#siteDateTime').height()+20,
                     left : $(window).width()+100,
                     width : $(window).width()/2,
                     height : $(window).height()-120,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteToolbarThemeEditor' : {
                     top : $('#siteDateTime').height()+20,
                     left : -1000,
                     height : $(window).height()-120,
 			width : 550,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteToolbarLeft' : {
                     top : 20,
                     left : -1000,
                     height : $(window).height()-120,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteToolbarRight' : {
                     top : 20,
                     left : $(window).width()+100,
                     height : $(window).height()-120,
                     width : 600,//!na.m.userDevice.isPhone ? 300 : $(window).width() - 50,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteToolbarTop' : {
                     top : -250,
                     left : 10,
                     height : 200,
                     width : $(window).width() - 20,
-                    opacity : 0.0001
+                    display : 'none'
                 },
                 '#siteTaskbar' : {
                     top : $(window).height() - 100
@@ -162,11 +162,61 @@ na.desktop = na.d = {
         }
     },
 
+    /**
+     * Resize a canvas so its backing store matches the display size × devicePixelRatio.
+     * Call this whenever the canvas is created or when the window/container resizes.
+     *
+     * @param {HTMLCanvasElement} canvas
+     * @param {number} [maxDPR=3]  - optional cap (useful on very high-DPI phones)
+     * @returns {boolean} true if the canvas was actually resized
+     */
+    setCanvasToDevicePixels : function (canvas, maxDPR = 3) {
+        if (!canvas) return false;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, maxDPR);
+        const rect = canvas.getBoundingClientRect();
+
+        // Fallback if the  canvas is not yet in the layout
+        const cssWidth  = rect.width  || canvas.clientWidth  || parseFloat(canvas.style.width)  || canvas.width;
+        const cssHeight = rect.height || canvas.clientHeight || parseFloat(canvas.style.height) || canvas.height;
+
+        const displayWidth  = Math.round(cssWidth  * dpr);
+        const displayHeight = Math.round(cssHeight * dpr);
+
+        if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+            canvas.width  = displayWidth;
+            canvas.height = displayHeight;
+
+            // Keep the CSS size the same (important!)
+            canvas.style.width  = cssWidth  + 'px';
+            canvas.style.height = cssHeight + 'px';
+
+            return true;
+        }
+        return false;
+    },
+
+    getStableViewportSize :function () {
+        if (window.visualViewport) {
+            return {
+                width:  Math.round(window.visualViewport.width),
+                height: Math.round(window.visualViewport.height)
+            };
+        }
+        // fallback
+        return {
+            width:  window.innerWidth,
+            height: window.innerHeight
+        };
+    },
+
     resize : function (callback, animate, reset) {
         if (na.desktop.settings.timeout_resize) clearTimeout (na.desktop.settings.timeout_resize);
         na.desktop.settings.timeout_resize = setTimeout (async function (callback, animate, reset) {
+            //var x = String(na.m.stacktrace()).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');           alert(x);
+
             na.desktop.resize_do (callback, animate, reset)
-        }, 310, callback, animate, reset)
+        }, 70, callback, animate, reset)
     },
 
     resize_do : async function (callback, animate, reset) {
@@ -240,6 +290,7 @@ na.desktop = na.d = {
 
             //if (visibleDivs.includes('#siteToolbarTop')) gtl.push ({ element : '#siteToolbarTop', edge : 'bottom' });
         }
+        //debugger;
 
         let divs = {};
         for (var sectionID in calculationResults) {
@@ -507,7 +558,6 @@ na.desktop = na.d = {
             }
 
             na.m.log (10010, fncn+' : calculated divs', false);
-//debugger;
 
 
             /*
@@ -692,12 +742,13 @@ na.desktop = na.d = {
 
                                     } else {
                                         let divID2 = divID;
-                                        $(divID).animate ({
+                                        $(divID).css ({
                                             top : divs[divID].top,
                                             left : divs[divID].left,
                                             width : divs[divID].width,
                                             height : divs[divID].height,
-                                            opacity : 1
+                                            opacity : 1,
+                                            display : 'flex'
                                         }, {
                                             queue : true,
                                             duration : na.d.g.animationSpeed,
@@ -737,7 +788,8 @@ na.desktop = na.d = {
                                         top : divs[divID].top,
                                         left : divs[divID].left,
                                         width : divs[divID].width,
-                                        height : divs[divID].height
+                                        height : divs[divID].height,
+                                        display : 'flex'
                                     }, options = {
                                         queue : true,
                                         duration : na.d.g.animationSpeed,
@@ -821,6 +873,12 @@ na.desktop = na.d = {
         if (allCompleted) {
             $('#siteContent .vividDialogContent').show();//fadeIn('normal');
             if (typeof callbackFunction=='function') callbackFunction();
+
+            // inside na.desktop.resize_do (or after the sizes are applied)
+            na.d.setCanvasToDevicePixels(document.querySelector('canvas.naBorder'));
+            na.d.setCanvasToDevicePixels(document.querySelector('canvas.naBackground'));
+
+            // and any other canvases you create later
             na.d.s.masterCallbacks = [];
         }
         /*

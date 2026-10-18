@@ -229,7 +229,7 @@ global $naWebOS;
             null,
             null
         );
-
+/*
         echo $naWebOS->html_vividButton (
             0, 'position:relative; margin:0;float:left;', // $relativeIndentLevel, $containerStyle
             'btnYoutubeContentManager', // $id
@@ -242,7 +242,7 @@ global $naWebOS;
                                          'btnMusic.png',
                                          null, // $buttonOverlayHTML
                                          '', '', '' // $buttonText, $buttonText_class, $buttonText_style
-        );
+        );*/
 
         echo $naWebOS->html_vividButton (
             7, 'margin:0;position:relative;float:left;',

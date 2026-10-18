@@ -58,10 +58,6 @@
 RAJM Veerman
 NL30INGB0007689155
 </pre>
-
-        <p class="backdropped" style="color:lime">
-        2026-Aug-10th, 09:44CEST<br/>
-        </p>
         <p class="backdropped">Please include what specifically you are donating for as part of your money transfer description.</p>
     </div>
 <div style="height:550px"></div>

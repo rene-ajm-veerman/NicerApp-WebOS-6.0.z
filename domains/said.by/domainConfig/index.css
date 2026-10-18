@@ -4,6 +4,35 @@ body {
     overflow : hidden;
     font-family: Montserrat, 'Roboto Condensed', sans-serif;
 }
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
+    position: fixed;
+}
+
+#paintable-canvas {
+width: 100%;
+height: 100%;
+overflow: hidden;
+position: relative;
+}
+
+#dialog-cache-layer {
+position: absolute;
+width: 0;
+height: 0;
+overflow: hidden; /* Stops the Android 15 layout engine from expanding screen space */
+top: -100px;
+left: -100px;
+}
+
+.vividDialog {
+    display : none;
+    position:absolute;
+
+}
+
 
 html {
     font-size: 100%;   /* usually = 16px, but respects user prefs */

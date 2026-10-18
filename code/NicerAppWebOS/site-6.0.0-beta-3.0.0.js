@@ -174,7 +174,7 @@ na.site = {
         //na.analytics.logMetaEvent ('na.site.success() : msg='+msg);
     },
     setStatusMsg : function (msg, resize, showMilliseconds, fade) {
-        if (resize===undefined) resize = true;
+        if (resize===undefined) resize = false;
         //debugger;
 
         //if (!resize) na.site.settings.current.cancelAllResizeCommands = true;
@@ -279,6 +279,7 @@ na.site = {
                 $('.vividMenu_item').css({opacity:0.0001});
                 */
 
+                    debugger;
                     if (!na.site.c.menus) na.site.c.menus = {};
                     const menu = $('#siteMenu')[0];
                     if (menu) na.site.c.menus['#'+menu.id] = new naVividMenu(menu.id);
@@ -357,7 +358,7 @@ na.site = {
                     window.onresize  = function(evt) {
                         $ ('#siteBackground, #siteBackground iframe, #siteBackground img, #siteBackground div').css({
                             width : $(window).width(),
-                                                                                                                    height : $(window).height()
+                            height : $(window).height()
                         });
                         //if ($('#siteContent .vividDialogContent').css('opacity')===1)
                         //  $('#siteContent .vividDialogContent').fadeOut('normal');
@@ -416,27 +417,28 @@ na.site = {
                     }
                     delete themeData.themeSettings.Dialogs;
                     delete themeData.Dialogs;
-                    debugger;
 
+                    try {
+                        var dc = 0;
+                        for (var x in na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements) dc++;
+                        if (dc === 0) {
+                            na.site.globals.themes[na.site.globals.themeName] = na.m.deepMerge (
+                                na.site.globals.themes[na.site.globals.themeName],
+                                themeData
+                            );
+                        } else {
+                            na.site.globals.themes[na.site.globals.themeName] = na.m.deepMerge (
+                                themeData,
+                                na.site.globals.themes[na.site.globals.themeName]
+                            );
+                        }
+                        delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Dialogs;
+                        delete na.site.globals.themes[na.site.globals.themeName].Dialogs;
+                        delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements.Dialogs;
+                    } catch (err) {
 
-                    var dc = 0;
-                    for (var x in na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements) dc++;
-                    if (dc === 0) {
-                        na.site.globals.themes[na.site.globals.themeName] = _.merge (
-                            na.site.globals.themes[na.site.globals.themeName],
-                            themeData
-                        );
-                    } else {
-                        na.site.globals.themes[na.site.globals.themeName] = _.merge (
-                            themeData,
-                            na.site.globals.themes[na.site.globals.themeName]
-                        );
                     }
-                    delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Dialogs;
-                    delete na.site.globals.themes[na.site.globals.themeName].Dialogs;
-                    delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements.Dialogs;
 
-                    debugger;
                     t.setSpecificity(true,false);
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
@@ -1714,6 +1716,7 @@ na.site = {
             };
         });
 
+        $('#btnShowStartMenu')[0].naInitializedAlreadyHere = true;
         if ( !$('#btnShowStartMenu')[0].naInitializedAlreadyHere ) {
             $('#btnShowStartMenu')[0].naInitializedAlreadyHere = true;
             $('#btnShowStartMenu, #btnShowStartMenu_container').off('click').on('click', function (e) {
@@ -2522,6 +2525,7 @@ na.site = {
         //na.desktop.resize(null, false);
         //na.onresize ({ reloadMenu:false });
 
+        return false;
 
         var t = this;
 
