@@ -800,7 +800,7 @@ na.desktop = na.d = {
                                         }
                                     };
                                     if (divID.substr(0,4)!=='#btn' || !na.m.userDevice.isPhone) props.opacity = 1;
-                                    $(divID).animate (props, options);
+                                    $(divID).css({display:'flex'}).animate (props, options);
                                 }
                             }
                         //}, 10); // ready to animate next DIV wait time between steps (in milliseconds)
