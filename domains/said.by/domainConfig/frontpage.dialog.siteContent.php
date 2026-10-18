@@ -29,7 +29,7 @@
                         </blockquote>
                     </div>
     -->
-    <div style="overflow:visible;position:absolute;width:640px;height:100%;">
+    <div style="overflow:visible;position:absolute;width:1000px;height:100%;">
         <iframe src="/NicerAppWebOS/businessLogos/models/angel-book-1.1.0.html" style="transform: scale(1);transition: transform 0.5s ease-in-out; transform-origin: top left;border:0px;height:100%;display: block;
             width: 100%;
             height: 100%; overflow : visible;

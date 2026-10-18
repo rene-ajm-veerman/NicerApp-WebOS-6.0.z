@@ -708,7 +708,7 @@ na.desktop = na.d = {
                                 if (divID=='#siteContent') {
                                     if (na.d.s.animate) {
                                         $(divID).css ({
-                                            display : 'flex'
+                                            display : 'block'
                                         }).animate ({
                                             top : divs[divID].top,
                                             left : divs[divID].left,
@@ -748,7 +748,7 @@ na.desktop = na.d = {
                                             width : divs[divID].width,
                                             height : divs[divID].height,
                                             opacity : 1,
-                                            display : 'flex'
+                                            display : 'block'
                                         }, {
                                             queue : true,
                                             duration : na.d.g.animationSpeed,
@@ -776,7 +776,7 @@ na.desktop = na.d = {
                                         left : divs[divID].left,
                                         width : divs[divID].width,
                                         height : divs[divID].height,
-                                        display : 'flex'
+                                        display : 'block'
                                     };
                                     if (divID.substr(0,4)!=='#btn' || !na.m.userDevice.isPhone) props.opacity = 1;
                                     $(divID).css(props);
@@ -789,7 +789,7 @@ na.desktop = na.d = {
                                         left : divs[divID].left,
                                         width : divs[divID].width,
                                         height : divs[divID].height,
-                                        display : 'flex'
+                                        display : 'block'
                                     }, options = {
                                         queue : true,
                                         duration : na.d.g.animationSpeed,
@@ -800,7 +800,7 @@ na.desktop = na.d = {
                                         }
                                     };
                                     if (divID.substr(0,4)!=='#btn' || !na.m.userDevice.isPhone) props.opacity = 1;
-                                    $(divID).css({display:'flex'}).animate (props, options);
+                                    $(divID).css({display:'block'}).animate (props, options);
                                 }
                             }
                         //}, 10); // ready to animate next DIV wait time between steps (in milliseconds)

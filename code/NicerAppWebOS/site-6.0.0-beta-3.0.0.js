@@ -250,13 +250,22 @@ na.site = {
 
         na.m.waitForCondition (
             'na.site.initialize : desktopIdle()? so we can do na.startUIvisuals()?',function () {
-                var r =
-                na.m.HTMLidle()
-                && typeof jQuery.spectrum=='object'
-                && typeof jQuery.jstree=='object'
-                && typeof $('#themeEditor_jsTree_selectors').jstree('get_json')=='object';
-                return r;
-            }, function() {
+
+                var ok = na.m.HTMLidle()
+                && typeof jQuery.fn.spectrum == 'function'
+                && typeof jQuery.fn.jstree == 'function';
+                console.log('desktopIdle ok =', ok);
+                return ok;
+
+                var checks = {
+                    HTMLidle : na.m.HTMLidle(),
+                               spectrum : typeof jQuery.fn.spectrum == 'function',
+                               jstree   : typeof jQuery.fn.jstree == 'function',
+                               elExists : $('#themeEditor_jsTree_selectors').length,
+                               treeInst : !!(jQuery.jstree && jQuery.jstree.reference('#themeEditor_jsTree_selectors'))
+                };
+                console.log('desktopIdle checks', JSON.stringify(checks));
+                return checks.HTMLidle && checks.spectrum && checks.jstree && checks.treeInst;            }, function() {
                 var fncn = 'na.site.initialize()::desktopIdle()';
 
                 if (typeof naGlobals=='object') t.g = t.globals = $.extend (t.g, naGlobals);
@@ -552,7 +561,7 @@ na.site = {
                 });
 
 
-            }, 20
+            }, 200
         );
 
         document.addEventListener ('keyup', function (e) {

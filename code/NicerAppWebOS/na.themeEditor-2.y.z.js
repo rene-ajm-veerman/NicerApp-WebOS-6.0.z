@@ -89,6 +89,7 @@ class naThemeEditor {
 
     onload (forDialogID) {
         na.m.waitForCondition ('na.te.onload(): $.spectrum()?', function () {
+            debugger;
             return jQuery.spectrum;
         }, function() {
             na.te.onload_do(forDialogID);
