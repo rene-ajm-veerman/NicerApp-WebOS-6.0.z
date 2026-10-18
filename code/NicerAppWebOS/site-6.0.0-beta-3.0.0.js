@@ -445,10 +445,13 @@ na.site = {
                         delete na.site.globals.themes[na.site.globals.themeName].Dialogs;
                         delete na.site.globals.themes[na.site.globals.themeName].themeSettings.Elements.Dialogs;
                     } catch (err) {
-
+                        debugger;
+                        na.m.log (1, 'Error during theme initialization : ' + err)
                     }
 
+                    debugger;
                     t.setSpecificity(true,false);
+                    na.te.onload('siteContent');
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
                     if (s) {
@@ -543,8 +546,8 @@ na.site = {
                         window._screenshotReady = true;
                     }, 6000);
 
-                    var numRand = Math.floor(Math. random() * 101);
-                    if (numRand === 1 || numRand === 2) {
+                    var numRand = Math.floor(Math. random() * 25);
+                    if (numRand === 1) {
                         setTimeout (function() {
                             var ks = Object.keys(na.site.about.easterEggs);
                             var numRand2 = Math.floor(Math. random() * ks.length);

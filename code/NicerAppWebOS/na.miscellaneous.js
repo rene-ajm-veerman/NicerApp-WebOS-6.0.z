@@ -171,7 +171,7 @@ na.m = {
         const result = { ...target };
         for (const key in source) {
             if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                result[key] = deepMerge(result[key] || {}, source[key]);
+                result[key] = na.m.deepMerge(result[key] || {}, source[key]);
             } else {
                 result[key] = source[key];
             }
