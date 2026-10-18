@@ -12,6 +12,7 @@ global $naWebOS;
     <link rel="manifest" href="/NicerAppWebOS/favicon/site.webmanifest">
     <link rel="mask-icon" href="/NicerAppWebOS/favicon/safari-pinned-tab.svg" color="#5bbad5">
     <link rel="shortcut icon" href="/NicerAppWebOS/favicon/favicon.ico">
+    <link rel="manifest" href="/manifest.json">
     <?php echo '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/3rd-party/jsTree-3.3.15/dist/themes/default/style.css?c='.date('Ymd_His', filemtime(dirname(__FILE__).'/../NicerAppWebOS/3rd-party/jsTree-3.3.15/dist/themes/default/style.css')).'">'.PHP_EOL; ?>
     <meta name="generator" content="<?=$naWebOS->about->whatsThis?>"/>
     <meta name="msapplication-TileColor" content="#ffffff">
@@ -1525,8 +1526,8 @@ echo $naWebOS->html_vividButton (
                 <label id="labelTextShadow" class="textShadowSettings_label">Text shadow</label>
             </div>
             <div id="textShadowControls">
-                <img srcPreload="/siteMedia/iconCreate.png" onclick="na.te.addTextShadow(event)"/>
-                <img srcPreload="/siteMedia/iconDelete.png" onclick="na.te.deleteTextShadow(event)"/>
+                <img src="/siteMedia/iconCreate.png" onclick="na.te.addTextShadow(event)"/>
+                <img src="/siteMedia/iconDelete.png" onclick="na.te.deleteTextShadow(event)"/>
                 <!--<div class="flexBreak"></div>
                 <div id="textShadow_0" class="textShadow" style="background:navy;border:1px solid white; border-radius:10px; margin : 5px; padding : 5px;" onclick="na.te.selectTextShadow(event)">ABC XYZ</div>-->
             </div>

@@ -39,7 +39,7 @@ na.desktop = na.d = {
                     top : ($(window).height()/2)-50,
                     left : ($(window).width()/2)-50,
                     width : 100,
-                    height : $(window).height()-120,
+                    height : 100,
                     display : 'none'
                 },
                 '#siteErrors' : {

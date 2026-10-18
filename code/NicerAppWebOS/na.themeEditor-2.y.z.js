@@ -2164,7 +2164,7 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
                                                 bg =  $(na.te.s.c.forElements);
                     };
                     var
-                    bg1 = bg.css('background').replace(/\'/g, '\\\'').replace(/"/g, '\''),
+                    bg1 = (bg.css('background') ?? '').replace(/\'/g, '\\\'').replace(/"/g, '\''),
                                                 opacity = bg1.indexOf('url(') !== -1 ? bg.css('opacity') : 1,
                                                 border = div.css('border'),
                                                 br = bg.css('borderRadius'),
@@ -2313,7 +2313,8 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
             } else {
                 var div = bg = $(na.te.s.c.forElements);
             };
-            bg1 = bg.css('background').replace(/\'/g, '\\\'').replace(/"/g, '\''),
+            var
+            bg1 = (bg.css('background') ?? '').replace(/\'/g, '\\\'').replace(/"/g, '\''),
                                         opacity = bg1.match(/url\(/) ? bg.css('opacity') : 1,
                                                             border = div.css('border'),
                                                             br = bg.css('borderRadius'),

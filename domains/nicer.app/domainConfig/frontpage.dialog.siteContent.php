@@ -65,7 +65,7 @@ NL30INGB0007689155
 
     <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
     <p class="backdropped">
-    2026-Aug-17th, 09:11CEST
+    2026-Oct-18th, 19:57CET
     </p>
     <p class="backdropped">
     These webservers are in the process of undergoing a major version upgrade of the database business logic code as well as other base layers. This upgrade is now nearly complete.
@@ -99,7 +99,7 @@ NL30INGB0007689155
     <h1 class="contentSectionTitle1">Free apps offered :</h1>
 
     <p class="backdropped"><a href="https://zoned.at/vs" class="nomod noPushState" target="naVS">Voices Synthesizer</a>.<br/>
-    See also <a href="https://github.com/debpalash/VoiceStudio/discussions/2760" class="nomod noPushState" target="naVSgh">here (github)</a>, <a href="https://grok.com/share/c2hhcmQtMw_aff8e0df-065c-4186-ab4e-18bf992450e4" class="nomod noPushState" target="naVSgrok">here (grok)</a>, and <a href="https://x.com/ReneVeerman1977/status/2109419966298554811" class="nomod noPushState" target="naVSx">here (X)</a>.
+    See also <a href="https://github.com/debpalash/VoiceStudio/discussions/2760" class="nomod noPushState" target="naVSgh">here (github)</a>, <a href="https://grok.com/share/c2hhcmQtMw_aff8e0df-065c-4186-ab4e-18bf992450e4" class="nomod noPushState" target="naVSgrok">here (Grok)</a>, and <a href="https://x.com/ReneVeerman1977/status/2109419966298554811" class="nomod noPushState" target="naVSx">here (X)</a>.
     </p>
 
     <p class="backdropped">Yields calculated in real time now for <a href="https://nicer.app/fusion/Grok-by-xai-and-Elon-Musk/tokamak-yields-v2.1.1.html" class="nomod noPushState" target="groksTokamak">nuclear fusion power plant designs</a>! With <a href="https://grok.com/share/c2hhcmQtMw_f2621998-1b7b-4d6f-81e0-993a6de5524e" class="nomod noPushState" target="grokFusionPowerPlantsDiscussion">assistance</a> by <a href="https://grok.com" class="nomod noPushState" target="grokHomepage">Grok.com</a> from <a href="https://x.ai" class="nomod noPushState" target="xaiHomepage">x.ai</a> (see also <a href="https://x.com/xai" class="nomod noPushState" target="xaiHomepageOnXdotCom">x.com/xai</a>).<br/>(C) + (R) 2026 by Rene AJM Veerman, building upon general progress in the science and engineering fields. I do not want to cheat anyone out of their legitimate own paychecks though! :-)</p>
