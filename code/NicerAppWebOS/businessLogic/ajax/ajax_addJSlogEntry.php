@@ -79,7 +79,7 @@ try {
     $ipInfo = json_decode($call->body->ip_info,true);
 } catch (Exception $e) {
     // fetch it from a good Web API if we haven't got the geoIP data yet.
-    try {
+    echo ($e->getMessage()); try {
         $key = trim(file_get_contents(dirname(__FILE__).'/ipinfo.io.key.txt'));
         $xec = 'curl -H "Authorization: Bearer '.$key.'" https://ipinfo.io/'.$naIP;
         exec ($xec, $output, $result);
@@ -93,7 +93,7 @@ try {
         ];
         $ipInfo = json_decode(join('',$output),true);
         $cdb->post($rec);
-    } catch (Exception $e) {};
+    } catch (Exception $e) { exit ($e->getMessage());};
 }
 
 // add the data

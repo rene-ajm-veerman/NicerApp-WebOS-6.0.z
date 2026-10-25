@@ -494,6 +494,7 @@ na.site = {
                     na.backgrounds = na.background;
 
                     t.startTooltips();
+                    t.startTooltips();
 
                     for (var appID in na.apps.loaded) {
                         var app = na.apps.loaded[appID];
@@ -856,7 +857,7 @@ na.site = {
                 rememberme : $('#siteLogin #rememberme')[0].checked ? 'true' : ''
             },
             success : function (data, ts, xhr) {
-                if (data.trim()=='status : Success') {
+                if (data.match(/status : Success/i)) {
                     $.cookie('cdb_loginName', $('#username').val(), na.m.cookieOptions());
                     if (typeof callback=='function') callback(true);
                     $('#siteRegistration').add('#siteLogin').fadeOut('normal', 'swing', function () {
@@ -3263,7 +3264,7 @@ na.site = {
                 };*/
                     //
                     na.te.onload('siteContent');
-                    na.setSpecificity (true);
+                    na.site.setSpecificity (true);
                     na.site.loadTheme_applySettings (dat, callback, loadBackground);
 
                 },
@@ -3446,6 +3447,7 @@ na.site = {
         */
             //debugger;
             $('#siteContent > .vividDialogContent > li > a, p, h1, h2, h3').not('.naVividTextCSS, .contentSectionTitle1, .contentSectionTitle1_a, .contentSectionTitle1_span, .contentSectionTitle2, .contentSectionTitle2_a, .contentSectionTitle2_span, .contentSectionTitle3, .contentSectionTitle3_a, .contentSectionTitle3_span, .backdropped, .animatedText_orangeYellow, .animatedText_blue, .animatedText_ivory, .naExternalLink, .naInternalLink, .naText').each (function(idx,el) {
+                if ($(el).parents('.naFrontpage_headerText').length>0) return;
                 var bg = na.m.adjustColorOpacity(el, dat.textBackgroundOpacity);
                 if (bg) $(el).css({background:bg});
             });

@@ -1688,47 +1688,55 @@ class class_naComments {
             $call = $cdb->get($rec['id']);
             $doc  = $call->body;
 
-            // Alleen de originele auteur mag bewerken
+            // ─── Critical: make sure we actually have a revision ───────────
+            if (empty($doc->_rev)) {
+                echo json_encode([
+                    'errorHTML'       => 'Cannot edit: document has no _rev',
+                    'couchdbErrorMsg' => 'Missing _rev on fetched document'
+                ]);
+                return;
+            }
+
+            // Only original author may edit
             if (!isset($doc->clientUsername) || $doc->clientUsername !== $naUsername) {
                 echo json_encode(['error' => 'Not allowed']);
                 return;
             }
 
-            // ─── Audit trail: snapshot VÓÓR de wijziging ───────────────
+            // Snapshot BEFORE changing anything
             $this->writeHistorySnapshot($doc, 'edit', [
                 'tz' => $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0)
             ]);
 
-            // Content bijwerken
-            $dbg = [$doc->msgHTML]; $doc->msgHTML = preg_replace ('/><br>\s*</i','><', $rec['msgHTML']);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = preg_replace ('/><br\/>\s*</i','><', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = preg_replace ('/<p><span class="backdropped">\s*<\/span><\/p>/i','', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = preg_replace ('/<p class="backdropped">\s*<\/p>/i','', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = str_replace('</span>', '', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML; $doc->msgHTML = str_replace('<p>', '<p class="backdropped">', $doc->msgHTML);
-            $dbg[] = $doc->msgHTML;
+            // Content cleaning (your existing preg_replace chain)
+            $doc->msgHTML = preg_replace('/><br>\s*</i', '><', $rec['msgHTML']);
+            $doc->msgHTML = preg_replace('/><br\/>\s*</i', '><', $doc->msgHTML);
+            $doc->msgHTML = preg_replace('/<p><span class="backdropped">\s*<\/span><\/p>/i', '', $doc->msgHTML);
+            $doc->msgHTML = preg_replace('/<p class="backdropped">\s*<\/p>/i', '', $doc->msgHTML);
+            $doc->msgHTML = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $doc->msgHTML);
+            $doc->msgHTML = str_replace('</span>', '', $doc->msgHTML);
+            $doc->msgHTML = str_replace('<p>', '<p class="backdropped">', $doc->msgHTML);
 
-            // Laatste bewerkingstijd bijwerken
+            // Edit metadata
             $now = time();
             $doc->editedDatetime    = $now;
             $doc->editedTZoffset    = $rec['clientTZoffset'] ?? ($doc->clientTZoffset ?? 0);
             $doc->editedDatetimeStr = naDateTimeStr($now, $doc->editedTZoffset);
 
-            // Photo album attachments (merge / replace)
+            // Attachments
             if (array_key_exists('mediaCodePath', $rec) || array_key_exists('mediaFiles', $rec) || array_key_exists('attachments', $rec)) {
-                $incoming = $this->normalizeAttachmentsFromRec($rec);
-                // Replace strategy: new uploads from this edit session replace previous set.
-                // Change to array_merge if you prefer append-only.
-                $doc->attachments = $incoming;
+                $doc->attachments = $this->normalizeAttachmentsFromRec($rec);
             }
 
+            // ─── Put with explicit _rev ────────────────────────────────────
+            // Most PHP-on-Couch style clients respect $doc->_rev when present.
+            // If your client requires the rev as a separate argument, change to:
+            //   $cdb->put($doc->_id, $doc, $doc->_rev);
             $cdb->put($doc->_id, $doc);
 
             echo json_encode([
                 'ok' => true,
-                'id' => $doc->_id//,
-                //'dbg' => $dbg
+                'id' => $doc->_id
             ]);
 
         } catch (Exception $e) {

@@ -180,6 +180,7 @@ na.m = {
     },
 
     addLogEntry : function (msg, htmlClasses) {
+        //alert(JSON.stringify({isBot:na.site.globals.isBot,naLAN:na.site.globals.naLAN}));
         if (na.site.globals.isBot || na.site.globals.naLAN) return false;
         var
         fncn = 'na.m.addLogEntry()',
@@ -199,6 +200,7 @@ na.m = {
             url : url,
             data : data,
             success : function (data, ts, xhr) {
+                debugger;
             },
             error : function (xhr, textStatus, errorThrown) {
                 na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);

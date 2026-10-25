@@ -1,4 +1,3 @@
-<meta name="description" content="Take a video or (tiled) background of any resolution, and project information onto that using any weblanguage you want. Written in a style simple enough for children to learn from.">
 <?php
     require_once(dirname(__FILE__).'/../NicerAppWebOS/boot.php');
     global $naWebOS;
@@ -6,7 +5,16 @@
     //$src = $naWebOS->codePath.'/../../domains/'.$naWebOS->domainFolder.'/domainConfig/pageHeader.php'; echo $src; var_dump(file_exists($src)); exit();
     require_once ($naWebOS->codePath.'/../domains/'.$naWebOS->domainFolder.'/domainConfig/pageHeader.php');
 ?>
-
+<style>
+#siteToolbarRight iframe {
+    text-align : center;
+    display : block;      /* important */
+    margin : 0 auto;      /* horizontal center */
+    width : 560px;        /* must have a width */
+    height : 315px;
+    margin-top : 20px;
+}
+</style>
     <iframe loading="lazy" defer="" artist="Skyla Reeze" song="All he said" width="560" height="315" src="https://www.youtube.com/embed/9uCJiPSsMvk?si=XDiiyF04qzSLrxJi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/Oks5KfrieK4?si=SXY8d9Yf9DoguGzI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/ppxE19VzyfE?si=Tq4HQJSd3Hz0MZ0w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
@@ -17,7 +25,7 @@
 
     <iframe loading="lazy" defer="" artist="Skyla Reeze" song="U and I" width="560" height="315" src="https://www.youtube.com/embed/YZRqT2hbXLE?si=0ZfeUBPCazQqLAHF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/yC-wslvmf4I?si=Eldr73Lqu602JoX4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
-    <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/GbEI-AiOuAo?si=dLhkKwUI8kflH4af" title="YouT    ube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+    <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/GbEI-AiOuAo?si=dLhkKwUI8kflH4af" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/zazZXLj3h38?si=4IC41ilh5e65BFNE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/dxBYuE_qSt8?si=-UMOt3jeBdGL1tBl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
 
@@ -81,6 +89,8 @@
     <iframe loading="lazy" defer="" artist="Umbrella corp" song="Resident Evil opening scene" width="560" height="315" src="https://www.youtube.com/embed/7zuDZrySShA?si=RR4WMetbmUMukYYK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" artist="EDM New Style" song="Phoenix (GMV)" width="560" height="315" src="https://www.youtube.com/embed/2x2OPY9Ggto?si=30gxWZEVm_mMS9YA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" artist="Cypress Hill" song="Gorillaz" width="560" height="315" src="https://www.youtube.com/embed/V5fAAtIfrCA?si=NR1Okzqw2mZZ0hy_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+    <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/gEZ62B38Hlk?si=_feBzMou3DgAGLZ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+    <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/cg333LVlpv8?si=M2zTWey0Z9RWAVy4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
 
     <iframe loading="lazy" defer="" artist="Cypress Hill" song="3 hours Best Of 2026" width="560" height="315" src="https://www.youtube.com/embed/rRJMzPICpwM?si=LTk40QPCPk6P7DXN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe loading="lazy" defer="" width="560" height="315" src="https://www.youtube.com/embed/DpqFEwGmPII?si=yqCy7vdLhRkLopjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
@@ -108,3 +118,4 @@
     <iframe width="560" height="315" src="https://www.youtube.com/embed/yFgdfG7z5Ho?si=EXdBB3jvVRFh1qN6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe width="560" height="315" src="https://www.youtube.com/embed/s5212tWdhlY?si=TNGzJbg5T07JGut4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
     <iframe width="560" height="315" src="https://www.youtube.com/embed/utSupFnnL7I?si=yWP75MoDxNWhiW48" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+</div>

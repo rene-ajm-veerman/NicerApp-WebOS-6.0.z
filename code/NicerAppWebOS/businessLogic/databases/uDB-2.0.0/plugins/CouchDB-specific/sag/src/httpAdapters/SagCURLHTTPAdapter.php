@@ -53,7 +53,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
     // the base cURL options
     $u = $this->user?:$naWebOS->domainFolderForDB.'___Guest';
     $p = $this->pass?:'Guest';
-    $url2 = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
+     $url2 = "{$this->proto}://{$this->host}:{$this->port}{$url}";
     global $naDebugStartup;
 
     if ($naDebugStartup) { echo ('<pre style="color:blue;background:white;margin:10px;padding:10px;border-radius:10px;">t3210A:'); var_dump ($url2); var_dump ($_COOKIE); var_dump(strpos($_COOKIE['cdb_loginName'],'Administrator')); echo '</pre>'; } // die();
@@ -80,7 +80,7 @@ class SagCURLHTTPAdapter extends SagHTTPAdapter {
         //&& strpos($_COOKIE['cdb_loginName'],'Administrator')===false
       ) {
         $opts[CURLOPT_HTTPHEADER][] = 'AuthSession: '.$_COOKIE['cdb_authSession_cookie'];
-        $url2 = "{$this->proto}://".rawurlencode($u).":".rawurlencode($p)."@{$this->host}:{$this->port}{$url}";
+        $url2 = "{$this->proto}://{$this->host}:{$this->port}{$url}";
         //var_dump ($url2); echo '<pre>'.json_encode(debug_backtrace(),JSON_PRETTY_PRINT).'</pre>';
         $opts[CURLOPT_URL] = $url2;
       }

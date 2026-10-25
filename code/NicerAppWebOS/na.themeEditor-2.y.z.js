@@ -2382,16 +2382,29 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
             var el = el2 = el3 = $(na.te.s.c.forElements);
         };
         var
-        newTextShadow =
-        $('#textShadowXoffset').val()+'px '
-        +$('#textShadowYoffset').val()+'px '
-        +$('#textShadowBlurRadius').val()+'px '
-        +na.te.s.c.textShadowColor,
+        els2 = $('.textShadow_bg'),
+        newTextShadow = '',
+        newTextShadow2 =
+            $('#textShadowXoffset').val()+'px '
+            +$('#textShadowYoffset').val()+'px '
+            +$('#textShadowBlurRadius').val()+'px '
+            +na.te.s.c.textShadowColor;
+
+        els2.each (function (idx,el) {
+            if (newTextShadow!=='') newTextShadow += ', ';
+            if ($(el).parent()[0].id==na.te.s.c.selectedTextShadowID) {
+                $(el).css({textShadow : newTextShadow2});
+                newTextShadow += newTextShadow2;
+            } else {
+                newTextShadow += $(el).css('textShadow');
+            }
+        });
+
+        var
         newFontSize = $('#textSize').val(),
         newFontWeight = parseInt($('#textWeight').val()) * 100,
         newFontFamily = newFontFamily ? newFontFamily : na.te.s.c.selectedFontFamily, //$('#textFontFamily').val(),//.replace(/ /g, '+'),
-        els = $('#'+na.te.s.c.selectedTextShadowID+' > div')
-        .add(el).add(el2).add(el3);
+        els = $('#'+na.te.s.c.selectedTextShadowID+' > div').add(el).add(el2).add(el3);
         if (newFontFamily) na.te.s.c.selectedFontFamily = newFontFamily;
 
         na.te.cssChange (els, {
@@ -2400,7 +2413,6 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
             fontSize : newFontSize+'px',
             fontFamily : newFontFamily
         });
-        debugger;
         na.site.saveTheme();
 
         $('.textShadow_containerDiv').removeClass('selected');
@@ -2448,7 +2460,7 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
 
     textSettingsSelected_textColor  (color) {
         if (color) na.te.s.c.textColor = color; else color = na.te.s.c.textColor;
-        if (typeof color=='object') color = 'rgba('+color._r+', '+color._g+', '+color._b+', '+color._a+')'; // firefox bugfix
+        if (typeof color=='object') color = 'rgba('+Math.floor(color._r)+', '+Math.floor(color._g)+', '+Math.floor(color._b)+', '+color._a+')'; // firefox bugfix
         if (na.te.s.c.forDialogID) {
             var
             el = $('#'+na.te.s.c.forDialogID),

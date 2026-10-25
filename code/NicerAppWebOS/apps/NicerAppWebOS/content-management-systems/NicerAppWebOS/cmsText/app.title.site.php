@@ -24,10 +24,13 @@ $ip = (array_key_exists('X-Forwarded-For',apache_request_headers())?apache_reque
 global $naWebOS;
 $cdb = $naWebOS->dbsAdmin->findConnection('couchdb')->cdb;
 
-$cdb->setDatabase(str_replace('_tree', '_documents', $view['database']),false);
+$dbName = str_replace('_tree', '_documents', $view['database']);
+$cdb->setDatabase($dbName,false);
 //echo '<pre style="color:lime;background:rgba(0,0,50,0.7);">'; var_dump ($view); echo '</pre>';
 
-try { $call = $cdb->get ($view['id']); } catch (Exception $e) { echo $e->getMessage(); exit(); };
+try { $call = $cdb->get ($view['id']); } catch (Exception $e) {
+    echo 'app.title.site.php::In database "'.$dbName.'", id='.$view['id'].' could not be found :'.$e->getMessage(); exit();
+};
 
 echo $call->body->pageTitle.' on Said.by';
 ?>

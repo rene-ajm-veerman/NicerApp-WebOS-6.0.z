@@ -759,11 +759,12 @@ function cdb_login($db, $cdb, $cRec, $username) {
 
     $done = false;
     global $naDebugStartup;
+    //$naDebugStartup = true;
     if ($naDebugStartup) {
         echo '<pre style="font-weight:bold;color:yellow;background:navy;">'; var_dump ($username); var_dump($cRec); debug_print_backtrace(); echo '</pre>';
     }
 
-    //echo '<pre>';var_dump($_COOKIE);echo '</pre>'; exit;
+    //echo '<pre>t467:';var_dump($_COOKIE);echo '</pre>'; //exit;
     if (
         !$done
         && is_array($_COOKIE)
@@ -772,13 +773,14 @@ function cdb_login($db, $cdb, $cRec, $username) {
         && $_COOKIE['cdb_authSession_cookie']!==''
     ) {
         try {
+            //echo 'Logging in by cookie '.$_COOKIE['cdb_authSession_cookie'];
             $r = $cdb->loginByCookie ($_COOKIE['cdb_authSession_cookie']);
             $done = true;
         } catch (Throwable $e) {
-            trigger_error ($fncn.' : could not login by cookie, $e->getMessage()='.$e->getMessage(), E_USER_WARNING);
+            echo $fncn.' : could not login by cookie, $e->getMessage()='.$e->getMessage();
             try {
                 echo '<h1>Could not login by cookie; '.$e->getMessage().'</h1>';
-                //echo '<pre>';var_dump($cRec);die();
+                echo '<pre>';var_dump($cRec);die();
                 $cdb->login ($db->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest');
                 $cdb_session = $cdb->getSession();
                 //echo '<pre>';var_dump($cdb_session);die();

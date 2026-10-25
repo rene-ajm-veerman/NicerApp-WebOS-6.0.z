@@ -76,8 +76,11 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
                 if ($cRec['username']=='admin') {
                     //echo '<h2 style="color:green;">Logging in as "admin"</h2>'; //exit;
                     $naLoginResult = cdb_login ($this, $this->cdb, $cRec, $cRec['username'], $cRec['password']);
-                } else
+                } else {
+                    //$dbg = [ $this->translate_plainUserName_to_couchdbUserName($cRec['username']), $cRec['password'] ];
+                    //echo '<div style="color:yellow;background:navy">'.json_encode($dbg,JSON_PRETTY_PRINT).'</div>';
                     $naLoginResult = cdb_login ($this, $this->cdb, $cRec, $this->translate_plainUserName_to_couchdbUserName($cRec['username']), $cRec['password']);
+                }
             } else{
                 echo '<h1>FALLBACK2</h1>';
                 $naLoginResult = cdb_login ($this, $this->cdb, null, null);
@@ -89,15 +92,15 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
                 } elseif (is_object($naWebOS->dbsAdmin)) {
                     $cdba = $naWebOS->dbsAdmin->findConnection('couchdb');
                     //echo '<pre style="color:navy;background:white;margin:10px;padding:10px;border-radius:10px;">t1978:'; var_dump($cdba); echo '</pre>';
-                    $cdba->cdb->setDatabase('_users',true);
-                    $cdba->cdb->put ('org.couchdb.user:'.$cdba->translate_plainUserName_to_couchdbUserName('Guest'),[
-                        'name' => $cdba->translate_plainUserName_to_couchdbUserName('Guest'),
-                        'type' => 'user',
-                        'roles' => [
-                            $cdba->translate_plainGroupName_to_couchdbGroupName('Guests')
-                        ],
-                        'password' => 'Guest'
-                    ]);
+                    // $cdba->cdb->setDatabase('_users',true);
+                    // $cdba->cdb->put ('org.couchdb.user:'.$cdba->translate_plainUserName_to_couchdbUserName('Guest'),[
+                    //     'name' => $cdba->translate_plainUserName_to_couchdbUserName('Guest'),
+                    //     'type' => 'user',
+                    //     'roles' => [
+                    //         $cdba->translate_plainGroupName_to_couchdbGroupName('Guests')
+                    //     ],
+                    //     'password' => 'Guest'
+                    // ]);
                     try {
                         $naLoginResult = $cdb->login ($db->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest', Sag::$AUTH_COOKIE);
                         $call = $cdba->cdb->find($findCommand);
@@ -110,36 +113,17 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
                 }
             }
         } catch (Exception $e) {
-
-            global $naDebugStartup;
-            if ($naDebugStartup) {
-                echo '<h1>ERROR: '.$e->getMessage().'</h1>';
-            }
+            echo '<h1 style="color:red">t661:'.$e->getMessage().'</h1>';
 
 
-            $cdba = $naWebOS->dbsAdmin->findConnection('couchdb');
-            $cdba->cdb->setDatabase('_users',true);
-            $cdba->cdb->put ('org.couchdb.user:'.$cdba->translate_plainUserName_to_couchdbUserName('Guest'),[
-                'name' => $cdba->translate_plainUserName_to_couchdbUserName('Guest'),
-                'type' => 'user',
-                'roles' => [
-                    $cdba->translate_plainGroupName_to_couchdbGroupName('Guests')
-                ],
-                'password' => 'Guest'
-            ]);
             try {
-                $cdb->login ($cdba->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest', Sag::$AUTH_COOKIE);
-                $call = $cdba->cdb->find($findCommand);
-            } catch (Throwable $e) {
-                //echo '<pre>.../NicerAppWebOS/functions.php::cdb_login() : Could not create account "Guest"</pre>';
-                return false;
+                $naLoginResult = cdb_login ($this, $this->cdb, ['username'=>na_couchdbUserName_from_plainUserName('Guest'), 'password'=>'Guest'], 'Guest');
+            } catch (Exception $e) {
+                echo '<h1 style="color:purple">t662:'.$e->getMessage().'</h1>';
             }
-
-
-            $naLoginResult = cdb_login ($this, $this->cdb, $this->translate_plainUserName_to_couchdbUserName('Guest'), 'Guest');
             //echo '<pre>'.$this->cn.'::__construct() : cdb_login() FATAL ERROR : '; var_dump ($naLoginResult); echo '</pre>'; exit();
         }
-        $_SESSION['loginResult'] = $naLoginResult;
+        //$_SESSION['loginResult'] = $naLoginResult;
 
         if (!$naLoginResult) return $naLoginResult; //die ('500 - could not login using username "'.$cRec['username'].' to NicerApp WebOS.');
 
@@ -149,18 +133,18 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
 
 
         // test db connection quality
-        global $naBackupAccountName; global $naBackupAccountPassword;
-        if (is_null($this->cdb->getSession(null,null)->body->userCtx->name)) {
-            trigger_error ('Could not log into couchdb database. Reason : Database cookie expired. Please login again.', E_USER_WARNING);
-        }
-
-        $u = $this->cdb->getSession(null,null)->body->userCtx;
-        global $naDebugStartup;
-        if ($naDebugStartup) {
-            echo '<pre style="color:red">t79:'; var_dump ([$username,$u]); echo '</pre>'; //exit();
-        }
-        $this->username = $u->name;
-        $this->roles = $u->roles;
+        // global $naBackupAccountName; global $naBackupAccountPassword;
+        // if (is_null($this->cdb->getSession(null,null)->body->userCtx->name)) {
+        //     trigger_error ('Could not log into couchdb database. Reason : Database cookie expired. Please login again.', E_USER_WARNING);
+        // }
+        //
+        // $u = $this->cdb->getSession(null,null)->body->userCtx;
+        // global $naDebugStartup;
+        // if ($naDebugStartup) {
+        //     echo '<pre style="color:red">t79:'; var_dump ([$username,$u]); echo '</pre>'; //exit();
+        // }
+        // $this->username = $u->name;
+        // $this->roles = $u->roles;
 
 
         if ($admin) {

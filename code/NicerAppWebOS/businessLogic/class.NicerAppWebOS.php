@@ -507,7 +507,7 @@ class NicerAppWebOS {
         $file = $this->path.'/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS/cmsComments/app.dialog.siteContent.php';
         if (!file_exists($file) || !is_readable($file)) {
             $msg = 'Could not find comments code "'.$file.'".';
-            $html = '<p>&nbsp;</p><span style="background:rgba(0,0,0,0.5);border:1px solid grey; box-shadow:2px 2px 4px 2px rgba(0,0,0,0.7); padding:10px;margin:20px;border-radius:8px;color:ivory;text-shadow:2px 2px 3px rgba(0,0,0,7);">'.$msg.'</span>';
+            $html = '<p>&nbsp;</p><div style="background:rgba(0,0,0,0.5);border:1px solid grey; box-shadow:2px 2px 4px 2px rgba(0,0,0,0.7); padding:10px;margin:20px;border-radius:8px;color:ivory;text-shadow:2px 2px 3px rgba(0,0,0,7);">'.$msg.'</div>';
             $ret['siteContent'] = $html;
         } else {
             $fc = require_return ($file);
@@ -519,7 +519,7 @@ class NicerAppWebOS {
 
     public function getContent__standardErrorMessage ($msg) {
         $ret = [];
-        $msg = '<p>&nbsp;</p><span style="background:rgba(0,0,0,0.5);border:1px solid grey; box-shadow:2px 2px 4px 2px rgba(0,0,0,0.7); padding:10px;margin:20px;border-radius:8px;color:ivory;text-shadow:2px 2px 3px rgba(0,0,0,7);">'.$msg.'</span>';
+        $msg = '<p>&nbsp;</p><div style="background:rgba(0,0,0,0.5);border:1px solid grey; box-shadow:2px 2px 4px 2px rgba(0,0,0,0.7); padding:10px;margin:20px;border-radius:8px;color:ivory;text-shadow:2px 2px 3px rgba(0,0,0,7);">'.$msg.'</div>';
         $file = $this->domainPath.'/domainConfig/errorMessage.default.php';
         if (!file_exists($file) || !is_readable($file)) {
             $html = $msg;
@@ -876,7 +876,7 @@ class NicerAppWebOS {
         $dataSetName = $db->dataSetName($relTableName);
         $cdb->setDatabase ($dataSetName, false);
         $ret = [];
-        //var_dump($fncn.' (1)'); exit;
+        var_dump($fncn.' '.$dataSetName.' (1)'); //exit;
 
         // am i called with the correct parameters, or not?
         if (
@@ -902,26 +902,36 @@ class NicerAppWebOS {
                 'selector' => [ 'user' => str_replace('-',' ',$username), 'url1' => $url1, 'seoValue' => $dataID ],
                 'fields' => ['_id']
             ];
-            //echo '<pre style="padding:8px;border-radius:10pFx;background:rgba(255,255,255,0.5);color:green;">'; var_dump ($findCommand); echo '</pre>';
+            //echo '<pre style="padding:8px;border-radius:10px;background:rgba(255,255,255,0.5);color:green;">t542:'; var_dump ($findCommand); echo '</pre>';
             try {
                 $call = $cdb->find ($findCommand);
             } catch (Exception $e) {
                 $msg = $fncn.' FAILED while trying to find in \''.$dataSetName.'\' : '.$e->getMessage();
                 global $naLAN;
                 if ($naLAN) $msg .= ' : <pre>'.json_encode(debug_backtrace(),JSON_PRETTY_PRINT).'</pre>';
-                trigger_error ($msg, E_USER_WARNING);
                 echo $msg;
+                trigger_error ($msg, E_USER_WARNING);
                 return false;
             }
 
-            //echo '<pre style="color:blue;background:rgba(255,255,255,0.7);border-radius:20px;">'; var_dump ($dataSetName); var_dump ($findCommand); var_dump ($call);var_dump (count($call->body->docs));exit();
+            //echo '<pre style="color:blue;background:rgba(255,255,255,0.7);border-radius:20px;">'; var_dump ($dataSetName); var_dump ($findCommand); var_dump ($call);var_dump (count($call->body->docs));//exit();
             //var_dump($fncn.' (2)'); exit;
 
             if (count($call->body->docs)===0) {
                 $msg = 'Content could not be found.';
                 return $this->getContent__standardErrorMessage ($msg);
             }
+            if (count($call->body->docs)>1) {
+                $ids = '';
+                foreach ($call->body->docs as $did => $doc) {
+                    if ($ids!=='') $ids .= ', ';
+                    $ids .= $doc->_id;
+                }
+                $msg = 'Duplicate content ('.count($call->body->docs).' documents found, ids='.$ids.') in '.$dataSetName.'.';
+                return $this->getContent__standardErrorMessage ($msg);
+            }
 
+            //echo '<h1>Fetching '.$call->body->docs[0]->_id.'</h1>';
             $call2 = $cdb->get ($call->body->docs[0]->_id);
             //echo '<pre style="color:blue">'; var_dump ($call2);exit();
             $dataRecord = (array)$call2->body;
@@ -942,6 +952,7 @@ class NicerAppWebOS {
                     'use_index' => 'primaryIndex',
                     'fields' => '_id'
                 ];
+                //echo '<pre style="color:purple">'.json_encode($findCommand,JSON_PRETTY_PRINT).'</pre>';
                 try {
                     $call3 = $cdb->find ($findCommand);
                 } catch (Exception $e) {
@@ -975,10 +986,9 @@ class NicerAppWebOS {
                 global $toArray;
                 $view = $toArray($dataRecord['viewSettings']);
             }
-            //echo '<pre style="color:green">'; var_dump ($view); echo '</pre>'; exit();
+            //echo '<pre style="color:green">'; var_dump ($view); echo '</pre>'; //exit();
             $this->view = $view;
             //var_dump($fncn.' (4)'); echo '<pre>'; var_dump ($view); exit;
-
             // render the view
             if (is_array($view)) {
                 if (array_key_exists('misc', $view)) {
@@ -991,13 +1001,13 @@ class NicerAppWebOS {
                     }
                     $view = [ $rp => $rec ];
                 }
-                //echo '<pre style="color:purple;background:cyan;">'; var_dump ($view); echo '</pre>'; exit();
+                //echo '<pre style="color:purple;background:cyan;">'; var_dump ($view); echo '</pre>'; //exit();
                 //var_dump($fncn.' (5)'); echo '<pre>'; var_dump ($view); exit;
 
                 foreach ($view as $viewsFolder => $viewSettings) {
                     $rootPath = str_replace('/NicerAppWebOS/','',$rootPath_na);
+                    //echo '<h3>'.$rootPath.'/'.$viewsFolder.'</h3>';
                     if (is_dir($rootPath.'/'.$viewsFolder)) {
-                        $debug = false;
                         $files = getFilePathList ($rootPath.'/'.$viewsFolder, false, '/app.*/', null, array('file'), 1, 1, true)['files'];
                         if ($debug) {
                             var_dump ($rootPath.'/'.$viewsFolder); echo '<pre style="color:yellow;background:red;">';
@@ -2549,6 +2559,8 @@ class NicerAppWebOS {
         //$fncn = $this->cn.'::getPageCSS_specific("'.json_encode($selector).'")';
 
         $db = $this->dbs->findConnection('couchdb');
+        $cdb = $db->cdb;
+         //cdb_login ($db, $cdb, 'said_by___Guest', 'Guest');
 
         //if ($debug)
         //{ echo '$selector='; var_dump ($selector); echo '<br/><br/>'.PHP_EOL.PHP_EOL; exit(); };
@@ -2608,12 +2620,13 @@ class NicerAppWebOS {
                                         echo $fncn.' : WARNING : invalid database connection ($this->dbs="'.json_encode($this->dbs).'")- this database server, or even the entire webserver, has been hacked by hostiles.';
                                         exit(); // or exit();
                                     }
+                                    $s = $this->dbs->findConnection('couchdb')->cdb->getSession();
                                     if ($debug) {
-                                        echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666d=$roles='; var_dump ($this->dbs->findConnection('couchdb')->cdb->getSession()); echo '</pre>';
+                                        echo '<pre style="color:lime;background:blue;margin:10px;padding:5px;">t666d=$roles='; var_dump ($s); echo '</pre>';
 
                                     }
-                                    if (!is_null($this->dbs->findConnection('couchdb')->roles))
-                                    foreach ( $this->dbs->findConnection('couchdb')->roles
+                                    if (!is_null($s->body->userCtx->roles))
+                                    foreach ($s->body->userCtx->roles
                                         as $roleIdx => $groupID
                                     ) {
                                         if ($debug) { echo 't667A='; var_dump($groupID); var_dump ($adjustedUserOrGroupID);};

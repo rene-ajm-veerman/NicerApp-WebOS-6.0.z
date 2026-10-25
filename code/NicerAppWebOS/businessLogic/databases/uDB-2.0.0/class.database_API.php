@@ -233,6 +233,7 @@ class class_NicerAppWebOS_database_API {
         } catch (Throwable $e) {
             echo '<h2 style="color:orange;background:navy;margin:10px;padding:10px;border-radius:10px;">t453:'.$e->getMessage().'</h2>';
             echo '<pre style="color:orange;background:navy;margin:10px;padding:10px;border-radius:10px;">t453:'.json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS),JSON_PRETTY_PRINT).'</pre>';
+            echo '<pre style="color:orange;background:navy;margin:10px;padding:10px;border-radius:10px;">t453:'.json_encode($e->getTrace(),JSON_PRETTY_PRINT).'</pre>';
             return false;
         }
 
