@@ -876,7 +876,7 @@ class NicerAppWebOS {
         $dataSetName = $db->dataSetName($relTableName);
         $cdb->setDatabase ($dataSetName, false);
         $ret = [];
-        var_dump($fncn.' '.$dataSetName.' (1)'); //exit;
+        //var_dump($fncn.' '.$dataSetName.' (1)'); //exit;
 
         // am i called with the correct parameters, or not?
         if (

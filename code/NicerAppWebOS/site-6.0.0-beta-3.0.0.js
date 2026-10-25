@@ -174,7 +174,7 @@ na.site = {
         //na.analytics.logMetaEvent ('na.site.success() : msg='+msg);
     },
     setStatusMsg : function (msg, resize, showMilliseconds, fade) {
-        if (resize===undefined) resize = false;
+        if (resize===undefined) resize = na.site.s.c.initialized;
         //debugger;
 
         //if (!resize) na.site.settings.current.cancelAllResizeCommands = true;
@@ -197,14 +197,16 @@ na.site = {
             speed : 'fast'
         });
 
-        na.m.waitForCondition(
-            'na.site.setStatusMsg(msg,resize,showMilliseconds) : na.m.HTMLidle()?', na.m.HTMLidle,
-                              function() {
-                                  if (resize) {
+//        na.m.waitForCondition(
+//            'na.site.setStatusMsg(msg,resize,showMilliseconds) : na.m.HTMLidle()?', na.m.HTMLidle,
+//                              function() {
+                                  //if (resize) {
+        debugger;
                                       na.site.settings.statusbarVisible = na.desktop.settings.visibleDivs.includes('#siteStatusbar');
                                       if (!na.site.settings.statusbarVisible) na.desktop.settings.visibleDivs.push('#siteStatusbar');
-                                      $(window).trigger('resize');
-                                  };
+                                      na.m.waitForCondition('setStatusMsg_do()', function () {return na && na.desktop}, function () { na.desktop.resize()}, 100);
+                                      //setTimeout (function(){$(window).trigger('resize');},100);
+                                  //};
 
                                   if (
                                       msg !== na.site.settings.defaultStatusMsg
@@ -216,8 +218,8 @@ na.site = {
                                           $(window).trigger('resize');
                                       }, showMilliseconds);
                                   }
-                              }, 20
-        );
+//                              }, 20
+//        );
     },
 
     initialize : async function (desktopDefinition) {
@@ -371,10 +373,10 @@ na.site = {
                         });
                         //if ($('#siteContent .vividDialogContent').css('opacity')===1)
                         //  $('#siteContent .vividDialogContent').fadeOut('normal');
-                        na.desktop.resize(function() {
+                        //na.desktop.resize(function() {
                             //na.site.delayedReloadMenu();
                             na.site.onresize ({ reloadMenu : true }); // BEST WAY : the menu may change it's layout completely based on the possibly changed orientation of your device.
-                        });
+                        //});
                     };
                     if (document.location.href.match('/wiki/')) {
                         $('#siteContent > .vividDialogContent > div').css({background:'none'});
@@ -533,7 +535,7 @@ na.site = {
 
                     na.m.addLogEntry ('NicerAppWebOS Fully started for <a href=\\"'+document.location.href+'\\" target=\\"_new\\">'+document.location.href+'</a>', 'naStatus_fullyBooted');
                     if (t.globals.version) {
-                        na.site.setStatusMsg ('<a href="https://nicer.app" target="_new" class="nomod noPusState">NicerApp WebOS v'+t.globals.version.version+'</a>&nbsp;(last modified '+t.globals.version.history.lastModified+'&nbsp;CET)&nbsp;is now fully started.');
+                        na.site.setStatusMsg ('<a href="https://nicer.app" target="_new" class="nomod noPusState">NicerApp WebOS v'+t.globals.version.version+'</a>&nbsp;(last modified '+t.globals.version.history.lastModified+'&nbsp;CET)&nbsp;is now fully started.', true);
                         $('#siteLastModified').html(t.globals.version.version+', last modified : '+t.globals.version.history.lastModified+' CET');
                     } else {
                         var html =

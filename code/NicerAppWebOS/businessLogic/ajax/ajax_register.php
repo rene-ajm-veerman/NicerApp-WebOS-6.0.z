@@ -91,7 +91,7 @@ if (!$got) {
 }
 
 $dbName = $cdbDomain.'___cms_tree___user___'.strtolower($username1);
-try { $cdb->deleteDatabase ($dbName); } catch (Exception $e) { };
+//try { $cdb->deleteDatabase ($dbName); } catch (Exception $e) { };
 $cdb->setDatabase($dbName, true);
 try {
     $call = $cdb->setSecurity ($security_user);
@@ -144,7 +144,7 @@ if ($do) try { $cdb->post($data); } catch (Exception $e) { if ($debug) { echo '<
 echo 'Created database '.$dbName.'<br/>'.PHP_EOL;
 
 $dbName = $cdbDomain.'___cms_documents___user___'.strtolower($username1);
-try { $cdb->deleteDatabase ($dbName); } catch (Exception $e) { };
+//try { $cdb->deleteDatabase ($dbName); } catch (Exception $e) { };
 $cdb->setDatabase($dbName, true);
 try {
     $call = $cdb->setSecurity ($security_user);

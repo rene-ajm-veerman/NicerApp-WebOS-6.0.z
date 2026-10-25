@@ -53,9 +53,12 @@ try {
         $_SESSION['cdb_loginName'] = $username;
     } else {
         // failed; re-create user rec and try again
-        $xecA = 'curl -vD - -X POST https://'.$naWebOS->domain.'/NicerAppWebOS/businessLogic/ajax/ajax_register.php -d "loginName='.$username.'" -d "pw='.$_POST['pw'].'" -d "email=no-reply@hotmail.com"';
-        exec ($xecA, $outputA, $resultA);
+        //$xecA = 'curl -vD - -X POST https://'.$naWebOS->domain.'/NicerAppWebOS/businessLogic/ajax/ajax_register.php -d "loginName='.$username.'" -d "pw='.$_POST['pw'].'" -d "email=no-reply@hotmail.com"';
+        //exec ($xecA, $outputA, $resultA);
+
         //echo '<pre>'; var_dump ($xecA); echo PHP_EOL; var_dump ($outputA); echo '</pre>';
+
+        echo 'status : Failed.'.PHP_EOL;
     }
 
 } catch (Exception $e) {

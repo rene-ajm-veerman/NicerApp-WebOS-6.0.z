@@ -13,8 +13,8 @@ na.desktop = na.d = {
         t.globals = t.g = {
             animationSpeed : 'fast',
             divs : [ '#siteTaskbar', '#siteDateTime', '#siteErrors', '#btnOptions', '#btnLoginLogout', '#btnChangeBackground', '#siteContent', '#siteYoutubePlayer', '#siteYoutubeSearch', '#siteComments', '#siteStatusbar', '#siteToolbarThemeEditor', '#siteToolbarLeft', '#siteToolbarRight', '#siteToolbarTop' ],
-            originalDivs : [ '#siteTaskbar', '#siteContent' ],
-            visibleDivs : [ '#siteTaskbar', '#siteContent' ],
+            originalDivs : [ '#siteStatusbar', '#siteTaskbar', '#siteContent' ],
+            visibleDivs : [ '#siteStatusbar', '#siteTaskbar', '#siteContent' ],
             configs : {
                 'background' : [ ],
                 'all' : [ '#siteContent', '#siteYoutubePlayer', '#siteYoutubeSearch', '#siteStatusbar' ],
@@ -123,8 +123,8 @@ na.desktop = na.d = {
             cmds : []
         }, settings);
 
-        $(window).resize(t.resize);
-        setTimeout (t.resize, 200);
+        //$(window).resize(t.resize);
+        //setTimeout (t.resize, 200);
 
         window.removeEventListener('deviceorientation', na.desktop.reloadMenu);
         window.addEventListener('deviceorientation', na.desktop.reloadMenu);
@@ -212,11 +212,12 @@ na.desktop = na.d = {
 
     resize : function (callback, animate, reset) {
         if (na.desktop.settings.timeout_resize) clearTimeout (na.desktop.settings.timeout_resize);
+        debugger;
         na.desktop.settings.timeout_resize = setTimeout (async function (callback, animate, reset) {
             //var x = String(na.m.stacktrace()).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');           alert(x);
 
             na.desktop.resize_do (callback, animate, reset)
-        }, 70, callback, animate, reset)
+        }, 100, callback, animate, reset)
     },
 
     resize_do : async function (callback, animate, reset) {
@@ -557,8 +558,8 @@ na.desktop = na.d = {
                 }
             }
 
-            na.m.log (10010, fncn+' : calculated divs', false);
-
+            na.m.log (101, fncn+' : calculated divs : '+JSON.stringify(divs), false);
+debugger;
 
             /*
             for (var i=0; i<na.d.g.divs.length; i++) {
@@ -670,7 +671,7 @@ na.desktop = na.d = {
 
                                 var css = na.d.g.defaultPos()[divIDx];
                                 if (na.d.s.animate) {
-                                    $(divID).animate (css,options);
+                                    $(divID).stop(true,true).animate (css,options);
                                 } else {
                                     na.d.s.animatingDivs[divID] = false;
                                     $(divID).css(css);
@@ -709,7 +710,7 @@ na.desktop = na.d = {
                                     if (na.d.s.animate) {
                                         $(divID).css ({
                                             display : 'block'
-                                        }).animate ({
+                                        }).stop(true,true).animate ({
                                             top : divs[divID].top,
                                             left : divs[divID].left,
                                             width : divs[divID].width,
@@ -743,13 +744,14 @@ na.desktop = na.d = {
                                     } else {
                                         let divID2 = divID;
                                         $(divID).css ({
+                                            opacity : 1,
+                                            display : 'block'
+                                        }).stop(true,true).animate({
                                             top : divs[divID].top,
                                             left : divs[divID].left,
                                             width : divs[divID].width,
                                             height : divs[divID].height,
-                                            opacity : 1,
-                                            display : 'block'
-                                        }, {
+                                        },{
                                             queue : true,
                                             duration : na.d.g.animationSpeed,
                                             easing : 'swing',
@@ -800,7 +802,7 @@ na.desktop = na.d = {
                                         }
                                     };
                                     if (divID.substr(0,4)!=='#btn' || !na.m.userDevice.isPhone) props.opacity = 1;
-                                    $(divID).css({display:'block'}).animate (props, options);
+                                    $(divID).css({display:'block'}).stop(true,true).animate (props, options);
                                 }
                             }
                         //}, 10); // ready to animate next DIV wait time between steps (in milliseconds)

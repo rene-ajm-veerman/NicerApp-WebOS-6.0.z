@@ -36,7 +36,7 @@ $ip = (array_key_exists('X-Forwarded-For',apache_request_headers())?apache_reque
     }, 100);
     */
     na.d.s.visibleDivs.push ('#siteComments');
-    na.d.resize();
+    //na.d.resize();
 </script>
 
 <!--<div class="lds-facebook"><!-- thanks for allowing CC0 license usage : https://loading.io/css/ -- ><div></div><div></div><div></div></div> -->
