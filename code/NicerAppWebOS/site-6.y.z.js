@@ -2799,6 +2799,7 @@ na.site = {
     setSpecificity : function (simple, saveTheme) {
         if (typeof simple=='undefined') simple = true;
         if (typeof saveTheme=='undefined') saveTheme = true;
+        var lastSelected = null;
 
         $('.na_themes_dropdown').html('<div class="vividDropDownBox_selected vividScrollpane" style="white-space:normal;overflow:visible;"></div><div class="vividDropDownBox_selector"><div class="vividScrollpane" style="padding:0px;height:400px;"></div></div>').delay(50);
         $('.vividDropDownBox_selected, .vividDropDownBox_selector').each(function(idx,el) {
@@ -2883,6 +2884,24 @@ na.site = {
                 $('.na_themes_dropdown__specificity').css({overflow:'visible'});
                 $('.na_themes_dropdown__specificity > .vividScrollpane').css({display:'block'});
             }
+        }
+
+        var rid2 = null;
+        if (lastSelected) {
+            for (var roleID in na.site.globals.themeDBkeys[lastSelected].permissions.write.roles) {
+                var rid = roleID.replace(/.*___/,'');
+                if (rid!=='Guest') rid2 = roleID;
+            }
+        }; debugger;
+
+        if (!lastSelected && !rid2) {
+            var lastSelected = j;
+            na.site.globals.themeDBkeys = na.site.globals.themesDBkeys[lastSelected];
+            na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName], function(){na.te.onload('siteContent')});
+            $('.na_themes_dropdown__specificity > .vividDropDownBox_selected').html (na.site.globals.themeDBkeys.specificityName);
+            na.te.settings.current.specificity = na.site.globals.themeDBkeys;
+            na.te.settings.current.specificityName = na.site.globals.themeDBkeys.specificityName;
+            na.m.log (3, 'na.site.setSpecificity() : specificity (simple==='+(simple?'true':'false')+') now set to "'+na.site.globals.themeDBkeys.specificityName+'"')
         }
 
 

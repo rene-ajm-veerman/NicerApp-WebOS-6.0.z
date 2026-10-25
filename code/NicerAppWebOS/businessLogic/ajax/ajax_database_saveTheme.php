@@ -5,7 +5,7 @@ global $naIP;
 global $naWebOS;
 
 $useAdminLogin = false; // bugfix when boolean 'true' (NO LONGER NEEDED)
-$debug = false;
+$debug = true;
 if ($debug) {
     echo 'info : '.__FILE__.' : $debug = true.<br/>'.PHP_EOL;
     ini_set('display_errors', 1);
@@ -36,6 +36,7 @@ if ($useAdminLogin) {
     $db = $naWebOS->dbs->findConnection('couchdb');
     $cdb = $db->cdb;
 }
+//var_dump($naWebOS->dbs->findConnection('couchdb')->cdb->getSession()); die();
 
 $dataSetName = $cdbDomain.'___themes';
 //echo $dataSetName; die();
@@ -252,9 +253,9 @@ if (!isset($_SESSION) || !is_array($_SESSION) || !array_key_exists('selectors',$
             // check permissions
             $hasPermission = false;
             if ($useAdminLogin) {
-                $roles = $naWebOS->dbsAdmin->findConnection('couchdb')->roles;
+                $roles = $naWebOS->dbsAdmin->findConnection('couchdb')->cdb->getSession()->body->userCtx->roles;
             } else {
-                $roles = $naWebOS->dbs->findConnection('couchdb')->roles;
+                $roles = $naWebOS->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->roles;
             }
             if ($debug) {
                 echo '<pre>$_COOKIE='; var_dump ($_COOKIE); echo '</pre>'.PHP_EOL.PHP_EOL;

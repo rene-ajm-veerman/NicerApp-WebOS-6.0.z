@@ -2245,6 +2245,7 @@ class NicerAppWebOS {
                         ],
                         'write' => [
                             'roles' => [
+                                $db->translate_plainGroupName_to_couchdbGroupName('Guests'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Owners'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Chief Officers'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Moderators')
@@ -2288,10 +2289,10 @@ class NicerAppWebOS {
                 ? $_COOKIE['cdb_loginName']
                 : 'Guest'
             );
-            //var_dump($username100);
+            //var_dump($username100); exit;
         $username100 = $db->translate_couchdbUserName_to_plainUserName ($username100);
             //var_dump($username100);
-        //echo '<pre style="color:blue;">'; var_dump ($_SESSION); echo '</pre>'; exit();
+        //echo '<pre style="color:blue;">'; var_dump ($username100); echo '</pre>'; //exit();
         $username101 = $db->translate_plainUserName_to_couchdbUserName ($username100);
         //echo $username101; exit();
 
@@ -2311,6 +2312,7 @@ class NicerAppWebOS {
                     'write' => [
                         //'users' => [ $username101 ]
                         'roles' => [
+                            $db->translate_plainGroupName_to_couchdbGroupName('Guests'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Owners'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Chief Officers'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Moderators')
@@ -2321,7 +2323,7 @@ class NicerAppWebOS {
                 'user' => $username100,
                 'display' => true
             );
-            $selectorNames[] = 'site for user '.$username101;
+            $selectorNames[] = 'site for user '.$username100;
             //$preferredSelectorName = 'site user '.$username100;
 
             $selectors[] = array (
