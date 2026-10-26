@@ -3479,55 +3479,14 @@ na.site = {
              *                html += na.m.cssTranslation(val.text,dat.themeSettings.Elements[val.text]);
              *                debugger;
         });*/
-            var tree = $('#themeEditor_jsTree_selectors').jstree(true);
-
-            var jsonNodes = tree
-            ? tree.get_json('#', { flat: true })
-            : [];
-
-            $.each(jsonNodes, function (i, val) {
-                if (val.type !== 'naElement') return;
-
-                // parent's text
-                var parentText = null;
-                var parentNode = null;
-                var level = 0;
-                while (val.parent && val.parent !== '#' && (!parentNode || parentNode.parent!=='#')) {
-                    if (!parentNode) {
-                        var parentNode = tree.get_node(val.parent);
-                    } else {
-                        var parentNode = tree.get_node(parentNode.parent);
-                    }
-                    if (parentNode && !parentText) {
-                        parentText = parentNode.text;
-                    }
-                    level++;
-                };
-
-                //if (parentText=='Elements') return;
-                //if ($(parentText).is('.vividDialog')) return;
-
-                // if (!dat.themeSettings.Elements[parentText]) {
-                //     dat.themeSettings.Elements[parentText] = {};
-                // }
-                // if (!dat.themeSettings.Elements[parentText][val.text]) {
-                //     dat.themeSettings.Elements[parentText][val.text] = { };
-                //     dat.themeSettings.Elements[parentText][val.text] = $.extend(
-                //         dat.themeSettings.Elements[parentText][val.text],
-                //         na.site.fetchTheme(val.text)
-                //     );
-                // }
+            for (var sel in dat.themeSettings) {
                 try {
-                    var ht = na.m.cssTranslation(val.text, dat.themeSettings[val.text]);
+                    var ht = na.m.cssTranslation(sel, dat.themeSettings[sel]);
                 } catch (e) {
                     var ht = '';
                 };
                 html += ht;
-
-            });
-
-            //$('.vividDialog').css(dat.themeSettings['.vividDialog']);
-            //$('.vividDialog > .vdBackground').css(dat.themeSettings['.vividDialog > .vdBackground']);
+            }
         };
 
         // if (dat.themeSettings.Elements) {
