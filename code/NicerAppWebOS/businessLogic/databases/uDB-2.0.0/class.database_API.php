@@ -834,7 +834,7 @@ public function replaceOne(array $filter, array $replacement, array $options = [
         // parameter error handling
         $go = true;
         $beginEnd = '----------------------<br/>'.PHP_EOL;
-        $msg = $beginEnd; $this->cn.'::'.$fncn.' : <br/>'.PHP_EOL;
+        $msg = $beginEnd.$fncn.' : <br/>'.PHP_EOL;
         if (!is_string($relTableName) || $relTableName=='') {
             $go = false;
             $msg .= 'invalid $relTableName.<br/>'.PHP_EOL;
@@ -860,7 +860,7 @@ public function replaceOne(array $filter, array $replacement, array $options = [
 
         if (!$go) {
             $msg .= $beginEnd;
-            trigger_error ($msg, E_USER_ERROR);
+            trigger_error ($msg, E_USER_WARNING);
             return false;
         } else {
             return $this->callDataSet($ct, 'editDataSubSet', [ $relTableName, $findCommand, $recordOverlay ]);

@@ -2026,6 +2026,7 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
 
         try {
             $call = $this->cdb->find ($findCommand);
+            //echo '<pre>'; echo '$findCommand='; var_dump($findCommand); echo PHP_EOL; echo '$call='; var_dump($call); echo PHP_EOL; echo '</pre>';
         } catch (Exception $e) {
             cdb_error (404, $e, 'Record '.json_encode($findCommand).' not found.');
             exit();
@@ -2082,9 +2083,9 @@ class class_NicerAppWebOS_database_API_couchdb_3_2__2_0_0 {
     }
 
     public function permissionsCheck ($call, $permissionsRequested) {
-        if (!property_exists('body', $call)) return false;
+        if (!property_exists($call,'body')) return false;
         foreach ($call->body as $idx => $doc) {
-            if (property_exists('na_permissions', $doc)) {
+            if (property_exists($doc,'na_permissions')) {
                 $p = $toArray($doc->na_permissions);
                 foreach ($permissionsRequested as $idx2 => $pr) {
                     if (array_key_exists($pr, $p)) {

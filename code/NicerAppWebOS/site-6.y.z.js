@@ -3363,15 +3363,6 @@ na.site = {
             }
         }
 
-        /*
-         *        $('#menusUseRainbowPanels')[0].checked = dat.menusUseRainbowPanels !== 'false';
-         *        if (dat.menusUseRainbowPanels) {
-         *            for (var menuID in na.site.components.menus) {
-         *                var m = na.site.components.menus[menuID];
-         *                m.percentageFor_rainbowPanels = dat.menusUseRainbowPanels === 'false' ? 0 : 100;
-    }
-
-    }*/
         if (loadBackground && dat.background /*&& dat.background!==na.site.globals.background*/) { /* doesn't jive with na.loadContent() */
             na.background.next (
                 '#siteBackground',
@@ -3392,21 +3383,6 @@ na.site = {
         if (dat.changeBackgroundsAutomatically===true || dat.changeBackgroundsAutomatically=='true') {
             if ($('#changeBackgroundsAutomatically')[0])
                 $('#changeBackgroundsAutomatically')[0].checked = true;
-
-            /*
-             *            var m = $('#backgroundChange_minutes').val();
-             *            var h = $('#backgroundChange_hours').val();
-             *            var ms = ((h * 60)+1) * (m * 60) * 1000;
-             *            clearTimeout(na.site.components.backgroundChangeInterval);
-             *            na.site.components.backgroundChangeTimeout = setInterval (function() {
-             *                na.backgrounds.next (
-             *                    '#siteBackground',
-             *                    na.site.globals.backgroundSearchKey,
-             *                    null,
-             *                    true
-             *                );
-        }, ms);
-        */
         } else {
             if ($('#changeBackgroundsAutomatically')[0])
                 $('#changeBackgroundsAutomatically')[0].checked = false;
@@ -3414,8 +3390,9 @@ na.site = {
         if (dat.backgroundChange_hours) $('#backgroundChange_hours').val(dat.backgroundChange_hours);
         if (dat.backgroundChange_minutes) $('#backgroundChange_minutes').val(dat.backgroundChange_minutes);
         if (dat.vdSettings_show) $('#vdSettings_show').val(dat.vdSettings_show);
-        else $('#vdSettings_show').val('transparent');
 
+
+        $('#vdSettings_show').val('transparent');
 
         var opacity = (
             $('#vdSettings_show').val()=='hidden'
@@ -3426,7 +3403,7 @@ na.site = {
         );
         setTimeout (function() {
             $('.vdSettings, .vdTools').delay(50).css({ opacity : opacity });
-        }, 500);
+        }, 1000);
 
 
         var
@@ -3451,12 +3428,6 @@ na.site = {
         if (dat.textBackgroundOpacity) {
             na.te.settings.textBackgroundOpacity = dat.textBackgroundOpacity;
             $('#btnOptions_menu input.sliderOpacityRange').val(dat.textBackgroundOpacity * 100);
-            /*
-             *            $('li span, p, h1, h2, h3').css({
-             *                background : 'rgba(0,0,0,'+dat.textBackgroundOpacity+')'
-        });
-        */
-            //debugger;
             $('#siteContent > .vividDialogContent > li > a, p, h1, h2, h3').not('.naVividTextCSS, .contentSectionTitle1, .contentSectionTitle1_a, .contentSectionTitle1_span, .contentSectionTitle2, .contentSectionTitle2_a, .contentSectionTitle2_span, .contentSectionTitle3, .contentSectionTitle3_a, .contentSectionTitle3_span, .backdropped, .animatedText_orangeYellow, .animatedText_blue, .animatedText_ivory, .naExternalLink, .naInternalLink, .naText').each (function(idx,el) {
                 if ($(el).parents('.naFrontpage_headerText').length>0) return;
                 var bg = na.m.adjustColorOpacity(el, dat.textBackgroundOpacity);
@@ -3465,20 +3436,6 @@ na.site = {
         }
         var html = '<style id="cssThemeSettings">';
         if (dat.themeSettings) {
-            // html += na.m.cssTranslation ('.vividDialog', dat.themeSettings['.vividDialog']);
-            // html += na.m.cssTranslation ('.vividDialog > .vdBackground', dat.themeSettings['.vividDialog > .vdBackground']);
-
-            /*
-             *            var jsonNodes = $('#themeEditor_jsTree_selectors').jstree(true)
-             *            ? $('#themeEditor_jsTree_selectors').jstree(true).get_json('#', { flat: true })
-             *            : [];
-             *            $.each(jsonNodes, function (i, val) {
-             *                if (val.type!=='naElement') return;
-             *                if (!dat.themeSettings.Elements[val.text]) dat.themeSettings.Elements[val.text] = { css : {} };
-             *                dat.themeSettings.Elements = $.extend (dat.themeSettings.Elements, na.site.fetchTheme (val.text));
-             *                html += na.m.cssTranslation(val.text,dat.themeSettings.Elements[val.text]);
-             *                debugger;
-        });*/
             for (var sel in dat.themeSettings) {
                 try {
                     var ht = na.m.cssTranslation(sel, dat.themeSettings[sel]);
@@ -3488,154 +3445,13 @@ na.site = {
                 html += ht;
             }
         };
-
-        // if (dat.themeSettings.Elements) {
-        //     loop1:
-        //     for (var selector in dat.themeSettings.Elements) {
-        //         if (selector=='css') continue;
-        //         html += na.m.cssTranslation (selector, dat.themeSettings.Elements);
-        //     }
-        // }
         html += '</style>';
-        //if (dat.themeSettings) na.site.globals.themes[na.site.globals.themeName] = dat.themeSettings;
-        debugger;
         $('#cssThemeSettings').remove();
         $('#cssPageSpecific').after (html);
-        //debugger; // you might want to inspect 'html' at some point..
 
-
-
-        /*
-         *        for (var category in dat.themeSettings) {
-         *            if (
-         *                dID=='.vividDialog'
-         *                || dID=='.vividDialog > .vdBackground'
-         *                || dID=='.vdBackground'
-         *            ) continue;
-         *            var categoryItems = dat.themeSettings[category];
-         *            switch (category) {
-         *                case 'Dialogs' :
-         *                    for (var dID in categoryItems) {
-         *                        var dit = categoryItems[dID].css;
-         *                        for (var divSel in dit) {
-         *                            var dit2 = dit[divSel];
-         *                            if (divSel=='#siteToolbarThemeEditor') dit2.opacity = 1; // dirty hack
-         *                            $(divSel).css (dit2);
-         *                            if (dit2.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-         *                                var
-         *                                del = $(dID)[0],
-         *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-         *                                test = rgbaRegEx.test(dit.background),
-         *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-         *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-         *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-         *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-         *                                        color:dit.background,
-         *                                        type:'flat',
-         *                                        clickoutFiresChange : false,
-         *                                        change : function (color) {
-         *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-         *                                            $(bg).css({ background : color, opacity : 1 });
-         *                                            na.te.settings.fireSaveTheme = true;
-         *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }
-    }
-    }
-    break;
-    case 'Apps' :
-        for (var appName in categoryItems) {
-            var appItem = categoryItems[appName].css;
-            for (var divSel in appItem) {
-                var dit = appItem[divSel];
-
-                /* messes up theme loading :
-                 *                            for (var prop in dit) {
-                 *                                var v = dit[prop];
-                 *                                if (typeof v=='string' && !v.match(/\!important/)) {
-                 *                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
-                 *                                    dit[prop] += ' !important';
-    }
-    }
-    * /
-
-    $(divSel).css(dit);
-
-    /*
-     *                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-     *                                var
-     *                                del = $(dID)[0],
-     *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-     *                                test = rgbaRegEx.test(dit.background),
-     *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-     *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-     *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-     *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-     *                                        color:dit.background,
-     *                                        type:'flat',
-     *                                        clickoutFiresChange : false,
-     *                                        change : function (color) {
-     *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-     *                                            $(bg).css({ background : color, opacity : 1 });
-     *                                            na.te.settings.fireSaveTheme = true;
-     *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }* /
-    }
-    }
-    break;
-    case 'Extras' :
-        for (var btnAddGraphics_jsTreeText in categoryItems) {
-            var it = categoryItems[btnAddGraphics_jsTreeText].css;
-            for (var divSel in it) {
-                var dit = it[divSel];
-
-                /* messes up theme loading :
-                 *                            for (var prop in dit) {
-                 *                                var v = dit[prop];
-                 *                                if (typeof v=='string' && !v.match(/\!important/)) {
-                 *                                    dit[prop] = dit[prop].replace(';','').replace(/\s\s/g,' ').trim();
-                 *                                    dit[prop] += ' !important';
-    }
-    }
-    * /
-
-    $(divSel).css(dit);
-    /*
-     *                            if (dit.background && dID == '#'+na.te.settings.forDialogID+' > .vdBackground') {
-     *                                var
-     *                                del = $(dID)[0],
-     *                                rgbaRegEx = /rgba\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\,\s*([\d\.]+)\).* /,
-     *                                test = rgbaRegEx.test(dit.background),
-     *                                ditbgOpacity = test ? dit.background.match(rgbaRegEx)[1] : dit.opacity;
-     *                                $('.sliderOpacityRange', del).attr('value', ditbgOpacity*100);
-     *                                if (test && na.te.settings.selectedButtonID == 'btnSelectBackgroundColor') {
-     *                                    $('#colorpicker').css({display:'block'}).spectrum ({
-     *                                        color:dit.background,
-     *                                        type:'flat',
-     *                                        clickoutFiresChange : false,
-     *                                        change : function (color) {
-     *                                            var bg = $('.vdBackground', $('#'+na.te.settings.forDialogID)[0]);
-     *                                            $(bg).css({ background : color, opacity : 1 });
-     *                                            na.te.settings.fireSaveTheme = true;
-     *                                            na.saveTheme();
-    }
-    }).css({display:'none'});
-    }
-    }* /
-    }
-    }
-    break;
-    }
-    };*/
-
-    na.m.log (1510, 'na.loadTheme_applySettings() : FINISHED.', false);
-    na.site.settings.running_loadTheme = false;
-    if (typeof callback=='function') callback(true);
+        na.m.log (1510, 'na.loadTheme_applySettings() : FINISHED.', false);
+        na.site.settings.running_loadTheme = false;
+        if (typeof callback=='function') callback(true);
     },
 
     saveTheme : function (callback, theme, loadBackground) {

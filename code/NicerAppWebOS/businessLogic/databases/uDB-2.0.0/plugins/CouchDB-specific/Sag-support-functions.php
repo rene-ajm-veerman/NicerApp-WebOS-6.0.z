@@ -20,8 +20,8 @@ function cdb_error ($errCode, $e, $msg) {
         'error' => $e ? $e->getMessage() : 'generic error',
         'msg' => $msg
     );
-    trigger_error (json_encode ($dbg, JSON_PRETTY_PRINT), E_USER_WARNING);
     echo '<pre>.../NicerAppWebOS/Sag-support-functions.php::cdb_error() : '; var_dump ($dbg); echo '</pre>';
+    trigger_error (json_encode ($dbg, JSON_PRETTY_PRINT), E_USER_WARNING);
     //echo 'Something went wrong. Please check again later.';
 }
 

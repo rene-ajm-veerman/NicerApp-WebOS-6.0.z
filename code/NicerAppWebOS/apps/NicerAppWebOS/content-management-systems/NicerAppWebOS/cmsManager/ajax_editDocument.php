@@ -102,6 +102,20 @@ if ($illegal) {
             ],
             'fields' => [ '_id' ]
         ];
+
+
+
+        $seoValue = str_replace('\\', '', $_POST['seoValue'] ?? '');
+
+        $findCommand = [
+            'selector' => [
+                'seoValue' => $seoValue
+            ],
+            'fields' => [ '_id' ]
+        ];
+
+
+
         if ( array_key_exists('user',$_POST) && $_POST['user']!=='' ) $findCommand['selector']['user'] = $_POST['user'];
         if ( array_key_exists('role',$_POST) && $_POST['role']!=='' ) $findCommand['selector']['role'] = $_POST['role'];
         //echo '<pre>'; var_dump ($findCommand); var_dump ($_POST); die();

@@ -700,7 +700,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         leftOffset = masterLeftOffset + 0,
         playerLeft = (leftOffset + columnWidth + na.d.g.margin),
 		dialogsLeft = Math.round (leftOffset);
-        $('#app__musicPlayer__header').css ({
+        $('#app__musicPlayer__header').animate ({
             width : contentInnerWidth,
             left : dialogsLeft,
             top : (na.d.g.margin*2)
@@ -722,14 +722,14 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 		dialogsTop = contentMargin + (na.d.g.margin*2) + $('#app__musicPlayer__header').height() + na.d.g.margin,
 		dialogsHeight = (myHeight - dialogsTop - contentMargin);
         
-		$('#horizontalMover__containmentBox2').css({
+		$('#horizontalMover__containmentBox2').stop(true,true).animate({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
 			opacity : 0.001,
 			display : 'block'
 		}).animate ({opacity:(0.3)},1000);
-		$('#horizontalMover__containmentBox1').css({
+		$('#horizontalMover__containmentBox1').stop(true,true).animate({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
@@ -747,47 +747,51 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         $('#app__musicPlayer__player__CSS3').css ({ left : '', top : '', opacity : 0.5 });
         
         $('#app__musicPlayer__description, #app__musicPlayer__description__CSS3, #app__musicPlayer__description__item__0, #app__musicPlayer__description__item__0__img1, app__musicPlayer__desc__item__0__img2, #app__musicPlayer__description, #app__musicPlayer__description').css({
-            position : 'absolute',
+            position : 'absolute'
+        }).stop(true,true).animate({
             width : columnWidth,
             height : (myHeight - 20 - 150) /3
         });
-        $('#app__musicPlayer__description').css({
+        $('#app__musicPlayer__description').stop(true,true).animate({
             left : playerLeft,
             top : dialogsTop + $('#app__musicPlayer__player')[0].offsetHeight + 30,
             width : columnWidth,
             height : ((myHeight - 20 - 150) /3)
         });
-        $('#app__musicPlayer__description__CSS3').css({
+        $('#app__musicPlayer__description__CSS3').stop(true,true).animate({
             width : columnWidth,
             height : (myHeight - 20 - 150) /3
         });
         $('#app__musicPlayer__description > table').css({
-            width : '',
+            width : ''
+        }).stop(true,true).animate({
             height : ((myHeight - 20 - 150) /3)
         });
         $('#horizontalMover').css({
-			left : masterLeftOffset + 10,
-            width : $('#app__musicPlayer__header').width()-20,
-            top : 2,
             background : 'rgba(243, 245, 39, 0.55)', // yellow, semi-translucent
             boxShadow : '2px 2px 2px rgba(0,0,0,0.7)'
-		});
+		}).stop(true,true).animate({
+            left : masterLeftOffset + 10,
+            width : $('#app__musicPlayer__header').width()-20,
+            top : 2
+        });
         $('#mp3s').css ({
+            width : columnWidth - 50,
             visibility : 'visible',
-            position : 'absolute',
+            position : 'absolute'
+        }).stop(true,true).animate({
             left : dialogsLeft,
-            width : columnWidth,
             height : myHeight ,
             top : dialogsTop
         });
 
-        $dialogPlaylist.css ({
+        $dialogPlaylist.animate ({
             left : playerLeft,
             width : columnWidth,
             height : (myHeight - 170 - $('#app__musicPlayer__header').height()) / (3/2),
             top : ($dialogMP3desc[0].offsetTop + $dialogMP3desc.height() + 30) + 'px'
         });
-        $('ul', $dialogPlaylist).css ({
+        $('ul', $dialogPlaylist).animate ({
             height : 'calc(100% - '+$('h2', $dialogPlaylist).outerHeight()+'px - 10px - '+$('h2', $dialogPlaylist).css('marginBottom')+' - '+$('h2', $dialogPlaylist).css('marginBottom')+')'
         });
         
@@ -796,14 +800,15 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 
 
             $('#mp3s .vividButton').css({position:'relative'});
-            var w = ($('#mp3s').width()-25);
+            var w = ($('#mp3s').width()-50);
+            debugger;
             na.m.waitForCondition (
                 'na.site.settings.HTMLidle for resizing of playlist .vividButton elements (not in a .vividMenu btw)',
                 function () { return na.m.HTMLidle(); },
                 function () {
                     var c = na.site.components;
                     $('.vividButton, .vividButton4, .vividButton_icon_50x50, .vividButton_icon_100x100', $('#mp3s')).each(function(idx,el) {
-                        $(el).css({width:w});
+                        $(el).stop(true,true).css({width:w});
                         c.buttons['#'+el.id] = new vividUserInterface_2D_button ({ naSite : na.site, el : el });
                     });
 

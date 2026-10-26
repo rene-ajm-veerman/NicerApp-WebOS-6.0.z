@@ -45,7 +45,7 @@ global $filePerms_ownerGroup;
 global $filePerms_perms;
 global $filePerms_perms_publicWriteableExecutable;
 
-$debug = true;
+$debug = false;
 
 // Settings
 $relativePath = array_key_exists('codePath',$_GET) ? $_GET['codePath'].(array_key_exists('relativePath', $_POST)?$_POST['relativePath']:'') : '';
@@ -62,6 +62,7 @@ $targetDir =
 $targetDir = str_replace('/domainConfig','',$naWebOS->domainPath).'/siteData/'.$naWebOS->domain.'/'.$relativePath;
 
 // Ensure full chain exists (commentsMedia / user / datetime / thumbs)
+if ($debug) { echo '$targetDir='; var_dump($targetDir); echo '<br/>'; echo PHP_EOL.PHP_EOL;}
 if (!is_dir($targetDir)) {
     @mkdir($targetDir, 0770, true);
 }
@@ -105,9 +106,9 @@ if (
     exit('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "File already exists."}, "id" : "id"}');
 }
 
-echo 't1:'.$filePath.'<br/>';
+//echo 't1:'.$filePath.'<br/>';
 createDirectoryStructure (dirname($filePath), $filePerms_ownerUser, $filePerms_ownerGroup, $filePerms_perms_publicWriteableExecutable);
-echo 't2:'.$thumbPath.'<br/>';
+//echo 't2:'.$thumbPath.'<br/>';
 createDirectoryStructure (dirname($thumbPath), $filePerms_ownerUser, $filePerms_ownerGroup, $filePerms_perms_publicWriteableExecutable);
 
 $cleanupTargetDir = true; // Remove old files
@@ -158,8 +159,8 @@ if ($cleanupTargetDir) {
 
 
 
-echo PHP_EOL."User: " . get_current_user() . "\n";
-echo "Process user: " . posix_getpwuid(posix_geteuid())['name'] . PHP_EOL;
+//echo PHP_EOL."User: " . get_current_user() . "\n";
+//echo "Process user: " . posix_getpwuid(posix_geteuid())['name'] . PHP_EOL;
 
 
 // Open temp file
@@ -177,7 +178,7 @@ if ($debug) { $dbg = [ '$xec' => $xec, '$output' => $output, '$result' => $resul
 if ($chunks ===0) {
     unlink($filePath.'.part');
 }
-echo 't6='; var_dump ($chunks); var_dump(is_writable(($filePath.'.part')));
+//echo 't6='; var_dump ($chunks); var_dump(is_writable(($filePath.'.part')));
 if (!$out = @fopen("{$filePath}.part", $chunks ? "ab" : "wb")) {
 	exit('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream "'.$filePath.'.part"}."}, "id" : "id"}');
 }
