@@ -197,29 +197,20 @@ na.site = {
             speed : 'fast'
         });
 
-//        na.m.waitForCondition(
-//            'na.site.setStatusMsg(msg,resize,showMilliseconds) : na.m.HTMLidle()?', na.m.HTMLidle,
-//                              function() {
-                                  //if (resize) {
-        debugger;
-                                      na.site.settings.statusbarVisible = na.desktop.settings.visibleDivs.includes('#siteStatusbar');
-                                      if (!na.site.settings.statusbarVisible) na.desktop.settings.visibleDivs.push('#siteStatusbar');
-                                      na.m.waitForCondition('setStatusMsg_do()', function () {return na && na.desktop}, function () { na.desktop.resize()}, 100);
-                                      //setTimeout (function(){$(window).trigger('resize');},100);
-                                  //};
+        na.site.settings.statusbarVisible = na.desktop.settings.visibleDivs.includes('#siteStatusbar');
+        if (!na.site.settings.statusbarVisible) na.desktop.settings.visibleDivs.push('#siteStatusbar');
+        na.m.waitForCondition('setStatusMsg_do()', function () {return na && na.desktop}, function () { na.desktop.resize()}, 100);
 
-                                  if (
-                                      msg !== na.site.settings.defaultStatusMsg
-                                      && typeof showMilliseconds=='number'
-                                  ) {
-                                      clearTimeout (na.site.settings.timeoutRevertStatusbarMsg);
-                                      na.site.settings.timeoutRevertStatusbarMsg = setTimeout (function (showMilliseconds) {
-                                          na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
-                                          $(window).trigger('resize');
-                                      }, showMilliseconds);
-                                  }
-//                              }, 20
-//        );
+        if (
+            msg !== na.site.settings.defaultStatusMsg
+            && typeof showMilliseconds=='number'
+        ) {
+            clearTimeout (na.site.settings.timeoutRevertStatusbarMsg);
+            na.site.settings.timeoutRevertStatusbarMsg = setTimeout (function (showMilliseconds) {
+                na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
+                $(window).trigger('resize');
+            }, showMilliseconds);
+        }
     },
 
     initialize : async function (desktopDefinition) {
@@ -451,9 +442,8 @@ na.site = {
                         na.m.log (1, 'Error during theme initialization : ' + err)
                     }
 
-                    debugger;
-                    t.setSpecificity(true,false);
                     na.te.onload('siteContent');
+                    t.setSpecificity(true,false);
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
                     if (s) {
@@ -2892,7 +2882,7 @@ na.site = {
                 var rid = roleID.replace(/.*___/,'');
                 if (rid!=='Guest') rid2 = roleID;
             }
-        }; debugger;
+        };
 
         if (!lastSelected && !rid2) {
             var lastSelected = j;
@@ -3514,8 +3504,8 @@ na.site = {
                     level++;
                 };
 
-                if (parentText=='Elements') return;
-                if ($(parentText).is('.vividDialog')) return;
+                //if (parentText=='Elements') return;
+                //if ($(parentText).is('.vividDialog')) return;
 
                 // if (!dat.themeSettings.Elements[parentText]) {
                 //     dat.themeSettings.Elements[parentText] = {};
@@ -3528,7 +3518,7 @@ na.site = {
                 //     );
                 // }
                 try {
-                    var ht = na.m.cssTranslation(val.text, dat.themeSettings.Elements[val.text]);
+                    var ht = na.m.cssTranslation(val.text, dat.themeSettings[val.text]);
                 } catch (e) {
                     var ht = '';
                 };
@@ -3540,15 +3530,16 @@ na.site = {
             //$('.vividDialog > .vdBackground').css(dat.themeSettings['.vividDialog > .vdBackground']);
         };
 
-        if (dat.themeSettings.Elements) {
-            loop1:
-            for (var selector in dat.themeSettings.Elements) {
-                if (selector=='css') continue;
-                html += na.m.cssTranslation (selector, dat.themeSettings.Elements);
-            }
-        }
+        // if (dat.themeSettings.Elements) {
+        //     loop1:
+        //     for (var selector in dat.themeSettings.Elements) {
+        //         if (selector=='css') continue;
+        //         html += na.m.cssTranslation (selector, dat.themeSettings.Elements);
+        //     }
+        // }
         html += '</style>';
         //if (dat.themeSettings) na.site.globals.themes[na.site.globals.themeName] = dat.themeSettings;
+        debugger;
         $('#cssThemeSettings').remove();
         $('#cssPageSpecific').after (html);
         //debugger; // you might want to inspect 'html' at some point..
@@ -3783,15 +3774,16 @@ na.site = {
 
         // Fetch dialogs properly
         //themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
-        themeData = $.extend(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
+        themeData = na.m.deepMerge(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
+        debugger;
         if (
             !themeData.themeSettings
             || !themeData.themeSettings.Elements
             || !themeData.themeSettings.Elements['#siteContent']
-        ) themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
+        ) themeData = na.m.deepMerge(themeData,na.site.loadTheme_fetchDialogs(themeData));
+        debugger;
 
-        //IS THIS NECESSARY?? na.site.loadTheme_applySettings (themeData, null, false); // apply theme changes, all except .background in this case.
-        na.site.globals.themes[na.site.globals.themeName] = _.merge (
+        na.site.globals.themes[na.site.globals.themeName] = na.m.deepMerge(
             na.site.globals.themes[na.site.globals.themeName],
             themeData
         );
@@ -3804,15 +3796,9 @@ na.site = {
         // ENCAPSULATE (ENCODE) json objects for HTTP transport
         try {
             var themeData2 = $.extend({},themeData);
+            themeData2.themeSettings = na.m.deepMerge(themeData.themeSettings);
 
-            /* 2026-09-08(Tuesday) 22:22 CET Thanks, Gemini!! :-)
-             * <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-             */
-
-            // Directly replaces your old JSON serialization line
-            themeData2.themeSettings = _.cloneDeep(themeData.themeSettings);
             themeData2.themeSettings = JSON.stringify(themeData.themeSettings); // won't work without the _.cloneDeep() call prior to this in latest kubuntu linux chrome.'
-
             themeData2.apps = JSON.stringify(Object.assign({},themeData.apps));
             themeData2.view = JSON.stringify(Object.assign({},themeData.view));
         } catch (err) {
@@ -3882,9 +3868,9 @@ na.site = {
             : [];
             $.each(jsonNodes, function (i, val) {
                 if (val.type!=='naElement') return;
-                if (!themeData2.themeSettings.Elements[val.text]) themeData2.themeSettings.Elements[val.text] = {};
-                themeData2.themeSettings.Elements[val.text] = $.extend (
-                    themeData2.themeSettings.Elements[val.text], na.site.fetchTheme(val.text)[val.text]
+                //if (!themeData2.themeSettings.Elements) themeData2.themeSettings.Elements[val.text] = {};
+                themeData2.themeSettings.Elements = $.extend (
+                    themeData2.themeSettings.Elements, na.site.fetchTheme(val.text.trim())[val.text.trim()]
                 );
             });
         } catch (err) {
@@ -3908,6 +3894,7 @@ na.site = {
 
     fetchTheme : function (selector) {
         var ret = {};
+        if (selector.indexOf('> .vdBackground')!==-1) return ret;
         ret[selector] = {
             border : $(selector).css('border'),
             borderRadius : $(selector).css('borderRadius'),
@@ -3932,11 +3919,12 @@ na.site = {
         //+$(selector).css('borderRightColor')+' '
         //+$(selector).css('borderBottomColor')+' '
         //+$(selector).css('borderLeftColor')+' ';
-        ret[selector].borderRadius = // firefox work-around
+
+        /*ret[selector].borderRadius = // firefox work-around
         $(selector).css("borderTopLeftRadius")+' '
         +$(selector).css("borderTopRightRadius")+' '
         +$(selector).css("borderBottomRightRadius")+' '
-        +$(selector).css("borderBottomLeftRadius")+' ';
+        +$(selector).css("borderBottomLeftRadius")+' ';*/
 
         if (!$(selector+' > .vdBackground')[0]) {
             if ($(selector).css('opacity')!=='') {
@@ -3958,7 +3946,7 @@ na.site = {
             }
         } else if (
             !selector.match(/,/)
-            && $(selector+' > .vdBackground').length>0
+            && $(selector+' > .vdBackground')[0]
         ) { // for vividDialogs only
             ret[selector+' > .vdBackground'] = {
                 opacity : $(selector+' > .vdBackground').css('opacity'),
@@ -3994,6 +3982,7 @@ na.site = {
         } else if (!$(selector)[0]) {
             $(selector).css('backgroundImage', 'none');
             ret[selector].background = $(selector).css('backgroundColor');
+            ret[selector].borderRadius = $(selector).parent().css('borderRadius');
         };
 
         return ret;

@@ -212,7 +212,6 @@ na.desktop = na.d = {
 
     resize : function (callback, animate, reset) {
         if (na.desktop.settings.timeout_resize) clearTimeout (na.desktop.settings.timeout_resize);
-        debugger;
         na.desktop.settings.timeout_resize = setTimeout (async function (callback, animate, reset) {
             //var x = String(na.m.stacktrace()).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');           alert(x);
 
@@ -559,7 +558,6 @@ na.desktop = na.d = {
             }
 
             na.m.log (101, fncn+' : calculated divs : '+JSON.stringify(divs), false);
-debugger;
 
             /*
             for (var i=0; i<na.d.g.divs.length; i++) {

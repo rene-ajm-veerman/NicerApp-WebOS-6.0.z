@@ -1,5 +1,5 @@
 class naThemeEditor {
-    /* (C) and (R) +-2022 to 2025 Rene AJM Veerman <rene.veerman.netherlands@gmail.com>
+    /* (C) and (R) +-2022 to 2026 Rene AJM Veerman <rene.veerman.netherlands@gmail.com>
      * price-tag for this component and all UI code and graphics examples for this nifty web dialog =
      * big-tech (as defined by .../NicerAppWebOS/LICENSE.html) : five million euros for a perpetual license for all your users and staff.
      * mediumsized online tech companies (as defined by .../NicerAppWebOS/LICENSE.html) : 1 million euros for a perpetual license for all your users and staff.
@@ -89,7 +89,6 @@ class naThemeEditor {
 
     onload (forDialogID) {
         na.m.waitForCondition ('na.te.onload(): $.spectrum()?', function () {
-            debugger;
             return jQuery.spectrum;
         }, function() {
             na.te.onload_do(forDialogID);
@@ -953,7 +952,7 @@ class naThemeEditor {
                                         themeSettings = {};
                                         for (var i in jsonNodes) {
                                             var it = jsonNodes[i];
-                                            na.te.transform_jsTree_to_siteGlobalsThemes__do (it, themeSettings);
+                                            themeSettings = na.te.transform_jsTree_to_siteGlobalsThemes__do (it, themeSettings);
                                         }
                                         return themeSettings;
     }
@@ -990,20 +989,19 @@ class naThemeEditor {
                 if (
                     it.text!=='Elements'
                     && !it.text.match(regExDialogs)
-                    && !it.text.match(regExApps)
+                    //&& !it.text.match(regExApps)
                     && !it.text.match(/Dialog/)
                     //&& !it.text.match(/Extras/)
                 ) {
-                    if (!themeSettings[it.text]) themeSettings[it.text] = {};
-                    themeSettings[it.text] = $.extend (
-                        themeSettings[it.text], na.site.fetchTheme(it.text)
+                    themeSettings = na.m.deepMerge (
+                         themeSettings, na.site.fetchTheme(it.text)
                     );
                 }
                 break;
 
 
 
-        }
+        };
         return themeSettings;
     }
 
@@ -1498,7 +1496,9 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
 
     cssExtract  (elID) {
         if (!elID) return {};
-        if (elID.match(/\./))
+        if (elID[0] && elID[0].tagName) {
+            var $el = elID;
+        } else if (elID.match(/\./))
             var $el = $(elID);
         else
             var $el = $('#'+elID);
@@ -1534,6 +1534,8 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
                                         textShadowColor = [],
                                         textShadowSliders = [],
                                         r = {};
+                                        r.background = $el.css('background');
+                                        debugger;
 
                                         if (typeof $el.css('boxShadow')=='string' && $el.css('boxShadow')!=='') {
                                             for (var j=0; j < bs.length; j++) {
@@ -1546,30 +1548,34 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
                                                 : bs[j].match(re1b);
 
                                                 if (typeof m1==='string') sliders.push('ERROR - '+bs[j]);
-                                                else if (m1[8]) boxShadowSliders.push([
+                                                else if (m1 && m1[8]) boxShadowSliders.push([
                                                     parseInt(m1[5].replace('px','')),
                                                                                       parseInt(m1[6].replace('px','')),
                                                                                       parseInt(m1[7].replace('px','')),
                                                                                       parseInt(m1[8].replace('px',''))
-                                                ]); else boxShadowSliders.push([
+                                                ]); else if (m1) boxShadowSliders.push([
                                                 parseInt(m1[5].replace('px','')),
                                                                                parseInt(m1[6].replace('px','')),
                                                                                parseInt(m1[7].replace('px',''))
                                                 ]);
 
-                                                boxShadow.push (bs[j]);
-                                                boxShadowColor.push(
-                                                    bs[j].match(re1a)
-                                                    ? 'rgba('+m1[1]+', '+m1[2]+', '+m1[3]+', '+m1[4]+')'
-                                                    : 'rgb('+m1[1]+', '+m1[2]+', '+m1[3]+')'
-                                                );
+                                                if (m1) {
+                                                    boxShadow.push (bs[j]);
+                                                    boxShadowColor.push(
+                                                        bs[j].match(re1a)
+                                                        ? 'rgba('+m1[1]+', '+m1[2]+', '+m1[3]+', '+m1[4]+')'
+                                                        : 'rgb('+m1[1]+', '+m1[2]+', '+m1[3]+')'
+                                                    )
+                                                }
                                             };
                                             r.boxShadow = boxShadow;
                                             r.boxShadowColor = boxShadowColor;
                                             r.boxShadowSliders = boxShadowSliders;
                                         };
 
+
                                         if (typeof $el.css('textShadow')=='string' && $el.css('textShadow')!=='') {
+                                            debugger;
                                             //debugger;
                                             for (var j=0; j < ts.length; j++) {
                                                 if (j > 0) ts[j] = 'rgb'+ts[j];
@@ -2381,6 +2387,15 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
         } else {
             var el = el2 = el3 = $(na.te.s.c.forElements);
         };
+debugger;
+
+
+        if (!na.te.s.c.textShadowColor) {
+            var cssExtract = na.te.cssExtract($(el).add(el2).add(el3));
+            na.te.s.c.textShadowColor = cssExtract.textShadowColor[0];
+        }
+
+
         var
         els2 = $('.textShadow_bg'),
         newTextShadow = '',
@@ -2417,7 +2432,6 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
 
         $('.textShadow_containerDiv').removeClass('selected');
         $('#'+na.te.s.c.selectedTextShadowID+'_containerDiv').addClass('selected');
-        //na.te.s.c.textShadowColor = cssExtract.textShadowColor[0];
         if ($('#textShadowSettings .sp-container').length > 0)
             if ($.spectrum) $('#textShadowColorpicker').spectrum('set', na.te.s.c.textShadowColor);
             else if ($.spectrum) na.te.initFlatSpectrum($('#textShadowColorpicker'), {
@@ -2662,7 +2676,6 @@ if (na.te.s.c.selectedImage) na.te.imageSelected(na.te.s.c.selectedImage);
             event.preventDefault();
 
             na.te.s.c.newElementID = na.m.randomString();
-            debugger;
             $('#themeEditor_jsTree_selectors').jstree().create_node(na.te.s.c.selectedSelector.node, {
                 id : na.te.s.c.newElementID,
                 text : 'New Element',

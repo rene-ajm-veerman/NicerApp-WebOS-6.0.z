@@ -60,9 +60,8 @@ na.m = {
         //var cssText = dID+' {\n';
         if (dID!==undefined && dID!=='undefined') {
             var cssText = dID + ' {';
-            var v1 = cssObj[dID];
-            for (var k in v1) {
-                var v2 = v1[k];
+            for (var k in cssObj) {
+                var v2 = cssObj[k];
                 cssText += '\t' + na.m.camelToKebab(k) + ' : '+v2+';\n';
             }
             cssText += '}\n';
