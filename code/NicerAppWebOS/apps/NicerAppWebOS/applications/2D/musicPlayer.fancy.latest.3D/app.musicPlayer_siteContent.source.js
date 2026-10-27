@@ -76,7 +76,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.ja
             }
         }
 	},
-	
+
 	queueMP3 : function (id, file) {
 		var pl = document.getElementById('playlist');
 		var pc = na.mp.playlistCount++;

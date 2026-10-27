@@ -274,7 +274,7 @@ global $naWebOS;
 
             'btnInformation', 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
             '',
-            'if (!$(this).is(\'.disabled\')) { $(\'#siteLogin\').fadeOut(\'fast\').delay(20).animate({top:-750}); }',
+            'na.c.onclick_btnNewComments(event);',   // ← handler below
             '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
             '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
 

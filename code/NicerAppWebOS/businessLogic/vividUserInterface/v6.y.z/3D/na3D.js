@@ -33,7 +33,6 @@ export class na3D_fileBrowser {
         t.me = 'na3D.js::na3D_fileBrowser';
         var fncn = t.me + '::constructor(el,parent,parameters)';
 
-
         na.threeD.audioVisualizer3D = {
             scene: null,
             analyser: null,
@@ -55,16 +54,21 @@ export class na3D_fileBrowser {
             beatThreshold: 1.4,
 
             init(t) {
-                this.scene = t.graph.scene();
-                if (!this.scene) return console.warn("No scene found");
+                var t1 = this;
+                na.m.waitForCondition('t.graph.scene?', function() {
+                    return t && t.graph && t.graph.scene;
+                }, function () {
+                    t1.scene = t.graph.scene();
+                    if (!t1.scene) return console.warn("No scene found");
 
-                this.visualGroup = new THREE.Group();
-                this.scene.add(this.visualGroup);
+                    t1.visualGroup = new THREE.Group();
+                    t1.scene.add(t1.visualGroup);
 
-                this.createCentralOrb();
-                this.createParticles();
+                    t1.createCentralOrb();
+                    t1.createParticles();
 
-                console.log("3D Audio Visualizer (Smooth) initialized");
+                    console.log("3D Audio Visualizer (Smooth) initialized");
+                },100)
             },
 
             createCentralOrb() {
@@ -291,7 +295,6 @@ export class na3D_fileBrowser {
                 this.visualGroup.position.set(pos.x, pos.y + 15, pos.z);
 
                 // Resolve hierarchical color from node level
-                debugger;
                 var
                 d = node.item?.level ?? node.level ?? 0,
                 d = Math.round(d / 2) + 1;
@@ -725,7 +728,7 @@ export class na3D_fileBrowser {
                         el.dataset.path = path+'/'+cit.name+'/'+file;
 
                         el.addEventListener('click', (evt) => {
-                            na.threeD.play($(evt.currentTarget).parents('.vividButton'), evt.currentTarget.dataset.path);
+                            na.threeD.play(na.threeD, $(evt.currentTarget).parents('.vividButton'), evt.currentTarget.dataset.path);
                         });
                     }
                 };
@@ -758,8 +761,8 @@ export class na3D_fileBrowser {
         setTimeout((t) => {
             na.threeD.audioVisualizer3D.init(window.threed || t);
             t.graph.refresh();           // or t.graph._d3ReheatSimulation?.();
-        t.graph.resumeAnimation?.()
-        }, 100, t);
+            t.graph.resumeAnimation?.()
+        }, 2000, t);
 
         console.time('timed 1_walk');
         await t._chunkedWalkArray(t, p);
@@ -1022,6 +1025,9 @@ export class na3D_fileBrowser {
 
         $('#fileListing, #playlist').css({overflowY:'auto'});
         t.initialized = true;
+        t.initFileListingDragDrop(t);
+        t.initAudioSeekBarClick(t);
+        t.initAudioVolumeBarClick(t);
         var x = t.items;
         t.onresize_postDo(t, true);
     }
@@ -1110,55 +1116,385 @@ export class na3D_fileBrowser {
         return result;
     }
 
-    play(buttonEl, relPath) {
-        const rawPath = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/music/' + relPath;
-        const fullUrl = na.m.encodeUnicodePath(rawPath);  // encode ONCE, here
+    // ─────────────────────────────────────────────────────────────
+    // 1. Drag & drop from #fileListing → #playlist  +  re-order inside #playlist
+    // ─────────────────────────────────────────────────────────────
+    initFileListingDragDrop(t) {
+        const fileListing = document.querySelector('#fileListing');
+        const playlistUl  = document.querySelector('#playlist ul') || document.querySelector('#playlist');
+        if (!fileListing || !playlistUl) return;
 
-        const doPlay = async (audio) => {
-            if (decodeURIComponent(audio.src) !== decodeURIComponent(location.origin + fullUrl)) {
-                // Safely abort any in-flight play before changing src
-                try { audio.pause(); } catch(e) {}
-                audio.src = fullUrl;
-                audio.load();
-            }
-            try {
-                await audio.play();
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error("Playback failed:", err);
+        // ---------- helpers ----------
+        const makeDraggable = (btn, isPlaylistItem = false) => {
+            if (btn.dataset.dndInit) return;
+            btn.dataset.dndInit = '1';
+            btn.setAttribute('draggable', 'true');
+
+            btn.addEventListener('dragstart', (e) => {
+                const a = btn.querySelector('a');
+                const path = a?.dataset?.path || a?.textContent?.trim() || '';
+                e.dataTransfer.setData('text/plain', path);
+                e.dataTransfer.setData('application/x-playlist-item', isPlaylistItem ? '1' : '0');
+                e.dataTransfer.effectAllowed = isPlaylistItem ? 'move' : 'copy';
+                btn.classList.add('dragging');
+
+                // remember the source <li> so we can move it later
+                if (isPlaylistItem) {
+                    e.dataTransfer.setData('text/html', btn.closest('li')?.outerHTML || '');
                 }
-                // AbortError is expected when track changes quickly — safe to ignore
-            }
+            });
+
+            btn.addEventListener('dragend', () => btn.classList.remove('dragging'));
         };
 
+        // ---------- #fileListing (source) ----------
+        fileListing.querySelectorAll('.vividButton').forEach(btn => makeDraggable(btn, false));
+
+        const observer = new MutationObserver(() => {
+            fileListing.querySelectorAll('.vividButton').forEach(btn => makeDraggable(btn, false));
+        });
+        observer.observe(fileListing, { childList: true, subtree: true });
+
+        // ---------- #playlist (drop target + re-order) ----------
+        playlistUl.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const isReorder = e.dataTransfer.types.includes('application/x-playlist-item')
+            && e.dataTransfer.getData('application/x-playlist-item') === '1';
+            e.dataTransfer.dropEffect = isReorder ? 'move' : 'copy';
+            playlistUl.classList.add('drag-over');
+
+            // visual insertion marker for re-order
+            const afterElement = getDragAfterElement(playlistUl, e.clientY);
+            const dragging = document.querySelector('.dragging');
+            if (dragging && isReorder) {
+                if (afterElement == null) {
+                    playlistUl.appendChild(dragging.closest('li'));
+                } else {
+                    playlistUl.insertBefore(dragging.closest('li'), afterElement);
+                }
+            }
+        });
+
+        playlistUl.addEventListener('dragleave', () => playlistUl.classList.remove('drag-over'));
+
+        playlistUl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            playlistUl.classList.remove('drag-over');
+
+            const isReorder = e.dataTransfer.getData('application/x-playlist-item') === '1';
+            if (isReorder) {
+                // already moved in dragover – just clean up
+                document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+                return;
+            }
+
+            // new item from #fileListing
+            const relPath = e.dataTransfer.getData('text/plain');
+            if (!relPath || !/\.mp3$/i.test(relPath)) return;
+
+            t.addTrackToPlaylist(t,relPath);
+        });
+
+        // helper for insertion point while dragging inside playlist
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset, element: child };
+                }
+                return closest;
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // make any existing playlist items draggable for re-order
+        playlistUl.querySelectorAll('.vividButton').forEach(btn => makeDraggable(btn, true));
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 2. Add a real button to the playlist
+    // ─────────────────────────────────────────────────────────────
+    addTrackToPlaylist(t,relPath) {
+        let playlistDragOccurred = false;
+
+        const playlistUl = document.querySelector('#playlist');
+        if (!playlistUl) return;
+
+        const i = playlistUl.querySelectorAll('li').length;
+        const safePath = relPath.replace(/'/g, "\\'");
+        const id = `playList_${i}_${Date.now()}`;
+
+        const li = document.createElement('li');
+        li.style.marginRight = '10px';
+        li.innerHTML = `
+        <div id="${id}" class="vividButton" style="position:relative;" draggable="true">
+        <a href="#" data-path="${safePath}" style="font-size:medium">${relPath}</a>
+        </div>`;
+        playlistUl.appendChild(li);
+
+        // wire the real click handler
+        const btn = li.querySelector('.vividButton');
+        const a   = btn.querySelector('a');
+
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (playlistDragOccurred) return;     // ignore click that follows a drag
+            na.threeD.play(na.threeD, btn, a.dataset.path);
+        });
+
+        // make it draggable for re-ordering
+        btn.dataset.dndInit = '1';
+        btn.setAttribute('draggable', 'true');
+        btn.addEventListener('dragstart', (e) => {
+            playlistDragOccurred = true;
+            e.dataTransfer.setData('text/plain', a.dataset.path);
+            e.dataTransfer.setData('application/x-playlist-item', '1');
+            e.dataTransfer.effectAllowed = 'move';
+            btn.classList.add('dragging');
+        });
+        btn.addEventListener('dragend', () => {btn.classList.remove('dragging'); setTimeout(() => { playlistDragOccurred = false; }, 50);});
+
+        na.site.startUIvisuals?.();
+    }
+
+
+
+
+
+
+    // ─────────────────────────────────────────────────────────────
+    // Click anywhere on .audioSeekBar → seek
+    // ─────────────────────────────────────────────────────────────
+    initAudioSeekBarClick(t) {
+        const $bar = $('.audioSeekBar');
+        if (!$bar.length) return;
+
+        $bar.off('click.seek').on('click.seek', function (e) {
+            const audio = na.threeD?.currentAudio;
+            if (!audio || !isFinite(audio.duration) || audio.duration <= 0) return;
+
+            const offset = $bar.offset();          // { top, left }
+            const width  = $bar.outerWidth();
+            const x      = e.pageX - offset.left;  // mouse X relative to bar
+
+            // clamp 0 → 1
+            let pct = x / width;
+            if (pct < 0) pct = 0;
+            if (pct > 1) pct = 1;
+
+            audio.currentTime = pct * audio.duration;
+
+            // keep label + visual bar in sync immediately
+            na.threeD.updateSeekBarLabel(audio);
+        });
+    }
+
+
+    // ─────────────────────────────────────────────────────────────
+    // Format seconds → "m:ss" or "h:mm:ss"
+    // ─────────────────────────────────────────────────────────────
+    formatTime(sec) {
+        if (!isFinite(sec) || sec < 0) return '0:00';
+        sec = Math.floor(sec);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        if (h > 0) {
+            return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Keep #audioSeekBarLabel up to date
+    // ─────────────────────────────────────────────────────────────
+    updateSeekBarLabel(audio) {
+        const label = document.querySelector('.audioSeekBarLabel');
+        const bar   = document.querySelector('.audioSeekBar_setting');
+        if (!label || !bar || !audio) return;
+
+        const cur  = na.threeD.formatTime(audio.currentTime);
+        const dur  = na.threeD.formatTime(audio.duration);
+
+        if (bar) {
+            const pct = (isFinite(audio.duration) && audio.duration > 0)
+            ? (audio.currentTime / audio.duration) * 100
+            : 0;
+
+            bar.style.width = pct.toFixed(2) + '%';
+        }
+
+        label.textContent = `${cur} / ${dur}`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Attach the time-update listeners once (call from play())
+    // ─────────────────────────────────────────────────────────────
+    ensureSeekBarListeners(audio) {
+        if (audio._seekBarWired) return;
+        audio._seekBarWired = true;
+
+        // update while playing
+        audio.addEventListener('timeupdate', () => na.threeD.updateSeekBarLabel(audio));
+
+        // duration becomes available
+        audio.addEventListener('loadedmetadata', () => na.threeD.updateSeekBarLabel(audio));
+        audio.addEventListener('durationchange', () => na.threeD.updateSeekBarLabel(audio));
+
+        // reset / final state
+        audio.addEventListener('ended', () => {
+            const label = document.querySelector('#audioSeekBarLabel');
+            if (label) {
+                const dur = formatTime(audio.duration);
+                label.textContent = `${dur} / ${dur}`;
+            }
+        });
+
+        audio.addEventListener('error', () => {
+            const label = document.querySelector('#audioSeekBarLabel');
+            if (label) label.textContent = '0:00 / 0:00';
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Click anywhere on .audioVolumeBar → set volume
+    // ─────────────────────────────────────────────────────────────
+    initAudioVolumeBarClick() {
+        const $bar = $('.audioVolumeBar');
+        if (!$bar.length) return;
+
+        $bar.off('click.volume').on('click.volume', function (e) {
+            const audio = na.threeD?.currentAudio;
+            if (!audio) return;
+
+            const offset = $bar.offset();
+            const width  = $bar.outerWidth();
+            const x      = e.pageX - offset.left;
+
+            // clamp 0 → 1
+            let pct = x / width;
+            if (pct < 0) pct = 0;
+            if (pct > 1) pct = 1;
+
+            audio.volume = pct;
+
+            // visual fill (same pattern as the seek bar)
+            var $setting = $('.audioVolumeBar_setting');
+            if ($setting.length) {
+                $setting.css('width', (pct * 100).toFixed(2) + '%');
+            }
+
+            $setting = $('.audioVolumeBarLabel');
+            if ($setting.length) {
+                $setting.html('Volume : '+(pct * 100).toFixed(2) + '%');
+            }
+        });
+    }
+
+    doPlay = async (audio) => {
+        if (decodeURIComponent(audio.src) !== decodeURIComponent(location.origin + na.threeD.fullUrl)) {
+            try { audio.pause(); } catch(e) {}
+            audio.src = na.threeD.fullUrl;
+            audio.load();
+        }
+        try {
+            await audio.play();
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('Playback failed:', err);
+        }
+    };
+
+
+
+
+
+    // ─────────────────────────────────────────────────────────────
+    // 3. play() – sequential / shuffle / repeat
+    // ─────────────────────────────────────────────────────────────
+    play(t, buttonEl, relPath) {
+        const rawPath  = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/music/' + relPath;
+        const fullUrl  = na.m.encodeUnicodePath(rawPath);
+        t.fullUrl = fullUrl;
+
+
+        // create the shared Audio element only once
         if (!na.threeD.currentAudio) {
             const audio = na.threeD.currentAudio = new Audio();
 
-            // Connect to visualizer ONCE, before any src is set
             if (na.threeD.audioVisualizer3D) {
                 na.threeD.audioVisualizer3D.connectAudio(audio);
             }
 
+            // ── ended → next track according to shuffle / repeat ──
             audio.addEventListener('ended', () => {
                 na.threeD.audioVisualizer3D?.stop();
+
+                const $items = $('#playlist .vividButton');
+                if ($items.length === 0) return;
+
+                const shuffleOn = !!document.querySelector('.btn_audioVideo_shuffle--state-shuffleOn');
+                const repeatOn  = !!document.querySelector('.btn_audioVideo_repeat--state-repeatOn');
+
+                let $current = $('#playlist .vividButtonSelected');
+                if ($current.length === 0) $current = $items.first();
+
+                let $next = null;
+
+                if (shuffleOn) {
+                    // pick a random different track
+                    const candidates = $items.not($current);
+                    if (candidates.length > 0) {
+                        $next = candidates.eq(Math.floor(Math.random() * candidates.length));
+                    } else if (repeatOn) {
+                        // only one track and repeat is on → play it again
+                        $next = $current;
+                    }
+                } else {
+                    // sequential
+                    const idx = $items.index($current);
+                    let nextIdx = idx + 1;
+                    if (nextIdx >= $items.length) {
+                        if (repeatOn) nextIdx = 0;
+                        else return; // stop
+                    }
+                    $next = $items.eq(nextIdx);
+                }
+
+                if ($next && $next.length) {
+                    const nextPath = $next.find('a').data('path') || $next.find('a').text().trim();
+                    na.threeD.play(na.threeD, $next[0], nextPath);
+                }
             });
+
             audio.addEventListener('error', (e) => {
-                console.error("Audio error:", audio.src, e);
+                console.error('Audio error:', audio.src, e);
                 na.threeD.audioVisualizer3D?.stop();
             });
+
+            // NEW – seek-bar label
+            t.ensureSeekBarListeners(audio);
         }
 
-        doPlay(na.threeD.currentAudio);
+        t.doPlay(na.threeD.currentAudio);
+        // force label update for the newly chosen track
+        t.updateSeekBarLabel(na.threeD.currentAudio);
 
-        // UI updates
-        $('#fileListing .vividButtonSelected').removeClass('vividButtonSelected').addClass('vividButton');
+        // UI highlight (both lists)
+        $('#fileListing .vividButtonSelected, #playlist .vividButtonSelected')
+        .removeClass('vividButtonSelected').addClass('vividButton');
         $(buttonEl).addClass('vividButtonSelected');
 
-        let i = $('#playlist li').length;
-        let html = '<li style="margin-right:10px;"><div id="playList_'+i+'" class="vividButton" style="position:relative;"><a href="javascript:na.apps.loaded.threed_fileExplorer.play($(\'#playList_'+i+'\')[0], \''+relPath.replace(/'/g,"\\'")+'\');" style="font-size:medium">'+relPath+'</a></div></li>';
-        $('#playlist ul').append(html);
-        na.site.startUIvisuals();
+        // only auto-add when the source is #fileListing
+        if (!$(buttonEl).closest('#playlist').length) {
+            t.addTrackToPlaylist(relPath);
+        }
     }
+
+
+
     getChildren(item) {
         return t.items.filter(it => it.parent === item && (t.showFiles || it.name.indexOf('.')===-1));
     }

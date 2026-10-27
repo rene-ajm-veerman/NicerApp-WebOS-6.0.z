@@ -195,7 +195,7 @@ class NicerAppWebOS {
         }
 
         $content = $this->getContent();
-        //echo '<pre>'; var_dump ($content); echo '</pre>'; //die();
+        //echo '<pre>'; var_dump ($content); echo '</pre>'; die();
 
         ob_start();    flush(); ob_flush(); ob_end_flush();
         if ($content==='') $content = [ 'siteContent' => '<h2>HTTPS Error 404 : Not found.</h2>', 'head' => '<h2>HTTPS Error 404</h2>' ];
@@ -675,6 +675,7 @@ class NicerAppWebOS {
 
                                     $titleFile = $appFolder.'/app.title.site.php';
                                     $desktopDefinitionFile = $appFolder.'/index.desktopDefinition.json';
+                                    //echo 't89:'; var_dump (['tf'=>$titleFile,'fe'=>file_exists($titleFile)]);die();
                                     if (file_exists($titleFile))
                                         $ret['_title'] = require_return ($titleFile);
                                     if (file_exists($desktopDefinitionFile))
@@ -711,7 +712,8 @@ class NicerAppWebOS {
                                     $files = $files['files'];
                                     if ($debug) { var_dump ($viewsFolder); echo '<pre style="color:yellow;background:magenta;padding:5px;margin:10px;border-radius:10px;">'; var_dump ($files); echo '</pre>'.PHP_EOL.PHP_EOL;  };
 
-                                    $titleFile = $this->codePath.'/'.$viewsFolder.'/app.title.site.php';
+                                    $titleFile = $viewsFolder.'/app.title.site.php';
+                                    //echo 't89B:'; var_dump (['tf'=>$titleFile,'fe'=>file_exists($titleFile)]);die();
                                     $desktopDefinitionFile = $this->codePath.'/'.$viewsFolder.'/index.desktopDefinition.json';
                                     if (file_exists($titleFile))
                                         $ret['_title'] = require_return ($titleFile);
@@ -783,7 +785,8 @@ class NicerAppWebOS {
                                 $files = $files['files'];
                                 if ($debug) { var_dump ($viewsFolder); echo '<pre style="color:yellow;background:magenta;padding:5px;margin:10px;border-radius:10px;">'; var_dump ($files); echo '</pre>'.PHP_EOL.PHP_EOL;  };
 
-                                $titleFile = $this->codePath.'/'.$viewsFolder.'/app.title.site.php';
+                                $titleFile = $viewsFolder.'/app.title.site.php';
+                                //echo 't89C:'; var_dump (['tf'=>$titleFile,'fe'=>file_exists($titleFile)]);die();
                                 $desktopDefinitionFile = $this->codePath.'/'.$viewsFolder.'/index.desktopDefinition.json';
                                 if (file_exists($titleFile))
                                     $ret['_title'] = require_return ($titleFile);
@@ -1017,7 +1020,7 @@ class NicerAppWebOS {
                         $titleFile = $rootPath.'/'.$viewsFolder.'/app.title.site.php';
                         if (file_exists($titleFile))
                         $ret = [
-                            'title' => execPHP($titleFile)
+                            '_title' => execPHP($titleFile)
                         ];
                         if ($debug) { echo '<pre style="color:blue">'; var_dump ($ret); };
 

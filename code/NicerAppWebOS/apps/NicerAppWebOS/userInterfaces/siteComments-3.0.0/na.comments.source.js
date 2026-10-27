@@ -722,6 +722,53 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             na.c.onclick_btnPostComment_afterDataTransfer('[]');
         }
     },
+
+    onclick_btnNewComments : function (event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        var url = '/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/ajax_getCommentsSince.php',
+        data = {
+            markSeen : 1,   // advances the per-user cutoff after the fetch
+            limit    : 200
+        },
+        ac = {
+            type : 'POST',
+            url  : url,
+            data : data,
+            success : function (html) {
+                // Re-use the existing comments dialog
+                var $pane = $('#siteComments .vividDialogContent.vividScrollpane');
+                if (!$pane.length) $pane = $('#siteComments');
+
+                na.d.s.visibleDivs.push ('#siteComments');
+                na.d.resize();
+
+                $pane.html(html);
+
+                // Make sure the dialog is visible (same pattern you use elsewhere)
+                var dlg = $('#siteComments')[0];
+                if (dlg && dlg.vividUserInterface_2D_dialog) {
+                    dlg.vividUserInterface_2D_dialog.show({ evt : event });
+                } else {
+                    $('#siteComments').removeClass('hidden').addClass('shown').css({ opacity : 'inherit', display : 'block' });
+                }
+
+                // Re-run any per-comment onload wiring you already have
+                if (typeof na.c.onload === 'function') {
+                    na.c.onload({ callback : function () {} });
+                }
+            },
+            error : function (xhr, ts, errorThrown) {
+                na.site.ajaxFail('na.comments.onclick_btnNewComments : ' + errorThrown);
+            }
+        };
+
+        $.ajax(ac);
+    },
+
     onclick_btnPostComment : function (event) {
         var editorEl = $('#siteCommentsEditor')[0];
         var isEdit   = !!editorEl.editID;

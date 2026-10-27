@@ -907,6 +907,69 @@ class class_naComments {
         return $html;
     }
 
+    public function buildCommentTree(array $flatComments, string $idField = '_id', string $parentField = 'parentID'): array
+    {
+        $byId = [];
+        $tree  = [];
+
+        // Index by ID + collect root nodes
+        foreach ($flatComments as $comment) {
+            $id = $comment[$idField];
+            $byId[$id] = $comment;
+            $byId[$id]['children'] = [];           // prepare children array
+
+            $parentId = $comment[$parentField] ?? null;
+
+            if ($parentId === null || $parentId === '#' || $parentId === 0) {
+                $tree[] = &$byId[$id];
+            } else {
+                // We'll attach later if parent exists
+            }
+        }
+
+        // Attach children
+        foreach ($byId as $id => &$comment) {
+            $parentId = $comment[$parentField] ?? null;
+            if ($parentId !== null && $parentId !== '#' && $parentId !== 0) {
+                if (isset($byId[$parentId])) {
+                    $byId[$parentId]['children'][] = &$comment;
+                }
+                // else → orphan → already ignored / can log
+            }
+        }
+
+        return $tree;
+    }
+
+    public function sortTreeNewestFirst(array &$nodes): void
+    {
+        // Sort current level newest → oldest
+        usort($nodes, function($a, $b) {
+            return $a['datetimeStr'] >= $b['datetimeStr'] ? -1 : 1;
+        });
+
+        // Recurse into children
+        foreach ($nodes as &$node) {
+            if (!empty($node['children'])) {
+                //usort($nodes['children'], fn($a, $b) => $b['datetimeStr'] <=> $a['datetimeStr']);
+                sortTreeNewestFirst($node['children']);
+            }
+        }
+    }
+    public function sortTreeTopLevelNewestOnly(array &$nodes, int $depth = 0): void {
+        if ($depth === 0) {
+            // ONLY sort the root level newest → oldest
+            usort($nodes, fn($a, $b) => $b['datetimeStr'] <=> $a['datetimeStr']);
+        }
+        // do NOT sort deeper levels → they stay oldest → newest
+
+        foreach ($nodes as &$node) {
+            if (!empty($node['children'])) {
+                sortTreeTopLevelNewestOnly($node['children'], $depth + 1);
+            }
+        }
+    }
+
     public function formatResults ($results, $post) {
         // The free help of grok.com was invaluable and quick to get this function to do exactly what I want for now :)
         global $naLAN;
@@ -924,433 +987,386 @@ class class_naComments {
             $openIDs = [];
         }
 
-        function buildCommentTree(array $flatComments, string $idField = '_id', string $parentField = 'parentID'): array
-        {
-            $byId = [];
-            $tree  = [];
-
-            // Index by ID + collect root nodes
-            foreach ($flatComments as $comment) {
-                $id = $comment[$idField];
-                $byId[$id] = $comment;
-                $byId[$id]['children'] = [];           // prepare children array
-
-                $parentId = $comment[$parentField] ?? null;
-
-                if ($parentId === null || $parentId === '#' || $parentId === 0) {
-                    $tree[] = &$byId[$id];
-                } else {
-                    // We'll attach later if parent exists
-                }
-            }
-
-            // Attach children
-            foreach ($byId as $id => &$comment) {
-                $parentId = $comment[$parentField] ?? null;
-                if ($parentId !== null && $parentId !== '#' && $parentId !== 0) {
-                    if (isset($byId[$parentId])) {
-                        $byId[$parentId]['children'][] = &$comment;
-                    }
-                    // else → orphan → already ignored / can log
-                }
-            }
-
-            return $tree;
-        }
-
-        function sortTreeNewestFirst(array &$nodes): void
-        {
-            // Sort current level newest → oldest
-            usort($nodes, function($a, $b) {
-                return $a['datetimeStr'] >= $b['datetimeStr'] ? -1 : 1;
-            });
-
-            // Recurse into children
-            foreach ($nodes as &$node) {
-                if (!empty($node['children'])) {
-                    //usort($nodes['children'], fn($a, $b) => $b['datetimeStr'] <=> $a['datetimeStr']);
-                    sortTreeNewestFirst($node['children']);
-                }
-            }
-        }
-        function sortTreeTopLevelNewestOnly(array &$nodes, int $depth = 0): void {
-            if ($depth === 0) {
-                // ONLY sort the root level newest → oldest
-                usort($nodes, fn($a, $b) => $b['datetimeStr'] <=> $a['datetimeStr']);
-            }
-            // do NOT sort deeper levels → they stay oldest → newest
-
-            foreach ($nodes as &$node) {
-                if (!empty($node['children'])) {
-                    sortTreeTopLevelNewestOnly($node['children'], $depth + 1);
-                }
-            }
-        }
-
         // ────────────────────────────────────────────────
         // Usage in your code:
         $flatList = $results;  // ← from DB or wherever
 
-        $tree = buildCommentTree($flatList, '_id', 'parentID');   // adjust field names if different
+        $tree = $this->buildCommentTree($flatList, '_id', 'parentID');   // adjust field names if different
 
         // Now sort the whole structure reverse-chronologically per level
-        sortTreeTopLevelNewestOnly($tree);
+        $this->sortTreeTopLevelNewestOnly($tree);
         //echo '<pre>t777;'; var_dump ($tree); echo '</pre>'; exit();
 
-        function printTree (&$tree, &$openIDs, &$t) {
-            $html = '';
-            foreach ($tree as $idx => $rootItem) {
-                $html .= printItem ($rootItem, $openIDs, $t);
-                if (count($rootItem['children'])>0) {
-                    $html .= printTree ($rootItem['children'], $openIDs, $t);
-                }
+
+        $html = $this->printTree($tree, $openIDs, $this);
+
+        return $html;
+    }
+
+    /**
+     * Root function: every comment newer than $since (across all pages),
+     * with page URL, content and timestamps — same shape as the page view.
+     *
+     * @param int|null $since   Unix timestamp. null = use the current user's stored cutoff.
+     * @param array    $options {
+     *     @var bool $asHtml          true → HTML, false → structured array (default false)
+     *     @var int  $limit           max docs (default 200, 0 = keep paging until done)
+     *     @var bool $includeHidden   include hidden comments (default false)
+     *     @var bool $markSeen        after fetch, update the user's cutoff to "now" (default false)
+     * }
+     * @return array|string
+     */
+
+    public function printTree (&$tree, &$openIDs, &$t) {
+        $html = '';
+        foreach ($tree as $idx => $rootItem) {
+            $html .= $t->printItem ($rootItem, $openIDs, $t);
+            if (count($rootItem['children'])>0) {
+                $html .= $t->printTree ($rootItem['children'], $openIDs, $t);
             }
-            return $html;
+        }
+        return $html;
+    }
+
+    public function printItem($it, $openIDs, $t) {
+        global $naLAN;
+        global $naIP;
+        global $naWebOS;
+        global $naUsername;
+        global $users;
+        $its_id = $it['_id'];
+        if (in_array($its_id,$openIDs)) $style='style="display:block"'; else $style='';
+        $html = '<div id="naComment_'.($its_id!=='#'?$its_id:'_').'" class="naComment_entry" '.$style.'>'.PHP_EOL;
+        //$html .= json_encode ($it, JSON_PRETTY_PRINT);
+        $html .= $naWebOS->html_vividButton(
+            1001, 'float:left',
+
+            'btnExpandComment',
+            'vividButton_icon_50x50 vbExpandComment', '_50x50', 'vbExpandComment',
+            '',
+            'na.c.onclick_btnExpandComment(event);',
+                                            '',
+                                            '',
+
+                                            1001, 'Expand comment',
+                                            'btnCssVividButton_outerBorder.png',
+                                            'btnCssVividButton.png',
+                                            'btnCssVividButton.greenYellow.png',
+                                            'btnPlus_shaded.png',
+                                            '', '', '', ''
+        ).PHP_EOL;
+        // History-knop alleen voor Government Authorities
+        if ($t->userIsGovernmentAuthority()) {
+            $html .= $naWebOS->html_vividButton(
+                1001, 'float:right',
+                'btnViewHistory',
+                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                '',
+                'na.c.onclick_btnViewHistory(event);',
+                                                '',
+                                                '',
+                                                1001, 'Audit History',
+                                                'btnCssVividButton_outerBorder.png',
+                                                'btnCssVividButton.png',
+                                                $this->themes[$this->theme]['btnHistory'] ?? 'btnCssVividButton.redStone.png',
+                                                'btnDocument.png',
+                                                '', '', '', ''
+            );
         };
-
-        function printItem($it, $openIDs, $t) {
-            global $naLAN;
-            global $naIP;
-            global $naWebOS;
-            global $naUsername;
-            global $users;
-            $its_id = $it['_id'];
-            if (in_array($its_id,$openIDs)) $style='style="display:block"'; else $style='';
-            $html = '<div id="naComment_'.($its_id!=='#'?$its_id:'_').'" class="naComment_entry" '.$style.'>'.PHP_EOL;
-                //$html .= json_encode ($it, JSON_PRETTY_PRINT);
-                $html .= $naWebOS->html_vividButton(
-                    1001, 'float:left',
-
-                    'btnExpandComment',
-                    'vividButton_icon_50x50 vbExpandComment', '_50x50', 'vbExpandComment',
-                    '',
-                    'na.c.onclick_btnExpandComment(event);',
-                    '',
-                    '',
-
-                    1001, 'Expand comment',
-                    'btnCssVividButton_outerBorder.png',
-                    'btnCssVividButton.png',
-                    'btnCssVividButton.greenYellow.png',
-                    'btnPlus_shaded.png',
-                    '', '', '', ''
-                ).PHP_EOL;
-                // History-knop alleen voor Government Authorities
-                if ($t->userIsGovernmentAuthority()) {
-                    $html .= $naWebOS->html_vividButton(
-                        1001, 'float:right',
-                        'btnViewHistory',
-                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                        '',
-                        'na.c.onclick_btnViewHistory(event);',
-                                                        '',
-                                                        '',
-                                                        1001, 'Audit History',
-                                                        'btnCssVividButton_outerBorder.png',
-                                                        'btnCssVividButton.png',
-                                                        $this->themes[$this->theme]['btnHistory'] ?? 'btnCssVividButton.redStone.png',
-                                                        'btnDocument.png',
-                                                        '', '', '', ''
-                    );
-                };
-                //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it, $naUsername]); echo '</pre>';
-                if (array_key_exists('clientUsername',$it) && $it['clientUsername']==$naUsername) {
-                    /*$html .= $naWebOS->html_vividButton(
-                        1001, 'float:right',
-
-                        'btnRemoveComment',
-                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                        '',
-                        'na.c.onclick_btnRemoveComment(event);',
-                        '',
-                        '',
-
-                        1001, 'Remove comment',
-                        'btnCssVividButton_outerBorder.png',
-                        'btnCssVividButton.png',
-                        $t->themes[$t->theme]['btnDeleteComment'],
-                        'btnTrashcan_red.png',
-                        '', '', '', ''
-                    ).PHP_EOL;
-		     */
-                    $html .= $naWebOS->html_vividButton(
-                        1001, 'float:right',
-                        'btnEditComment',
-                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                        '',
-                        'na.c.onclick_btnEditComment(event);',
-                                                        '',
-                                                        '',
-                                                        1001, 'Edit comment',
-                                                        'btnCssVividButton_outerBorder.png',
-                                                        'btnCssVividButton.png',
-                                                        $t->themes[$t->theme]['btnEditComment'],
-                                                        'btnDocument.png',          // or any icon you already have
-                                                        '', '', '', ''
-                    ).PHP_EOL;
-                    $h = (
-                        array_key_exists('hidden',$it)
-                        && $it['hidden']
-                    );
-                    if ($h) {
-                        $filter = 'opacity:0.4;filter:greyscale(1) brightness(0.6)';
-                    } else {
-                        $filter = '';
-                    }
-                    $html .= $naWebOS->html_vividButton(
-                        1001, 'float:right;'.$filter,
-                        'btnHideComment',
-                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                        '',
-                        'na.c.onclick_btnToggleHidden(event);',
-                                                        (isset($it['hidden']) && $it['hidden'] ? 'Show comment' : 'Hide comment'),
-                                                        '',
-                                                        1001, '(Un)hide comment',
-                                                        'btnCssVividButton_outerBorder.png',
-                                                        'btnCssVividButton.png',
-                                                        $t->themes[$t->theme]['btnEditComment'],
-                                                        '1660_blk_19329_zoom.upperBodyOnly.256x256.png',          // or any icon you already have
-                                                        '', '', '', ''
-                    ).PHP_EOL;
-                    $html .= html_viewHistoryButton($it['_id'], [
-                        'title'        => 'Comment Revision History',
-                        'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
-                        'database' => 'cms_comments',
-                        'limit'        => 55500
-                    ]);
-                }
-                $html .= "\t".'<div style="display:none">'.PHP_EOL;
-                $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;
-                $html .= "\t\t".'<span class="naComment_parentID">'.$it['parentID'].'</span>'.PHP_EOL;
-                if (array_key_exists('clientIP', $it)) $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
-                $html .= "\t\t".'<span class="naComment_clientDatetime">'.$it['clientDatetime'].'</span>'.PHP_EOL;
-                $html .= "\t\t".'<span class="naComment_clientTZoffset">'.$it['clientTZoffset'].'</span>'.PHP_EOL;
-                if (array_key_exists('clientUsername', $it)) $html .= "\t\t".'<span class="naComment_clientUsername">'.$it['clientUsername'].'</span>'.PHP_EOL;
-                $html .= "\t".'</div>'.PHP_EOL;
-
-
-            $html .= "\t".'<div class="naComment_header">';
-            if (
-                array_key_exists('clientUsername', $it)
-                && is_string($it['clientUsername'])
-                && trim($it['clientUsername'])!==''
-            ) {
-                $u = $it['clientUsername'];
-            } else {
-                $u = 'Guest';
-            }
-            global $users;
-            if (!isset($users[$u])) $users[$u] = [];
-            $users[$u] = negotiateOptions ($users[$u], $t->fetchUserRecord($u));
-            global $naDebugStartup;
-            if ($naDebugStartup) {
-                echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
-            }
-
-            $html .= "\t".'<span class="naComment_username">'
-            . (array_key_exists('displayName',$users[$u])?$users[$u]['displayName']:$users[$u]['userRealName'])
-            . '</span>'.PHP_EOL;
-
-            $html .=
-            '<span class="naComment_clientDatetime" style="display:none;">'.$it['clientDatetime'].'</span>'
-            .'<span class="naComment_clientTZoffset" style="display:none;">'.$it['clientTZoffset'].'</span>'
-            .'<span class="naComment_datetime" '
-            . 'onclick="na.c.onclick_datetime(event)" '
-            . 'style="cursor:pointer;" '
-            . 'title="Click to link to this comment">'
-            . naDateTimeHeader($it['clientDatetime'], $it['clientTZoffset']);
-            $html .= '</span>'.PHP_EOL;
-
-            if (!empty($it['editedDatetime'])) {
-                $html .=
-                    '<span class="naComment_editedDatetime" style="display:none;">'.$it['editedDatetime'].'</span>'
-                    .'<span class="naComment_editedTZoffset" style="display:none;">'.$it['editedTZoffset'].'</span>'
-                    .'<span class="naComment_edited" title="Last edited">'
-                    . ' (edited ' . naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
-                    .'</span>';
-            }
-
-
-
-            $html .= "\t".'</div>'.PHP_EOL;
-
-
-            //$html .= $t->mode.'<br/>';
-            // $it2 = $it;
-            // $p = [];
+        //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it, $naUsername]); echo '</pre>';
+        if (array_key_exists('clientUsername',$it) && $it['clientUsername']==$naUsername) {
+            /*$html .= $naWebOS->html_vividButton(
+             *                        1001, 'float:right',
+             *
+             *                        'btnRemoveComment',
+             *                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+             *                        '',
+             *                        'na.c.onclick_btnRemoveComment(event);',
+             *                        '',
+             *                        '',
+             *
+             *                        1001, 'Remove comment',
+             *                        'btnCssVividButton_outerBorder.png',
+             *                        'btnCssVividButton.png',
+             *                        $t->themes[$t->theme]['btnDeleteComment'],
+             *                        'btnTrashcan_red.png',
+             *                        '', '', '', ''
+             *                    ).PHP_EOL;
+             */
+            $html .= $naWebOS->html_vividButton(
+                1001, 'float:right',
+                'btnEditComment',
+                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                '',
+                'na.c.onclick_btnEditComment(event);',
+                                                '',
+                                                '',
+                                                1001, 'Edit comment',
+                                                'btnCssVividButton_outerBorder.png',
+                                                'btnCssVividButton.png',
+                                                $t->themes[$t->theme]['btnEditComment'],
+                                                'btnDocument.png',          // or any icon you already have
+                                                '', '', '', ''
+            ).PHP_EOL;
             $h = (
                 array_key_exists('hidden',$it)
                 && $it['hidden']
             );
-            // $dbg = [
-            //     array_key_exists('hidden',$it),
-            //     array_key_exists('hidden',$it) && $it['hidden'],
-            //     $h,
-            //     $it
-            // ];
+            if ($h) {
+                $filter = 'opacity:0.4;filter:greyscale(1) brightness(0.6)';
+            } else {
+                $filter = '';
+            }
+            $html .= $naWebOS->html_vividButton(
+                1001, 'float:right;'.$filter,
+                'btnHideComment',
+                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                '',
+                'na.c.onclick_btnToggleHidden(event);',
+                                                (isset($it['hidden']) && $it['hidden'] ? 'Show comment' : 'Hide comment'),
+                                                '',
+                                                1001, '(Un)hide comment',
+                                                'btnCssVividButton_outerBorder.png',
+                                                'btnCssVividButton.png',
+                                                $t->themes[$t->theme]['btnEditComment'],
+                                                '1660_blk_19329_zoom.upperBodyOnly.256x256.png',          // or any icon you already have
+                                                '', '', '', ''
+            ).PHP_EOL;
+            $html .= html_viewHistoryButton($it['_id'], [
+                'title'        => 'Comment Revision History',
+                'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
+                'database' => 'cms_comments',
+                'limit'        => 55500
+            ]);
+        }
+        $html .= "\t".'<div style="display:none">'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_parentID">'.$it['parentID'].'</span>'.PHP_EOL;
+        if (array_key_exists('clientIP', $it)) $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_clientDatetime">'.$it['clientDatetime'].'</span>'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_clientTZoffset">'.$it['clientTZoffset'].'</span>'.PHP_EOL;
+        if (array_key_exists('clientUsername', $it)) $html .= "\t\t".'<span class="naComment_clientUsername">'.$it['clientUsername'].'</span>'.PHP_EOL;
+        $html .= "\t".'</div>'.PHP_EOL;
 
-            //walkArray ($it2, $it2, null, 'wav', false, $p);
-            //$html .= '<pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>';
-            if (
-                strpos($t->mode,'ajax')!==false
-                && $h!==true
-            ) {
 
-
-                // ────────────────────────────────────────────────
-                // Authority freeze notice (alleen zichtbaar voor de auteur)
-                // ────────────────────────────────────────────────
-                if (
-                    !empty($it['hidden'])
-                    && !empty($it['hiddenByAuthority'])
-                    && isset($it['clientUsername'])
-                    && $it['clientUsername'] === $naUsername
-                ) {
-                    $canUnhide = !empty($it['authorCanUnhide']);
-
-                    $html .= '<div class="naComment_authorityNotice" style="
-                    margin: 12px 0 16px 0;
-                    padding: 14px 18px;
-                    background: linear-gradient(135deg, rgba(180,30,30,0.85), rgba(120,10,10,0.9));
-                    border: 1px solid rgba(255,180,180,0.4);
-                    border-radius: 12px;
-                    color: #fff;
-                    font-size: 0.95em;
-                    line-height: 1.45;
-                    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-                    ">';
-
-                    $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
-                    ⚠ Deze post is verborgen door justitie
-                    </div>';
-
-                    if (!empty($it['hiddenReason'])) {
-                        $html .= '<div style="margin-bottom:8px;">
-                        <strong>Reden:</strong> ' . htmlspecialchars($it['hiddenReason']) . '
-                        </div>';
-                    }
-
-                    if (!empty($it['hiddenAtStr'])) {
-                        $html .= '<div style="opacity:0.85; font-size:0.9em; margin-bottom:8px;">
-                        Bevroren op: ' . htmlspecialchars($it['hiddenAtStr']) . '
-                        </div>';
-                    }
-
-                    if ($canUnhide) {
-                        $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2);">
-                        Je mag deze post zelf weer zichtbaar maken via de "Hide/Show" knop.
-                        </div>';
-                    } else {
-                        $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2); color:#ffb0b0;">
-                        <em>Je kunt deze post niet zelf weer zichtbaar maken. Alleen justitie kan de freeze opheffen.</em>
-                        </div>';
-                    }
-
-                    $html .= '</div>';
-                } else {
-                    $mh = $it['msgHTML'];
-                    $mh = str_replace('<iframe', '<iframe loading="lazy" defer=""', $mh);
-                    $mh = str_replace('allowfullscreen>', 'allowfullscreen="">', $mh);
-
-                    $c = -1;
-                    $re = '@<br\s*\\/>\s*<br\s*\\/>@';
-                    $matches = [];
-                    //$c1 = preg_match_all ($re, $mh, $matches);
-                    $mh = preg_replace($re, '', $mh, -1, $c);
-                    $dbg = [['$mh'=>htmlentities($mh),'$c'=>$c]];//, '$c1'=>$c1, '$matches'=>$matches]];
-                    while ($c > 0) {
-                        $mh = preg_replace($re, '', $mh, -1, $c);
-                        $dbg[] = ['$mh'=>htmlentities($mh),'$c'=>$c];
-                    };
-                    $dbg[] = '----2----';
-                    $dbg[] = $mh; $mh = preg_replace ('/><br\s*\/></','><', $mh);
-                    $dbg[] = $mh; $mh = preg_replace ('/><p>\s*<\/p>/','><', $mh);
-                    $dbg[] = $mh; $mh = preg_replace ('/<p><span class="backdropped">\s*<\/span><\/p>/','', $mh);
-                    $dbg[] = $mh; $mh = preg_replace ('/<p class="backdropped">\s*<\/p>/','', $mh);
-                    $dbg[] = $mh; $mh = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $mh);
-                    $dbg[] = $mh; $mh = str_replace('</span>', '', $mh);
-                    $dbg[] = $mh; $mh = str_replace('<p>', '<p class="backdropped">', $mh);
-                    $dbg[] = $mh;
-                    foreach ($dbg as $i=>$dl) {
-                        if (is_string($dbg[$i]))$dbg[$i] = htmlentities($dl);
-                    }
-
-                    //$html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'"><pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre></div>'.PHP_EOL;
-                    $html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'">'.$mh.'</div>'.PHP_EOL;
-                }
-
-                // Show small screenshots for any URLs mentioned in this comment
-                $mentionedUrls = $t->extractUrlsFromHtml($it['msgHTML'] ?? '');
-                $html .= $t->getLinkedScreenshotsHtml($mentionedUrls);
-
-                // Photo attachments → open via cmsViewMedia /view/… (same as photoAlbum)
-                if (!empty($it['attachments']) && is_array($it['attachments'])) {
-                    $html .= '<div class="naComment_attachments">';
-                    foreach ($it['attachments'] as $att) {
-                        $name  = (string)($att['name'] ?? '');
-                        $rel   = (string)($att['relativePath'] ?? '');
-                        $thumb = htmlspecialchars($att['thumbUrl'] ?? $att['url'] ?? '');
-                        $full  = htmlspecialchars($att['url'] ?? '');
-                        if ($name === '' && $rel === '') continue;
-
-                        // codePath = directory part of relativePath; filename = basename
-                        $codePath = $rel !== ''
-                        ? trim(str_replace('\\', '/', dirname($rel)), '/')
-                        : '';
-                            $filename = $name !== '' ? basename($name) : basename($rel);
-
-                        $viewPayload = [
-                            '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS' => [
-                                'cmsViewMedia' => [
-                                    'appFolder' => '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS',
-                                    'codePath'  => $codePath,
-                                    'filename'  => $filename,
-                                ],
-                            ],
-                        ];
-                        $href = '/view/' . encode_base64_url(json_encode($viewPayload));
-
-                        $html .= '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($href) . '\');" class="nomod" title="' . htmlspecialchars($filename) . '">'
-                        .  '<img src="' . ($thumb !== '' ? $thumb : $full) . '" alt="' . htmlspecialchars($filename) . '" loading="lazy"/>'
-                        .  '</a>';
-                    }
-                    $html .= '</div>';
-                }
-
-            };
-                $html .= "\t".'<div class="naComment_subComments">';
-                $html .= "\t".'</div>'.PHP_EOL;
-                $html .=
-                    "\t".$naWebOS->html_vividButton (
-                        1001, 'margin-left:30px;',
-
-                        'btnAddSubComment',
-                        'vividButton_icon_50x50 vbAddSubComment', '_50x50', 'vbAddSubComment',
-                        '',
-                        'na.c.onclick_btnAddComment(event);',
-                        '',
-                        '',
-
-                        1001, 'Add reply',
-
-                        'btnCssVividButton_outerBorder.png',
-                        'btnCssVividButton.png',
-                        $t->themes[$t->theme]['btnAddReply'],
-                        'btnDocument2.png',
-
-                        '',
-
-                        'Add reply',
-                        '', ''
-                    ).PHP_EOL;
-            $html .= '</div>'.PHP_EOL;
-            return $html;
+        $html .= "\t".'<div class="naComment_header">';
+        if (
+            array_key_exists('clientUsername', $it)
+            && is_string($it['clientUsername'])
+            && trim($it['clientUsername'])!==''
+        ) {
+            $u = $it['clientUsername'];
+        } else {
+            $u = 'Guest';
+        }
+        global $users;
+        if (!isset($users[$u])) $users[$u] = [];
+        $users[$u] = negotiateOptions ($users[$u], $t->fetchUserRecord($u));
+        global $naDebugStartup;
+        if ($naDebugStartup) {
+            echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
         }
 
-        $html = printTree($tree, $openIDs, $this);
+        $html .= "\t".'<span class="naComment_username">'
+        . (array_key_exists('displayName',$users[$u])?$users[$u]['displayName']:$users[$u]['userRealName'])
+        . '</span>'.PHP_EOL;
 
+        $html .=
+        '<span class="naComment_clientDatetime" style="display:none;">'.$it['clientDatetime'].'</span>'
+        .'<span class="naComment_clientTZoffset" style="display:none;">'.$it['clientTZoffset'].'</span>'
+        .'<span class="naComment_datetime" '
+        . 'onclick="na.c.onclick_datetime(event)" '
+        . 'style="cursor:pointer;" '
+        . 'title="Click to link to this comment">'
+        . naDateTimeHeader($it['clientDatetime'], $it['clientTZoffset']);
+        $html .= '</span>'.PHP_EOL;
+
+        if (!empty($it['editedDatetime'])) {
+            $html .=
+            '<span class="naComment_editedDatetime" style="display:none;">'.$it['editedDatetime'].'</span>'
+            .'<span class="naComment_editedTZoffset" style="display:none;">'.$it['editedTZoffset'].'</span>'
+            .'<span class="naComment_edited" title="Last edited">'
+            . ' (edited ' . naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
+            .'</span>';
+        }
+
+
+
+        $html .= "\t".'</div>'.PHP_EOL;
+
+
+        //$html .= $t->mode.'<br/>';
+        // $it2 = $it;
+        // $p = [];
+        $h = (
+            array_key_exists('hidden',$it)
+            && $it['hidden']
+        );
+        // $dbg = [
+        //     array_key_exists('hidden',$it),
+        //     array_key_exists('hidden',$it) && $it['hidden'],
+        //     $h,
+        //     $it
+        // ];
+
+        //walkArray ($it2, $it2, null, 'wav', false, $p);
+        //$html .= '<pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>';
+        if (
+            strpos($t->mode,'ajax')!==false
+            && $h!==true
+        ) {
+
+
+            // ────────────────────────────────────────────────
+            // Authority freeze notice (alleen zichtbaar voor de auteur)
+            // ────────────────────────────────────────────────
+            if (
+                !empty($it['hidden'])
+                && !empty($it['hiddenByAuthority'])
+                && isset($it['clientUsername'])
+                && $it['clientUsername'] === $naUsername
+            ) {
+                $canUnhide = !empty($it['authorCanUnhide']);
+
+                $html .= '<div class="naComment_authorityNotice" style="
+                margin: 12px 0 16px 0;
+                padding: 14px 18px;
+                background: linear-gradient(135deg, rgba(180,30,30,0.85), rgba(120,10,10,0.9));
+                border: 1px solid rgba(255,180,180,0.4);
+                border-radius: 12px;
+                color: #fff;
+                font-size: 0.95em;
+                line-height: 1.45;
+                box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+                ">';
+
+        $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
+        ⚠ Deze post is verborgen door justitie
+        </div>';
+
+            if (!empty($it['hiddenReason'])) {
+                $html .= '<div style="margin-bottom:8px;">
+                <strong>Reden:</strong> ' . htmlspecialchars($it['hiddenReason']) . '
+                </div>';
+            }
+
+            if (!empty($it['hiddenAtStr'])) {
+                $html .= '<div style="opacity:0.85; font-size:0.9em; margin-bottom:8px;">
+                Bevroren op: ' . htmlspecialchars($it['hiddenAtStr']) . '
+                </div>';
+            }
+
+            if ($canUnhide) {
+                $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2);">
+                Je mag deze post zelf weer zichtbaar maken via de "Hide/Show" knop.
+                </div>';
+            } else {
+                $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2); color:#ffb0b0;">
+                <em>Je kunt deze post niet zelf weer zichtbaar maken. Alleen justitie kan de freeze opheffen.</em>
+                </div>';
+            }
+
+            $html .= '</div>';
+            } else {
+                $mh = $it['msgHTML'];
+                $mh = str_replace('<iframe', '<iframe loading="lazy" defer=""', $mh);
+                $mh = str_replace('allowfullscreen>', 'allowfullscreen="">', $mh);
+
+                $c = -1;
+                $re = '@<br\s*\\/>\s*<br\s*\\/>@';
+                $matches = [];
+                //$c1 = preg_match_all ($re, $mh, $matches);
+                $mh = preg_replace($re, '', $mh, -1, $c);
+                $dbg = [['$mh'=>htmlentities($mh),'$c'=>$c]];//, '$c1'=>$c1, '$matches'=>$matches]];
+                while ($c > 0) {
+                    $mh = preg_replace($re, '', $mh, -1, $c);
+                    $dbg[] = ['$mh'=>htmlentities($mh),'$c'=>$c];
+                };
+                $dbg[] = '----2----';
+                $dbg[] = $mh; $mh = preg_replace ('/><br\s*\/></','><', $mh);
+                $dbg[] = $mh; $mh = preg_replace ('/><p>\s*<\/p>/','><', $mh);
+                $dbg[] = $mh; $mh = preg_replace ('/<p><span class="backdropped">\s*<\/span><\/p>/','', $mh);
+                $dbg[] = $mh; $mh = preg_replace ('/<p class="backdropped">\s*<\/p>/','', $mh);
+                $dbg[] = $mh; $mh = str_replace('<p><span class="backdropped"', '<p class="backdropped"', $mh);
+                $dbg[] = $mh; $mh = str_replace('</span>', '', $mh);
+                $dbg[] = $mh; $mh = str_replace('<p>', '<p class="backdropped">', $mh);
+                $dbg[] = $mh;
+                foreach ($dbg as $i=>$dl) {
+                    if (is_string($dbg[$i]))$dbg[$i] = htmlentities($dl);
+                }
+
+                //$html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'"><pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre></div>'.PHP_EOL;
+                $html .= "\t".'<div class="naComment_msgHTML" style="opacity:'.($h?0.4:1).'">'.$mh.'</div>'.PHP_EOL;
+            }
+
+            // Show small screenshots for any URLs mentioned in this comment
+            $mentionedUrls = $t->extractUrlsFromHtml($it['msgHTML'] ?? '');
+            $html .= $t->getLinkedScreenshotsHtml($mentionedUrls);
+
+            // Photo attachments → open via cmsViewMedia /view/… (same as photoAlbum)
+            if (!empty($it['attachments']) && is_array($it['attachments'])) {
+                $html .= '<div class="naComment_attachments">';
+                foreach ($it['attachments'] as $att) {
+                    $name  = (string)($att['name'] ?? '');
+                    $rel   = (string)($att['relativePath'] ?? '');
+                    $thumb = htmlspecialchars($att['thumbUrl'] ?? $att['url'] ?? '');
+                    $full  = htmlspecialchars($att['url'] ?? '');
+                    if ($name === '' && $rel === '') continue;
+
+                    // codePath = directory part of relativePath; filename = basename
+                    $codePath = $rel !== ''
+                    ? trim(str_replace('\\', '/', dirname($rel)), '/')
+                    : '';
+                    $filename = $name !== '' ? basename($name) : basename($rel);
+
+                    $viewPayload = [
+                        '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS' => [
+                            'cmsViewMedia' => [
+                                'appFolder' => '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS',
+                                'codePath'  => $codePath,
+                                'filename'  => $filename,
+                            ],
+                        ],
+                    ];
+                    $href = '/view/' . encode_base64_url(json_encode($viewPayload));
+
+                    $html .= '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($href) . '\');" class="nomod" title="' . htmlspecialchars($filename) . '">'
+                    .  '<img src="' . ($thumb !== '' ? $thumb : $full) . '" alt="' . htmlspecialchars($filename) . '" loading="lazy"/>'
+                    .  '</a>';
+                }
+                $html .= '</div>';
+            }
+
+        };
+        $html .= "\t".'<div class="naComment_subComments">';
+        $html .= "\t".'</div>'.PHP_EOL;
+        $html .=
+        "\t".$naWebOS->html_vividButton (
+            1001, 'margin-left:30px;',
+
+            'btnAddSubComment',
+            'vividButton_icon_50x50 vbAddSubComment', '_50x50', 'vbAddSubComment',
+            '',
+            'na.c.onclick_btnAddComment(event);',
+                                         '',
+                                         '',
+
+                                         1001, 'Add reply',
+
+                                         'btnCssVividButton_outerBorder.png',
+                                         'btnCssVividButton.png',
+                                         $t->themes[$t->theme]['btnAddReply'],
+                                         'btnDocument2.png',
+
+                                         '',
+
+                                         'Add reply',
+                                         '', ''
+        ).PHP_EOL;
+        $html .= '</div>'.PHP_EOL;
         return $html;
     }
+
 
      public function formatFooter() {
         global $naWebOS;
@@ -1359,6 +1375,217 @@ class class_naComments {
             .'</div>'.PHP_EOL;
         return $html;
     }
+
+    public function getCommentsSince(?int $since = null, array $options = [])
+    {
+        global $naWebOS, $naUsername;
+
+        $asHtml        = (bool)($options['asHtml'] ?? false);
+        $limit         = (int)($options['limit'] ?? 200);
+        $includeHidden = (bool)($options['includeHidden'] ?? false);
+        $markSeen      = (bool)($options['markSeen'] ?? false);
+
+        $this->addIndexes();
+
+        // Resolve per-user cutoff when caller didn't pass one
+        if ($since === null) {
+            $since = $this->getUserCommentsSeenAt($naUsername);
+            // Fallback: last 7 days if user has never marked anything
+            if ($since === null) {
+                $since = time() - 86400 * 7;
+            }
+        }
+
+        $db     = $naWebOS->dbsAdmin->findConnection('couchdb');
+        $cdb    = $db->cdb;
+        $dbName = $db->dataSetName('cms_comments');
+        $cdb->setDatabase($dbName, true);
+
+        $fields = [
+            '_id', 'parentID', 'rootItemJSON',
+            'datetimeStr', 'clientDatetime', 'clientTZoffset',
+            'clientIP', 'clientUsername',
+            'editedDatetime', 'editedDatetimeStr', 'editedTZoffset',
+            'msgHTML', 'hidden', 'attachments',
+            'hiddenBy', 'hiddenAt', 'hiddenReason', 'hiddenByAuthority', 'authorCanUnhide'
+        ];
+
+        $selector = [
+            'clientDatetime' => ['$gte' => (int)$since]
+        ];
+
+        if (!$includeHidden) {
+            $selector['$or'] = [
+                ['hidden' => ['$exists' => false]],
+                ['hidden' => false],
+                ['hidden' => null]
+            ];
+        }
+
+        $findCommand = [
+            'selector' => $selector,
+            'fields'   => $fields,
+            'limit'    => $limit > 0 ? min($limit, 200) : 200,
+            'sort'     => [['clientDatetime' => 'desc']],
+            // Prefer an index on clientDatetime (see below)
+            'use_index' => 'by_clientDatetime'
+        ];
+
+        $results  = [];
+        $bookmark = null;
+        $fetched  = 0;
+
+        do {
+            if ($bookmark) {
+                $findCommand['bookmark'] = $bookmark;
+            }
+
+            $call  = $cdb->find($findCommand);
+            $batch = $this->transformResults_findCommand($call);
+
+            foreach ($batch as $doc) {
+                $pageUrl = '';
+                if (!empty($doc['rootItemJSON'])) {
+                    $root = is_string($doc['rootItemJSON'])
+                    ? json_decode($doc['rootItemJSON'], true)
+                    : $doc['rootItemJSON'];
+                    if (is_array($root) && !empty($root['url'])) {
+                        $pageUrl = $root['url'];
+                    }
+                }
+                $doc['pageUrl'] = $pageUrl;
+                $results[] = $doc;
+                $fetched++;
+            }
+
+            $bookmark = $call->body->bookmark ?? null;
+            $hasMore  = $bookmark && $bookmark !== 'nil' && count($batch) > 0;
+
+            if ($limit > 0 && $fetched >= $limit) {
+                break;
+            }
+        } while ($hasMore);
+
+        if ($limit > 0) {
+            $results = array_slice($results, 0, $limit);
+        }
+
+        if ($markSeen && !empty($naUsername)) {
+            $this->setUserCommentsSeenAt($naUsername, time());
+        }
+
+        if (!$asHtml) {
+            return [
+                'since'    => $since,
+                'count'    => count($results),
+                'comments' => $results   // each has pageUrl, msgHTML, datetimeStr, clientDatetime, …
+            ];
+        }
+
+        // HTML in the same style as the page-specific view, grouped by page
+        $html  = '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css">';
+        $html .= '<div class="naComment_header_div"><h2 class="naComments_header">New comments'
+        . ' <span style="font-size:0.75em;opacity:0.8">(since '
+        . htmlspecialchars(naDateTimeStr($since, 0))
+        . ')</span></h2></div>';
+        $html .= '<div class="naComment_results">';
+
+        $byPage = [];
+        foreach ($results as $c) {
+            $key = $c['pageUrl'] ?: '(unknown page)';
+            $byPage[$key][] = $c;
+        }
+
+        foreach ($byPage as $pageUrl => $pageComments) {
+            $html .= '<div class="naComment_pageGroup" style="margin:24px 0 12px 0;padding:10px 14px;background:rgba(0,40,80,0.35);border-radius:12px;">'
+            . '<strong>Page:</strong> '
+            . ($pageUrl !== '(unknown page)'
+            ? '<a href="' . htmlspecialchars($pageUrl) . '" target="_blank" rel="noopener">'
+            . htmlspecialchars($pageUrl) . '</a>'
+            : htmlspecialchars($pageUrl))
+            . '</div>';
+
+            $html .= $this->formatResults($pageComments, ['openIDs' => json_encode([])]);
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Read the per-user "comments seen until" timestamp.
+     * Returns null if the user has none yet.
+     */
+    public function getUserCommentsSeenAt(?string $username = null): ?int
+    {
+        global $naWebOS, $naUsername;
+
+        $username = $username ?: $naUsername;
+        if (empty($username)) {
+            // Optional guest fallback via cookie
+            if (!empty($_COOKIE['na_commentsSeenAt'])) {
+                return (int)$_COOKIE['na_commentsSeenAt'];
+            }
+            return null;
+        }
+
+        try {
+            $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
+            $cdb = $db->cdb;
+            $cdb->setDatabase('_users', false);
+
+            $userId = 'org.couchdb.user:' . na_couchdbUsername_from_plainUsername($username);
+            $call   = $cdb->get($userId);
+            $doc    = $call->body ?? null;
+
+            if ($doc && isset($doc->commentsSeenAt)) {
+                return (int)$doc->commentsSeenAt;
+            }
+        } catch (Exception $e) {
+            // ignore – treat as "never seen"
+        }
+        return null;
+    }
+
+    /**
+     * Persist the per-user cutoff (call after the user has looked at the feed).
+     */
+    public function setUserCommentsSeenAt(?string $username = null, ?int $ts = null): bool
+    {
+        global $naWebOS, $naUsername;
+
+        $username = $username ?: $naUsername;
+        $ts       = $ts ?? time();
+
+        if (empty($username)) {
+            // Guest: cookie only
+            setcookie('na_commentsSeenAt', (string)$ts, [
+                'expires'  => time() + 86400 * 365,
+                      'path'     => '/',
+                      'secure'   => true,
+                      'httponly' => true,
+                      'samesite' => 'Lax'
+            ]);
+            return true;
+        }
+
+        try {
+            $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
+            $cdb = $db->cdb;
+            $cdb->setDatabase('_users', false);
+
+            $userId = 'org.couchdb.user:' . na_couchdbUsername_from_plainUsername($username);
+            $call   = $cdb->get($userId);
+            $doc    = $call->body;
+
+            $doc->commentsSeenAt = (int)$ts;
+            $cdb->put($doc->_id, $doc);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     function fetchUserRecord ($username) {
         global $naWebOS;
         $dba = $naWebOS->dbsAdmin->findConnection('couchdb');
@@ -1808,43 +2035,44 @@ class class_naComments {
     }
 
     public function addIndexes() {
-        return false;
-
         global $naWebOS;
         $debug = false;
-        $db = $naWebOS->dbs->findConnection('couchdb');
+        $db = $naWebOS->dbs->findConnection('couchdb');   // or dbsAdmin if that’s what you use for schema
         $cdb = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
-        $cdb->setDatabase ($dbName);
+        $cdb->setDatabase($dbName);
 
+        // existing indexes you already have …
         $rec = [
-            'index' => [
-                'fields' => [ 'datetimeStr', 'parentID' ]
-            ],
-            'name' => 'sortIndex_datetimeStrParentID',
-            'type' => 'json'
+            'index' => [ 'fields' => [ 'datetimeStr', 'parentID' ] ],
+            'name'  => 'sortIndex_datetimeStrParentID',
+            'type'  => 'json'
         ];
-        try {
-            $cdb->setIndex ($rec);
-        } catch (Exception $e) {
-            if ($debug) { echo '<pre style="color:red">'; var_dump ($e); echo '</pre>'; exit(); }
+        try { $cdb->setIndex($rec); } catch (Exception $e) {
+            if ($debug) { echo '<pre style="color:red">'; var_dump($e); echo '</pre>'; }
         }
 
         $rec = [
-            'index' => [
-                'fields' => [ 'clientIP', 'clientDatetime', 'clientTZoffset' ]
-            ],
-            'name' => 'sortIndex_clientIndexes',
-            'type' => 'json'
+            'index' => [ 'fields' => [ 'clientIP', 'clientDatetime', 'clientTZoffset' ] ],
+            'name'  => 'sortIndex_clientIndexes',
+            'type'  => 'json'
         ];
-        try {
-            $cdb->setIndex ($rec);
-        } catch (Exception $e) {
-            if ($debug) { echo '<pre style="color:red">'; var_dump ($e); echo '</pre>'; exit(); }
+        try { $cdb->setIndex($rec); } catch (Exception $e) {
+            if ($debug) { echo '<pre style="color:red">'; var_dump($e); echo '</pre>'; }
         }
 
+        // ── NEW: the one getCommentsSince needs ──────────────────────────
+        $rec = [
+            'index' => [ 'fields' => [ 'clientDatetime' ] ],
+            'name'  => 'by_clientDatetime',
+            'type'  => 'json'
+        ];
+        try {
+            $cdb->setIndex($rec);
+        } catch (Exception $e) {
+            if ($debug) { echo '<pre style="color:red">'; var_dump($e); echo '</pre>'; }
+        }
     }
-
     /**
      * Explicitly process pending screenshot jobs from PHP.
      *

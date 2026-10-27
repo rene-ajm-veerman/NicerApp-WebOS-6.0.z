@@ -13,31 +13,29 @@ $spacer = "\n\t\t\t\t";
 	<meta http-equiv="content-language" content="english">
 	<link type="text/css" rel="StyleSheet" media="screen" href="/NicerAppWebOS/3rd-party/jQuery/jPlayer-2.9.1/jplayer.vivid.css"/>
 
-	<div id="app__musicPlayer__player" class="vividDialog naNoComments" style="margin:20px;overflow:visible;position:relative;width:calc(100% - 40px);height:120px;">
+	<div id="app__musicPlayer__player" class="vividDialog naNoComments" style="margin:20px;overflow:visible;position:relative;width:calc(100% - 40px);height:166px;">
         <audio id="audioTag"></audio>
         
 		<div class="audioPlayerUI">
-            <div class="audioPlayerButtons">
+            <div class="audioPlayerButtons" style="display:flex;justify-content:space-around;margin-top:25px;">
                 <div id="btnPlayPause" class="vividButton4" buttonType="btn_audioVideo_playPause" onclick="na.musicPlayer.playpause()"></div>
                 <div id="btnMuteUnmute" class="vividButton4" buttonType="btn_audioVideo_muteUnmute" onclick="na.musicPlayer.mute()"></div>
                 <div id="btnShuffle" class="vividButton4" buttonType="btn_audioVideo_shuffle" onclick="na.musicPlayer.toggleShuffle()"></div>
                 <div id="btnRepeat" class="vividButton4" buttonType="btn_audioVideo_repeat" onclick="na.musicPlayer.toggleRepeat()"></div>
             </div>
             <div class="flexBreak"></div>
-            <div class="audioPlayerControls">
-                <div class="audioVolumeBar" onclick="na.musicPlayer.setVolume(event);">
-                    <div class="audioVolumeBar_setting" style="width:calc(100% - 4px);"></div>
-                </div>
-                <div class="audioSeekBar" onclick="na.musicPlayer.seek(event);">
-                    <div class="audioSeekBar_setting" style="width:0px;"></div>
+            <div class="audioPlayerControls" style="padding:10px;">
+                <div class="audioVolumeBar" style="width:200px;text-align:center;">
+                    <div class="audioVolumeBar_setting" style="width:calc(100% - 4px);max-width:calc(100% - 8px);"></div><br/>
+                    <span class="audioVolumeBarLabel" style="padding:10px">Volume : 100</span>
+                    </div>
+                <div class="audioSeekBar" style="width:200px;text-align:center;">
+                    <div class="audioSeekBar_setting" style="width:0px;max-width:calc(100% - 8px);"></div><br/>
+                    <span class="audioSeekBarLabel" style="padding:10px">0:00:00 0:00:00</span>
                 </div>
             </div>
-            <div class="audioPlayerControlsLabels">
-                <div class="audioVolumeBarLabel" style="text-align:center">Volume : 100</div>
-                <div class="audioSeekBarLabel">
-                    <div class="audioSeekBarLabel_currentTime">0:00</div>
-                    <div class="audioSeekBarLabel_length">1:15:00</div>
-                </div>
+            <div class="audioPlayerControlsLabels" style="display:flex;justify-content:space-around;">
+
             </div>
 		</div>
 	</div>
