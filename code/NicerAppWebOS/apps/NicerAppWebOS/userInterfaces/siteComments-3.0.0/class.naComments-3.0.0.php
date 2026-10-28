@@ -740,24 +740,53 @@ class class_naComments {
             'msgHTML', 'hidden', 'attachments'
         ];
 
-        $dbName = $db->dataSetName ('cms_comments');
+        $dbName = $db->dataSetName('cms_comments');
         try {
             $cdb->setDatabase($dbName, true);
         } catch (Exception $e) {
             return $e->getMessage();
         }
 
-        $findCommand = [
-            'selector' => [
-                'rootItemJSON' => $rootItemJSON//, // unwrap from ajax call's data field
-//                'parentID' => '#'
-            ],
-            'fields' => &$fields,
-            'limit' => 200,
-            'sort' => [ ['datetimeStr'=>'desc'], ['parentID'=>'desc'] ],
-            'use_index' => '_design/20986d30727811fa9067a1e39a306d1b35fcf6d5'
+        // ── date range from the datepicker buttons ─────────────────────
+        $dateFrom = null;
+        $dateTo   = null;
+        if (is_array($post)) {
+            if (isset($post['dateFrom']) && $post['dateFrom'] !== '' && $post['dateFrom'] !== null) {
+                $dateFrom = (int)$post['dateFrom'];
+            }
+            if (isset($post['dateTo']) && $post['dateTo'] !== '' && $post['dateTo'] !== null) {
+                $dateTo = (int)$post['dateTo'];
+            }
+        }
+        // belt-and-suspenders: also accept raw $_POST
+        if ($dateFrom === null && isset($_POST['dateFrom']) && $_POST['dateFrom'] !== '') {
+            $dateFrom = (int)$_POST['dateFrom'];
+        }
+        if ($dateTo === null && isset($_POST['dateTo']) && $_POST['dateTo'] !== '') {
+            $dateTo = (int)$_POST['dateTo'];
+        }
+
+        $selector = [
+            'rootItemJSON' => $rootItemJSON
         ];
-        //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
+
+        if ($dateFrom !== null || $dateTo !== null) {
+            $range = [];
+            if ($dateFrom !== null) $range['$gte'] = $dateFrom;
+            if ($dateTo   !== null) $range['$lte'] = $dateTo;
+            $selector['clientDatetime'] = $range;
+        }
+
+        $findCommand = [
+            'selector' => $selector,
+            'fields'   => &$fields,
+            'limit'    => 200,
+            'sort'     => [ ['clientDatetime' => 'desc'] ],  // sort on the same field as the range
+            // when a range is active, prefer the datetime index; otherwise keep the page index
+            'use_index' => ($dateFrom !== null || $dateTo !== null)
+            ? 'by_clientDatetime'
+            : '_design/20986d30727811fa9067a1e39a306d1b35fcf6d5'
+        ];        //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
         //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
         //exit();
 
@@ -870,38 +899,33 @@ class class_naComments {
             ).PHP_EOL
             .$naWebOS->html_vividButton (
                 1000, 'float:right',
-
                 'btnDateRange_lower',
                 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
                 '',
-                'na.c.onclick_btnAddComment(event);',
-                '',
-                '',
-
-                1001, 'Pick begin date',
-                'btnCssVividButton_outerBorder.png',
-                'btnCssVividButton.png',
-                'btnCssVividButton.yellow1a.png',
-                'pngtree-calendar-3d-icon-isolated-on-a-transparent-background-symbolizing-schedules-and-png-image_20358144.png',
-
-                '', 'Pick begin date', '', ''
+                'na.c.onclick_btnDateRange(event, \'lower\');',
+                                         '',
+                                         '',
+                                         1001, 'Pick begin date',
+                                         'btnCssVividButton_outerBorder.png',
+                                         'btnCssVividButton.png',
+                                         'btnCssVividButton.yellow1a.png',
+                                         'pngtree-calendar-3d-icon-isolated-on-a-transparent-background-symbolizing-schedules-and-png-image_20358144.png',
+                                         '', 'Pick begin date', '', ''
             ).PHP_EOL
             .$naWebOS->html_vividButton (
                 1000, 'float:right',
-
                 'btnDateRange_upper',
                 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
                 '',
-                'na.c.onclick_btnAddComment(event);',
-                '',
-                '',
-
-                1001, 'Pick end date',
-                'btnCssVividButton_outerBorder.png',
-                'btnCssVividButton.png',
-                'btnCssVividButton.yellow1a.png',
-                'calendar.png',
-                '', 'Pick end date', '', ''
+                'na.c.onclick_btnDateRange(event, \'upper\');',
+                                         '',
+                                         '',
+                                         1001, 'Pick end date',
+                                         'btnCssVividButton_outerBorder.png',
+                                         'btnCssVividButton.png',
+                                            'btnCssVividButton.yellow1a.png',
+                                         'calendar.png',
+                                         '', 'Pick end date', '', ''
             ).PHP_EOL
             .'</div>'.PHP_EOL;
         return $html;

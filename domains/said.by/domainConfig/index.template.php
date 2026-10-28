@@ -113,7 +113,7 @@ global $naWebOS;
         <img class="bg_last" alt=""/>
     </div>
 
-    <div id="siteStatusbar" class="vividDialog naStatusbar naNoComments naNoSettings">
+    <div id="siteStatusbar" class="vividDialog naStatusbar naNoComments naNoSettings" style="height:fit-content;">
 
         <div class="vividDialogContent vividScrollpane">
             <a href="https://nicer.app" target="_new" class="nomod noPusState">NicerApp WebOS</a>&nbsp;is now initializing it's core HTML, CSS and Javascripts..

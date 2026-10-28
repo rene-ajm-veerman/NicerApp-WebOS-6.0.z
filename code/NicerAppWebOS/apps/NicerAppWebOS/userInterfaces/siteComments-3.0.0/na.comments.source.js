@@ -21,6 +21,10 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             }
         },
         current : {},
+        dateRange : {
+            lower : null,   // unix seconds (start of day)
+            upper : null    // unix seconds (end of day)
+        },
 		loadedIn : {
 			'#siteComments' : {
 				onload : function (settings) {
@@ -242,6 +246,135 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
             }
         });
     },
+
+
+
+
+
+    /**
+     * which = 'lower' | 'upper'
+     */
+    onclick_btnDateRange : function (event, which) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        which = which || 'lower';
+        debugger;
+
+        // One off-screen input reused for both buttons
+        var $inp = $('#naComments_dateRangePicker');
+        if (!$inp.length) {
+            $inp = $('<input type="text" id="naComments_dateRangePicker" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">')
+            .appendTo('body');
+        }
+
+        // Destroy previous instance so we can rebind for lower vs upper
+        if ($inp.hasClass('hasDatepicker')) {
+            $inp.datepicker('destroy');
+        }
+
+        var current = na.c.s.dateRange[which];
+        if (current) {
+            $inp.val($.datepicker.formatDate('yy-mm-dd', new Date(current * 1000)));
+        } else {
+            $inp.val('');
+        }
+
+        $inp.datepicker({
+            dateFormat  : 'yy-mm-dd',
+            changeMonth : true,
+            changeYear  : true,
+            showAnim    : 'fadeIn',
+            onSelect    : function (dateText) {
+                var parts = dateText.split('-');
+                var dt = new Date(
+                    parseInt(parts[0], 10),
+                                  parseInt(parts[1], 10) - 1,
+                                  parseInt(parts[2], 10)
+                );
+                if (which === 'upper') {
+                    dt.setHours(23, 59, 59, 999);
+                } else {
+                    dt.setHours(0, 0, 0, 0);
+                }
+                na.c.s.dateRange[which] = Math.floor(dt.getTime() / 1000);
+                na.c.updateDateRangeButtonLabels();
+                na.c.reloadWithDateRange();
+                $inp.datepicker('hide');
+            }
+        });
+
+        // Open next to the clicked button
+        debugger;
+        $inp.datepicker('show');
+        var $btn = $(event.currentTarget).closest('.vividButton, [id^=btnDateRange]');
+        if ($btn.length) {
+            var off = $btn.offset();
+            $('#ui-datepicker-div').css({
+                top  : off.top + $btn.outerHeight() + 6,
+                                        left : Math.max(8, off.left - 40)
+            });
+        }
+    },
+
+    updateDateRangeButtonLabels : function () {
+        var fmt = function (ts) {
+            if (!ts) return '';
+            var d = new Date(ts * 1000);
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        };
+        var $lo = $('#btnDateRange_lower');
+        var $hi = $('#btnDateRange_upper');
+        if ($lo.length) {
+            $lo.attr('title', na.c.s.dateRange.lower
+            ? 'Begin: ' + fmt(na.c.s.dateRange.lower) + ' (click to change)'
+            : 'Pick begin date');
+        }
+        if ($hi.length) {
+            $hi.attr('title', na.c.s.dateRange.upper
+            ? 'End: ' + fmt(na.c.s.dateRange.upper) + ' (click to change)'
+            : 'Pick end date');
+        }
+    },
+
+    reloadWithDateRange : function () {
+        var url = '/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/ajax_getNewComments.php',
+        data = {
+            url     : document.location.href.replace(document.location.search,'').replace(/\\\//g, '/') + document.location.search,
+            openIDs : (typeof na.c.openIDs === 'function') ? na.c.openIDs() : '[]'
+        };
+
+        if (na.c.s.dateRange.lower) data.dateFrom = na.c.s.dateRange.lower;
+        if (na.c.s.dateRange.upper) data.dateTo   = na.c.s.dateRange.upper;
+
+        $.ajax({
+            type : 'POST',
+            url  : url,
+            data : data,
+            success : function (html) {
+                var $pane = $('#siteComments .vividDialogContent.vividScrollpane');
+                if (!$pane.length) $pane = $('#siteComments');
+                $pane.fadeOut('fast', function () {
+                    $pane.html(html).delay(100)
+                    na.site.startUIvisuals();
+                    $pane.fadeIn('fast');
+                });
+                if (typeof na.c.onload === 'function') {
+                    na.c.onload({ callback : function () {} });
+                }
+                na.c.updateDateRangeButtonLabels();
+            },
+            error : function (xhr, ts, err) {
+                na.site.ajaxFail('na.comments.reloadWithDateRange : ' + err);
+            }
+        });
+    },
+
+
+
+
+
 
     onclick_btnViewHistory: function(event) {
         event.preventDefault();
