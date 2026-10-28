@@ -786,7 +786,7 @@ class class_naComments {
             'use_index' => ($dateFrom !== null || $dateTo !== null)
             ? 'by_clientDatetime'
             : '_design/20986d30727811fa9067a1e39a306d1b35fcf6d5'
-        ];        //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
+        ];          //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
         //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
         //exit();
 
@@ -1055,6 +1055,7 @@ class class_naComments {
         global $naIP;
         global $naWebOS;
         global $naUsername;
+        $naUsername = na_plainUsername_from_couchdbUsername($_COOKIE['cdb_loginName']);
         global $users;
         $its_id = $it['_id'];
         if (in_array($its_id,$openIDs)) $style='style="display:block"'; else $style='';
@@ -1095,8 +1096,8 @@ class class_naComments {
                                                 '', '', '', ''
             );
         };
-        //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it, $naUsername]); echo '</pre>';
-        if (array_key_exists('clientUsername',$it) && $it['clientUsername']==$naUsername) {
+        //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it['clientUsername'], $naUsername]); echo '</pre>';
+        if (array_key_exists('clientUsername',$it) && na_plainUsername_from_couchdbUsername($it['clientUsername'])==$naUsername) {
             /*$html .= $naWebOS->html_vividButton(
              *                        1001, 'float:right',
              *
@@ -1917,6 +1918,7 @@ class class_naComments {
     {
         $fncn = $this->cn . '::edit($in)';
         global $naWebOS, $naIP, $naUsername;
+        $naUsername = $_COOKIE['cdb_loginName'];
 
         if (!is_array($in)) {
             trigger_error($fncn . ' : !is_array($in)', E_USER_ERROR);
