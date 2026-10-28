@@ -20,6 +20,21 @@ animation: lime-shine 3s linear infinite;
 @media (prefers-reduced-motion: reduce) {
   #siteContent * { animation: none !important; }
 }*/
+.tooltipster-base .tooltipster-content {
+  overflow: hidden !important;   /* or visible if you never want scroll */
+  box-sizing: border-box;
+}
+
+/* If you use a custom theme / secondary theme */
+.tooltipster-sidetip.your-theme .tooltipster-content,
+.tooltipster-sidetip.your-theme .tooltipster-box {
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
+.tooltipster-box {
+  overflow: visible;          /* or hidden */
+  max-width: none;            /* only if you are not intentionally constraining it */
+}
 
 
 #siteBackgrounds_tabs .bgTab {

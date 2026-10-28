@@ -919,13 +919,11 @@ class class_naComments {
             $byId[$id]['children'] = [];           // prepare children array
 
             $parentId = $comment[$parentField] ?? null;
-
-            if ($parentId === null || $parentId === '#' || $parentId === 0) {
+            if ($parentId === null || $parentId === '' || $parentId === '#' || $parentId === 0) {
                 $tree[] = &$byId[$id];
             } else {
-                // We'll attach later if parent exists
-            }
-        }
+                // attach later if parent exists
+            }        }
 
         // Attach children
         foreach ($byId as $id => &$comment) {
@@ -1141,13 +1139,16 @@ class class_naComments {
         }
         $html .= "\t".'<div style="display:none">'.PHP_EOL;
         $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_parentID">'.$it['parentID'].'</span>'.PHP_EOL;
-        if (array_key_exists('clientIP', $it)) $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_clientDatetime">'.$it['clientDatetime'].'</span>'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_clientTZoffset">'.$it['clientTZoffset'].'</span>'.PHP_EOL;
-        if (array_key_exists('clientUsername', $it)) $html .= "\t\t".'<span class="naComment_clientUsername">'.$it['clientUsername'].'</span>'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_parentID">'.($it['parentID'] ?? '#').'</span>'.PHP_EOL;
+        if (array_key_exists('clientIP', $it)) {
+            $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
+        }
+        $html .= "\t\t".'<span class="naComment_clientDatetime">'.($it['clientDatetime'] ?? '').'</span>'.PHP_EOL;
+        $html .= "\t\t".'<span class="naComment_clientTZoffset">'.($it['clientTZoffset'] ?? 0).'</span>'.PHP_EOL;
+        if (array_key_exists('clientUsername', $it)) {
+            $html .= "\t\t".'<span class="naComment_clientUsername">'.$it['clientUsername'].'</span>'.PHP_EOL;
+        }
         $html .= "\t".'</div>'.PHP_EOL;
-
 
         $html .= "\t".'<div class="naComment_header">';
         if (
@@ -1173,12 +1174,12 @@ class class_naComments {
 
         $html .=
         '<span class="naComment_clientDatetime" style="display:none;">'.$it['clientDatetime'].'</span>'
-        .'<span class="naComment_clientTZoffset" style="display:none;">'.$it['clientTZoffset'].'</span>'
+        .'<span class="naComment_clientTZoffset" style="display:none;">'.($it['clientTZoffset']??'').'</span>'
         .'<span class="naComment_datetime" '
         . 'onclick="na.c.onclick_datetime(event)" '
         . 'style="cursor:pointer;" '
         . 'title="Click to link to this comment">'
-        . naDateTimeHeader($it['clientDatetime'], $it['clientTZoffset']);
+        . naDateTimeHeader($it['clientDatetime'], ($it['clientTZoffset']??0));
         $html .= '</span>'.PHP_EOL;
 
         if (!empty($it['editedDatetime'])) {

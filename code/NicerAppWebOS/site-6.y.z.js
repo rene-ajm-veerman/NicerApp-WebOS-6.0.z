@@ -2707,8 +2707,6 @@ na.site = {
         if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
         if (ptSettings.content!=='') {
             $(el).tooltipster(ptSettings);
-        $(el).tooltipster('show');
-        $(el).tooltipster('hide');
         $(el).addClass('started');
         setTimeout (function() {
         $(na.site.components.btnLoginLogout).tooltipster('show');
@@ -2779,9 +2777,31 @@ na.site = {
             if (na.m.userDevice.isPhone) ptSettings.showOn = 'none';
             if (!el.id) el.id='tooltip_'+na.m.randomString();
             if (el && el.id && $.tooltipster && ptSettings.content!=='') $(el).tooltipster(ptSettings);
+
+            setTimeout (function() {
+                try {
+                    $(el).tooltipster('show');
+                } catch (e) {};
+                $('.mainTooltipTheme').css ({opacity:0.001});
+                setTimeout (function() {
+                    try {
+                        $(el).tooltipster('hide');
+                    } catch (e) {};
+                }, 200);
+            }, 600);
+            $(el).addClass('started');
+            setTimeout (function() {
+                $(na.site.components.btnChangeBackground).tooltipster('show');
+                setTimeout(function() {
+                    $(na.site.components.btnChangeBackground).tooltipster('hide');
+                }, 2000);
+                //if (na.m.userDevice.isPhone) $('.mainTooltipTheme').css({left:$('.mainTooltipTheme').offset().left-20});
+                //$('.tip-arrow').css({left:$(el).offset().left-$('.mainTooltipTheme').offset().left});
+            }, 1000);
         }
         //console.log ('startTooltips : el.id=='+el.id+', cookie::haveShownTutorial='+$.cookie('haveShownTutorial'));
         $(el).attr('title','');
+
         });
         //$.cookie('haveShownTutorial', parseInt($.cookie('haveShownTutorial'))+1, na.m.cookieOptions());
     },

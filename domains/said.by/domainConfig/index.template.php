@@ -283,7 +283,7 @@ global $naWebOS;
             null,//'btnCssVividButton_outerBorder.png',
             null,//'btnCssVividButton.png',
             null,//'btnCssVividButton.grey2a.png',
-            'btnInformation.png',
+            'btnComments.png',
 
             '',
 

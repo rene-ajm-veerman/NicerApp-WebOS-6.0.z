@@ -747,6 +747,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
                 na.d.resize();
 
                 $pane.html(html);
+                na.site.startUIvisuals();
 
                 // Make sure the dialog is visible (same pattern you use elsewhere)
                 var dlg = $('#siteComments')[0];

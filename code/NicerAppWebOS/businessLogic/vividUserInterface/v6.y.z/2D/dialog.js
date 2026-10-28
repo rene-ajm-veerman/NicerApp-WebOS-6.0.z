@@ -137,7 +137,7 @@ class vividUserInterface_2D_dialog {
                                 '',
                                 '',
 
-                                7, 'Comments',
+                                7, 'Comments for this page',
 
                                 'btnCssVividButton_outerBorder.png',
                                 'btnCssVividButton.png',

@@ -232,7 +232,7 @@ global $naWebOS;
     <div id="siteDatetime"></div>
     <?php
     echo $naWebOS->html_vividButton (
-        4, 'position:absolute;right:-8px;top:-8px;z-index:9000000',
+        4, 'position:absolute;right:-1px;top:-1px;zoom:50%;z-index:9000000',
 
         'btnInformation', 'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
         '',
@@ -240,12 +240,12 @@ global $naWebOS;
                                      '',//'$(\'#siteStartMenu\').removeClass(\'hidden\').addClass(\'shown\')',
                                      '',//'$(\'#siteStartMenu\')[0].vividUserInterface_2D_dialog.hide({evt:event,checkHeldUp:\'#siteStartMenu\'});',
 
-                                     7, null,
+                                     7, 'View new comments all over the site.',
 
                                      null,//'btnCssVividButton_outerBorder.png',
                                      null,//'btnCssVividButton.png',
                                      null,//'btnCssVividButton.grey2a.png',
-                                     'btnInformation.png',
+                                     'pencil.png',
 
                                      '',
 
