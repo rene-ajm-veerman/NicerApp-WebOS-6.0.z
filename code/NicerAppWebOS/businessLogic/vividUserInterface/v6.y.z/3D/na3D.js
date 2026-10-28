@@ -290,46 +290,65 @@ export class na3D_fileBrowser {
             followNode(node) {
                 if (!node || !this.visualGroup) return;
 
-                // Get world position from the ForceGraph3D three.js object
-                const pos = node.__threeObj?.position ?? node.pos ?? { x: 0, y: 0, z: 0 };
+                // Prefer live Three.js object, then graph node coords
+                const obj = node.__threeObj;
+                const pos = obj?.position
+                ?? { x: node.x ?? 0, y: node.y ?? 0, z: node.z ?? 0 };
+
                 this.visualGroup.position.set(pos.x, pos.y + 15, pos.z);
 
-                // Resolve hierarchical color from node level
-                var
-                d = node.item?.level ?? node.level ?? 0,
+                // Keep visualizer attached to the scene (can get lost after graph rebuilds)
+                if (this.scene && this.visualGroup.parent !== this.scene) {
+                    this.scene.add(this.visualGroup);
+                }
+
+                // Hierarchical color
+                let d = node.item?.level ?? node.level ?? 0;
                 d = Math.round(d / 2) + 1;
-                const hex = window.threed.getHierarchicalColor(window.threed, d);
+                const hex = window.threed?.getHierarchicalColor?.(window.threed, d) ?? '#00ffcc';
                 const color = new THREE.Color(hex);
 
-                // Recolor central orb
                 if (this.centralOrb) {
                     this.centralOrb.material.color.set(color);
                     this.centralOrb.material.emissive.set(color.clone().multiplyScalar(0.4));
-
-                    // Recolor glow child
                     const glow = this.centralOrb.children[0];
-                    if (glow?.material) {
-                        glow.material.color.set(color);
-                    }
+                    if (glow?.material) glow.material.color.set(color);
                 }
 
-                // Recolor particles — shift their hue toward the node color
                 if (this.particles) {
                     const colors = this.particles.geometry.attributes.color.array;
                     const count  = colors.length / 3;
                     const r = color.r, g = color.g, b = color.b;
-
                     for (let i = 0; i < count; i++) {
-                        // Blend each particle toward the node color, keep some brightness variation
-                        const t = 0.8 + Math.random() * 0.2;  // 80–100% toward node color
+                        const t = 0.8 + Math.random() * 0.2;
                         colors[i * 3]     = r * t;
                         colors[i * 3 + 1] = g * t;
                         colors[i * 3 + 2] = b * t;
                     }
                     this.particles.geometry.attributes.color.needsUpdate = true;
                 }
-            }
 
+                // Remember which node we should stick to
+                this._followTarget = node;
+            },
+
+            // call once after audioVisualizer3D.init(...)
+            startFollowLoop() {
+                const vis = na.threeD.audioVisualizer3D;
+                if (!vis || vis._followLoop) return;
+
+                const tick = () => {
+                    const node = vis._followTarget || window.threed?.currentNode;
+                    if (node && vis.visualGroup) {
+                        const obj = node.__threeObj;
+                        const pos = obj?.position
+                        ?? { x: node.x ?? 0, y: node.y ?? 0, z: node.z ?? 0 };
+                        vis.visualGroup.position.set(pos.x, pos.y + 15, pos.z);
+                    }
+                    vis._followLoop = requestAnimationFrame(tick);
+                };
+                vis._followLoop = requestAnimationFrame(tick);
+            }
         };
 
 
@@ -738,7 +757,16 @@ export class na3D_fileBrowser {
 
 
             if (na.threeD.audioVisualizer3D) {
+                // immediate attempt
                 na.threeD.audioVisualizer3D.followNode(node);
+
+                // retry after layout / object creation
+                requestAnimationFrame(() => {
+                    na.threeD.audioVisualizer3D.followNode(node);
+                });
+                setTimeout(() => {
+                    na.threeD.audioVisualizer3D.followNode(node);
+                }, 300);
             }
 
             done = true;
@@ -760,6 +788,7 @@ export class na3D_fileBrowser {
 
         setTimeout((t) => {
             na.threeD.audioVisualizer3D.init(window.threed || t);
+            na.threeD.audioVisualizer3D.startFollowLoop?.();
             t.graph.refresh();           // or t.graph._d3ReheatSimulation?.();
             t.graph.resumeAnimation?.()
         }, 2000, t);
