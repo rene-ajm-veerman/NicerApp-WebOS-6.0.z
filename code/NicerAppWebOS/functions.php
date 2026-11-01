@@ -151,7 +151,124 @@ function naDateTimeHeader ($s, $tz) {
     return $html;
 }
 
+/**
+ * Returns a human-readable time difference between $s and now,
+ * adjusted for the given timezone offset (in minutes).
+ *
+ * Examples:
+ *   naTimeDiffStr(time() - 45)           → "45s ago"
+ *   naTimeDiffStr(time() - 3700)         → "1h 1m 40s ago"
+ *   naTimeDiffStr(time() - 90000, -120)  → "1d, 1h 0m 0s ago"
+ *
+ * @param int|float $s   Unix timestamp (seconds or milliseconds)
+ * @param int       $tz  Timezone offset in minutes (e.g. 60 for UTC+1, -300 for UTC-5)
+ * @return string
+ */
+function naTimeDiffStr($s, $tz = 0)
+{
+    // Normalise the incoming timestamp (same logic as naDateTimeStr / naDateTimeHeader)
+    $sa = $s;
+    if (date('Y', $s) == 1970) {
+        $sa = $s * 1000;                 // was in milliseconds
+    }
+    if (date('Y', $s) > 5000) {
+        $sa = round($s / 1000);          // was in milliseconds (Y5K bug workaround)
+    }
 
+    // Timezone offset in seconds
+    $tza = $tz * 60;
+
+    // Extra safety for the original "×1000 / ÷1000" edge cases
+    if (abs($tza) >= 12 * 3600 + 1) {
+        $tza = (int)($tza / 1000);
+    }
+
+    $now = time();
+    $diff = $now - ((int)$sa + $tza);
+
+    // Future dates → show "in X"
+    $suffix = ' ago';
+    if ($diff < 0) {
+        $diff   = abs($diff);
+        $suffix = '';
+        $prefix = 'in ';
+    } else {
+        $prefix = '';
+    }
+
+    return $prefix . secondsToTimeString($diff) . $suffix;
+}
+
+/**
+ * Calculate the time difference between two timestamps,
+ * each with its own timezone offset (minutes).
+ *
+ * Returns a human-readable string (e.g. "2d, 3h 15m 40s" or "in 45s").
+ *
+ * @param int|float $ts1   First timestamp (seconds or milliseconds)
+ * @param int       $tz1   Timezone offset of $ts1 in minutes
+ * @param int|float $ts2   Second timestamp (seconds or milliseconds)
+ * @param int       $tz2   Timezone offset of $ts2 in minutes
+ * @param bool      $absolute  If true, always returns positive duration (no "ago"/"in")
+ * @return string
+ */
+function naTimeDiffBetween($ts1, $tz1, $ts2, $tz2, $absolute = false)
+{
+    // Normalise both timestamps (same logic as the original functions)
+    $sa1 = normaliseTimestamp($ts1);
+    $sa2 = normaliseTimestamp($ts2);
+
+    // Convert offsets to seconds (with the same safety net as original code)
+    $tza1 = normaliseOffset($tz1);
+    $tza2 = normaliseOffset($tz2);
+
+    // Absolute moments in UTC (seconds)
+    $utc1 = (int)$sa1 + $tza1;
+    $utc2 = (int)$sa2 + $tza2;
+
+    $diff = $utc2 - $utc1;   // positive = $ts2 is later than $ts1
+
+    if ($absolute) {
+        return secondsToTimeString(abs($diff));
+    }
+
+    if ($diff < 0) {
+        return 'in ' . secondsToTimeString(abs($diff));
+    }
+
+    return secondsToTimeString($diff) . ' ago';
+}
+
+/**
+ * Helper: normalise a timestamp that may be in seconds or milliseconds
+ */
+function normaliseTimestamp($s)
+{
+    $sa = $s;
+    if (date('Y', $s) == 1970) {
+        $sa = $s * 1000;
+    }
+    if (date('Y', $s) > 5000) {
+        $sa = round($s / 1000);
+    }
+    return $sa;
+}
+
+/**
+ * Helper: convert timezone offset (minutes) to seconds,
+ * with the original safety checks
+ */
+function normaliseOffset($tz)
+{
+    $tza = $tz * 60;
+
+    // Original quirky safety net
+    if (abs($tza) >= 12 * 3600 + 1) {
+        $tza = (int)($tza / 1000);
+    }
+
+    return $tza;
+}
 
 function secondsToTimeString ($seconds) {
     $days = floor($seconds / 86400);

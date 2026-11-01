@@ -1212,7 +1212,11 @@ class class_naComments {
             '<span class="naComment_editedDatetime" style="display:none;">'.$it['editedDatetime'].'</span>'
             .'<span class="naComment_editedTZoffset" style="display:none;">'.$it['editedTZoffset'].'</span>'
             .'<span class="naComment_edited" title="Last edited">'
-            . ' (edited ' . naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
+            . ' (last edited ' . naTimeDiffBetween(
+                $it['clientDatetime'], $it['clientTZoffset'],
+                $it['editedDatetime'], $it['editedTZoffset'],
+                true
+            ).' later, '. naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
             .'</span>';
         }
 
