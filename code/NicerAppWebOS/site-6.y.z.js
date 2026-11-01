@@ -442,8 +442,8 @@ na.site = {
                         na.m.log (1, 'Error during theme initialization : ' + err)
                     }
 
-                    na.te.onload('siteContent');
                     t.setSpecificity(true,false);
+                    na.te.onload('siteContent');
 
                     //if (s.view) themeData.view = s.view; //else if (s.url) themeData.url = s.url;
                     if (s) {
@@ -2810,6 +2810,7 @@ na.site = {
         if (typeof simple=='undefined') simple = true;
         if (typeof saveTheme=='undefined') saveTheme = true;
         var lastSelected = null;
+        debugger;
 
         $('.na_themes_dropdown').html('<div class="vividDropDownBox_selected vividScrollpane" style="white-space:normal;overflow:visible;"></div><div class="vividDropDownBox_selector"><div class="vividScrollpane" style="padding:0px;height:400px;"></div></div>').delay(50);
         $('.vividDropDownBox_selected, .vividDropDownBox_selector').each(function(idx,el) {
@@ -2842,6 +2843,7 @@ na.site = {
             var l = i;
         }
         var selectMe = false;
+        debugger;
         for (var j in na.site.globals.themesDBkeys) {
             var i = parseInt(j);
             if (
@@ -2889,6 +2891,7 @@ na.site = {
                 na.m.log (3, 'na.site.setSpecificity() : specificity (simple==='+(simple?'true':'false')+') now set to "'+na.site.globals.themeDBkeys.specificityName+'"')
                 //break; // DO NOT DO THIS! breaks na.site.saveTheme()??
             };
+            debugger;
             if (na.site.globals.themesDBkeys[i].has_write_permission) {
                 $('.na_themes_dropdown__specificity > .vividDropDownBox_selector > .vividScrollpane').append($(divEl).clone(true,true));
                 $('.na_themes_dropdown__specificity').css({overflow:'visible'});

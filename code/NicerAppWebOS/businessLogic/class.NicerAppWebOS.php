@@ -1467,13 +1467,13 @@ class NicerAppWebOS {
     public function getPageCSS_checkPermissions($d) {
         global $naDebugAll;
         global $naLAN;
-        $debug = $this->debugThemeLoading;
+        $debug =  $this->debugThemeLoading;
         $db = $this->dbs->findConnection('couchdb');
         //echo '<pre style="color:orange;background:darkred;margin:10px;padding:8px;border-radius:10px;">$db='; var_dump ($db); echo '</pre>';
         $viewFolder = '[UNKNOWN VIEW]';
 
         $selectors2 = $d['selectors'];
-        if ($debug) { echo '<pre style="color:yellow;background:darkred;margin:10px;padding:8px;border-radius:10px;">$selectors2='; var_dump ($selectors2); echo '</pre>'; }
+        //if ($debug) { echo '<pre style="color:yellow;background:darkred;margin:10px;padding:8px;border-radius:10px;">$selectors2='; var_dump ($selectors2); echo '</pre>'; }
         $selectorNames = $d['selectorNames'];
         //$debug = true;
         foreach ($selectors2 as $idx => $selector) {
@@ -1497,7 +1497,7 @@ class NicerAppWebOS {
                             $adjustedUserOrGroupID = $userOrGroupID; // TODO : check if this is necessary
 
                             if ($debug)
-                            { echo '<pre style="color:white;background:blue;margin:10px;padding:5px;">t666b2='; var_dump($accountType); echo PHP_EOL; var_dump ($userOrGroupID); echo PHP_EOL; var_dump ($adjustedUserOrGroupID); echo PHP_EOL.PHP_EOL; echo 't666='; var_dump ($this->dbs->findConnection('couchdb')->username); echo '</pre>';}
+                            { echo '<pre style="color:white;background:blue;margin:10px;padding:5px;">t666b2='; var_dump($accountType); echo PHP_EOL; var_dump ($userOrGroupID); echo PHP_EOL; var_dump ($adjustedUserOrGroupID); echo PHP_EOL.PHP_EOL; echo 't666='; var_dump ($this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->name); echo '</pre>';}
                             if ($accountType == 'roles') {
                                 if ($debug) {
                                     echo '$this->dbs->username='; var_dump($this->dbs->findConnection('couchdb')->username).'<br/>'.PHP_EOL;
@@ -1509,8 +1509,8 @@ class NicerAppWebOS {
                                     //exit(); // or exit();
                                 }
 
-                                if (!is_null($this->dbs->findConnection('couchdb')->roles))
-                                foreach ( $this->dbs->findConnection('couchdb')->roles
+                                if (!is_null($this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->roles))
+                                foreach ( $this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->roles
                                     as $roleIdx => $groupID
                                 ) {
                                     if ($debug) { echo 't667='; var_dump($groupID); };
@@ -1521,7 +1521,7 @@ class NicerAppWebOS {
                             }
                             if (
                                 $accountType == 'users'
-                                && $this->dbs->findConnection('couchdb')->username
+                                && $this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->name
                                     == $adjustedUserOrGroupID
                             ) {
                                 $hasPermission = true;
@@ -1543,6 +1543,7 @@ class NicerAppWebOS {
 
         if ($debug) {
             echo '<pre style="color:lime;background:blue;border-radius:10px;">'; var_dump ($selectors2); echo '</pre></pre>';
+            exit;
 
         }
 
@@ -1621,7 +1622,7 @@ class NicerAppWebOS {
         //echo '<pre>'; var_dump ($_SESSION);
 
         $selectors2 = array_reverse($selectors, true);
-        //echo '<pre>'; var_dump ($selectors2); echo '</pre>'; exit();
+        //echo '<pre>'; var_dump ($d1); var_dump ($selectors2); echo '</pre>'; exit();
         //$selectorNames2 = array_reverse($selectorNames, true);
 
         $ret = '';
@@ -2248,7 +2249,6 @@ class NicerAppWebOS {
                         ],
                         'write' => [
                             'roles' => [
-                                $db->translate_plainGroupName_to_couchdbGroupName('Guests'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Owners'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Chief Officers'),
                                 $db->translate_plainGroupName_to_couchdbGroupName('Moderators')
@@ -2297,14 +2297,14 @@ class NicerAppWebOS {
             //var_dump($username100);
         //echo '<pre style="color:blue;">'; var_dump ($username100); echo '</pre>'; //exit();
         $username101 = $db->translate_plainUserName_to_couchdbUserName ($username100);
-        //echo $username101; exit();
+        //var_dump($username101); echo '<pre>'; var_dump ($this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx); exit();
 
 
         if (
                     (
                 is_object($this->dbs)
-                && is_string($this->dbs->findConnection('couchdb')->username)
-                && $this->dbs->findConnection('couchdb')->username!==''
+                && is_string($this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->name)
+                && $this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->name!==''
                 //&& $this->dbs->findConnection('couchdb')->username!==$this->domainFolderForDB.'___Guest'
                 && $username100!==''
             )
@@ -2346,7 +2346,7 @@ class NicerAppWebOS {
             if (false) { echo '<pre style="color:white;background:blue">'; var_dump ($this->dbs->findConnection('couchdb')); echo '</pre>'; }
 
 
-            foreach ($this->dbs->findConnection('couchdb')->roles as $roleIdx => $role) {
+            foreach ($this->dbs->findConnection('couchdb')->cdb->getSession()->body->userCtx->roles as $roleIdx => $role) {
                 $role2 = $this->dbs->findConnection('couchdb')->translate_couchdbGroupName_to_plainGroupName($role);
                 if ($debug) { echo '<pre style="color:lime;background:navy">'; var_dump ($role2); echo '</pre>'; }
                 $selectors[] = array (
@@ -2539,7 +2539,7 @@ class NicerAppWebOS {
         $hasJS = false;
         $hasCSS = false;
 
-
+//$debug = true;
         if ($debug) {
             $dbg1a = [
                 '$hasJS' => $hasJS,
@@ -2547,6 +2547,7 @@ class NicerAppWebOS {
                 '$selectors' => $selectors
             ];
             echo '<pre style="color:green;">';var_dump ($dbg1a); echo '</pre>';
+            exit;
         }
         return [
             'selectorNames' => $selectorNames,
