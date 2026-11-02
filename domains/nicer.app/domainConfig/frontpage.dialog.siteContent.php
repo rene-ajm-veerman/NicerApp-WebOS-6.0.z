@@ -65,13 +65,13 @@ NL30INGB0007689155
 
     <div class="naFrontpage_headerText naFrontpage_headerText_maintenance" style="float:right">
     <p class="backdropped">
-    2026-Oct-18th, 19:57CET
+    2026-Nov-2nd, 07:25CET
     </p>
     <p class="backdropped">
     These webservers are in the process of undergoing a major version upgrade of the database business logic code as well as other base layers. This upgrade is now nearly complete.
     </p>
     <p class="backdropped">
-    Services may go down temporarily on any of my servers for seemingly unexplainable reasons over the next few weeks.
+    During 2026, before Dec 1st, I will finalize this v6 release. During 2027, a transition is made to <a href="https://nicer.app/NicerAppWebOS/businessLogic/vividUserInterface/v8.y.z/demo.byGrok.desktop3D.v2.1.0.php" class="nomod noPushState" target="naDesktop3D">a fully 3D desktop</a>.
     </p>
     <p class="backdropped">
     In addition, the <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/dump_by_prefix.php" class="nomod noPushState" target="ghDumpScript">PHP database backup-to-filesystem scripts</a> have been written now (yes, there is a <a href="https://github.com/rene-ajm-veerman/NicerApp-WebOS-6.y.z/blob/main/code/NicerAppWebOS/scripts.maintenance/restore_by_prefix.php" class="nomod noPushState" target="ghRestoreScript">restore script</a> too), and put on 10-minute intervals of execution into folders which automatically get backed up whenever i update my sourcecode backups. The backups are saved on disk for 2 days.
