@@ -58,7 +58,7 @@ NicerApp WebOS from Nicer Enterprises
                 $settingsFilePath = $dir.'/../../../domains/'.$bn.'/domainConfig/settings.json';
             }
 	     */
-		$scriptDir = dirname($_SERVER['PWD']);//dirname(__FILE__);
+		$scriptDir = $_SERVER['PWD'];//dirname(__FILE__);
 		//var_dump ($_SERVER); exit;
 
 		if (preg_match('#/domains/([^/]+)/#', $scriptDir, $m)) {
@@ -91,7 +91,8 @@ NicerApp WebOS from Nicer Enterprises
 			}
 		    // $settingsFilePath = '/var/www/NicerAppWebOS-v6.0.z/domains/' . $bn . '/domainConfig/settings.json';
 		}
-	}
+		//var_dump($bn); var_dump($settingsFilePath); die();
+    }
 
 //var_dump ($scriptDir); var_dump ($settingsFilePath); exit;
 // adjust the number of dirname() levels according to your real layout
