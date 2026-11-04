@@ -327,13 +327,15 @@ $url = trim($url);
             $job['_id'] = $res['_id'] ?? null;
         }
 
-	$this->cacheSet('url', $url, $job, 300); // 5 min while processing
+        $this->cacheSet('url', $url, $job, 300); // 5 min while processing
         return $job;
     }
 
 
 	public function findByUrl(string $url): ?array
     {
+        $this->createDatabaseAndIndexes();
+
         // 1. Redis first
         $cached = $this->cacheGet('url', $url);
         if ($cached !== null) {
@@ -348,6 +350,8 @@ $url = trim($url);
             $ttl = (int)($row['retain'] ?? 0);
             $this->cacheSet('url', $url, $row, $ttl > 0 ? $ttl : $this->defaultTtl);
         }
+
+        $this->runWorker();
 
         return $row;
     }
