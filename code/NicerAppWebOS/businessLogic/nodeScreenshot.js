@@ -52,7 +52,15 @@ process.on('unhandledRejection', (reason) => {
                 '--safebrowsing-disable-extension-blacklist',
                 '--disable-extensions',
                 '--no-first-run',
-                '--disable-gpu'
+
+                // WebGL / GPU fixes
+                '--enable-gpu',                    // important – do NOT use --disable-gpu
+                '--ignore-gpu-blocklist',
+                '--use-gl=angle',
+                '--use-angle=swiftshader-webgl',   // or just 'swiftshader'
+                '--enable-unsafe-swiftshader',     // required on newer Chromium
+                // alternative that sometimes works better:
+                // '--use-gl=swiftshader',
             ],
             ignoreHTTPSErrors: true,
             headless: 'new'
@@ -84,9 +92,10 @@ process.on('unhandledRejection', (reason) => {
 
         try {
             await page.goto(finalUrl, {
-                waitUntil: 'networkidle2',
+                waitUntil: 'load',
                 timeout: 120000
             });
+            await new Promise(r => setTimeout(r, 10*1000)); // extra settle time
         } catch (err) {
             // HTTPS connection refused → try HTTP once
             if (

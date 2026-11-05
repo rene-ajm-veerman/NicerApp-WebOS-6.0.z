@@ -59,7 +59,8 @@ NicerApp WebOS from Nicer Enterprises
             }
 	     */
 		$scriptDir = $_SERVER['PWD'];//dirname(__FILE__);
-		//var_dump ($_SERVER); exit;
+		if (!is_dir($scriptDir)) $scriptDir = dirname($_SERVER['PWD']);
+		//var_dump ($scriptDir);// exit;
 
 		if (preg_match('#/domains/([^/]+)/#', $scriptDir, $m)) {
     			$bn = $m[1];
@@ -76,18 +77,18 @@ NicerApp WebOS from Nicer Enterprises
             		$bn = explode('/',$dir)[5];
 			//var_dump ($bn); exit;
 		}
-		$settingsFilePath = dirname($scriptDir, 2) . '/domains/' . $bn . '/domainConfig/settings.json';
+		$settingsFilePath = dirname($scriptDir, 3) . '/domains/' . $bn . '/domainConfig/settings.json';
 		if (!file_exists($settingsFilePath)) {
-			$settingsFilePath = dirname($scriptDir, 2) . '/' . $bn . '/domainConfig/settings.json';
+			$settingsFilePath = dirname($scriptDir, 3) . '/' . $bn . '/domainConfig/settings.json';
 		}
 		
 		// Optional: also accept an environment override for cron
 		if ($envDomain = getenv('NA_DOMAIN')) {
 		    $bn = $envDomain;
-		    $settingsFilePath = dirname($scriptDir, 2) . '/domains/' . $bn . '/domainConfig/settings.json';
+		    $settingsFilePath = dirname($scriptDir, 3) . '/domains/' . $bn . '/domainConfig/settings.json';
 		    // or hard-code the known root if you prefer:
 			if (!file_exists($settingsFilePath)) {
-				$settingsFilePath =  dirname($scriptDir, 2) . '/' . $bn . '/domainConfig/settings.json';
+				$settingsFilePath =  dirname($scriptDir, 3) . '/' . $bn . '/domainConfig/settings.json';
 			}
 		    // $settingsFilePath = '/var/www/NicerAppWebOS-v6.0.z/domains/' . $bn . '/domainConfig/settings.json';
 		}

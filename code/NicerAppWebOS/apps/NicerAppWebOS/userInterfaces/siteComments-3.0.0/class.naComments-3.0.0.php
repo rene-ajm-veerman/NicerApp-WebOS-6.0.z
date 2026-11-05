@@ -1957,7 +1957,10 @@ class class_naComments {
 
             // Only original author may edit
             //echo '<pre>'; var_dump ($doc); var_dump ($naUsername); exit;
-            if (!isset($doc->clientUsername) || $doc->clientUsername !== na_plainUsername_from_couchdbUsername($naUsername)) {
+            if (!isset($doc->clientUsername) || (
+                $doc->clientUsername !== na_plainUsername_from_couchdbUsername($naUsername)
+                && $doc->clientUsername !== $naUsername
+            )) {
                 echo json_encode(['error' => 'Not allowed']);
                 return;
             }

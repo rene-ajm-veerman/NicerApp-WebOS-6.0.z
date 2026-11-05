@@ -787,54 +787,93 @@ $url = trim($url);
 
         $s = $this->nodeScript;   // currently forced to screenshot_other2.js
 
-	$paths = $this->buildFilePath($url);
-$this->ensureDirectory($paths['dir']);
+        $paths = $this->buildFilePath($url);
+        $this->ensureDirectory($paths['dir']);
 
-$cmd = "node " . escapeshellarg($this->nodeScript) . " "
-     . escapeshellarg($url) . " "
-     . escapeshellarg($paths['absolute']) . " 2>&1";
+        $nodeBin = '/usr/bin/node';   // or just 'node' if PATH is clean
+        // or better: put it in a config / env var
 
-echo "<div class=\"phpError\">Starting unix process : $cmd</div>";
+        $cmd = escapeshellarg($nodeBin) . ' '
+        . escapeshellarg($this->nodeScript) . ' '
+        . escapeshellarg($url) . ' '
+        . escapeshellarg($paths['absolute']);
 
-$output = [];
-$returnCode = 0;
-exec($cmd, $output, $returnCode);
+        echo "<div class=\"phpError\">Starting unix process : $cmd</div>";
 
-$errorText = implode("\n", $output);
-echo "<pre class=\"phpError\">Node output:\n" . htmlspecialchars($errorText) . "</pre>";
+        // Clean environment for Node / Puppeteer
+        $env = [
+            'HOME'                => '/var/www',                                    // writable for www-data
+            'PUPPETEER_CACHE_DIR' => '/var/www/.cache/puppeteer',
+            'PATH'                => '/usr/local/bin:/usr/bin:/bin',
+            'NODE_ENV'            => 'production',
+            // optional safety:
+            // 'NODE_OPTIONS'     => '--max-old-space-size=4096',
+        ];
 
-$success = ($returnCode === 0 && file_exists($paths['absolute']));
+        $descriptors = [
+            0 => ['pipe', 'r'],           // stdin
+            1 => ['pipe', 'w'],           // stdout
+            2 => ['pipe', 'w'],           // stderr
+        ];
 
-$attempts    = (int)($job['attempts'] ?? 1);
-$maxAttempts = (int)($job['maxAttempts'] ?? 3);
-$now         = date('Y-m-d H:i:s');
+        $process = proc_open($cmd, $descriptors, $pipes, null, $env);
 
-if ($success) {
-    // thumbnail
-    $thumbCmd = 'convert ' . escapeshellarg($paths['absolute'])
-              . ' -resize 1400 '
-              . escapeshellarg($paths['absolute'] . '_thumb.png') . ' 2>&1';
-    exec($thumbCmd, $thumbOut, $thumbRc);
+        $output = [];
+        $returnCode = -1;
 
-    $update = [
-        'status'       => 'ready',
-        'filePath'     => $paths['absolute'],
-        'relativePath' => $paths['relative'],
-        'lockedAt'     => null,
-        'lockedBy'     => null,
-        'error'        => null,
-        'updated'      => $now,
-    ];
-    $this->markReady(array_merge($job, $update));
-} else {
-    // ... your permanent-failure logic ...
-    $update = [ /* failed / pending */ ];
-    $this->markInvalid($url);
-}
+        if (is_resource($process)) {
+            fclose($pipes[0]);
 
-$filter = !empty($job['_id']) ? ['_id' => $job['_id']] : ['url' => $url];
-$this->db->updateMany($filter, ['$set' => $update]);
-return array_merge($job, $update);
+            $stdout = stream_get_contents($pipes[1]);
+            $stderr = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            $returnCode = proc_close($process);
+
+            $combined = trim($stdout . "\n" . $stderr);
+            $output   = $combined === '' ? [] : explode("\n", $combined);
+        } else {
+            $output = ['proc_open failed – could not start node process'];
+        }
+
+        $errorText = implode("\n", $output);
+        echo "<pre class=\"phpError\">Node output:\n" . htmlspecialchars($errorText) . "</pre>";
+        $errorText = implode("\n", $output);
+        echo "<pre class=\"phpError\">Node output:\n" . htmlspecialchars($errorText) . "</pre>";
+
+        $success = ($returnCode === 0 && file_exists($paths['absolute']));
+
+        $attempts    = (int)($job['attempts'] ?? 1);
+        $maxAttempts = (int)($job['maxAttempts'] ?? 3);
+        $now         = date('Y-m-d H:i:s');
+
+        if ($success) {
+            // thumbnail
+            $thumbCmd = 'convert ' . escapeshellarg($paths['absolute'])
+                    . ' -resize 1400 '
+                    . escapeshellarg($paths['absolute'] . '_thumb.png') . ' 2>&1';
+            exec($thumbCmd, $thumbOut, $thumbRc);
+
+            $update = [
+                'status'       => 'ready',
+                'filePath'     => $paths['absolute'],
+                'relativePath' => $paths['relative'],
+                'lockedAt'     => null,
+                'lockedBy'     => null,
+                'error'        => null,
+                'updated'      => $now,
+            ];
+            $this->markReady(array_merge($job, $update));
+        } else {
+            // ... your permanent-failure logic ...
+            $update = [ /* failed / pending */ ];
+            $this->markInvalid($url);
+        }
+
+        $filter = !empty($job['_id']) ? ['_id' => $job['_id']] : ['url' => $url];
+        $this->db->updateMany($filter, ['$set' => $update]);
+        return array_merge($job, $update);
 
     }
 
