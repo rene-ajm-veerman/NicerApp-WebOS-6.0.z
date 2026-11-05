@@ -2,6 +2,46 @@
 
 Guidance for AI coding agents working on this repository.
 
+## How to use this AGENTS.md
+
+Place this file at the **repository root** as `AGENTS.md` (or copy its contents into your agent’s project instructions). Agents such as Cursor, Claude Code, Copilot Workspace, Aider, Continue, or custom Grok/Claude sessions will pick it up as project context.
+
+### Recommended workflow for agents
+
+1. **Orient first**  
+   Read this file, then open `code/NicerAppWebOS/boot.php`, `businessLogic/class.NicerAppWebOS.php`, and one AJAX script under `businessLogic/ajax/` before changing behavior.
+
+2. **Respect the request path**  
+   Browser → jQuery AJAX → PHP endpoint → DB libraries → response. Never introduce direct browser-to-CouchDB (or other DB) access.
+
+3. **Prefer existing patterns**  
+   - New server endpoints: follow the style of `businessLogic/ajax/*.php` (require `boot.php`, use `$naWebOS`, return SUCCESS/FAILED or structured data).  
+   - New apps/UI: live under `apps/NicerAppWebOS/` and the existing theme/site JS versioning scheme.  
+   - Domain-specific config: only under `domains/<name>/domainConfig/`.
+
+4. **Do not casually edit `boot.php`**  
+   It is explicitly restricted; coordinate with the project owner for bootstrap changes.
+
+5. **Install / run context**  
+   There is no `npm run build` / `make test` app pipeline. Use the install and dependency commands in this document. Validate by loading the site in Chrome and exercising login, backgrounds, and the relevant AJAX paths.
+
+6. **When unsure**  
+   Search the tree for similar features (comments, screenshots, themes, login) and mirror their structure rather than inventing a parallel stack.
+
+### What agents should prioritize
+
+- Keeping CouchDB and other DBs off the public network.  
+- Preserving domain isolation via `settings.json` / `naLAN.json`.  
+- Matching existing file naming (`site-6.*.js`, versioned app folders).  
+- Minimal, targeted diffs; avoid mass reformatting of legacy files.
+
+### What agents should avoid
+
+- Exposing Sag/CouchDB credentials or ports to the client.  
+- Hard-coding production hostnames instead of reading domain settings.  
+- Adding a second bootstrap path that bypasses `boot.php`.  
+- Checking large `siteMedia` binaries into git when they belong outside the distribution.
+
 ## Project overview
 
 NicerApp WebOS is a browser-based 2D (+ evolving 3D) WebOS / CMS. Pages use photo, tiled image, YouTube/iframe, WebGL or canvas backgrounds with semi-transparent content and apps layered on top. Server-side stack is PHP on Linux; primary data store is Apache CouchDB (JSON documents). Optional SQL (MySQL/PostgreSQL via ADOdb patterns) exists but CouchDB is the default.
