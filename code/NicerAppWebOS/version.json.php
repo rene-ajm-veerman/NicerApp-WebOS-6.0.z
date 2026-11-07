@@ -2,8 +2,8 @@
 global $naWebOS;
 ?>
 {
-    "whatsThis" : "NicerApp WebOS v6.0.0-beta-5.0.0",
-    "version" : "v6.0.0-beta-5.0.0",
+    "whatsThis" : "NicerApp WebOS v6.0.0-beta-6.0.0",
+    "version" : "v6.0.0-beta-6.0.0",
     "copyright" : [
         "Copyright (C) 2002-2026 \"Rene A.J.M. Veerman\" [rene.veerman.netherlands@gmail.com]"
     ],

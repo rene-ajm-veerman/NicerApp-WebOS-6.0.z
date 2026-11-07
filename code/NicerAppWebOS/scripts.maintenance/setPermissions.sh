@@ -60,6 +60,10 @@ for CURRENT_PATH in "${DOMAIN_ROOTS[@]}"; do
 	if [ ! -e $CURRENT_PATH/siteCache ]; then mkdir $CURRENT_PATH/siteCache; fi
 	if [ ! -e $CURRENT_PATH/siteData ]; then mkdir $CURRENT_PATH/siteData; fi
 
+	chown -R $NA_MAIN_USER:$NA_MAIN_GROUP $CURRENT_PATH/downloads
+	sudo chmod -R $NA_USERDATA_PERMISSIONS $CURRENT_PATH/downloads
+	sudo find $CURRENT_PATH/downloads -type d -exec chmod u+x,g+x {} \;
+
 	chown -R $NA_MAIN_USER:$NA_MAIN_GROUP $CURRENT_PATH/siteCache 
 	sudo chmod -R $NA_USERDATA_PERMISSIONS $CURRENT_PATH/siteCache
 	sudo find $CURRENT_PATH/siteCache -type d -exec chmod u+x,g+x {} \;

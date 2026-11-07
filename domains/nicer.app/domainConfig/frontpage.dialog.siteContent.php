@@ -35,7 +35,7 @@
         Project status : <span id="siteLastModified"></span>.
         </p>
         <p style="padding:8px;border-radius:5px;margin-block-start:0;margin-block-end:0;margin-inline-start:0;margin-inline-end:0;">
-        Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.y.z" class="nomod noPushState" target="naGithub">v6.y.z on Github.com</a>,
+        Opensourced as <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-6.0.z" class="nomod noPushState" target="naGithub">v6.0.z on Github.com</a>,
         and available as <a href="https://nicer.app/downloads" class="nomod noPushState" target="naDownload">full package here</a>,<br/>
         </p>
 

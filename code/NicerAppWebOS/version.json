@@ -1,14 +1,13 @@
 {
-    "whatsThis" : "NicerApp WebOS v6.0.0-beta-5.0.0",
-    "version" : "v6.0.0-beta-5.0.0",
+    "whatsThis" : "NicerApp WebOS v6.0.0-beta-6.0.0",
+    "version" : "v6.0.0-beta-6.0.0",
     "copyright" : [
-        "Copyright (C) 2002-2026 \"Rene A.J.M. Veerman\" [rene.veerman.netherlands@gmail.com]",
-        "Copyright (C) 2026 \"Rene A.J.M. Veerman\" [rene.veerman.netherlands@gmail.com] + grok.com + claude.ai/chat"
+        "Copyright (C) 2002-2026 \"Rene A.J.M. Veerman\" [rene.veerman.netherlands@gmail.com]"
     ],
     "license" : "https://nicer.app/license",
     "history" : {
         "firstCreated" : "2002 around January if i'm not mistaken.",
-        "lastModified" : "2026-11(November)-01(Sunday) 06:17:29"
+        "lastModified" : "2026-11(November)-07(Saturday) 23:10:12"
     },
     "supportedBrowsers" : [
         {
