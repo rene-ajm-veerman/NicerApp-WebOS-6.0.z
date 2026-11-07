@@ -2378,9 +2378,9 @@ another example:
 
                             $ev = "\$r = $listCall";
                             //htmlDump ($ev);
-                            if (!empty($listCall)) eval ($ev);
+                            //if (!empty($listCall)) eval ($ev);
                             $idx = count ($result);
-                            if (!empty($r)) $r = " - [listCall=$r]";
+                            //if (!empty($r)) $r = " - [listCall=$r]";
                             /*if (!$returnRecursive) {
                                 $result[$idx] = $filepath.$r;
                             } else {
