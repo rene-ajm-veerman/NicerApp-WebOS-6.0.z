@@ -324,6 +324,27 @@ NicerApp WebOS from Nicer Enterprises
     // Or pass a specific User-Agent
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $naIsBot = $detect->isCrawler($userAgent);
+    if (!$naIsBot
+        && !$naLAN
+        && (
+            $naWebOS->domain=='nicer.app'
+            || $naWebOS->domain=='said.by'
+        )
+    ) {
+        $from = "bot@nicer.app";
+        $to = 'rene.veerman.netherlands@gmail.com';
+        $subject = 'INFO : login detected from '.$naIP.' using '.$userAgent;
+        $body = "FYI.\n";
+
+        $headers = [
+            'From: ' . $from,
+            'Content-Type: text/plain; charset=UTF-8',
+            'X-Mailer: FileIntegrityChecker',
+        ];
+
+        mail($to, $subject, $body, implode("\r\n", $headers));
+
+    }
     // Get the name of the bot (very useful)
     $name = $detect->getMatches(); // Returns the matching bot name/pattern
     $naIsDesktop = false;
