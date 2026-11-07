@@ -1518,7 +1518,7 @@ export class na3D_fileBrowser {
 
         // only auto-add when the source is #fileListing
         if (!$(buttonEl).closest('#playlist').length) {
-            t.addTrackToPlaylist(relPath);
+            t.addTrackToPlaylist(t, relPath);
         }
     }
 
