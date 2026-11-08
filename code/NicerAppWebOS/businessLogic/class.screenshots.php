@@ -121,7 +121,7 @@ trait naScreenshotsRedisCache
     }
 }
 
-/**
+/**https://said.by/siteData/said.by/screenshots/2026/11/08/470b49b210b4102c4543502babc9c357.png_thumb.png
  * Minimal working Screenshots manager for NicerApp
  * MIT licensed
  */
@@ -539,7 +539,7 @@ $url = trim($url);
 
         global $naWebOS;
 
-        $db  = $naWebOS->dbs->findConnection('couchdb');
+        $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
 
         $dbName = $db->dataSetName('screenshots');
@@ -978,7 +978,7 @@ $url = trim($url);
 
                 $this->table = (str_replace('.','_',$naWebOS->domainFolder) ?? 'default') . '___screenshots';
                 //echo '<h1>'.$this->table.'</h1>';
-                $this->cdb = $naWebOS->dbs->findConnection('couchdb')->cdb;//(property_exists($old, 'cdb') && is_object($old->cdb))
+                $this->cdb = $naWebOS->dbsAdmin->findConnection('couchdb')->cdb;//(property_exists($old, 'cdb') && is_object($old->cdb))
                 //? $old->cdb
                 //: $old;
 

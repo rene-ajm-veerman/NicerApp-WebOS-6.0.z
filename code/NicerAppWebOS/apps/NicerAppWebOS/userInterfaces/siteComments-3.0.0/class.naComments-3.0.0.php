@@ -504,7 +504,7 @@ class class_naComments {
         // -------------------------------------------------
         $uniqueUrls = [];
 
-        $db  = $naWebOS->dbs->findConnection('couchdb');
+        $db  = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
         $cdb->setDatabase($dbName, true);
@@ -2267,7 +2267,7 @@ class class_naComments {
             require_once dirname(__FILE__, 5) . '/businessLogic/class.screenshots.php';
 
             global $naWebOS;
-            $uDB2 = $naWebOS->dbs->findConnection('couchdb'); // adjust as needed
+            $uDB2 = $naWebOS->dbsAdmin->findConnection('couchdb'); // adjust as needed
             $screenshots = new naScreenshots($uDB2);
 
             $html = '<div class="naComment_linkedScreenshots" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">';
@@ -2279,7 +2279,8 @@ class class_naComments {
                 $record = $screenshots->findByUrl($url);
                 if (!$record || ($record['status'] ?? '') !== 'ready') continue;
 
-                $relPath = ltrim((string)($record['relativePath'] ?? ''), '/');
+                $relPath = str_replace('//','/',$record['relativePath'] ?? '');
+                $relPath = str_replace($naWebOS->domainPath.'/siteData/','',$relPath);
                 if ($relPath === '') continue;
 
                 $imgSrc = '/siteData/' . $naWebOS->domain . '/' . $relPath . '_thumb.png';
@@ -2301,7 +2302,7 @@ class class_naComments {
 
                 $html .=
                 '<div class="naComment_linkedScreenshotItem" style="display:flex; flex-direction:column; align-items:center;">' .
-                '<div onclick="na.site.loadContent(\'' . htmlspecialchars($url) . '\');" target="_blank" class="nomod noPushState" ' .
+                '<div onclick="na.site.loadContent(event,\'' . htmlspecialchars($url) . '\');" target="_blank" class="nomod noPushState" ' .
                 'style="display:inline-block; height:auto;" title="' . htmlspecialchars($url) . '">' .
                 '<img src="' . htmlspecialchars($imgSrc) . '" ' .
                 'alt="Linked page screenshot" ' .

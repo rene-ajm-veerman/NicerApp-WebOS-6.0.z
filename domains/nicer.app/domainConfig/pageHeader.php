@@ -58,7 +58,7 @@
         <tr>
         <td rowspan="2" align="right">
         <div style="font-size:x-large;font-weight:bold;text-shadow:0px 0px 4px black, 2px 2px 8px black">
-            <div><p class="backdropped"><span style="font-size:x-large;font-weight:bold">© and ® 2026 <a href="https://zoned.at/d4" class="tooltip" title="Diary part 4">René</a> AJM Veerman</span> [<a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>],<br/>Current status : Fixing various lingering bugs.<!-- <br/>i'm now continuing work on the installation procedures at <a href="new.nicer.app" class="nomod noPushState" target="nna">new.nicer.app</a>.--></p></div>
+            <div><p class="backdropped"><span style="font-size:x-large;font-weight:bold">© <!--and ®--> 2026 <a href="https://zoned.at/d4" class="tooltip" title="Diary part 4">René</a> AJM Veerman</span> [<a href="mailto:rene.veerman.netherlands@gmail.com">rene.veerman.netherlands@gmail.com</a>],<br/>Current status : Fixing various lingering bugs.<!-- <br/>i'm now continuing work on the installation procedures at <a href="new.nicer.app" class="nomod noPushState" target="nna">new.nicer.app</a>.--></p></div>
 
             <div><p class="backdropped" alt="Original idea by unknown and/or anonymous humans">Original idea by unknown and/or anonymous human(s) ;-)</p></div>
         </div>
