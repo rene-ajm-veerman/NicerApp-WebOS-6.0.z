@@ -132,7 +132,6 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                         $(na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.loaderIcon).remove();
                     },
                     onresize : function (settings) {
-                        debugger;
                         // TODO : what's settings.isManualResize ???
                         //if ($('#appGame').css('display')=='none') $('#appGame').fadeIn('slow');
                         na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].onresize(settings);
@@ -1982,6 +1981,9 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
         },
 
         onresize : function (settings, displayNews) {
+
+            if (typeof displayNews == 'undefined') displayNews = true;
+
             var
             na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'], g = na1.globals, s = na1.settings,
             c = s.current, db = c.db;
@@ -2095,7 +2097,6 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                               na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'],
                                               g = na1.globals, s = na1.settings, c = s.current, db = c.db, app = na.site.globals.app;
 
-
                                               setTimeout (function() {
                                                   na1.onresize_do(s.dnf?s.dnf.id:undefined);
                                                   var doCountDown = false;
@@ -2117,10 +2118,12 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                                           doCountDown = true;
                                                       }
                                                   });
-                                                  if (doCountDown) {
+                                                  if (doCountDown || true) {
                                                       $('.newsApp__header__countDownStr').animate({opacity:1});
                                                       na1.countDown();
                                                       //na1.loadNews_read_loop();
+                                                      delete na.m.settings.locked_displayNewNewsItems;
+                                                      na1.displayNewNewsItems();
                                                   }
                                               }, 100);
 
