@@ -987,7 +987,7 @@ class class_naComments {
 
         foreach ($nodes as &$node) {
             if (!empty($node['children'])) {
-                sortTreeTopLevelNewestOnly($node['children'], $depth + 1);
+                $this->sortTreeTopLevelNewestOnly($node['children'], $depth + 1);
             }
         }
     }
