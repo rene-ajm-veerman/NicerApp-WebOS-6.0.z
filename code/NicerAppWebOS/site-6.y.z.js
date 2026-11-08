@@ -2686,7 +2686,7 @@ na.site = {
 
     startTooltips : function (evt, rootEl) {
         if (!rootEl) rootEl = document;
-        $('.tooltip, a', rootEl).each (function(idx,el) {
+        $('.tooltip, a, div', rootEl).each (function(idx,el) {
             var theme = $(el).attr('tooltipTheme');
             if (!theme) theme = 'mainTooltipTheme';
             /*if (el.id=='btnLoginLogout' && parseInt($.cookie('haveShownTutorial'))<3) {
@@ -2766,7 +2766,7 @@ na.site = {
             try {
                 var html = $(el).attr('title');
             } catch (error) {
-                var html = $(el).attr('title');
+                return;
             }
             var
             ptSettings = {

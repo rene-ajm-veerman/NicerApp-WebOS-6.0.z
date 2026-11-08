@@ -841,7 +841,7 @@ class class_naComments {
             //]);
 
             return
-            '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css">'
+            '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css?v=2026-11-08--17-59">'
             . $this->formatHeader($rootItemJSON)
             . '<div class="naComment_results">'
             . $this->formatResults($results, $post)
@@ -2255,7 +2255,7 @@ class class_naComments {
 
     /**
      * Build small thumbnail screenshots for URLs mentioned inside a comment.
-     * Each thumbnail links to the original URL; underneath it a lime "screenshot"
+     * Each thumbnail links to the original URL; underneath it a "screenshot"
      * link opens the full screenshot via the same /view/ + cmsViewMedia path
      * used for uploaded comment photos.
      */
@@ -2270,7 +2270,7 @@ class class_naComments {
             $uDB2 = $naWebOS->dbs->findConnection('couchdb'); // adjust as needed
             $screenshots = new naScreenshots($uDB2);
 
-            $html = '<div class="naComment_linkedScreenshots" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr 1fr; flex-wrap:wrap; gap:10px;">';
+            $html = '<div class="naComment_linkedScreenshots" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">';
             $count = 0;
 
             foreach ($urls as $url) {
@@ -2282,7 +2282,7 @@ class class_naComments {
                 $relPath = ltrim((string)($record['relativePath'] ?? ''), '/');
                 if ($relPath === '') continue;
 
-                $imgSrc = '/siteData/' . $naWebOS->domain.'/'.$relPath . '_thumb.png';
+                $imgSrc = '/siteData/' . $naWebOS->domain . '/' . $relPath . '_thumb.png';
 
                 // Build full-view payload the same way uploaded comment photos do
                 $codePath = trim(str_replace('\\', '/', dirname($relPath)), '/');
@@ -2300,21 +2300,20 @@ class class_naComments {
                 $viewHref = '/view/' . encode_base64_url(json_encode($viewPayload));
 
                 $html .=
-                '<div class="naComment_linkedScreenshotItem" style="display:flex; flex-direction:column; align-items:stretch;">' .
-                '<a href="' . htmlspecialchars($url) . '" target="_blank" class="nomod noPushState" ' .
-                'style="display:inline-block; width:100%; line-height:0;" title="' . htmlspecialchars($url) . '">' .
+                '<div class="naComment_linkedScreenshotItem" style="display:flex; flex-direction:column; align-items:center;">' .
+                '<div onclick="na.site.loadContent(\'' . htmlspecialchars($url) . '\');" target="_blank" class="nomod noPushState" ' .
+                'style="display:inline-block; height:auto;" title="' . htmlspecialchars($url) . '">' .
                 '<img src="' . htmlspecialchars($imgSrc) . '" ' .
                 'alt="Linked page screenshot" ' .
-                'style="width:100%; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:transform 0.15s;" ' .
-                'onmouseover="" ' .
-                'onmouseout="" />' .
-                '</a>' .
+                'style="max-width:100%; height:auto; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:transform 0.15s;" />' .
                 '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($viewHref) . '\');" ' .
                 'class="nomod naComment_screenshotFullLink" ' .
-                'style="color:lime; text-align:center; font-size:0.85em; margin-top:4px; text-decoration:underline; cursor:pointer;" ' .
+                'style="margin:20px;color:white; text-align:center; margin-top:4px; ' .
+                'text-decoration:underline; cursor:pointer; padding:2px 8px; border-radius:4px; display:inline-block;" ' .
                 'title="Open full screenshot">' .
                 'screenshot' .
                 '</a>' .
+                '</div>' .
                 '</div>';
 
                 $count++;
@@ -2327,6 +2326,7 @@ class class_naComments {
             return '';
         }
     }
+
 }
 function wav($cd) {
     if (array_key_exists('msgHTML',$cd['params']['v'])) {

@@ -88,7 +88,6 @@
 
  .naComment_pageScreenshot a {
     display: inline-block;
-    line-height: 0;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
@@ -120,9 +119,8 @@
 
  .naComment_linkedScreenshots a {
     display: inline-block;
-    line-height: 0;
     overflow: hidden;
-    transform: scale(0.567);
+    transform: scale(0.95);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.30);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     background: rgba(0, 0, 0, 0.4);
@@ -130,7 +128,7 @@
  }
 
  .naComment_linkedScreenshots a:hover {
-    transform: scale(0.95);
+    transform: scale(1.05);
     box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
     z-index: 5;
  }
@@ -144,7 +142,8 @@
  /* Make sure thumbnails start semi-transparent and become fully opaque on hover */
  .naComment_linkedScreenshots a,
 .naComment_pageScreenshot a {
-   opacity: 0.456;
+    z-index : 9999555;
+    opacity: 0.456;
    border : 1px solid grey;
    border-radius : 30px;
    background : rgba(0,0,0,0.4);
