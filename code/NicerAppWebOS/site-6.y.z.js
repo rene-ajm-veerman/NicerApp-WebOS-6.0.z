@@ -207,7 +207,7 @@ na.site = {
         ) {
             clearTimeout (na.site.settings.timeoutRevertStatusbarMsg);
             na.site.settings.timeoutRevertStatusbarMsg = setTimeout (function (showMilliseconds) {
-                na.d.s.visibleDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
+                na.d.s.visibleDivs = na.desktop.globals.originalDivs = arrayRemove (na.d.s.visibleDivs,'#siteStatusbar');
                 $(window).trigger('resize');
             }, showMilliseconds);
         }
