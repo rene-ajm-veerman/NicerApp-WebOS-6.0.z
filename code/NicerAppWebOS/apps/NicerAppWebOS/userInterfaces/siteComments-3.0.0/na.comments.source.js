@@ -221,28 +221,46 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
         var $target = $('#naComment_' + id);
         if ($target.length === 0) return;
 
-        // The scrollable container inside the comments dialog
+        // -------------------------------------------------
+        // 1. Kill native browser hash scrolling immediately
+        // -------------------------------------------------
+        // These three lines are the most important part of the fix
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+
+        // Extra safety for some browsers / WebKit
+        if (document.body.style) {
+            document.body.style.scrollBehavior = 'auto';
+            document.documentElement.style.scrollBehavior = 'auto';
+        }
+
+        // -------------------------------------------------
+        // 2. The scrollable container inside the comments dialog
+        // -------------------------------------------------
         var $container = $('#siteComments .vividDialogContent');
         if ($container.length === 0) {
             $container = $('#siteComments');
         }
         if ($container.length === 0) return;
 
-        // Highlight the target comment briefly
+        // Highlight briefly
         $('.naComment_highlighted').removeClass('naComment_highlighted');
         $target.addClass('naComment_highlighted');
         setTimeout(function () {
             $target.removeClass('naComment_highlighted');
         }, 2200);
 
-        // ---------- jQuery.scrollTo ----------
+        // -------------------------------------------------
+        // 3. Custom scroll (keep your existing settings)
+        // -------------------------------------------------
         $container.scrollTo($target, {
             duration : 500,
             easing   : 'swing',
-            offset   : { top : -30, left : 0 },   // 30px breathing room above the comment
+            offset   : { top : -30, left : 0 },
             axis     : 'y',
             onAfter  : function () {
-                // optional: anything you want after the scroll finishes
+                // optional
             }
         });
     },
