@@ -2118,7 +2118,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                                           doCountDown = true;
                                                       }
                                                   });
-                                                  if (doCountDown || true) {
+                                                  if (doCountDown || true) { // obsoleted 'if'
                                                       $('.newsApp__header__countDownStr').animate({opacity:1});
                                                       na1.countDown();
                                                       //na1.loadNews_read_loop();
