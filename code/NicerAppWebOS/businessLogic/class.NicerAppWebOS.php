@@ -909,12 +909,20 @@ class NicerAppWebOS {
             try {
                 $call = $cdb->find ($findCommand);
             } catch (Exception $e) {
-                $msg = $fncn.' FAILED while trying to find in \''.$dataSetName.'\' : '.$e->getMessage();
-                global $naLAN;
-                if ($naLAN) $msg .= ' : <pre>'.json_encode(debug_backtrace(),JSON_PRETTY_PRINT).'</pre>';
-                echo $msg;
-                trigger_error ($msg, E_USER_WARNING);
-                return false;
+                if (stripos($e->getMessage(), 'unauthorized') === false) {
+                    $msg = $fncn.' FAILED while trying to find in \''.$dataSetName.'\' : '.$e->getMessage();
+                    global $naLAN;
+                    if ($naLAN) $msg .= ' : <pre>'.json_encode(debug_backtrace(),JSON_PRETTY_PRINT).'</pre>';
+                    echo $msg;
+                    trigger_error ($msg, E_USER_WARNING);
+                    throw $e;
+                    return false;
+                } else {
+                    cdb_login ($db, $cdb, $this->domainFolderForDB.'___Guest', 'Guest');
+                    $db = $naWebOS->dbs->findConnection('couchdb');
+                    $cdb = $db->cdb;
+                    $call = $cdb->find ($findCommand);
+                };
             }
 
             //echo '<pre style="color:blue;background:rgba(255,255,255,0.7);border-radius:20px;">'; var_dump ($dataSetName); var_dump ($findCommand); var_dump ($call);var_dump (count($call->body->docs));//exit();

@@ -145,6 +145,8 @@ na.desktop = na.d = {
         na.site.settings.zingtouch.bind ($('#siteContent')[0], 'distance', na.desktop.gestureChange);
         */
 
+        // enable border/corner resizing for all vivid dialogs
+        na.desktop.enableDialogResize('.vividDialog');
     },
 
     reloadMenu : function () {
@@ -1344,6 +1346,189 @@ na.desktop.toggleYoutubeContentManager = function () {
     }
     na.desktop.resize();
 };
+
+/* ------------------------------------------------------------------
+ *  Resize handles for .vividDialog
+ *  – mouse + touch
+ *  – blue-lime on hover, bright red while dragging
+ * ------------------------------------------------------------------ */
+na.desktop.enableDialogResize = function (selector = '.vividDialog') {
+
+    const HANDLE_SIZE = 8;          // px
+    const MIN_W = 180;
+    const MIN_H = 120;
+
+    // CSS (injected once)
+    if (!document.getElementById('na-dialog-resize-css')) {
+        const style = document.createElement('style');
+        style.id = 'na-dialog-resize-css';
+        style.textContent = `
+        .vividDialog {
+            position: absolute;
+            box-sizing: border-box;
+            transition: box-shadow 0.15s ease, outline 0.15s ease;
+        }
+
+        /* default (subtle) */
+        .vividDialog:not(.na-resizing) {
+            outline: 1px solid transparent;
+        }
+
+        /* HOVER – blue-lime */
+        .vividDialog:hover:not(.na-resizing) {
+            outline: 2px solid #7CFC00;               /* lime */
+            box-shadow: 0 0 12px 2px rgba(0, 255, 180, 0.55);
+        }
+
+        /* ACTIVE RESIZE – bright red */
+        .vividDialog.na-resizing {
+            outline: 2px solid #FF1744 !important;
+            box-shadow: 0 0 18px 4px rgba(255, 23, 68, 0.75) !important;
+        }
+
+        /* the eight handles */
+        .na-resize-handle {
+            position: absolute;
+            z-index: 99999;
+            background: transparent;
+            transition: background 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        /* hover on a specific handle also lights it up */
+        .na-resize-handle:hover {
+            background: rgba(124, 252, 0, 0.35);
+            box-shadow: 0 0 8px 2px rgba(0, 255, 180, 0.6);
+        }
+        .vividDialog.na-resizing .na-resize-handle {
+            background: rgba(255, 23, 68, 0.45);
+            box-shadow: 0 0 10px 3px rgba(255, 23, 68, 0.7);
+        }
+
+        /* positions */
+        .na-resize-n  { top: -${HANDLE_SIZE/2}px; left: ${HANDLE_SIZE}px; right: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: n-resize; }
+        .na-resize-s  { bottom: -${HANDLE_SIZE/2}px; left: ${HANDLE_SIZE}px; right: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: s-resize; }
+        .na-resize-e  { top: ${HANDLE_SIZE}px; bottom: ${HANDLE_SIZE}px; right: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; cursor: e-resize; }
+        .na-resize-w  { top: ${HANDLE_SIZE}px; bottom: ${HANDLE_SIZE}px; left: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; cursor: w-resize; }
+        .na-resize-ne { top: -${HANDLE_SIZE/2}px; right: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: ne-resize; }
+        .na-resize-nw { top: -${HANDLE_SIZE/2}px; left: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: nw-resize; }
+        .na-resize-se { bottom: -${HANDLE_SIZE/2}px; right: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: se-resize; }
+        .na-resize-sw { bottom: -${HANDLE_SIZE/2}px; left: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: sw-resize; }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Create the eight handles for one dialog
+    function addHandles(el) {
+        if (el.dataset.naResizeReady) return;
+        el.dataset.naResizeReady = '1';
+
+        const dirs = ['n','s','e','w','ne','nw','se','sw'];
+        dirs.forEach(dir => {
+            const h = document.createElement('div');
+            h.className = `na-resize-handle na-resize-${dir}`;
+            h.dataset.dir = dir;
+            el.appendChild(h);
+        });
+    }
+
+    function scan() {
+        document.querySelectorAll(selector).forEach(addHandles);
+    }
+    scan();
+
+    const obs = new MutationObserver(scan);
+    obs.observe(document.body, { childList: true, subtree: true });
+
+    // ---- interaction ----
+    let active = null;
+
+    function onPointerDown(e) {
+        const handle = e.target.closest('.na-resize-handle');
+        if (!handle) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const el = handle.closest(selector);
+        if (!el) return;
+
+        const rect = el.getBoundingClientRect();
+        active = {
+            el,
+            dir: handle.dataset.dir,
+            startX: e.clientX ?? e.touches?.[0]?.clientX,
+            startY: e.clientY ?? e.touches?.[0]?.clientY,
+            startRect: {
+                left:   rect.left,
+                top:    rect.top,
+                width:  rect.width,
+                height: rect.height
+            }
+        };
+
+        el.classList.add('na-resizing');          // ← bright red
+
+        document.addEventListener('pointermove', onPointerMove, { passive: false });
+        document.addEventListener('pointerup',   onPointerUp);
+        document.addEventListener('touchmove',   onPointerMove, { passive: false });
+        document.addEventListener('touchend',    onPointerUp);
+    }
+
+    function onPointerMove(e) {
+        if (!active) return;
+        e.preventDefault();
+
+        const x = e.clientX ?? e.touches?.[0]?.clientX;
+        const y = e.clientY ?? e.touches?.[0]?.clientY;
+        const dx = x - active.startX;
+        const dy = y - active.startY;
+        const r  = active.startRect;
+        const dir = active.dir;
+
+        let left   = r.left;
+        let top    = r.top;
+        let width  = r.width;
+        let height = r.height;
+
+        if (dir.includes('e')) width  = Math.max(MIN_W, r.width  + dx);
+        if (dir.includes('s')) height = Math.max(MIN_H, r.height + dy);
+        if (dir.includes('w')) {
+            width  = Math.max(MIN_W, r.width  - dx);
+            left   = r.left + (r.width - width);
+        }
+        if (dir.includes('n')) {
+            height = Math.max(MIN_H, r.height - dy);
+            top    = r.top  + (r.height - height);
+        }
+
+        Object.assign(active.el.style, {
+            left:   left   + 'px',
+            top:    top    + 'px',
+            width:  width  + 'px',
+            height: height + 'px'
+        });
+
+        active.el.dispatchEvent(new CustomEvent('na-dialog-resized', {
+            detail: { left, top, width, height }
+        }));
+        na.desktop.resize();
+    }
+
+    function onPointerUp() {
+        if (active) {
+            active.el.classList.remove('na-resizing');   // ← back to normal
+        }
+        active = null;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup',   onPointerUp);
+        document.removeEventListener('touchmove',   onPointerMove);
+        document.removeEventListener('touchend',    onPointerUp);
+    }
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('touchstart',  onPointerDown, { passive: false });
+};
+
 
 
 na.d.s = na.d.settings;

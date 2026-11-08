@@ -1171,7 +1171,7 @@ class class_naComments {
         $html .= "\t\t".'<span class="naComment_clientDatetime">'.($it['clientDatetime'] ?? '').'</span>'.PHP_EOL;
         $html .= "\t\t".'<span class="naComment_clientTZoffset">'.($it['clientTZoffset'] ?? 0).'</span>'.PHP_EOL;
         if (array_key_exists('clientUsername', $it)) {
-            $html .= "\t\t".'<span class="naComment_clientUsername">'.$it['clientUsername'].'</span>'.PHP_EOL;
+            $html .= "\t\t".'<span class="naComment_clientUsername">'.na_plainUsername_from_couchdbUsername($it['clientUsername']).'</span>'.PHP_EOL;
         }
         $html .= "\t".'</div>'.PHP_EOL;
 
@@ -1181,7 +1181,7 @@ class class_naComments {
             && is_string($it['clientUsername'])
             && trim($it['clientUsername'])!==''
         ) {
-            $u = $it['clientUsername'];
+            $u = na_plainUsername_from_couchdbUsername($it['clientUsername']);
         } else {
             $u = 'Guest';
         }
