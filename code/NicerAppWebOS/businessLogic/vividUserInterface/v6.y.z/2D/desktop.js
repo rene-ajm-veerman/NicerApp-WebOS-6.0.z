@@ -873,7 +873,7 @@ na.desktop = na.d = {
 
         //debugger;
         if (allCompleted) {
-            $('#siteContent .vividDialogContent').show();//fadeIn('normal');
+            $('#siteContent .vividDialogContent').fadeIn('normal');
             if (typeof callbackFunction=='function') callbackFunction();
 
             // inside na.desktop.resize_do (or after the sizes are applied)
@@ -1347,18 +1347,18 @@ na.desktop.toggleYoutubeContentManager = function () {
     na.desktop.resize();
 };
 
+
+
 /* ------------------------------------------------------------------
  *  Resize handles for .vividDialog
- *  – mouse + touch
+ *  – respects the element's own min/max width/height
  *  – blue-lime on hover, bright red while dragging
  * ------------------------------------------------------------------ */
 na.desktop.enableDialogResize = function (selector = '.vividDialog') {
 
-    const HANDLE_SIZE = 8;          // px
-    const MIN_W = 180;
-    const MIN_H = 120;
+    const HANDLE_SIZE = 8;   // px
 
-    // CSS (injected once)
+    // ---------- CSS (same as before) ----------
     if (!document.getElementById('na-dialog-resize-css')) {
         const style = document.createElement('style');
         style.id = 'na-dialog-resize-css';
@@ -1368,33 +1368,23 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
             box-sizing: border-box;
             transition: box-shadow 0.15s ease, outline 0.15s ease;
         }
-
-        /* default (subtle) */
         .vividDialog:not(.na-resizing) {
             outline: 1px solid transparent;
         }
-
-        /* HOVER – blue-lime */
         .vividDialog:hover:not(.na-resizing) {
-            outline: 2px solid #7CFC00;               /* lime */
+            outline: 2px solid #7CFC00;
             box-shadow: 0 0 12px 2px rgba(0, 255, 180, 0.55);
         }
-
-        /* ACTIVE RESIZE – bright red */
         .vividDialog.na-resizing {
             outline: 2px solid #FF1744 !important;
             box-shadow: 0 0 18px 4px rgba(255, 23, 68, 0.75) !important;
         }
-
-        /* the eight handles */
         .na-resize-handle {
             position: absolute;
             z-index: 99999;
             background: transparent;
             transition: background 0.12s ease, box-shadow 0.12s ease;
         }
-
-        /* hover on a specific handle also lights it up */
         .na-resize-handle:hover {
             background: rgba(124, 252, 0, 0.35);
             box-shadow: 0 0 8px 2px rgba(0, 255, 180, 0.6);
@@ -1403,8 +1393,6 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
             background: rgba(255, 23, 68, 0.45);
             box-shadow: 0 0 10px 3px rgba(255, 23, 68, 0.7);
         }
-
-        /* positions */
         .na-resize-n  { top: -${HANDLE_SIZE/2}px; left: ${HANDLE_SIZE}px; right: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: n-resize; }
         .na-resize-s  { bottom: -${HANDLE_SIZE/2}px; left: ${HANDLE_SIZE}px; right: ${HANDLE_SIZE}px; height: ${HANDLE_SIZE}px; cursor: s-resize; }
         .na-resize-e  { top: ${HANDLE_SIZE}px; bottom: ${HANDLE_SIZE}px; right: -${HANDLE_SIZE/2}px; width: ${HANDLE_SIZE}px; cursor: e-resize; }
@@ -1417,13 +1405,45 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
         document.head.appendChild(style);
     }
 
-    // Create the eight handles for one dialog
+    // ---------- helpers ----------
+    function parseSize(value, fallback) {
+        if (value === undefined || value === null || value === '' || value === 'none' || value === 'auto') {
+            return fallback;
+        }
+        const n = parseFloat(value);
+        return isNaN(n) ? fallback : n;
+    }
+
+    function getConstraints(el) {
+        const cs = getComputedStyle(el);
+
+        // Prefer data-* attributes if present, otherwise CSS, otherwise sensible defaults
+        const minW = parseSize(
+            el.dataset.minWidth  || el.dataset.minwidth  || cs.minWidth,
+            180
+        );
+        const minH = parseSize(
+            el.dataset.minHeight || el.dataset.minheight || cs.minHeight,
+            120
+        );
+        const maxW = parseSize(
+            el.dataset.maxWidth  || el.dataset.maxwidth  || cs.maxWidth,
+            Infinity
+        );
+        const maxH = parseSize(
+            el.dataset.maxHeight || el.dataset.maxheight || cs.maxHeight,
+            Infinity
+        );
+
+        return { minW, minH, maxW, maxH };
+    }
+
+    // ---------- create handles ----------
     function addHandles(el) {
         if (el.dataset.naResizeReady) return;
         el.dataset.naResizeReady = '1';
 
-        const dirs = ['n','s','e','w','ne','nw','se','sw'];
-        dirs.forEach(dir => {
+        ['n','s','e','w','ne','nw','se','sw'].forEach(dir => {
             const h = document.createElement('div');
             h.className = `na-resize-handle na-resize-${dir}`;
             h.dataset.dir = dir;
@@ -1435,11 +1455,9 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
         document.querySelectorAll(selector).forEach(addHandles);
     }
     scan();
+    new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
 
-    const obs = new MutationObserver(scan);
-    obs.observe(document.body, { childList: true, subtree: true });
-
-    // ---- interaction ----
+    // ---------- interaction ----------
     let active = null;
 
     function onPointerDown(e) {
@@ -1463,10 +1481,11 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
                 top:    rect.top,
                 width:  rect.width,
                 height: rect.height
-            }
+            },
+            constraints: getConstraints(el)
         };
 
-        el.classList.add('na-resizing');          // ← bright red
+        el.classList.add('na-resizing');
 
         document.addEventListener('pointermove', onPointerMove, { passive: false });
         document.addEventListener('pointerup',   onPointerUp);
@@ -1478,49 +1497,61 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
         if (!active) return;
         e.preventDefault();
 
-        const x = e.clientX ?? e.touches?.[0]?.clientX;
-        const y = e.clientY ?? e.touches?.[0]?.clientY;
+        const x  = e.clientX ?? e.touches?.[0]?.clientX;
+        const y  = e.clientY ?? e.touches?.[0]?.clientY;
         const dx = x - active.startX;
         const dy = y - active.startY;
         const r  = active.startRect;
         const dir = active.dir;
+        const { minW, minH, maxW, maxH } = active.constraints;
 
         let left   = r.left;
         let top    = r.top;
         let width  = r.width;
         let height = r.height;
 
-        if (dir.includes('e')) width  = Math.max(MIN_W, r.width  + dx);
-        if (dir.includes('s')) height = Math.max(MIN_H, r.height + dy);
-        if (dir.includes('w')) {
-            width  = Math.max(MIN_W, r.width  - dx);
-            left   = r.left + (r.width - width);
+        // horizontal
+        if (dir.includes('e')) {
+            width = Math.min(maxW, Math.max(minW, r.width + dx));
         }
-        if (dir.includes('n')) {
-            height = Math.max(MIN_H, r.height - dy);
-            top    = r.top  + (r.height - height);
+        if (dir.includes('w')) {
+            width = Math.min(maxW, Math.max(minW, r.width - dx));
+            left  = r.left + (r.width - width);
         }
 
+        // vertical
+        if (dir.includes('s')) {
+            height = Math.min(maxH, Math.max(minH, r.height + dy));
+        }
+        if (dir.includes('n')) {
+            height = Math.min(maxH, Math.max(minH, r.height - dy));
+            top    = r.top + (r.height - height);
+        }
+
+        // Apply – do NOT set minWidth/maxWidth to the current size
         Object.assign(active.el.style, {
             left:   left   + 'px',
             top:    top    + 'px',
-            minWidth:  width  + 'px',
-            minHeight: height + 'px',
             width:  width  + 'px',
-            height: height + 'px',
-            maxWidth:  width  + 'px',
-            maxHeight: height + 'px'
+            height: height + 'px'
         });
 
         active.el.dispatchEvent(new CustomEvent('na-dialog-resized', {
             detail: { left, top, width, height }
         }));
-        na.desktop.resize();
+
+        for (var appID in na.apps.loaded) {
+            var app = na.apps.loaded[appID];
+            if (typeof app.onresize=='function') app.onresize();
+        }
+
+        // optional – only if you really need the whole desktop to reflow while dragging
+        // na.desktop.resize();
     }
 
     function onPointerUp() {
         if (active) {
-            active.el.classList.remove('na-resizing');   // ← back to normal
+            active.el.classList.remove('na-resizing');
         }
         active = null;
         document.removeEventListener('pointermove', onPointerMove);
@@ -1532,7 +1563,6 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('touchstart',  onPointerDown, { passive: false });
 };
-
 
 
 na.d.s = na.d.settings;

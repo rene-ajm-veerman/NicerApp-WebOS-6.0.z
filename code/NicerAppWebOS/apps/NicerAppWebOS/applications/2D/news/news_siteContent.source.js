@@ -132,6 +132,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                         $(na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.loaderIcon).remove();
                     },
                     onresize : function (settings) {
+                        debugger;
                         // TODO : what's settings.isManualResize ???
                         //if ($('#appGame').css('display')=='none') $('#appGame').fadeIn('slow');
                         na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].onresize(settings);
