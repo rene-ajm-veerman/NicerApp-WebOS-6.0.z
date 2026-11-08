@@ -58,12 +58,27 @@ if (!na.photoAlbum) na.photoAlbum = {
         
         setTimeout(na.photoAlbum.updateZoom,200);
         na.m.hookScrollwheel ($('#viewMedia')[0], na.photoAlbum.mousewheel, false, true);
-        document.onmousedown = na.photoAlbum.startDrag;
-        document.onmouseup = na.photoAlbum.stopDrag;
+
+        // ------------------------------------------------------------------
+        // inside na.photoAlbum.onload  – replace the two document.on* lines
+        // ------------------------------------------------------------------
+        na.m.hookScrollwheel ($('#viewMedia')[0], na.photoAlbum.mousewheel, false, true);
+
+        // mouse
+        document.addEventListener('mousedown',  na.photoAlbum.startDrag, {passive:false});
+        document.addEventListener('mouseup',    na.photoAlbum.stopDrag);
+        document.addEventListener('mousemove',  na.photoAlbum.dragDiv,   {passive:false});
+
+        // touch
+        document.addEventListener('touchstart', na.photoAlbum.startDrag, {passive:false});
+        document.addEventListener('touchend',   na.photoAlbum.stopDrag);
+        document.addEventListener('touchcancel',na.photoAlbum.stopDrag);
+        document.addEventListener('touchmove',  na.photoAlbum.dragDiv,   {passive:false});
+
         if (!na.photoAlbum.settings.onresizeHooked) {
-            window.addEventListener ('resize', function () {
-                debugger;
-                setTimeout(na.photoAlbum.onload,500) });
+            window.addEventListener('resize', function () {
+                setTimeout(na.photoAlbum.onload, 500);
+            });
             na.photoAlbum.settings.onresizeHooked = true;
         }
 
@@ -72,56 +87,60 @@ if (!na.photoAlbum) na.photoAlbum = {
     onresize : function (evt) {
     },
     
-	startDrag : function (e) {
-        // determine event object
-        debugger;
-        if (!e) {
-            var e = window.event;
-        }
-        if(e.preventDefault) e.preventDefault();
+    // ------------------------------------------------------------------
+    // replace the three drag methods
+    // ------------------------------------------------------------------
+    startDrag : function (e) {
+        // normalize event (mouse or first touch)
+        if (!e) e = window.event;
+        var touch = e.touches && e.touches[0];
+        var clientX = touch ? touch.clientX : e.clientX;
+        var clientY = touch ? touch.clientY : e.clientY;
 
-        // IE uses srcElement, others use target
-        targ = e.target ? e.target : e.srcElement;
+        // only react when the photo itself is the target
+        var targ = e.target || e.srcElement;
+        if (targ.id !== 'viewMedia') return;
 
-        if (targ.id != 'viewMedia') {return};
-        // calculate event X, Y coordinates
-            na.photoAlbum.settings.offsetX = e.clientX;
-            na.photoAlbum.settings.offsetY = e.clientY;
+        if (e.preventDefault) e.preventDefault();   // stop page scroll / text selection
 
-        // calculate integer values for top and left 
-        // properties
-        na.photoAlbum.settings.coordX = $('#siteContent .vividDialogContent')[0].scrollLeft;
-        na.photoAlbum.settings.coordY = $('#siteContent .vividDialogContent')[0].scrollTop;
-        na.photoAlbum.settings.drag = true;
-        // move div element
-            document.onmousemove=na.photoAlbum.dragDiv;
-        return false;
-        
+        var s = na.photoAlbum.settings;
+        s.offsetX = clientX;
+        s.offsetY = clientY;
+        s.coordX  = $('#siteContent .vividDialogContent')[0].scrollLeft;
+        s.coordY  = $('#siteContent .vividDialogContent')[0].scrollTop;
+        s.drag    = true;
     },
+
     dragDiv : function (e) {
-        if (!na.photoAlbum.settings.drag) {return};
-        if (!e) { var e= window.event};
-        // var targ=e.target?e.target:e.srcElement;
-        // move div element
-        var deltaX = e.clientX - na.photoAlbum.settings.offsetX;
-        var deltaY = e.clientY - na.photoAlbum.settings.offsetY;
+        var s = na.photoAlbum.settings;
+        if (!s.drag) return;
 
-        // invert so the photo follows the drag direction
-        $('#siteContent .vividDialogContent')[0].scrollLeft = na.photoAlbum.settings.coordX - deltaX;
-        $('#siteContent .vividDialogContent')[0].scrollTop = na.photoAlbum.settings.coordY - deltaY;
+        if (!e) e = window.event;
+        var touch = e.touches && e.touches[0];
+        var clientX = touch ? touch.clientX : e.clientX;
+        var clientY = touch ? touch.clientY : e.clientY;
 
-        // inside dragDiv, after applying the scroll:
-        na.photoAlbum.settings.offsetX = e.clientX;
-        na.photoAlbum.settings.offsetY = e.clientY;
-        na.photoAlbum.settings.coordX  = $('#siteContent .vividDialogContent')[0].scrollLeft;
-        na.photoAlbum.settings.coordY  = $('#siteContent .vividDialogContent')[0].scrollTop;
+        if (e.preventDefault) e.preventDefault();
 
-        return false;
+        var deltaX = clientX - s.offsetX;
+        var deltaY = clientY - s.offsetY;
+
+        // invert so the photo follows the finger / mouse
+        var el = $('#siteContent .vividDialogContent')[0];
+        el.scrollLeft = s.coordX - deltaX;
+        el.scrollTop  = s.coordY - deltaY;
+
+        // keep reference point up-to-date (smooth continuous drag)
+        s.offsetX = clientX;
+        s.offsetY = clientY;
+        s.coordX  = el.scrollLeft;
+        s.coordY  = el.scrollTop;
     },
-	stopDrag : function () {
-        na.photoAlbum.settings.drag=false;
+
+    stopDrag : function () {
+        na.photoAlbum.settings.drag = false;
     },
-    
+
     mousewheel : function (evt) {
         var
         s = na.photoAlbum.settings,
