@@ -1504,8 +1504,12 @@ na.desktop.enableDialogResize = function (selector = '.vividDialog') {
         Object.assign(active.el.style, {
             left:   left   + 'px',
             top:    top    + 'px',
+            minWidth:  width  + 'px',
+            minHeight: height + 'px',
             width:  width  + 'px',
-            height: height + 'px'
+            height: height + 'px',
+            maxWidth:  width  + 'px',
+            maxHeight: height + 'px'
         });
 
         active.el.dispatchEvent(new CustomEvent('na-dialog-resized', {
