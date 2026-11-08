@@ -92,34 +92,44 @@ na.backgrounds = na.background = na.bg = {
     // ------------------------------------------------------------------
     showBrowser : function () {
         const html = `
-        <div id="siteBackgrounds_tabs" style="padding:8px 12px 0; display:flex; gap:8px;">
+        <div id="siteBackgrounds_tabs" style="padding:8px 12px 0; display:flex; gap:8px; flex-shrink:0;">
         <button class="bgTab active" data-tab="images">Images</button>
         <button class="bgTab" data-tab="youtube">YouTube Videos</button>
         </div>
 
-        <div id="siteBackgrounds_tab_images" class="bgTabContent">
-        <div id="siteBackgrounds_leftPanel" class="siteBackgrounds_panel vividScrollpane">
-        <div id="siteBackgrounds_searchBox" style="padding:8px 12px 4px; position:sticky; top:0; background:inherit; z-index:2;">
-        <input type="search" id="siteBackgrounds_filter"
-        placeholder="Filter tags…"
-        style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #666; background:#222; color:#eee; font-size:14px;">
-        </div>
-        <div id="siteBackgrounds_tags"></div>
-        </div>
-        <div id="siteBackgrounds_rightPanel" class="siteBackgrounds_panel vividScrollpane"></div>
+        <div id="siteBackgrounds_tab_images" class="bgTabContent" style="flex:1; min-height:0; display:flex;"> … </div>
+
+        <div id="siteBackgrounds_tab_youtube" class="bgTabContent"
+        style="display:none; flex:1; min-height:0; flex-direction:column;">
+
+        <!-- this row must stay display:flex -->
+        <div style="padding:12px; display:flex; gap:8px; align-items:center; flex-shrink:0;">
+            <button id="ytSearchBtn" class="vividButton" style="display:block;position:relative;flex-shrink:0;">Search</button>
+            <input type="search" id="ytSearchInput" placeholder="Search YouTube or paste video URL / ID…" style="flex:1; min-width:180px; padding:8px 12px; border-radius:6px;border:1px solid #666; background:#222; color:#eee;">
         </div>
 
-        <div id="siteBackgrounds_tab_youtube" class="bgTabContent" style="display:none;">
-        <div style="padding:12px; display:flex; gap:8px; flex-wrap:wrap;">
-        <input type="search" id="ytSearchInput" placeholder="Search YouTube or paste video URL / ID…"
-        style="flex:1; min-width:220px; padding:8px 12px; border-radius:6px; border:1px solid #666; background:#222; color:#eee;">
-        <button id="ytSearchBtn" class="vividButton">Search</button>
-        </div>
-        <div id="ytResults" class="vividScrollpane" style="padding:8px; height:calc(100% - 70px); overflow:auto;"></div>
+        <div id="ytResults" class="vividScrollpane"
+        style="padding:8px; flex:1; min-height:0; overflow:auto;"></div>
         </div>
         `;
 
-        $('#siteBackgrounds_content').html(html);
+        $('#siteBackgrounds_content').css({
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: 0
+        })
+        .html(html);
+
+        $('#siteBackgrounds').css({
+            position : 'absolute',
+            top : '4%',
+            left : '4%',
+            width : '92%',
+            height : 'calc(96% - 100px)',
+                                  display : 'flex',          // if it isn’t already
+                                  flexDirection : 'column'
+        }).fadeIn('normal');
 
         // basic tab switching
         $('#siteBackgrounds_tabs .bgTab').on('click', function () {

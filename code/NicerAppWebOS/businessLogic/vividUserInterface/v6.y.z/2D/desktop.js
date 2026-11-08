@@ -871,7 +871,6 @@ na.desktop = na.d = {
             },
         50);
 
-        //debugger;
         if (allCompleted) {
             $('#siteContent .vividDialogContent').fadeIn('normal');
             if (typeof callbackFunction=='function') callbackFunction();
@@ -884,6 +883,7 @@ na.desktop = na.d = {
                 var app = na.apps.loaded[appID];
                 if (typeof app.onresize=='function') app.onresize();
             }
+            na.photoAlbum.updateZoom();
 
             // and any other canvases you create later
             na.d.s.masterCallbacks = [];

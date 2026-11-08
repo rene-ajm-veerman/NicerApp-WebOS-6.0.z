@@ -111,94 +111,126 @@ if (!na.photoAlbum) na.photoAlbum = {
     },
     
     mousewheel : function (evt) {
-        var 
+        var
         s = na.photoAlbum.settings,
         rolled = 0,
-        direction = 1;
-        
+        direction = 1,
+        container = $('#siteContent .vividDialogContent')[0],
+        img = $('#viewMedia')[0];
+
         if ('wheelDelta' in evt) {
-            rolled = event.wheelDelta;
+            rolled = evt.wheelDelta;
         } else {
             rolled = -1 * evt.detail;
-        };
+        }
         rolled = (na.m.userDevice.isInvertedMousewheel ? 1 : -1) * rolled;
-        if (rolled<0) direction = -1;
+        if (rolled < 0) direction = -1;
         direction = -1 * direction;
-        //
-        
-        //rolled = rolled * 0.57;
 
-        if (s.zoomPercentage) s.zoomPercentage = s.zoomPercentage + ( direction * ((s.zoomPercentage/100)*3) );
-        if (s.zoomPercentage<s.minZoom) s.zoomPercentage=s.minZoom;
+        // --- mouse position relative to the scrollable container ---
+        var rect = container.getBoundingClientRect();
+        var mouseX = evt.clientX - rect.left;   // viewport → container
+        var mouseY = evt.clientY - rect.top;
+
+        // content-space coordinates under the mouse *before* the zoom
+        var contentX = container.scrollLeft + mouseX;
+        var contentY = container.scrollTop  + mouseY;
+
+        // remember old size so we can compute the scale factor
+        var oldW = img.offsetWidth  || s.tw;
+        var oldH = img.offsetHeight || s.th;
+
+        // apply the percentage change (same formula you already had)
+        if (s.zoomPercentage) {
+            s.zoomPercentage = s.zoomPercentage + (direction * ((s.zoomPercentage / 100) * 3));
+        }
+        if (s.zoomPercentage < s.minZoom) s.zoomPercentage = s.minZoom;
+
+        // update the image size / position
+        na.photoAlbum.updateZoom();
+
+        // new size after updateZoom
+        var newW = img.offsetWidth  || s.tw;
+        var newH = img.offsetHeight || s.th;
+
+        // how much the content grew (or shrank)
+        var scaleX = newW / oldW;
+        var scaleY = newH / oldH;
+
+        // the same content point should stay under the mouse
+        var newContentX = contentX * scaleX;
+        var newContentY = contentY * scaleY;
+
+        container.scrollLeft = newContentX - mouseX;
+        container.scrollTop  = newContentY - mouseY;
+    },
+
+    onresize : function (settings) {
         na.photoAlbum.updateZoom();
     },
-    
-    
+
     updateZoom : function () {
         var
         jQueryImg = $('#viewMedia'),
         s = na.photoAlbum.settings,
         w = jQueryImg[0].naturalWidth,
         h = jQueryImg[0].naturalHeight,
-        iframeWidth = $('#siteContent .vividDialogContent').width(),
+        iframeWidth  = $('#siteContent .vividDialogContent').width(),
         iframeHeight = $('#siteContent .vividDialogContent').height(),
-        imgpw = Math.floor((iframeWidth*100)/w),
-        imgph = Math.floor((iframeHeight*100)/h),
+        imgpw = Math.floor((iframeWidth  * 100) / w),
+        imgph = Math.floor((iframeHeight * 100) / h),
         th = false,
         tw = false;
-        if (imgph>imgpw) {
-            if (h>iframeHeight) {
-                th = ((h)/100) * s.zoomPercentage;
-                tw = jQueryImg.css({width:'',left:0,height:th}).delay(50).width();
-            } else if (w>iframeWidth) {
-                tw = ((w)/100) * s.zoomPercentage;
-                th = jQueryImg.css({top:0,width:tw,height:''}).delay(50).height();
-            } else if (w>h) {
-                tw = ((w)/100) * s.zoomPercentage;
-                th = jQueryImg.css({top:0,width:tw,height:''}).delay(50).height();
+
+        if (imgph > imgpw) {
+            if (h > iframeHeight) {
+                th = (h / 100) * s.zoomPercentage;
+                tw = jQueryImg.css({width:'', left:0, height:th}).delay(50).width();
+            } else if (w > iframeWidth) {
+                tw = (w / 100) * s.zoomPercentage;
+                th = jQueryImg.css({top:0, width:tw, height:''}).delay(50).height();
+            } else if (w > h) {
+                tw = (w / 100) * s.zoomPercentage;
+                th = jQueryImg.css({top:0, width:tw, height:''}).delay(50).height();
             } else {
-                th = ((h)/100) * s.zoomPercentage;
-                tw = jQueryImg.css({width:'',left:0,height:th}).delay(50).width();
+                th = (h / 100) * s.zoomPercentage;
+                tw = jQueryImg.css({width:'', left:0, height:th}).delay(50).width();
             }
         } else {
-            if (w>iframeWidth) {
-                tw = ((w)/100) * s.zoomPercentage;
-                th = jQueryImg.css({top:0,width:tw,height:''}).delay(50).height();
-            } else if (h>iframeHeight) {
-                th = ((h)/100) * s.zoomPercentage;
-                tw = jQueryImg.css({width:'',left:0,height:th}).delay(50).width();
-            } else if (w>h) {
-                tw = ((w)/100) * s.zoomPercentage;
-                th = jQueryImg.css({top:0,width:tw,height:''}).delay(50).height();
+            if (w > iframeWidth) {
+                tw = (w / 100) * s.zoomPercentage;
+                th = jQueryImg.css({top:0, width:tw, height:''}).delay(50).height();
+            } else if (h > iframeHeight) {
+                th = (h / 100) * s.zoomPercentage;
+                tw = jQueryImg.css({width:'', left:0, height:th}).delay(50).width();
+            } else if (w > h) {
+                tw = (w / 100) * s.zoomPercentage;
+                th = jQueryImg.css({top:0, width:tw, height:''}).delay(50).height();
             } else {
-                th = ((h)/100) * s.zoomPercentage;
-                tw = jQueryImg.css({width:'',left:0,height:th}).delay(50).width();
+                th = (h / 100) * s.zoomPercentage;
+                tw = jQueryImg.css({width:'', left:0, height:th}).delay(50).width();
             }
-        };
-        s.th = Math.round(th*1000)/1000;
-        s.tw = Math.round(tw*1000)/1000;
-        
+        }
+
+        s.th = Math.round(th * 1000) / 1000;
+        s.tw = Math.round(tw * 1000) / 1000;
+
+        // When the image is larger than the viewport we keep left/top at 0
+        // and let the container scroll.  When it is smaller we still centre it.
         var pos = {
-            left : ((iframeWidth-tw)/2),
-            top : ((iframeHeight-th)/2),
-            width : tw,
-            height : th
-        },
-        pos2 = {
-            left : pos.left<0 ? 0 : pos.left,
-            top : pos.top<0 ? 0 : pos.top,
-            width : tw,
+            left   : (tw > iframeWidth)  ? 0 : ((iframeWidth  - tw) / 2),
+            top    : (th > iframeHeight) ? 0 : ((iframeHeight - th) / 2),
+            width  : tw,
             height : th
         };
 
-        //setTimeout(function(pos2) {
-            jQueryImg.css (pos2);
-        //}, 100, pos2);
-        $('#naPhotoAlbum__control__naturalWidth').html ( 'Original\'s width : ' + s.naturalWidth);
-        $('#naPhotoAlbum__control__naturalHeight').html ( 'Original\'s height : ' + s.naturalHeight);
-        $('#naPhotoAlbum__control__width').html ( 'Width : ' + s.tw);
-        $('#naPhotoAlbum__control__height').html ( 'Height : ' + s.th);
-        $('#naPhotoAlbum__control__zoomPercentage').html ( 'Zoom : ' + Math.round(s.zoomPercentage*1000)/1000 + '%');
+        jQueryImg.css(pos);
+
+        $('#naPhotoAlbum__control__naturalWidth').html  ('Original\'s width : '  + s.naturalWidth);
+        $('#naPhotoAlbum__control__naturalHeight').html ('Original\'s height : ' + s.naturalHeight);
+        $('#naPhotoAlbum__control__width').html         ('Width : '  + s.tw);
+        $('#naPhotoAlbum__control__height').html        ('Height : ' + s.th);
+        $('#naPhotoAlbum__control__zoomPercentage').html('Zoom : '   + Math.round(s.zoomPercentage * 1000) / 1000 + '%');
     }
     
 };
