@@ -500,6 +500,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
         gotoNextPage : function () {
             var
             na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'], g = na1.globals, s = na1.settings, c = s.current, db = c.db;
+            debugger;
             s.gotoNextPage = true;
         },
 
@@ -1060,7 +1061,6 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
 
             s.unread = unread;
             s.displayCounts = '';
-            debugger;
             for (k in ks) {
                 if (s.displayCounts!=='') s.displayCounts +=', ';
                 s.displayCounts += dc[ks[k]];
@@ -1950,8 +1950,8 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
             na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'], g = na1.globals, s = na1.settings, c = s.current, db = c.db;
             s.dontHide = true;
             var el = $('#siteContent__btnOptions_menu');
-            var x = (parseInt($('#delayNewItemsMax').val()) - parseInt($('#delayNewItemsMin').val())) / 2
-            if (el.css('display')!='none') el.fadeIn(Math.round(x));
+            var x = (parseInt($('#delayNewItemsMax').val()) - parseInt($('#delayNewItemsMin').val())) / 2;
+            if (el.css('display')=='none') el.fadeIn(Math.round(x));
 
         },
 
