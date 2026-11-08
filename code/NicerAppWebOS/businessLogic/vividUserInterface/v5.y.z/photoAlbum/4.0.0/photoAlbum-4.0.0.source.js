@@ -60,20 +60,21 @@ if (!na.photoAlbum) na.photoAlbum = {
         na.m.hookScrollwheel ($('#viewMedia')[0], na.photoAlbum.mousewheel, false, true);
 
         // ------------------------------------------------------------------
-        // inside na.photoAlbum.onload  – replace the two document.on* lines
+        // inside na.photoAlbum.onload  – replace the event registration block
         // ------------------------------------------------------------------
-        na.m.hookScrollwheel ($('#viewMedia')[0], na.photoAlbum.mousewheel, false, true);
+        setTimeout(na.photoAlbum.updateZoom, 200);
+        na.m.hookScrollwheel($('#viewMedia')[0], na.photoAlbum.mousewheel, false, true);
 
         // mouse
-        document.addEventListener('mousedown',  na.photoAlbum.startDrag, {passive:false});
+        document.addEventListener('mousedown',  na.photoAlbum.startDrag, {passive: false});
         document.addEventListener('mouseup',    na.photoAlbum.stopDrag);
-        document.addEventListener('mousemove',  na.photoAlbum.dragDiv,   {passive:false});
+        document.addEventListener('mousemove',  na.photoAlbum.dragDiv,   {passive: false});
 
-        // touch
-        document.addEventListener('touchstart', na.photoAlbum.startDrag, {passive:false});
+        // touch (pan + pinch)
+        document.addEventListener('touchstart', na.photoAlbum.startDrag, {passive: false});
         document.addEventListener('touchend',   na.photoAlbum.stopDrag);
         document.addEventListener('touchcancel',na.photoAlbum.stopDrag);
-        document.addEventListener('touchmove',  na.photoAlbum.dragDiv,   {passive:false});
+        document.addEventListener('touchmove',  na.photoAlbum.dragDiv,   {passive: false});
 
         if (!na.photoAlbum.settings.onresizeHooked) {
             window.addEventListener('resize', function () {
@@ -88,59 +89,104 @@ if (!na.photoAlbum) na.photoAlbum = {
     },
     
     // ------------------------------------------------------------------
-    // replace the three drag methods
+    // replace startDrag / dragDiv / stopDrag and add a helper
     // ------------------------------------------------------------------
-    startDrag : function (e) {
-        // normalize event (mouse or first touch)
-        if (!e) e = window.event;
-        var touch = e.touches && e.touches[0];
-        var clientX = touch ? touch.clientX : e.clientX;
-        var clientY = touch ? touch.clientY : e.clientY;
 
-        // only react when the photo itself is the target
+    // helper: distance between two touch points
+    getPinchDistance : function (touches) {
+        var dx = touches[0].clientX - touches[1].clientX;
+        var dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    },
+
+    // helper: midpoint of two touch points
+    getPinchMidpoint : function (touches) {
+        return {
+            x: (touches[0].clientX + touches[1].clientX) / 2,
+            y: (touches[0].clientY + touches[1].clientY) / 2
+        };
+    },
+
+    startDrag : function (e) {
+        if (!e) e = window.event;
+
+        var s = na.photoAlbum.settings;
         var targ = e.target || e.srcElement;
         if (targ.id !== 'viewMedia') return;
 
-        if (e.preventDefault) e.preventDefault();   // stop page scroll / text selection
+        if (e.preventDefault) e.preventDefault();
 
-        var s = na.photoAlbum.settings;
-        s.offsetX = clientX;
-        s.offsetY = clientY;
-        s.coordX  = $('#siteContent .vividDialogContent')[0].scrollLeft;
-        s.coordY  = $('#siteContent .vividDialogContent')[0].scrollTop;
-        s.drag    = true;
+        // ---- two-finger pinch start ----
+        if (e.touches && e.touches.length === 2) {
+            s.isPinching   = true;
+            s.drag         = false;               // disable single-finger pan
+            s.pinchStartDist = na.photoAlbum.getPinchDistance(e.touches);
+            s.pinchStartZoom = s.zoomPercentage;
+            s.pinchMidpoint  = na.photoAlbum.getPinchMidpoint(e.touches);
+            return;
+        }
+
+        // ---- one-finger / mouse pan start ----
+        var touch   = e.touches && e.touches[0];
+        var clientX = touch ? touch.clientX : e.clientX;
+        var clientY = touch ? touch.clientY : e.clientY;
+
+        s.isPinching = false;
+        s.offsetX    = clientX;
+        s.offsetY    = clientY;
+        s.coordX     = $('#siteContent .vividDialogContent')[0].scrollLeft;
+        s.coordY     = $('#siteContent .vividDialogContent')[0].scrollTop;
+        s.drag       = true;
     },
 
     dragDiv : function (e) {
         var s = na.photoAlbum.settings;
+        if (!e) e = window.event;
+        if (e.preventDefault) e.preventDefault();
+
+        // ---- two-finger pinch zoom ----
+        if (s.isPinching && e.touches && e.touches.length === 2) {
+            var newDist   = na.photoAlbum.getPinchDistance(e.touches);
+            var scale     = newDist / s.pinchStartDist;
+            var newZoom   = s.pinchStartZoom * scale;
+
+            // respect minimum zoom
+            if (newZoom < s.minZoom) newZoom = s.minZoom;
+
+            // optional soft maximum (feel free to raise or remove)
+            if (newZoom > 800) newZoom = 800;
+
+            s.zoomPercentage = newZoom;
+            na.photoAlbum.updateZoom();
+            return;
+        }
+
+        // ---- one-finger / mouse pan ----
         if (!s.drag) return;
 
-        if (!e) e = window.event;
-        var touch = e.touches && e.touches[0];
+        var touch   = e.touches && e.touches[0];
         var clientX = touch ? touch.clientX : e.clientX;
         var clientY = touch ? touch.clientY : e.clientY;
-
-        if (e.preventDefault) e.preventDefault();
 
         var deltaX = clientX - s.offsetX;
         var deltaY = clientY - s.offsetY;
 
-        // invert so the photo follows the finger / mouse
         var el = $('#siteContent .vividDialogContent')[0];
-        el.scrollLeft = s.coordX - deltaX;
+        el.scrollLeft = s.coordX - deltaX;   // inverted so photo follows finger
         el.scrollTop  = s.coordY - deltaY;
 
-        // keep reference point up-to-date (smooth continuous drag)
+        // keep reference point current for smooth continuous drag
         s.offsetX = clientX;
         s.offsetY = clientY;
         s.coordX  = el.scrollLeft;
         s.coordY  = el.scrollTop;
     },
 
-    stopDrag : function () {
-        na.photoAlbum.settings.drag = false;
+    stopDrag : function (e) {
+        var s = na.photoAlbum.settings;
+        s.drag       = false;
+        s.isPinching = false;
     },
-
     mousewheel : function (evt) {
         var
         s = na.photoAlbum.settings,
