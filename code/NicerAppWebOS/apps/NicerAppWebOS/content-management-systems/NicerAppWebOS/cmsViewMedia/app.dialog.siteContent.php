@@ -96,7 +96,7 @@ $dbg = array (
 );
 //echo '<pre>t2:'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>'; //exit();
 
-$files = getFilePathList ($baseDir.'/'.$targetURL, false, FILE_FORMATS_photos, null, array('file'), 1, 1, false);
+$files = getFilePathList (str_replace('//','/',$baseDir.'/'.$targetURL), false, FILE_FORMATS_photos, null, array('file'), 1, 1, false);
 usort($files, function($a, $b) {
     return strcmp($a['webPath'], $b['webPath']);
 });

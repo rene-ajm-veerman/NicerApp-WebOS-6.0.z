@@ -96,6 +96,8 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
 
                 na.comments.onload(function () {
                     na.site.startUIvisuals();
+                    debugger;
+                    na.site.startTooltips();
                     setTimeout(na.comments.scrollToHash, 150);
                 });
             },

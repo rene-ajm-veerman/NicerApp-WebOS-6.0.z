@@ -11,7 +11,7 @@ class class_naComments {
             'btnEditComment'    => 'btnCssVividButton.redStone.png',
             'btnHistory'    => 'btnCssVividButton.redStone.png',
             'btnHideComment'    => 'btnCssVividButton.redStone.png'
-         ],
+        ],
         'DutchCulture' => [
             'btnMainCommentAdd' => 'btnCssVividButton.orange1c.png',
             'btnDeleteComment' => 'btnCssVividButton.yellow1a.png',
@@ -660,193 +660,193 @@ class class_naComments {
             //echo $json; exit;
             if (is_null($rootItemJSON)) $rootItemJSON = $json;//str_replace('\/','/',substr($json,1  ,strlen($json)-2));
         };
-        $rootItemJSON = preg_replacE('/#.*"/','"',$rootItemJSON);
-        $rootItemJSON = str_replace('\\/', '/', $rootItemJSON);
+            $rootItemJSON = preg_replacE('/#.*"/','"',$rootItemJSON);
+            $rootItemJSON = str_replace('\\/', '/', $rootItemJSON);
 
 
 
-        // -------------------------------------------------
-        // 1. Extract the main page URL
-        // -------------------------------------------------
-        $pageUrl = '';
-        if ($rootItemJSON) {
-            $root = is_string($rootItemJSON) ? json_decode($rootItemJSON, true) : $rootItemJSON;
-            $pageUrl = is_array($root) ? ($root['url'] ?? '') : '';
-        }
-
-        // -------------------------------------------------
-        // 2. Prepare screenshots manager
-        // -------------------------------------------------
-        require_once dirname(__FILE__, 5) . '/boot.php';
-        require_once dirname(__FILE__, 5) . '/businessLogic/class.screenshots.php';
-        global $naWebOS;
-        $uDB2 = $naWebOS->dbsAdmin->findConnection('couchdb');
-        $screenshots = new naScreenshots($uDB2);
-
-        // Enqueue the main page
-        /*
-        if ($pageUrl) {
-            $screenshots->enqueue($pageUrl, [
-                'retain'   => 86400 * 7,
-                'priority' => 10
-            ]);
-        }*/
-
-        // -------------------------------------------------
-        // 3. Ensure we have a screenshot for the main page
-        // -------------------------------------------------
-        $retainSeconds = 86400 * 7; // keep screenshots for 7 days (adjust as you like)
-
-        /*
-        if ($pageUrl) {
-            // This will return the existing ready one if still fresh,
-            // otherwise it enqueues a new job
-            $screenshots->enqueue($pageUrl, [
-                'retain'   => $retainSeconds,
-                'priority' => 10,          // high priority for the current page
-                'meta'     => ['source' => 'comments-header']
-            ]);
-        }*/
-
-        // -------------------------------------------------
-        // 4. Optionally process a few jobs right now
-        //    (so the user often sees the new screenshot after a refresh)
-        // -------------------------------------------------
-        // Keep this number low so the page stays fast
-        /*
-        $screenshots->processQueue([
-            'maxJobs'      => 2,           // process max 2 jobs in this request
-            'sleepSeconds' => 0,
-            'verbose'      => false,
-            'releaseStale' => true
-        ]);
-        */
-
-        // -------------------------------------------------
-        // 5. Continue with the normal comments rendering
-        // -------------------------------------------------
-        // ... your existing CouchDB query code for comments stays the same ...
-
-
-
-        global $naWebOS;
-        $db = $naWebOS->dbsAdmin->findConnection('couchdb');
-        $cdb = $db->cdb;
-        $in = &$_GET;
-        $fields = [
-            '_id', 'parentID', 'datetimeStr',
-            'clientDatetime', 'clientTZoffset', 'clientIP', 'clientUsername',
-            'editedDatetime', 'editedDatetimeStr', 'editedTZoffset',
-            'msgHTML', 'hidden', 'attachments'
-        ];
-
-        $dbName = $db->dataSetName('cms_comments');
-        try {
-            $cdb->setDatabase($dbName, true);
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-
-        // ── date range from the datepicker buttons ─────────────────────
-        $dateFrom = null;
-        $dateTo   = null;
-        if (is_array($post)) {
-            if (isset($post['dateFrom']) && $post['dateFrom'] !== '' && $post['dateFrom'] !== null) {
-                $dateFrom = (int)$post['dateFrom'];
+            // -------------------------------------------------
+            // 1. Extract the main page URL
+            // -------------------------------------------------
+            $pageUrl = '';
+            if ($rootItemJSON) {
+                $root = is_string($rootItemJSON) ? json_decode($rootItemJSON, true) : $rootItemJSON;
+                $pageUrl = is_array($root) ? ($root['url'] ?? '') : '';
             }
-            if (isset($post['dateTo']) && $post['dateTo'] !== '' && $post['dateTo'] !== null) {
-                $dateTo = (int)$post['dateTo'];
+
+            // -------------------------------------------------
+            // 2. Prepare screenshots manager
+            // -------------------------------------------------
+            require_once dirname(__FILE__, 5) . '/boot.php';
+            require_once dirname(__FILE__, 5) . '/businessLogic/class.screenshots.php';
+            global $naWebOS;
+            $uDB2 = $naWebOS->dbsAdmin->findConnection('couchdb');
+            $screenshots = new naScreenshots($uDB2);
+
+            // Enqueue the main page
+            /*
+             *        if ($pageUrl) {
+             *            $screenshots->enqueue($pageUrl, [
+             *                'retain'   => 86400 * 7,
+             *                'priority' => 10
+             *            ]);
+    }*/
+
+            // -------------------------------------------------
+            // 3. Ensure we have a screenshot for the main page
+            // -------------------------------------------------
+            $retainSeconds = 86400 * 7; // keep screenshots for 7 days (adjust as you like)
+
+            /*
+             *        if ($pageUrl) {
+             *            // This will return the existing ready one if still fresh,
+             *            // otherwise it enqueues a new job
+             *            $screenshots->enqueue($pageUrl, [
+             *                'retain'   => $retainSeconds,
+             *                'priority' => 10,          // high priority for the current page
+             *                'meta'     => ['source' => 'comments-header']
+             *            ]);
+    }*/
+
+            // -------------------------------------------------
+            // 4. Optionally process a few jobs right now
+            //    (so the user often sees the new screenshot after a refresh)
+            // -------------------------------------------------
+            // Keep this number low so the page stays fast
+            /*
+             *        $screenshots->processQueue([
+             *            'maxJobs'      => 2,           // process max 2 jobs in this request
+             *            'sleepSeconds' => 0,
+             *            'verbose'      => false,
+             *            'releaseStale' => true
+             *        ]);
+             */
+
+            // -------------------------------------------------
+            // 5. Continue with the normal comments rendering
+            // -------------------------------------------------
+            // ... your existing CouchDB query code for comments stays the same ...
+
+
+
+            global $naWebOS;
+            $db = $naWebOS->dbsAdmin->findConnection('couchdb');
+            $cdb = $db->cdb;
+            $in = &$_GET;
+            $fields = [
+                '_id', 'parentID', 'datetimeStr',
+                'clientDatetime', 'clientTZoffset', 'clientIP', 'clientUsername',
+                'editedDatetime', 'editedDatetimeStr', 'editedTZoffset',
+                'msgHTML', 'hidden', 'attachments'
+            ];
+
+            $dbName = $db->dataSetName('cms_comments');
+            try {
+                $cdb->setDatabase($dbName, true);
+            } catch (Exception $e) {
+                return $e->getMessage();
             }
-        }
-        // belt-and-suspenders: also accept raw $_POST
-        if ($dateFrom === null && isset($_POST['dateFrom']) && $_POST['dateFrom'] !== '') {
-            $dateFrom = (int)$_POST['dateFrom'];
-        }
-        if ($dateTo === null && isset($_POST['dateTo']) && $_POST['dateTo'] !== '') {
-            $dateTo = (int)$_POST['dateTo'];
-        }
 
-        $selector = [
-            'rootItemJSON' => $rootItemJSON
-        ];
-
-        if ($dateFrom !== null || $dateTo !== null) {
-            $range = [];
-            if ($dateFrom !== null) $range['$gte'] = $dateFrom;
-            if ($dateTo   !== null) $range['$lte'] = $dateTo;
-            $selector['clientDatetime'] = $range;
-        }
-
-        $findCommand = [
-            'selector' => $selector,
-            'fields'   => &$fields,
-            'limit'    => 200,
-            'sort'     => [ ['clientDatetime' => 'desc'] ],  // sort on the same field as the range
-            // when a range is active, prefer the datetime index; otherwise keep the page index
-            'use_index' => ($dateFrom !== null || $dateTo !== null)
-            ? 'by_clientDatetime'
-            : '_design/20986d30727811fa9067a1e39a306d1b35fcf6d5'
-        ];          //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
-        //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
-        //exit();
-
-        $bm = 'abc';
-        $oldBM = 'def';
-        $results = [];
-        while ($bm!==$oldBM) {
-            if ($bm!=='abc') $findCommand['bookmark'] = $bm;
-            $call = $cdb->find($findCommand);
-            //echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>';
-
-            $oldBM = $bm;
-            if (
-                isset($call)
-                && property_exists($call,'body')
-                && property_exists($call->body, 'bookmark')
-                && is_string($call->body->bookmark)
-                && $call->body->bookmark !== ''
-                && $call->body->bookmark !== 'nil'
-            ) {
-                $bm = $call->body->bookmark;
-            } else {
-                $bm = 'abc';
-            };
-
-            $results = array_merge_recursive($results, $this->transformResults_findCommand ($call));
-        }
-        //exit();
-
-        // Also scan the comments that were just loaded for any mentioned URLs
-        foreach ($results as &$comment) {
-            if (!empty($comment['msgHTML'])) {
-                $foundUrls = $this->extractUrlsFromHtml($comment['msgHTML']);
-                //echo json_encode($foundUrls,JSON_PRETTY_PRINT);
-                foreach ($foundUrls as $u) {
-                    $img = $screenshots->buildFilePath($u);
-                    global $naWebOS;
-                    $comment['msgHTML'] = str_replace ($u, $u, $comment['msgHTML']).'<br/><a href="'.htmlspecialchars($u).'" target="_blank"><img style="width:100%" src="'.str_replace($naWebOS->domainPath,'',$img['absolute']).'_thumb.png"/></a>';
-                    $screenshots->enqueue($u, [
-                        'retain'   => 86400 * 7,
-                        'priority' => 5,
-                        'meta'     => ['source' => 'comment-text']
-                    ]);
+            // ── date range from the datepicker buttons ─────────────────────
+            $dateFrom = null;
+            $dateTo   = null;
+            if (is_array($post)) {
+                if (isset($post['dateFrom']) && $post['dateFrom'] !== '' && $post['dateFrom'] !== null) {
+                    $dateFrom = (int)$post['dateFrom'];
+                }
+                if (isset($post['dateTo']) && $post['dateTo'] !== '' && $post['dateTo'] !== null) {
+                    $dateTo = (int)$post['dateTo'];
                 }
             }
-        }
+            // belt-and-suspenders: also accept raw $_POST
+            if ($dateFrom === null && isset($_POST['dateFrom']) && $_POST['dateFrom'] !== '') {
+                $dateFrom = (int)$_POST['dateFrom'];
+            }
+            if ($dateTo === null && isset($_POST['dateTo']) && $_POST['dateTo'] !== '') {
+                $dateTo = (int)$_POST['dateTo'];
+            }
 
-        // Process a couple of jobs right away
-        //$screenshots->processQueue([
-        //    'maxJobs' => 3,
-        //    'verbose' => false
-        //]);
+            $selector = [
+                'rootItemJSON' => $rootItemJSON
+            ];
 
-        return
-        '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css">'
-        . $this->formatHeader($rootItemJSON)
-        . '<div class="naComment_results">'
-        . $this->formatResults($results, $post)
-        . '</div>'
-        . $this->formatFooter();
+            if ($dateFrom !== null || $dateTo !== null) {
+                $range = [];
+                if ($dateFrom !== null) $range['$gte'] = $dateFrom;
+                if ($dateTo   !== null) $range['$lte'] = $dateTo;
+                $selector['clientDatetime'] = $range;
+            }
+
+            $findCommand = [
+                'selector' => $selector,
+                'fields'   => &$fields,
+                'limit'    => 200,
+                'sort'     => [ ['clientDatetime' => 'desc'] ],  // sort on the same field as the range
+                // when a range is active, prefer the datetime index; otherwise keep the page index
+                'use_index' => ($dateFrom !== null || $dateTo !== null)
+                ? 'by_clientDatetime'
+                : '_design/20986d30727811fa9067a1e39a306d1b35fcf6d5'
+            ];          //echo '<pre>'; var_dump ($_SERVER); echo '</pre>';
+            //echo '<pre>'; echo json_encode ($findCommand, JSON_PRETTY_PRINT); echo '</pre>';
+            //exit();
+
+            $bm = 'abc';
+            $oldBM = 'def';
+            $results = [];
+            while ($bm!==$oldBM) {
+                if ($bm!=='abc') $findCommand['bookmark'] = $bm;
+                $call = $cdb->find($findCommand);
+                //echo '<pre>'; echo json_encode ($call, JSON_PRETTY_PRINT); echo '</pre>';
+
+                $oldBM = $bm;
+                if (
+                    isset($call)
+                    && property_exists($call,'body')
+                    && property_exists($call->body, 'bookmark')
+                    && is_string($call->body->bookmark)
+                    && $call->body->bookmark !== ''
+                    && $call->body->bookmark !== 'nil'
+                ) {
+                    $bm = $call->body->bookmark;
+                } else {
+                    $bm = 'abc';
+                };
+
+                $results = array_merge_recursive($results, $this->transformResults_findCommand ($call));
+            }
+            //exit();
+
+            // Also scan the comments that were just loaded for any mentioned URLs
+            foreach ($results as &$comment) {
+                if (!empty($comment['msgHTML'])) {
+                    $foundUrls = $this->extractUrlsFromHtml($comment['msgHTML']);
+                    //echo json_encode($foundUrls,JSON_PRETTY_PRINT);
+                    foreach ($foundUrls as $u) {
+                        $img = $screenshots->buildFilePath($u);
+                        global $naWebOS;
+                        $comment['msgHTML'] = str_replace ($u, $u, $comment['msgHTML']).'<br/><a href="'.htmlspecialchars($u).'" target="_blank"><img style="width:100%" src="'.str_replace($naWebOS->domainPath,'',$img['absolute']).'_thumb.png"/></a>';
+                        $screenshots->enqueue($u, [
+                            'retain'   => 86400 * 7,
+                            'priority' => 5,
+                            'meta'     => ['source' => 'comment-text']
+                        ]);
+                    }
+                }
+            }
+
+            // Process a couple of jobs right away
+            //$screenshots->processQueue([
+            //    'maxJobs' => 3,
+            //    'verbose' => false
+            //]);
+
+            return
+            '<link type="text/css" rel="StyleSheet" href="/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments-3.0.0/na.comments.css">'
+            . $this->formatHeader($rootItemJSON)
+            . '<div class="naComment_results">'
+            . $this->formatResults($results, $post)
+            . '</div>'
+            . $this->formatFooter();
     }
 
     public function transformResults_findCommand ($call) {
@@ -865,7 +865,7 @@ class class_naComments {
         return json_decode(json_encode($call->body->docs),true);
     }
 
-   public function formatHeader($rootItemJSON = null) {
+    public function formatHeader($rootItemJSON = null) {
         global $naWebOS;
 
         // Extract the page URL
@@ -878,56 +878,56 @@ class class_naComments {
 
         $html =
         '<div class="naComment_header_div">' . PHP_EOL
-            . '<h2 class="naComments_header">Comments</h2>' . PHP_EOL
-            //. $screenshotHtml
-            .$naWebOS->html_vividButton (
-                1000, 'float:right',
+        . '<h2 class="naComments_header">Comments</h2>' . PHP_EOL
+        //. $screenshotHtml
+        .$naWebOS->html_vividButton (
+            1000, 'float:right',
 
-                'btnAddNewComment',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnAddComment(event);',
-                '',
-                '',
+            'btnAddNewComment',
+            'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+            '',
+            'na.c.onclick_btnAddComment(event);',
+                                     '',
+                                     '',
 
-                1001, 'Add comment',
-                'btnCssVividButton_outerBorder.png',
-                'btnCssVividButton.png',
-                $this->themes[$this->theme]['btnMainCommentAdd'],
-                'btnDocument2.png',
-                                         '', 'Add comment', '', ''
-            ).PHP_EOL
-            .$naWebOS->html_vividButton (
-                1000, 'float:right',
-                'btnDateRange_lower',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnDateRange(event, \'lower\');',
-                                         '',
-                                         '',
-                                         1001, 'Pick begin date',
-                                         'btnCssVividButton_outerBorder.png',
-                                         'btnCssVividButton.png',
-                                         'btnCssVividButton.yellow1a.png',
-                                         'pngtree-calendar-3d-icon-isolated-on-a-transparent-background-symbolizing-schedules-and-png-image_20358144.png',
-                                         '', 'Pick begin date', '', ''
-            ).PHP_EOL
-            .$naWebOS->html_vividButton (
-                1000, 'float:right',
-                'btnDateRange_upper',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnDateRange(event, \'upper\');',
-                                         '',
-                                         '',
-                                         1001, 'Pick end date',
-                                         'btnCssVividButton_outerBorder.png',
-                                         'btnCssVividButton.png',
-                                            'btnCssVividButton.yellow1a.png',
-                                         'calendar.png',
-                                         '', 'Pick end date', '', ''
-            ).PHP_EOL
-            .'</div>'.PHP_EOL;
+                                     1001, 'Add comment',
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.png',
+                                     $this->themes[$this->theme]['btnMainCommentAdd'],
+                                     'btnDocument2.png',
+                                     '', 'Add comment', '', ''
+        ).PHP_EOL
+        .$naWebOS->html_vividButton (
+            1000, 'float:right',
+            'btnDateRange_lower',
+            'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+            '',
+            'na.c.onclick_btnDateRange(event, \'lower\');',
+                                     '',
+                                     '',
+                                     1001, 'Pick begin date',
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.png',
+                                     'btnCssVividButton.yellow1a.png',
+                                     'pngtree-calendar-3d-icon-isolated-on-a-transparent-background-symbolizing-schedules-and-png-image_20358144.png',
+                                     '', 'Pick begin date', '', ''
+        ).PHP_EOL
+        .$naWebOS->html_vividButton (
+            1000, 'float:right',
+            'btnDateRange_upper',
+            'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+            '',
+            'na.c.onclick_btnDateRange(event, \'upper\');',
+                                     '',
+                                     '',
+                                     1001, 'Pick end date',
+                                     'btnCssVividButton_outerBorder.png',
+                                     'btnCssVividButton.png',
+                                     'btnCssVividButton.yellow1a.png',
+                                     'calendar.png',
+                                     '', 'Pick end date', '', ''
+        ).PHP_EOL
+        .'</div>'.PHP_EOL;
         return $html;
     }
 
@@ -949,18 +949,18 @@ class class_naComments {
                 // attach later if parent exists
             }        }
 
-        // Attach children
-        foreach ($byId as $id => &$comment) {
-            $parentId = $comment[$parentField] ?? null;
-            if ($parentId !== null && $parentId !== '#' && $parentId !== 0) {
-                if (isset($byId[$parentId])) {
-                    $byId[$parentId]['children'][] = &$comment;
+            // Attach children
+            foreach ($byId as $id => &$comment) {
+                $parentId = $comment[$parentField] ?? null;
+                if ($parentId !== null && $parentId !== '#' && $parentId !== 0) {
+                    if (isset($byId[$parentId])) {
+                        $byId[$parentId]['children'][] = &$comment;
+                    }
+                    // else → orphan → already ignored / can log
                 }
-                // else → orphan → already ignored / can log
             }
-        }
 
-        return $tree;
+            return $tree;
     }
 
     public function sortTreeNewestFirst(array &$nodes): void
@@ -1270,9 +1270,9 @@ class class_naComments {
                 box-shadow: 0 4px 18px rgba(0,0,0,0.35);
                 ">';
 
-        $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
-        ⚠ Deze post is verborgen door justitie
-        </div>';
+            $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
+            ⚠ Deze post is verborgen door justitie
+            </div>';
 
             if (!empty($it['hiddenReason'])) {
                 $html .= '<div style="margin-bottom:8px;">
@@ -1398,11 +1398,11 @@ class class_naComments {
     }
 
 
-     public function formatFooter() {
+    public function formatFooter() {
         global $naWebOS;
         $html =
-            '<div class="naComments_footer">'.PHP_EOL
-            .'</div>'.PHP_EOL;
+        '<div class="naComments_footer">'.PHP_EOL
+        .'</div>'.PHP_EOL;
         return $html;
     }
 
@@ -2143,7 +2143,7 @@ class class_naComments {
         if ($releaseStale) {
             $released = $this->releaseStaleLocks();
             if ($verbose && $released > 0) {
-		    echo "<p class=\"phpError\">[" . date('H:i:s') . "] Released {$released} stale lock(s)</p>";
+                echo "<p class=\"phpError\">[" . date('H:i:s') . "] Released {$released} stale lock(s)</p>";
             }
         }
 
@@ -2162,7 +2162,7 @@ class class_naComments {
             $url = $job['url'] ?? '(unknown)';
 
             if ($verbose) {
-		    echo "<p class=\"phpError\">[" . date('H:i:s') . "] Processing: {$url}</p>";
+                echo "<p class=\"phpError\">[" . date('H:i:s') . "] Processing: {$url}</p>";
             }
 
             try {
@@ -2254,7 +2254,10 @@ class class_naComments {
     }
 
     /**
-     * Build small thumbnail screenshots for URLs mentioned inside a comment
+     * Build small thumbnail screenshots for URLs mentioned inside a comment.
+     * Each thumbnail links to the original URL; underneath it a lime "screenshot"
+     * link opens the full screenshot via the same /view/ + cmsViewMedia path
+     * used for uploaded comment photos.
      */
     public function getLinkedScreenshotsHtml(array $urls, int $max = 5): string
     {
@@ -2276,19 +2279,45 @@ class class_naComments {
                 $record = $screenshots->findByUrl($url);
                 if (!$record || ($record['status'] ?? '') !== 'ready') continue;
 
-                $imgSrc = '/siteData/' . ltrim($record['relativePath'] ?? '', '/').'_thumb.png';
+                $relPath = ltrim((string)($record['relativePath'] ?? ''), '/');
+                if ($relPath === '') continue;
+
+                $imgSrc = '/siteData/' . $relPath . '_thumb.png';
+
+                // Build full-view payload the same way uploaded comment photos do
+                $codePath = trim(str_replace('\\', '/', dirname($relPath)), '/');
+                $filename = basename($relPath);
+
+                $viewPayload = [
+                    '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS' => [
+                        'cmsViewMedia' => [
+                            'appFolder' => '/NicerAppWebOS/apps/NicerAppWebOS/content-management-systems/NicerAppWebOS',
+                            'codePath'  => $codePath,
+                            'filename'  => $filename,
+                        ],
+                    ],
+                ];
+                $viewHref = '/view/' . encode_base64_url(json_encode($viewPayload));
 
                 $html .=
+                '<div class="naComment_linkedScreenshotItem" style="display:flex; flex-direction:column; align-items:stretch;">' .
                 '<a href="' . htmlspecialchars($url) . '" target="_blank" class="nomod noPushState" ' .
-                'style="display:inline-block; width:100%;line-height:0;" title="' . htmlspecialchars($url) . '">' .
+                'style="display:inline-block; width:100%; line-height:0;" title="' . htmlspecialchars($url) . '">' .
                 '<img src="' . htmlspecialchars($imgSrc) . '" ' .
                 'alt="Linked page screenshot" ' .
                 'style="width:100%; border-radius:7px; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:transform 0.15s;" ' .
                 'onmouseover="" ' .
                 'onmouseout="" />' .
-                '</a>';
+                '</a>' .
+                '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($viewHref) . '\');" ' .
+                'class="nomod naComment_screenshotFullLink" ' .
+                'style="color:lime; text-align:center; font-size:0.85em; margin-top:4px; text-decoration:underline; cursor:pointer;" ' .
+                'title="Open full screenshot">' .
+                'screenshot' .
+                '</a>' .
+                '</div>';
 
-            $count++;
+                $count++;
             }
 
             $html .= '</div>';

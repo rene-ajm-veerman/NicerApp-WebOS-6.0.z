@@ -74,6 +74,7 @@ if (!na.photoAlbum) na.photoAlbum = {
     
 	startDrag : function (e) {
         // determine event object
+        debugger;
         if (!e) {
             var e = window.event;
         }
@@ -102,8 +103,12 @@ if (!na.photoAlbum) na.photoAlbum = {
         if (!e) { var e= window.event};
         // var targ=e.target?e.target:e.srcElement;
         // move div element
-        $('#siteContent .vividDialogContent')[0].scrollLeft = na.photoAlbum.settings.coordX+e.clientX-na.photoAlbum.settings.offsetX;
-        $('#siteContent .vividDialogContent')[0].scrollTop = na.photoAlbum.settings.coordY+e.clientY-na.photoAlbum.settings.offsetY;
+        var deltaX = e.clientX - na.photoAlbum.settings.offsetX;
+        var deltaY = e.clientY - na.photoAlbum.settings.offsetY;
+
+        // invert so the photo follows the drag direction
+        $('#siteContent .vividDialogContent')[0].scrollLeft = na.photoAlbum.settings.coordX - deltaX;
+        $('#siteContent .vividDialogContent')[0].scrollTop = na.photoAlbum.settings.coordY - deltaY;
         return false;
     },
 	stopDrag : function () {

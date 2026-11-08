@@ -883,7 +883,7 @@ na.desktop = na.d = {
                 var app = na.apps.loaded[appID];
                 if (typeof app.onresize=='function') app.onresize();
             }
-            na.photoAlbum.updateZoom();
+            if (na.photoAlbum) na.photoAlbum.updateZoom();
 
             // and any other canvases you create later
             na.d.s.masterCallbacks = [];
