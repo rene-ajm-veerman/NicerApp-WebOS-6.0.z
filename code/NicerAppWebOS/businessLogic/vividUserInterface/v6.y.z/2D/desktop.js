@@ -880,6 +880,11 @@ na.desktop = na.d = {
             na.d.setCanvasToDevicePixels(document.querySelector('canvas.naBorder'));
             na.d.setCanvasToDevicePixels(document.querySelector('canvas.naBackground'));
 
+            for (var appID in na.apps.loaded) {
+                var app = na.apps.loaded[appID];
+                if (typeof app.onresize=='function') app.onresize();
+            }
+
             // and any other canvases you create later
             na.d.s.masterCallbacks = [];
         }
