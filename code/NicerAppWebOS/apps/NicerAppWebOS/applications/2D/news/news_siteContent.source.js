@@ -74,16 +74,12 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                     && na.site.s.c.booted
                                     && na.desktop
                                     && !na.desktop.settings.animating
-
-
-
                                     /*$('#jsPageSpecific').length > 0
                                      *                                && $('#siteContent__content').length > 0
                                      *                                && na.m.desktopIdle()
                                      *                                &&
                                      */
                                 );
-                                return true;
                             }, function () {
                                 na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.loadedIn['#siteContent'].onresize();
                                 na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.loadedIn['#siteContent'].settings.initialized = true;
@@ -210,7 +206,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
             ks = Object.keys(dc),
             total = 0,
             highest = 10;
-            ks = ks.sort(function(a,b){ b - a });
+            ks = ks.sort(function(a,b){ return b - a; });
             s.displayCounts = '';
             if (ks.length > 0) {
                 for (k in ks) {
@@ -425,7 +421,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                    total = 0,
                                    highest = 10;
 
-                                   ks = ks.sort(function(a,b){ b - a });
+                                   ks = ks.sort(function(a,b){ return b - a; });
                                    s.displayCounts = '';
                                    s.displayCountInt = 0;
                                    for (k in ks) {
@@ -754,68 +750,68 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                            na.m.log (2, dat);
                                            setTimeout (function() {
                                                if (typeof data=='string')
-                                               try {
-                                                   dataText = data;
-                                                   data = JSON.parse(data);
-                                               } catch (err) {
-                                                   debugger;
-                                               }
-                                               if (data.length > 0) {
-                                                   na.m.walkArray (data, data, undefined, na1.loadNews_get_forDateTimeRange_walkValue);
+                                                   try {
+                                                       dataText = data;
+                                                       data = JSON.parse(data);
+                                                   } catch (err) {
+                                                       debugger;
+                                                   }
+                                                   if (data.length > 0) {
+                                                       na.m.walkArray (data, data, undefined, na1.loadNews_get_forDateTimeRange_walkValue);
 
-                                                   var itemsLoadedCount = s.idx - idxStart;
+                                                       var itemsLoadedCount = s.idx - idxStart;
 
-                                                   //na.analytics.logMetaEvent ('newsApp : loadNews_get_forDateTimeRange() data fetched sucessfully for itemsLoadedCount='+itemsLoadedCount+' and url='+url);
-                                               } else {
-                                                   itemsLoadedCount = 0;
-                                               };
+                                                       //na.analytics.logMetaEvent ('newsApp : loadNews_get_forDateTimeRange() data fetched sucessfully for itemsLoadedCount='+itemsLoadedCount+' and url='+url);
+                                                   } else {
+                                                       itemsLoadedCount = 0;
+                                                   };
 
-                                               //if (itemsLoadedCount < 50) {
-                                               s.read_loop_minutesIntoPast = 60 * g.readHistory_numHours;
-                                               s.read_loop_millisecondsToDoNext = 5 * 60 * 1000;
-                                               //} /*else {//if (itemsLoadedCount < 200) {
-                                               //s.read_loop_minutesIntoPast = 60 * (g.readHistory_numHours/2);
-                                               //s.read_loop_millisecondsToDoNext = 1000;
-                                               //} /*else {
-                                               //s.read_loop_minutesIntoPast = 60;
-                                               //s.read_loop_millisecondsToDoNext = 2 * 60 * 1000;
-                                               //};
+                                                   //if (itemsLoadedCount < 50) {
+                                                   s.read_loop_minutesIntoPast = 60 * g.readHistory_numHours;
+                                                   s.read_loop_millisecondsToDoNext = 5 * 60 * 1000;
+                                                   //} /*else {//if (itemsLoadedCount < 200) {
+                                                   //s.read_loop_minutesIntoPast = 60 * (g.readHistory_numHours/2);
+                                                   //s.read_loop_millisecondsToDoNext = 1000;
+                                                   //} /*else {
+                                                   //s.read_loop_minutesIntoPast = 60;
+                                                   //s.read_loop_millisecondsToDoNext = 2 * 60 * 1000;
+                                                   //};
 
-                                               na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db.concat(data);
+                                                   na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db.concat(data);
 
-                                               if (itemsLoadedCount===0) {
-                                                   s.timerLoadNews_read_loop = setTimeout (na1.loadNews_read_loop, s.read_loop_millisecondsToDoNext);
-                                                   return false;
-                                               } else {
-                                                   clearInterval (s.intervalMailLogCountdown);
-                                                   $('#newsApp_debug').animate({opacity:0.001}, {complete :function () {
-                                                       $('#newsApp_debug').html('').delay(50);
-                                                   }});
-                                               }
+                                                   if (itemsLoadedCount===0) {
+                                                       s.timerLoadNews_read_loop = setTimeout (na1.loadNews_read_loop, s.read_loop_millisecondsToDoNext);
+                                                       return false;
+                                                   } else {
+                                                       clearInterval (s.intervalMailLogCountdown);
+                                                       $('#newsApp_debug').animate({opacity:0.001}, {complete :function () {
+                                                           $('#newsApp_debug').html('').delay(50);
+                                                       }});
+                                                   }
 
-                                               var
-                                               db = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db,
-                                               dc = {},
-                                               di = {},
-                                               params = {
-                                                   dc : dc,
-                                                   di : di
-                                               },
+                                                   var
+                                                   db = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].settings.current.db,
+                                                   dc = {},
+                                                   di = {},
+                                                   params = {
+                                                       dc : dc,
+                                                       di : di
+                                                   },
 
-                                               dc = { 0 : 0 },
-                                               di = { 0 : [] },
-                                               params = {
-                                                   dc : dc,
-                                                   di : di
-                                               };
+                                                   dc = { 0 : 0 },
+                                                   di = { 0 : [] },
+                                                   params = {
+                                                       dc : dc,
+                                                       di : di
+                                                   };
 
-                                               na.m.walkArray (db, db, undefined, na1.displayNews_getDisplayCounts, false, params);
+                                                   na.m.walkArray (db, db, undefined, na1.displayNews_getDisplayCounts, false, params);
 
-                                               var
-                                               ks = Object.keys(dc),
+                                                   var
+                                                   ks = Object.keys(dc),
                                                        total = 0;
 
-                                                       ks = ks.sort(function(a,b){ b - a });
+                                                       ks = ks.sort(function(a,b){ return b - a; });
 
                                                        var
                                                        unread = dc[ks[0]];
@@ -842,7 +838,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                                        total = 0,
                                                        highest = 10;
 
-                                                       ks = ks.sort(function(a,b){ b - a });
+                                                       ks = ks.sort(function(a,b){ return b - a; });
                                                        s.displayCounts = '';
                                                        for (k in ks) {
                                                            if (s.displayCounts!=='') s.displayCounts +=', ';
@@ -1093,213 +1089,234 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                 return false;
             }
 
-            while (it===null || !it.t || !it.de) {
-                var
-                key = Math.floor(Math.random() * (its.length-1));
+            // Fixed: previous while could busy-loop on the main thread when many items
+            // lacked .t/.de, were already on-screen, or random kept re-picking the same
+            // entries. That froze the browser. Bound attempts and exit cleanly.
+            var maxAttempts = Math.min(50, Math.max(its.length * 2, 10));
+            var attempts = 0;
+            var alreadyOnScreen = {};
+            // Cache titles currently shown so we do not rescan the DOM every attempt
+            $('#newsApp_content .newsApp__item__outer').each(function () {
+                var t = $(this).find('.newsApp__item__title').text();
+                if (t) alreadyOnScreen[t] = true;
+            });
 
-                it = its[key];
-                if (!it.displayCount) it.displayCount = -1;
-                it.displayCount++;
-                if (it.displayCount > 100) return false;
-
-                if (typeof it.displayCount=='number' && it.displayCount > 0) {
-                    it = null;
-                } else {
-                    var els2 = $('#newsApp_content .newsApp__item__outer');
-                    for (var j=0; j<els2.length; j++) {
-                        if (
-                            it
-                            && it.t
-                            && typeof it.t=='string'
-                            && els2[j].innerHTML.indexOf(it.t)!==-1
-                        ) found = true;
+                while (attempts < maxAttempts && (it === null || !it.t || !it.de || found)) {
+                    attempts++;
+                    found = false;
+                    var key = Math.floor(Math.random() * its.length); // was (length-1) — never picked last item
+                    it = its[key];
+                    if (!it) {
+                        it = null;
+                        continue;
                     }
+                    if (typeof it.displayCount !== 'number') it.displayCount = 0;
+                    it.displayCount++;
+                    // Prefer never/rarely shown items; skip ones already shown many times
+                    if (it.displayCount > 20) {
+                        it = null;
+                        continue;
+                    }
+                    if (!it.t || !it.de) {
+                        it = null;
+                        continue;
+                    }
+                    if (alreadyOnScreen[it.t] || (typeof it.t === 'string' && alreadyOnScreen[it.t.trim()])) {
+                        found = true;
+                        it = null;
+                        continue;
+                    }
+                    // Candidate looks usable
+                    break;
                 }
-            };
-
-            if (found || !na1.match_searchCriteria(it)) {
-                return false;
-            } else {
-                var
-                thumbWidth = (
-                    na.m.userDevice.isPhone
-                    ? 80
-                    : 150
-                ),
-                prefix = '',
-                dnf = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].displayNews_full(''),
-                full = dnf.full,
-                removed = dnf.removed,
-                dnfi = na1.displayNews_formatItem (it, ''), // displayNews_formatItem() also puts the formatted item into the DOM!
-                html = dnfi.html,
-                htmlTooltip = dnfi.html2;
-                s.dnfi = dnfi;
-                s.dnf = dnf;
-
-                if (!html) {
-                    if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', !html : return false');
+                if (attempts >= maxAttempts || it === null || !it.t || !it.de || found) {
+                    if (s.displayDebugInfo) na.site.setStatusMsg('na1.displayNewNewsItem : s.tries===' + s.tries + ', no suitable item after ' + attempts + ' attempts : return false');
                     return false;
                 }
-                html = html.replace ('<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>','');
-                html = html.replace (/http:\/\//g, 'https://');
 
-
-                var el = $(dnfi.id)[0];
-                $('.newsApp__item__title, .newsApp__item__contentContainer, .newsApp__item__mediaSingle, .vividScrollpane, .newsApp__item__footer',el)
-                .css({
-                    display : 'block',
-                    opacity : 1
-                }).delay(10);
-                var
-                ms = $('.newsApp__item__mediaSingle',el),
-                w = $(el).width() - 14;
-
-                //if (ms[0]) w -= ms.width();
-                //console.log (w);
-                //if ($('.newsApp__item__mediaSingle img', el)[0]) $('.vividScrollpane', el).add($('.newsApp__item__mediaSingle img', el)).css ({width : '40%'}); else $('.vividScrollpane', el).css ({width : w});
-
-                var
-                h = $('#siteContent .vividDialogContent').height() - $('#newsApp_title').outerHeight();
-                if ($(window).width() < na.site.globals.reallySmallDeviceWidth) {
-                    w = $('#newsApp_content').width();
+                if (found || !na1.match_searchCriteria(it)) {
+                    return false;
                 } else {
-                    var w1 =
-                    (
-                        $('.newsApp__item__mediaSingle', $(dnfi.id)[0]).width()
-                        + $('.vividScrollpane', $(dnfi.id)[0]).width()
-                    )
-                    || $('.newsApp__item__title', $(dnfi.id)[0]).width()
-                    || 0;
-
-                    if (w < w1) w = w1;
-                }
-
-                var
-                itEl = $('#newsApp__item__'+it.idx)[0],
-                sp = $('.vividScrollpane', itEl)[0],
-                dnf = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].displayNews_full(''),
-                full = dnf.full,
-                removed = dnf.removed;
-                s.dnf = dnf;
-                s.it = it;
-                s.itEl = itEl;
-                if (removed) {
-                    if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', removed : return false');
-                }
-
-
-                var sph1 = 0;
-                $('.newsApp__item__outer').each(function(idx3, el3) {
-                    var count = true;
-                    if ($(el3).index() !== $(itEl).index()+1) count = false;
-                    if (count) sph1 += $(el3).outerHeight();
-                });
-                    h -= sph1;
-
-                    if (!dnfi) {
-                        if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', !dnfi : return false');
-                        return false;
-                    };
-
-                    if (!s.getToTry) s.getToTry = g.numItemsThatFitScreen;
-
-                    //console.log (full,removed);
-                    if (full || removed) {
-                        $(itEl).remove();
-                        return false;
-                    }
-
-                    it.displayCount++;
-                    if (it.displayCount > s.maxDisplayCount) s.maxDisplayCount = it.displayCount;
-
-
-                    if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news']) return false;
-                    if (!itEl) {
-                        return false;
-                    }
-
-                    //if (sp && sp.scrollHeight > 300) {
                     var
-                    jel2 = $('.newsApp__item__mediaSingle',itEl),
-                    jels =
-                    $('img, iframe', sp || itEl)
-                    .not('[src*="track"]')
-                    .not('.newsApp__item__mediaSingle__0')
-                    .not('[width="1"]')
-                    .not('[border="1"]')
-                    .not('.dontResize');
-                    jels.each(function(idx,el) {
-                        var
-                        pctg = Math.floor(100 / jels.length),
-                              th = $('.news__item__title', itEl).height(),
-                              fh = $('.newsApp__item__footer', itEl).height(),
-                              ph = $('p, div', itEl).height(),
-                              ph2 = 20 * $('p, div', itEl).length,
-                              mh = Math.round((th?parseInt(th)+20:0) + (fh+20?parseInt(fh):0) + (ph?parseInt(ph)+20:0) + (ph2?parseInt(ph2):0) + 60);
+                    thumbWidth = (
+                        na.m.userDevice.isPhone
+                        ? 80
+                        : 150
+                    ),
+                    prefix = '',
+                    dnf = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].displayNews_full(''),
+                    full = dnf.full,
+                    removed = dnf.removed,
+                    dnfi = na1.displayNews_formatItem (it, ''), // displayNews_formatItem() also puts the formatted item into the DOM!
+                    html = dnfi.html,
+                    htmlTooltip = dnfi.html2;
+                    s.dnfi = dnfi;
+                    s.dnf = dnf;
 
-                              $(el).css ({
-                                  margin : 0,
-                                  border : '0px solid black',
-                                  float : '',
-                                  maxWidth : '100%',//$(el).parent('div').width(),
-                                         maxHeight : 'calc('+pctg+'% - '+mh+'px)'
-                              });
-                              el.removeAttribute('height');
-                              el.removeAttribute('width');
+                    if (!html) {
+                        if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', !html : return false');
+                        return false;
+                    }
+                    html = html.replace ('<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>','');
+                    html = html.replace (/http:\/\//g, 'https://');
+
+
+                    var el = $(dnfi.id)[0];
+                    $('.newsApp__item__title, .newsApp__item__contentContainer, .newsApp__item__mediaSingle, .vividScrollpane, .newsApp__item__footer',el)
+                    .css({
+                        display : 'block',
+                        opacity : 1
+                    }).delay(10);
+                    var
+                    ms = $('.newsApp__item__mediaSingle',el),
+                    w = $(el).width() - 14;
+
+                    //if (ms[0]) w -= ms.width();
+                    //console.log (w);
+                    //if ($('.newsApp__item__mediaSingle img', el)[0]) $('.vividScrollpane', el).add($('.newsApp__item__mediaSingle img', el)).css ({width : '40%'}); else $('.vividScrollpane', el).css ({width : w});
+
+                    var
+                    h = $('#siteContent .vividDialogContent').height() - $('#newsApp_title').outerHeight();
+                    if ($(window).width() < na.site.globals.reallySmallDeviceWidth) {
+                        w = $('#newsApp_content').width();
+                    } else {
+                        var w1 =
+                        (
+                            $('.newsApp__item__mediaSingle', $(dnfi.id)[0]).width()
+                            + $('.vividScrollpane', $(dnfi.id)[0]).width()
+                        )
+                        || $('.newsApp__item__title', $(dnfi.id)[0]).width()
+                        || 0;
+
+                        if (w < w1) w = w1;
+                    }
+
+                    var
+                    itEl = $('#newsApp__item__'+it.idx)[0],
+                    sp = $('.vividScrollpane', itEl)[0],
+                    dnf = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].displayNews_full(''),
+                    full = dnf.full,
+                    removed = dnf.removed;
+                    s.dnf = dnf;
+                    s.it = it;
+                    s.itEl = itEl;
+                    if (removed) {
+                        if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', removed : return false');
+                    }
+
+
+                    var sph1 = 0;
+                    $('.newsApp__item__outer').each(function(idx3, el3) {
+                        var count = true;
+                        if ($(el3).index() !== $(itEl).index()+1) count = false;
+                        if (count) sph1 += $(el3).outerHeight();
                     });
-                    //}
-            };
+                        h -= sph1;
 
-            if (!$('div > div > iframe', itEl)[0]) {
-                var
-                minWidth = null,
-                ms = $('.newsApp__item__mediaSingle', itEl),
-                imgs = $('img', itEl);
-
-                if (imgs.length==0 && ms[0] && it.m.length && it.m.length>0) {
-                    var m1 = it.m[it.m.length-1];
-                    for (var i=0; i<it.m.length; i++) {
-                        var m = it.m[i];
-                        if (typeof m.u=='string') {
-                            if (!minWidth && typeof m.width=='number') minWidth = parseInt(m.width);
-                            if (parseInt(m.width) < minWidth) {
-                                minWidth = parseInt(m.width);
-                                var m1 = it.m[i];
-                            }
-                            if (m.content) {
-                                var m1 = it.m[i];
-                                minWidth = thumbWidth;
-                            }
+                        if (!dnfi) {
+                            if (s.displayDebugInfo) na.site.setStatusMsg ('na1.displayNewNewsItem : s.tries==='+s.tries+', !dnfi : return false');
+                            return false;
                         };
-                    }
-                    if (!minWidth) minWidth=thumbWidth;
-                    if (minWidth>thumbWidth) minWidth=thumbWidth;
 
-                    if (typeof m1.u=='string') {
-                        m1.u = m1.u.replace ('http://', 'https://');
+                        if (!s.getToTry) s.getToTry = g.numItemsThatFitScreen;
 
+                        //console.log (full,removed);
+                        if (full || removed) {
+                            $(itEl).remove();
+                            return false;
+                        }
+
+                        it.displayCount++;
+                        if (it.displayCount > s.maxDisplayCount) s.maxDisplayCount = it.displayCount;
+
+
+                        if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news']) return false;
+                        if (!itEl) {
+                            return false;
+                        }
+
+                        //if (sp && sp.scrollHeight > 300) {
                         var
-                        html = '<a class="nomod" target="_new" href="'+it.u+'"><img src="'+m1.u+'" class="newsApp__item__mediaSingle__0" style="width:150px;"/></a>';
+                        jel2 = $('.newsApp__item__mediaSingle',itEl),
+                        jels =
+                        $('img, iframe', sp || itEl)
+                        .not('[src*="track"]')
+                        .not('.newsApp__item__mediaSingle__0')
+                        .not('[width="1"]')
+                        .not('[border="1"]')
+                        .not('.dontResize');
+                        jels.each(function(idx,el) {
+                            var
+                            pctg = Math.floor(100 / jels.length),
+                                  th = $('.news__item__title', itEl).height(),
+                                  fh = $('.newsApp__item__footer', itEl).height(),
+                                  ph = $('p, div', itEl).height(),
+                                  ph2 = 20 * $('p, div', itEl).length,
+                                  mh = Math.round((th?parseInt(th)+20:0) + (fh+20?parseInt(fh):0) + (ph?parseInt(ph)+20:0) + (ph2?parseInt(ph2):0) + 60);
 
-                        $(ms)[0].innerHTML = html;
-                    }
+                                  $(el).css ({
+                                      margin : 0,
+                                      border : '0px solid black',
+                                      float : '',
+                                      maxWidth : '100%',//$(el).parent('div').width(),
+                                             maxHeight : 'calc('+pctg+'% - '+mh+'px)'
+                                  });
+                                  el.removeAttribute('height');
+                                  el.removeAttribute('width');
+                        });
+                        //}
                 };
-            }
+
+                if (!$('div > div > iframe', itEl)[0]) {
+                    var
+                    minWidth = null,
+                    ms = $('.newsApp__item__mediaSingle', itEl),
+                    imgs = $('img', itEl);
+
+                    if (imgs.length==0 && ms[0] && it.m.length && it.m.length>0) {
+                        var m1 = it.m[it.m.length-1];
+                        for (var i=0; i<it.m.length; i++) {
+                            var m = it.m[i];
+                            if (typeof m.u=='string') {
+                                if (!minWidth && typeof m.width=='number') minWidth = parseInt(m.width);
+                                if (parseInt(m.width) < minWidth) {
+                                    minWidth = parseInt(m.width);
+                                    var m1 = it.m[i];
+                                }
+                                if (m.content) {
+                                    var m1 = it.m[i];
+                                    minWidth = thumbWidth;
+                                }
+                            };
+                        }
+                        if (!minWidth) minWidth=thumbWidth;
+                        if (minWidth>thumbWidth) minWidth=thumbWidth;
+
+                        if (typeof m1.u=='string') {
+                            m1.u = m1.u.replace ('http://', 'https://');
+
+                            var
+                            html = '<a class="nomod" target="_new" href="'+it.u+'"><img src="'+m1.u+'" class="newsApp__item__mediaSingle__0" style="width:150px;"/></a>';
+
+                            $(ms)[0].innerHTML = html;
+                        }
+                    };
+                }
 
 
-            clearTimeout (s.timeout_onresize_loadTheme);
-            s.timeout_onresize_loadTheme = setTimeout (function() {
-                na.m.waitForCondition('na1.onresize() : safe to call na.site.loadTheme_applySettings?', function() {
-                    return (
-                        !na.site.settings.running_loadTheme
-                        && !na.site.settings.running_saveTheme
-                    );
-                }, function () {
-                    na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName], null, false, false, false);
-                    //na.te.reApplySelectorsTree();
+                clearTimeout (s.timeout_onresize_loadTheme);
+                s.timeout_onresize_loadTheme = setTimeout (function() {
+                    na.m.waitForCondition('na1.onresize() : safe to call na.site.loadTheme_applySettings?', function() {
+                        return (
+                            !na.site.settings.running_loadTheme
+                            && !na.site.settings.running_saveTheme
+                        );
+                    }, function () {
+                        na.site.loadTheme_applySettings (na.site.globals.themes[na.site.globals.themeName], null, false, false, false);
+                        //na.te.reApplySelectorsTree();
+                    }, 100);
                 }, 100);
-            }, 100);
-            return true;
+                return true;
         },
 
         match_searchCriteria : function (it) {
@@ -1691,87 +1708,87 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
             var seov = na1.settings.section.replace(/.*__/,'').replace('__','-').replace('_','-').toLowerCase();
             /* old, works :
              *
-            html += '<div class="newsApp__item__footer"><span class="newsApp__item__date"><a class="nomod noPushState" target="_new"  target="newsAppItem_'+it.idx+'" href="' + it.rssURL+'">' + na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it)+'</a></span><br/>';
-            html += '<span class="newsApp__item__copy"><a class="nomod noPushState" href="javascript:var el = $(\'#newsApp__item__'+it.idx+'\')[0], textarea = $(\'#siteContent__textareaCopy\')[0]; if (!textarea) { var el2=document.createElement(\'textarea\'); window.top.document.append(el2); textarea=el2 }; el_html = el.innerHTML; el.innerHTML = el.innerHTML.replace(\/<span class..newsApp__item__copy.*>.*<.a><.span>\/,\'\') + \'Found via <a href=\\\'https://nicer.app/'+seov+'\\\' target=\\\'_new\\\'>https://nicer.app/'+seov+'</a>\'; var type = \'text/html\'; var blob = new Blob([el.innerHTML], { type }); var data = [new ClipboardItem({ [type]: blob })]; navigator.clipboard.write(data).then( () => {/* success * /}, () => {/* failure * /} ); var selection = window.getSelection(); var range = document.createRange(); range.selectNodeContents(el); selection.removeAllRanges(); selection.addRange(range); window.top.document.execCommand(\'copy\');setTimeout(function(){selection.removeAllRanges(); el.innerHTML=el_html;},1000);">Copy to clipboard</a></span></div> ';
-            html+= '</div>';
-            */
+             *            html += '<div class="newsApp__item__footer"><span class="newsApp__item__date"><a class="nomod noPushState" target="_new"  target="newsAppItem_'+it.idx+'" href="' + it.rssURL+'">' + na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it)+'</a></span><br/>';
+             *            html += '<span class="newsApp__item__copy"><a class="nomod noPushState" href="javascript:var el = $(\'#newsApp__item__'+it.idx+'\')[0], textarea = $(\'#siteContent__textareaCopy\')[0]; if (!textarea) { var el2=document.createElement(\'textarea\'); window.top.document.append(el2); textarea=el2 }; el_html = el.innerHTML; el.innerHTML = el.innerHTML.replace(\/<span class..newsApp__item__copy.*>.*<.a><.span>\/,\'\') + \'Found via <a href=\\\'https://nicer.app/'+seov+'\\\' target=\\\'_new\\\'>https://nicer.app/'+seov+'</a>\'; var type = \'text/html\'; var blob = new Blob([el.innerHTML], { type }); var data = [new ClipboardItem({ [type]: blob })]; navigator.clipboard.write(data).then( () => {/* success * /}, () => {/* failure * /} ); var selection = window.getSelection(); var range = document.createRange(); range.selectNodeContents(el); selection.removeAllRanges(); selection.addRange(range); window.top.document.execCommand(\'copy\');setTimeout(function(){selection.removeAllRanges(); el.innerHTML=el_html;},1000);">Copy to clipboard</a></span></div> ';
+             *            html+= '</div>';
+             */
 
-            html += '<div class="newsApp__item__footer"><table class="newsApp__item__date"><tr><td><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it.u+'">' + na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it)+'</a></span></td>';
+             html += '<div class="newsApp__item__footer"><table class="newsApp__item__date"><tr><td><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it.u+'">' + na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it)+'</a></span></td>';
 
-            html += '<td class="newsApp__item__copy"><div id="newsApp__copyAndPaste__'+it.idx+'" class="vividButton4 btn_copyAndPaste" buttonType="btn_copyAndPaste" style="float:right" target="newsAppItem_'+it.idx+'" onclick="var el = $(\'#newsApp__item__'+it.idx+'\')[0], textarea = $(\'#siteContent__textareaCopy\')[0]; if (!textarea) { var el2=document.createElement(\'textarea\'); window.top.document.append(el2); textarea=el2 }; el_html = el.innerHTML; el.innerHTML = el.innerHTML.replace(\/<span class..newsApp__item__copy.>Copy to clipboard<.a><.span>>\/,\'\') + \'Found via <a href=\\\'https://nicer.app/'+seov+'\\\' target=\\\'_new\\\'>https://nicer.app/'+seov+'</a>\'; var selection = window.getSelection(); var range = document.createRange(); range.selectNodeContents(el); selection.removeAllRanges(); selection.addRange(range); window.top.document.execCommand(\'copy\');setTimeout(function(){selection.removeAllRanges(); el.innerHTML=el_html;},1000);"></div></td></tr></table> ';
-            html+= '</div>';
-
-
-            // tooltipster HTML
-            var html2 = '';
-            html2+= '<span class="newsApp__item__url"><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it._id+'">Article</a> discovered via ';
-            html2+= '<a class="nomod" target="newsAppItem_'+it.idx+'_rssURL" href="' + it.rssURL+'">'+na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].urlToDomainName(it.rssURL)+'</a></span>';
-            html2+= '<br/>';
-            html2+= '<span class="newsApp__item__category"><span class="newsApp__item__categoryTitle">Category</span> <span class="newsApp__item__categoryColon">:</span> <span class="newsApp__item__categoryValue">'+it.path.substr(0, it.path.length)+'</span></span><br/>';
-            var pd = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it);
-            html2 += '<span class="newsApp__item__date">' + pd + '</span><br/>';
-
-            $(container).append(html).delay(50);
-            na.site.startUIvisuals('#newsApp__copyAndPaste__'+it.idx);
-            s.lastEl = $('#newsApp__item__'+it.idx);
+             html += '<td class="newsApp__item__copy"><div id="newsApp__copyAndPaste__'+it.idx+'" class="vividButton4 btn_copyAndPaste" buttonType="btn_copyAndPaste" style="float:right" target="newsAppItem_'+it.idx+'" onclick="var el = $(\'#newsApp__item__'+it.idx+'\')[0], textarea = $(\'#siteContent__textareaCopy\')[0]; if (!textarea) { var el2=document.createElement(\'textarea\'); window.top.document.append(el2); textarea=el2 }; el_html = el.innerHTML; el.innerHTML = el.innerHTML.replace(\/<span class..newsApp__item__copy.>Copy to clipboard<.a><.span>>\/,\'\') + \'Found via <a href=\\\'https://nicer.app/'+seov+'\\\' target=\\\'_new\\\'>https://nicer.app/'+seov+'</a>\'; var selection = window.getSelection(); var range = document.createRange(); range.selectNodeContents(el); selection.removeAllRanges(); selection.addRange(range); window.top.document.execCommand(\'copy\');setTimeout(function(){selection.removeAllRanges(); el.innerHTML=el_html;},1000);"></div></td></tr></table> ';
+             html+= '</div>';
 
 
-            var
-            el = $('#newsApp__item__'+it.idx)[0],
-            th = $('.news__item__title', el).height(),
-            fh = $('.newsApp__item__footer', el).height(),
-            ph = $('p, div', el).height(),
-            ph2 = 20 * $('p, div', el).length,
-            //mh = Math.round((th?parseInt(th):0) + (fh?parseInt(fh):0) + (ph?parseInt(ph):0) + (ph2?parseInt(ph2):0) + 60);
-            mh = hf - Math.round((th?parseInt(th)+5:0) + (fh?parseInt(fh)+125:0) + 0);
+             // tooltipster HTML
+             var html2 = '';
+             html2+= '<span class="newsApp__item__url"><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it._id+'">Article</a> discovered via ';
+             html2+= '<a class="nomod" target="newsAppItem_'+it.idx+'_rssURL" href="' + it.rssURL+'">'+na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].urlToDomainName(it.rssURL)+'</a></span>';
+             html2+= '<br/>';
+             html2+= '<span class="newsApp__item__category"><span class="newsApp__item__categoryTitle">Category</span> <span class="newsApp__item__categoryColon">:</span> <span class="newsApp__item__categoryValue">'+it.path.substr(0, it.path.length)+'</span></span><br/>';
+             var pd = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it);
+             html2 += '<span class="newsApp__item__date">' + pd + '</span><br/>';
 
-            $(el).css({maxHeight:hf,height:''});
-            $('.newsApp__item__desc',el).css({maxHeight:mh});
-            $('.newsApp__item__contentContainer',el).css({maxHeight:mh});
+             $(container).append(html).delay(50);
+             na.site.startUIvisuals('#newsApp__copyAndPaste__'+it.idx);
+             s.lastEl = $('#newsApp__item__'+it.idx);
 
-            /*
-             *        $(el).find('div, span')
-             *            .not('.vividScrollpane, .newsApp__item__title_bg, .newsApp__item__outer__bg, .newsApp__item__outer__bgFile1, .newsApp__item__outer__bgFile2, .newsApp__item__noPaint, a')
-             *            .each(function(idx,el2) {
-             *                if (!$(el2).find('*').not('a')[1]) if (!$(el2).parents().is('div, p, cite, a')) $(el2).addClass('newsApp__item__paint');
-             *                if ($(el2).html().trim()=='') $(el2).remove();
+
+             var
+             el = $('#newsApp__item__'+it.idx)[0],
+             th = $('.news__item__title', el).height(),
+             fh = $('.newsApp__item__footer', el).height(),
+             ph = $('p, div', el).height(),
+             ph2 = 20 * $('p, div', el).length,
+             //mh = Math.round((th?parseInt(th):0) + (fh?parseInt(fh):0) + (ph?parseInt(ph):0) + (ph2?parseInt(ph2):0) + 60);
+             mh = hf - Math.round((th?parseInt(th)+5:0) + (fh?parseInt(fh)+125:0) + 0);
+
+             $(el).css({maxHeight:hf,height:''});
+             $('.newsApp__item__desc',el).css({maxHeight:mh});
+             $('.newsApp__item__contentContainer',el).css({maxHeight:mh});
+
+             /*
+              *        $(el).find('div, span')
+              *            .not('.vividScrollpane, .newsApp__item__title_bg, .newsApp__item__outer__bg, .newsApp__item__outer__bgFile1, .newsApp__item__outer__bgFile2, .newsApp__item__noPaint, a')
+              *            .each(function(idx,el2) {
+              *                if (!$(el2).find('*').not('a')[1]) if (!$(el2).parents().is('div, p, cite, a')) $(el2).addClass('newsApp__item__paint');
+              *                if ($(el2).html().trim()=='') $(el2).remove();
         });
         */
-            $('.newsApp__item__title > p > a', el).each(function(idx,el) {
-                var $p = $(el).parent('.newsApp__item__title > p');
-                if ($p[0].innerHTML.replace(/<a>?.*<\/a>/g, '').replace(/<br\/>/g,'').trim() === '') {
-                    $p.addClass('disabled');
-                }
-            });
+             $('.newsApp__item__title > p > a', el).each(function(idx,el) {
+                 var $p = $(el).parent('.newsApp__item__title > p');
+                 if ($p[0].innerHTML.replace(/<a>?.*<\/a>/g, '').replace(/<br\/>/g,'').trim() === '') {
+                     $p.addClass('disabled');
+                 }
+             });
 
-            $(el).find('table').css ({
-                width : '100%',
-                height : '100%'
-            });
-            $(el).css({height:'fit-content'});
+             $(el).find('table').css ({
+                 width : '100%',
+                 height : '100%'
+             });
+             $(el).css({height:'fit-content'});
 
-            /*
-             *        $(el).find('img, iframe').each(function(idx,el){
-             *            var
-             *            p = $(el).parents('p, div')[0],
-             *            l = $(el).offset().left - $(p).offset().left,
-             *            w = $(p).width() - (2 * l);
-             *
-             *
-             *            if ($(el).width() > w - 30)
-             *                $(el).css({width:w-38});
+             /*
+              *        $(el).find('img, iframe').each(function(idx,el){
+              *            var
+              *            p = $(el).parents('p, div')[0],
+              *            l = $(el).offset().left - $(p).offset().left,
+              *            w = $(p).width() - (2 * l);
+              *
+              *
+              *            if ($(el).width() > w - 30)
+              *                $(el).css({width:w-38});
         });
         */
 
-            s.lastEl.css({opacity:1,display:'none'});
-            $('#newsApp__item__'+it.idx).fadeIn('normal');
+             s.lastEl.css({opacity:1,display:'none'});
+             $('#newsApp__item__'+it.idx).fadeIn('normal');
 
-            return {
-                // beware : algorithm subconcious code owned by Nicer.App.
-                id : '#newsApp__item__'+it.idx,
-                html : html,
-                html2 : html2
-            };
+             return {
+                 // beware : algorithm subconcious code owned by Nicer.App.
+                 id : '#newsApp__item__'+it.idx,
+                 html : html,
+                 html2 : html2
+             };
         },
 
         urlToDomainName : function (url) {

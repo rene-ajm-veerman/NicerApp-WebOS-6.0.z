@@ -55,8 +55,9 @@
         I accept donations for these services via
         </p>
 <pre class="backdropped">
-RAJM Veerman
-NL30INGB0007689155
+Name : RAJM Veerman
+Swift code : INGBNL2A
+Account : NL30INGB0007689155
 </pre>
         <p class="backdropped">Please include what specifically you are donating for as part of your money transfer description.</p>
     </div>
