@@ -109,6 +109,13 @@ if (!na.photoAlbum) na.photoAlbum = {
         // invert so the photo follows the drag direction
         $('#siteContent .vividDialogContent')[0].scrollLeft = na.photoAlbum.settings.coordX - deltaX;
         $('#siteContent .vividDialogContent')[0].scrollTop = na.photoAlbum.settings.coordY - deltaY;
+
+        // inside dragDiv, after applying the scroll:
+        na.photoAlbum.settings.offsetX = e.clientX;
+        na.photoAlbum.settings.offsetY = e.clientY;
+        na.photoAlbum.settings.coordX  = $('#siteContent .vividDialogContent')[0].scrollLeft;
+        na.photoAlbum.settings.coordY  = $('#siteContent .vividDialogContent')[0].scrollTop;
+
         return false;
     },
 	stopDrag : function () {
