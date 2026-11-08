@@ -2282,7 +2282,7 @@ class class_naComments {
                 $relPath = ltrim((string)($record['relativePath'] ?? ''), '/');
                 if ($relPath === '') continue;
 
-                $imgSrc = '/siteData/' . $relPath . '_thumb.png';
+                $imgSrc = '/siteData/' . $naWebOS->domain.'/'.$relPath . '_thumb.png';
 
                 // Build full-view payload the same way uploaded comment photos do
                 $codePath = trim(str_replace('\\', '/', dirname($relPath)), '/');

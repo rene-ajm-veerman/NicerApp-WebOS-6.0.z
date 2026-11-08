@@ -105,7 +105,7 @@ na.desktop = na.d = {
                 }
                 };
             },
-            margin : 30
+            margin : na.m.userDevice.isPhone?10:30
         };
 
         for (var divIdx=0; divIdx < t.g.divs.length; divIdx++) {
