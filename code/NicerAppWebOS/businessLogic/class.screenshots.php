@@ -147,7 +147,7 @@ class naScreenshots
 
         $this->siteDataRoot = (isset($naWebOS)
         ? str_replace('/domainConfig', '', $naWebOS->domainPath) . '/siteData'
-        : '');
+        : '').'/'.$naWebOS->domain;
 
         $this->nodeScript = realpath(dirname(__FILE__) . '/nodeScreenshot.js')
         ?: realpath(dirname(__FILE__) . '/../businessLogic/nodeScreenshot.js');
