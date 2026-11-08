@@ -2309,8 +2309,7 @@ class class_naComments {
                 '<a href="javascript:na.site.loadContent(event,\'' . htmlspecialchars($viewHref) . '\');" ' .
                 'class="nomod naComment_screenshotFullLink" ' .
                 'style="margin:20px;color:white; text-align:center; margin-top:4px; ' .
-                'text-decoration:underline; cursor:pointer; padding:2px 8px; border-radius:4px; display:inline-block;" ' .
-                'title="Open full screenshot">' .
+                'text-decoration:underline; cursor:pointer; padding:2px 8px; border-radius:4px; display:inline-block;">' .
                 'screenshot' .
                 '</a>' .
                 '</div>' .
