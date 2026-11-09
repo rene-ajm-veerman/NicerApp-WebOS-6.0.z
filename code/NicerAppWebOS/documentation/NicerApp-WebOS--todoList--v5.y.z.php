@@ -38,6 +38,8 @@ The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/N
         </ol>
     </div></li>
 
+    <li class="todoList"><div>(2026) Start work on a self-healer component for this WebOS, and a lot more Desktop OS level automated security to be installed via the <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-5.10.z/tree/main/NicerAppWebOS/scripts.install" target="mainBashInstallScript_for_NicerAppWebOS" class="nomod noPushState contentSectionTitle3_a"><span class="contentSectionTitle3_span">main Bash install script</span></a>.</div></li>
+
     <li class="todoList"><div>(2026) Build a VAPID enabled database-updated detection system for browser apps, and release that permanently as open source, based on uDB-2.y.z.</div></li>
 
     <li class="todoList"><div>(2026) Permanently and completely fix the web-based theme editor for NA.
@@ -53,7 +55,7 @@ The yearly release stage of a new <a href="https://github.com/rene-ajm-veerman/N
     <li class="todoList"><div>(2026) Get na.m.log() to log per datetimeRangeBegin.milliseconds to datetimeRangeEnd.milliseconds into a database on the server, for use in /view/logs as the PHP data belonging to a PHP session_id().<br/>
     Status : Completed javascript code, now needs revamped generalizedDatabaseAPI written and called, and db businesslogic PHP code.</div></li>
 
-    <li class="todoList"><div>(2027) Start work on a self-healer component for this WebOS, and a lot more Desktop OS level automated security to be installed via the <a href="https://github.com/rene-ajm-veerman/nicerApp-WebOS-5.10.z/tree/main/NicerAppWebOS/scripts.install" target="mainBashInstallScript_for_NicerAppWebOS" class="nomod noPushState contentSectionTitle3_a"><span class="contentSectionTitle3_span">main Bash install script</span></a>.</div></li>
+    <li class="todoList"><div>(2027) For bot traffic, output all comments (based on $_GET vars indicating a date time range) as part of the initial HTML delivery</div></li>
 
     <li class="todoList"><div>(2027-March-and-beyond) Expand on desktop.js to let it be used to dynamically change the size and position of dialogs on the end-user's screen.</div></li>
 

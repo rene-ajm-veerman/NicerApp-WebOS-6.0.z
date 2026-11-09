@@ -795,6 +795,8 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
                 try {
                     var json = (typeof raw === 'string') ? JSON.parse(raw) : raw;
 
+                    debugger;
+
                     if (json.ok) {
                         na.comments.onreload();
                         // Visual feedback
@@ -865,6 +867,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
                 na.c.onclick_btnPostComment_afterDataTransfer(data);
             },
             error : function (xhr, ts, errorThrown) {
+                debugger;
                 na.site.ajaxFail('na.comments.onclick_btnPostComment : ' + errorThrown);
             }
         };

@@ -100,7 +100,7 @@ class class_naComments {
     {
         global $naWebOS;
         $codePath = trim($codePath, '/');
-        $baseURL  = '/siteData/' . $naWebOS->domainFolder . '/' . $codePath;
+        $baseURL  = '/siteData/' . $naWebOS->domain . '/' . $codePath;
         $out = [];
         foreach ($files as $f) {
             $name = is_array($f) ? ($f['name'] ?? $f['filename'] ?? '') : (string)$f;
@@ -249,7 +249,7 @@ class class_naComments {
             trigger_error($fncn . ' : missing id', E_USER_ERROR);
         }
 
-        $db     = $naWebOS->dbs->findConnection('couchdb');
+        $db     = $naWebOS->dbsAdmin->findConnection('couchdb');
         $cdb    = $db->cdb;
         $dbName = $db->dataSetName('cms_comments');
         $cdb->setDatabase($dbName, true);
@@ -258,7 +258,10 @@ class class_naComments {
             $call = $cdb->get($in['id']);
             $doc  = $call->body;
 
-            $isOwner     = (isset($doc->clientUsername) && $doc->clientUsername === $naUsername);
+            $isOwner     = (isset($doc->clientUsername) && (
+                $doc->clientUsername === $naUsername
+                || na_plainUsername_from_couchdbUsername($doc->clientUsername) === na_plainUsername_from_couchdbUsername($naUsername)
+            ));
             $isAuthority = $this->userIsGovernmentAuthority();
 
             if (!$isOwner && !$isAuthority) {
@@ -713,14 +716,14 @@ class class_naComments {
             //    (so the user often sees the new screenshot after a refresh)
             // -------------------------------------------------
             // Keep this number low so the page stays fast
-            /*
-             *        $screenshots->processQueue([
-             *            'maxJobs'      => 2,           // process max 2 jobs in this request
-             *            'sleepSeconds' => 0,
-             *            'verbose'      => false,
-             *            'releaseStale' => true
-             *        ]);
-             */
+
+                    $screenshots->processQueue([
+                        'maxJobs'      => 4,           // process max 2 jobs in this request
+                        'sleepSeconds' => 0,
+                        'verbose'      => false,
+                        'releaseStale' => true
+                    ]);
+
 
             // -------------------------------------------------
             // 5. Continue with the normal comments rendering
@@ -1057,194 +1060,203 @@ class class_naComments {
         global $naUsername;
         $naUsername = na_plainUsername_from_couchdbUsername($_COOKIE['cdb_loginName']);
         global $users;
-        $its_id = $it['_id'];
-        if (in_array($its_id,$openIDs)) $style='style="display:block"'; else $style='';
-        $html = '<div id="naComment_'.($its_id!=='#'?$its_id:'_').'" class="naComment_entry" '.$style.'>'.PHP_EOL;
-        //$html .= json_encode ($it, JSON_PRETTY_PRINT);
-        $html .= $naWebOS->html_vividButton(
-            1001, 'float:left',
 
-            'btnExpandComment',
-            'vividButton_icon_50x50 vbExpandComment', '_50x50', 'vbExpandComment',
-            '',
-            'na.c.onclick_btnExpandComment(event);',
-                                            '',
-                                            '',
+        $h = (
+            array_key_exists('hidden',$it)
+            && $it['hidden']
+        );
+        $dbg = [
+            array_key_exists('hidden',$it),
+            array_key_exists('hidden',$it) && $it['hidden'],
+            $h,
+            $it
+        ];
+        //var_dump ($h);
 
-                                            1001, 'Expand comment',
-                                            'btnCssVividButton_outerBorder.png',
-                                            'btnCssVividButton.png',
-                                            'btnCssVividButton.greenYellow.png',
-                                            'btnPlus_shaded.png',
-                                            '', '', '', ''
-        ).PHP_EOL;
-        // History-knop alleen voor Government Authorities
-        if ($t->userIsGovernmentAuthority()) {
-            $html .= $naWebOS->html_vividButton(
-                1001, 'float:right',
-                'btnViewHistory',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnViewHistory(event);',
-                                                '',
-                                                '',
-                                                1001, 'Audit History',
-                                                'btnCssVividButton_outerBorder.png',
-                                                'btnCssVividButton.png',
-                                                $this->themes[$this->theme]['btnHistory'] ?? 'btnCssVividButton.redStone.png',
-                                                'btnDocument.png',
-                                                '', '', '', ''
-            );
-        };
-        //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it['clientUsername'], $naUsername]); echo '</pre>';
-        if (array_key_exists('clientUsername',$it) && na_plainUsername_from_couchdbUsername($it['clientUsername'])==$naUsername) {
-            /*$html .= $naWebOS->html_vividButton(
-             *                        1001, 'float:right',
-             *
-             *                        'btnRemoveComment',
-             *                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-             *                        '',
-             *                        'na.c.onclick_btnRemoveComment(event);',
-             *                        '',
-             *                        '',
-             *
-             *                        1001, 'Remove comment',
-             *                        'btnCssVividButton_outerBorder.png',
-             *                        'btnCssVividButton.png',
-             *                        $t->themes[$t->theme]['btnDeleteComment'],
-             *                        'btnTrashcan_red.png',
-             *                        '', '', '', ''
-             *                    ).PHP_EOL;
-             */
-            $html .= $naWebOS->html_vividButton(
-                1001, 'float:right',
-                'btnEditComment',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnEditComment(event);',
-                                                '',
-                                                '',
-                                                1001, 'Edit comment',
-                                                'btnCssVividButton_outerBorder.png',
-                                                'btnCssVividButton.png',
-                                                $t->themes[$t->theme]['btnEditComment'],
-                                                'btnDocument.png',          // or any icon you already have
-                                                '', '', '', ''
-            ).PHP_EOL;
-            $h = (
-                array_key_exists('hidden',$it)
-                && $it['hidden']
-            );
-            if ($h) {
-                $filter = 'opacity:0.4;filter:greyscale(1) brightness(0.6)';
-            } else {
-                $filter = '';
-            }
-            $html .= $naWebOS->html_vividButton(
-                1001, 'float:right;'.$filter,
-                'btnHideComment',
-                'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
-                '',
-                'na.c.onclick_btnToggleHidden(event);',
-                                                (isset($it['hidden']) && $it['hidden'] ? 'Show comment' : 'Hide comment'),
-                                                '',
-                                                1001, '(Un)hide comment',
-                                                'btnCssVividButton_outerBorder.png',
-                                                'btnCssVividButton.png',
-                                                $t->themes[$t->theme]['btnEditComment'],
-                                                '1660_blk_19329_zoom.upperBodyOnly.256x256.png',          // or any icon you already have
-                                                '', '', '', ''
-            ).PHP_EOL;
-            $html .= html_viewHistoryButton($it['_id'], [
-                'title'        => 'Comment Revision History',
-                'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
-                'database' => 'cms_comments',
-                'limit'        => 55500
-            ]);
-        }
-        $html .= "\t".'<div style="display:none">'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_parentID">'.($it['parentID'] ?? '#').'</span>'.PHP_EOL;
-        if (array_key_exists('clientIP', $it)) {
-            $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
-        }
-        $html .= "\t\t".'<span class="naComment_clientDatetime">'.($it['clientDatetime'] ?? '').'</span>'.PHP_EOL;
-        $html .= "\t\t".'<span class="naComment_clientTZoffset">'.($it['clientTZoffset'] ?? 0).'</span>'.PHP_EOL;
-        if (array_key_exists('clientUsername', $it)) {
-            $html .= "\t\t".'<span class="naComment_clientUsername">'.na_plainUsername_from_couchdbUsername($it['clientUsername']).'</span>'.PHP_EOL;
-        }
-        $html .= "\t".'</div>'.PHP_EOL;
 
-        $html .= "\t".'<div class="naComment_header">';
         if (
-            array_key_exists('clientUsername', $it)
-            && is_string($it['clientUsername'])
-            && trim($it['clientUsername'])!==''
+            (!array_key_exists('clientUsername', $it) || (
+                na_plainUsername_from_couchdbUsername($it['clientUsername']) === na_plainUsername_from_couchdbUsername($naUsername)
+                && $it['clientUsername'] !== $naUsername
+            ))
+            || $h!==true
         ) {
-            $u = na_plainUsername_from_couchdbUsername($it['clientUsername']);
-        } else {
-            $u = 'Guest';
-        }
-        global $users;
-        if (!isset($users[$u])) $users[$u] = [];
-        $users[$u] = negotiateOptions ($users[$u], $t->fetchUserRecord($u));
-        global $naDebugStartup;
-        if ($naDebugStartup) {
-            echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
-        }
+            $its_id = $it['_id'];
+            if (in_array($its_id,$openIDs)) $style='style="display:block"'; else $style='';
+            $html = '<div id="naComment_'.($its_id!=='#'?$its_id:'_').'" class="naComment_entry" '.$style.'>'.PHP_EOL;
+            //$html .= json_encode ($it, JSON_PRETTY_PRINT);
+            $html .= $naWebOS->html_vividButton(
+                1001, 'float:left',
 
-        $html .= "\t".'<span class="naComment_username">'
-        . (array_key_exists('displayName',$users[$u])?$users[$u]['displayName']:$users[$u]['userRealName'])
-        . '</span>'.PHP_EOL;
+                'btnExpandComment',
+                'vividButton_icon_50x50 vbExpandComment', '_50x50', 'vbExpandComment',
+                '',
+                'na.c.onclick_btnExpandComment(event);',
+                                                '',
+                                                '',
 
-        $html .=
-        '<span class="naComment_clientDatetime" style="display:none;">'.$it['clientDatetime'].'</span>'
-        .'<span class="naComment_clientTZoffset" style="display:none;">'.($it['clientTZoffset']??'').'</span>'
-        .'<span class="naComment_datetime" '
-        . 'onclick="na.c.onclick_datetime(event)" '
-        . 'style="cursor:pointer;" '
-        . 'title="Click to link to this comment">'
-        . naDateTimeHeader($it['clientDatetime'], ($it['clientTZoffset']??0));
-        $html .= '</span>'.PHP_EOL;
+                                                1001, 'Expand comment',
+                                                'btnCssVividButton_outerBorder.png',
+                                                'btnCssVividButton.png',
+                                                'btnCssVividButton.greenYellow.png',
+                                                'btnPlus_shaded.png',
+                                                '', '', '', ''
+            ).PHP_EOL;
+            // History-knop alleen voor Government Authorities
+            if ($t->userIsGovernmentAuthority()) {
+                $html .= $naWebOS->html_vividButton(
+                    1001, 'float:right',
+                    'btnViewHistory',
+                    'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                    '',
+                    'na.c.onclick_btnViewHistory(event);',
+                                                    '',
+                                                    '',
+                                                    1001, 'Audit History',
+                                                    'btnCssVividButton_outerBorder.png',
+                                                    'btnCssVividButton.png',
+                                                    $this->themes[$this->theme]['btnHistory'] ?? 'btnCssVividButton.redStone.png',
+                                                    'btnDocument.png',
+                                                    '', '', '', ''
+                );
+            };
+            //echo '<pre style="color:yellow;background:purple;font-weight:bold;margin:10px;padding:10px;border-radius:10px">'; var_dump([$it['clientUsername'], $naUsername]); echo '</pre>';
+            if (array_key_exists('clientUsername',$it) && na_plainUsername_from_couchdbUsername($it['clientUsername'])==$naUsername) {
+                /*$html .= $naWebOS->html_vividButton(
+                *                        1001, 'float:right',
+                *
+                *                        'btnRemoveComment',
+                *                        'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                *                        '',
+                *                        'na.c.onclick_btnRemoveComment(event);',
+                *                        '',
+                *                        '',
+                *
+                *                        1001, 'Remove comment',
+                *                        'btnCssVividButton_outerBorder.png',
+                *                        'btnCssVividButton.png',
+                *                        $t->themes[$t->theme]['btnDeleteComment'],
+                *                        'btnTrashcan_red.png',
+                *                        '', '', '', ''
+                *                    ).PHP_EOL;
+                */
+                $html .= $naWebOS->html_vividButton(
+                    1001, 'float:right',
+                    'btnEditComment',
+                    'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                    '',
+                    'na.c.onclick_btnEditComment(event);',
+                                                    '',
+                                                    '',
+                                                    1001, 'Edit comment',
+                                                    'btnCssVividButton_outerBorder.png',
+                                                    'btnCssVividButton.png',
+                                                    $t->themes[$t->theme]['btnEditComment'],
+                                                    'btnDocument.png',          // or any icon you already have
+                                                    '', '', '', ''
+                ).PHP_EOL;
+                $h = (
+                    array_key_exists('hidden',$it)
+                    && $it['hidden']
+                );
+                if ($h) {
+                    $filter = 'opacity:0.4;filter:greyscale(1) brightness(0.6)';
+                } else {
+                    $filter = '';
+                }
+                $html .= $naWebOS->html_vividButton(
+                    1001, 'float:right;'.$filter,
+                    'btnHideComment',
+                    'vividButton_icon_50x50 grouped', '_50x50', 'grouped',
+                    '',
+                    'na.c.onclick_btnToggleHidden(event);',
+                                                    (isset($it['hidden']) && $it['hidden'] ? 'Show comment' : 'Hide comment'),
+                                                    '',
+                                                    1001, '(Un)hide comment',
+                                                    'btnCssVividButton_outerBorder.png',
+                                                    'btnCssVividButton.png',
+                                                    $t->themes[$t->theme]['btnEditComment'],
+                                                    '1660_blk_19329_zoom.upperBodyOnly.256x256.png',          // or any icon you already have
+                                                    '', '', '', ''
+                ).PHP_EOL;
+                $html .= html_viewHistoryButton($it['_id'], [
+                    'title'        => 'Comment Revision History',
+                    'contentField' => 'snapshot.msgHTML',   // or just 'msgHTML' if you kept the old format
+                    'database' => 'cms_comments',
+                    'limit'        => 55500
+                ]);
+            }
+            $html .= "\t".'<div style="display:none">'.PHP_EOL;
+            $html .= "\t\t".'<span class="naComment_id">'.$it['_id'].'</span>'.PHP_EOL;
+            $html .= "\t\t".'<span class="naComment_parentID">'.($it['parentID'] ?? '#').'</span>'.PHP_EOL;
+            if (array_key_exists('clientIP', $it)) {
+                $html .= "\t\t".'<span class="naComment_clientIP">'.$it['clientIP'].'</span>'.PHP_EOL;
+            }
+            $html .= "\t\t".'<span class="naComment_clientDatetime">'.($it['clientDatetime'] ?? '').'</span>'.PHP_EOL;
+            $html .= "\t\t".'<span class="naComment_clientTZoffset">'.($it['clientTZoffset'] ?? 0).'</span>'.PHP_EOL;
+            if (array_key_exists('clientUsername', $it)) {
+                $html .= "\t\t".'<span class="naComment_clientUsername">'.na_plainUsername_from_couchdbUsername($it['clientUsername']).'</span>'.PHP_EOL;
+            }
+            $html .= "\t".'</div>'.PHP_EOL;
 
-        if (!empty($it['editedDatetime'])) {
+            $html .= "\t".'<div class="naComment_header">';
+            if (
+                array_key_exists('clientUsername', $it)
+                && is_string($it['clientUsername'])
+                && trim($it['clientUsername'])!==''
+            ) {
+                $u = na_plainUsername_from_couchdbUsername($it['clientUsername']);
+            } else {
+                $u = 'Guest';
+            }
+            global $users;
+            if (!isset($users[$u])) $users[$u] = [];
+            $users[$u] = negotiateOptions ($users[$u], $t->fetchUserRecord($u));
+            global $naDebugStartup;
+            if ($naDebugStartup) {
+                echo '<pre>'.json_encode($users,JSON_PRETTY_PRINT).'</pre>';
+            }
+
+            $html .= "\t".'<span class="naComment_username">'
+            . (array_key_exists('displayName',$users[$u])?$users[$u]['displayName']:$users[$u]['userRealName'])
+            . '</span>'.PHP_EOL;
+
             $html .=
-            '<span class="naComment_editedDatetime" style="display:none;">'.$it['editedDatetime'].'</span>'
-            .'<span class="naComment_editedTZoffset" style="display:none;">'.$it['editedTZoffset'].'</span>'
-            .'<span class="naComment_edited" title="Last edited">'
-            . ' (last edited ' . naTimeDiffBetween(
-                $it['clientDatetime'], $it['clientTZoffset'],
-                $it['editedDatetime'], $it['editedTZoffset'],
-                true
-            ).' later, '. naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
-            .'</span>';
-        }
+            '<span class="naComment_clientDatetime" style="display:none;">'.$it['clientDatetime'].'</span>'
+            .'<span class="naComment_clientTZoffset" style="display:none;">'.($it['clientTZoffset']??'').'</span>'
+            .'<span class="naComment_datetime" '
+            . 'onclick="na.c.onclick_datetime(event)" '
+            . 'style="cursor:pointer;" '
+            . 'title="Click to link to this comment">'
+            . naDateTimeHeader($it['clientDatetime'], ($it['clientTZoffset']??0));
+            $html .= '</span>'.PHP_EOL;
+
+            if (!empty($it['editedDatetime'])) {
+                $html .=
+                '<span class="naComment_editedDatetime" style="display:none;">'.$it['editedDatetime'].'</span>'
+                .'<span class="naComment_editedTZoffset" style="display:none;">'.$it['editedTZoffset'].'</span>'
+                .'<span class="naComment_edited" title="Last edited">'
+                . ' (last edited ' . naTimeDiffBetween(
+                    $it['clientDatetime'], $it['clientTZoffset'],
+                    $it['editedDatetime'], $it['editedTZoffset'],
+                    true
+                ).' later, '. naDateTimeHeader($it['editedDatetime'], $it['editedTZoffset'] ?? 0) . ')'
+                .'</span>';
+            }
 
 
 
-        $html .= "\t".'</div>'.PHP_EOL;
+            $html .= "\t".'</div>'.PHP_EOL;
 
 
         //$html .= $t->mode.'<br/>';
         // $it2 = $it;
         // $p = [];
-        $h = (
-            array_key_exists('hidden',$it)
-            && $it['hidden']
-        );
-        // $dbg = [
-        //     array_key_exists('hidden',$it),
-        //     array_key_exists('hidden',$it) && $it['hidden'],
-        //     $h,
-        //     $it
-        // ];
+         //echo '<pre>'; var_dump ($t->mode); var_dump ($dbg); echo '</pre>';
 
         //walkArray ($it2, $it2, null, 'wav', false, $p);
         //$html .= '<pre>'.json_encode($dbg,JSON_PRETTY_PRINT).'</pre>';
-        if (
-            strpos($t->mode,'ajax')!==false
-            && $h!==true
-        ) {
+
 
 
             // ────────────────────────────────────────────────
@@ -1270,33 +1282,33 @@ class class_naComments {
                 box-shadow: 0 4px 18px rgba(0,0,0,0.35);
                 ">';
 
-            $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
-            ⚠ Deze post is verborgen door justitie
-            </div>';
-
-            if (!empty($it['hiddenReason'])) {
-                $html .= '<div style="margin-bottom:8px;">
-                <strong>Reden:</strong> ' . htmlspecialchars($it['hiddenReason']) . '
+                $html .= '<div style="font-weight:700; font-size:1.05em; margin-bottom:6px;">
+                ⚠ Deze post is verborgen door justitie
                 </div>';
-            }
 
-            if (!empty($it['hiddenAtStr'])) {
-                $html .= '<div style="opacity:0.85; font-size:0.9em; margin-bottom:8px;">
-                Bevroren op: ' . htmlspecialchars($it['hiddenAtStr']) . '
-                </div>';
-            }
+                if (!empty($it['hiddenReason'])) {
+                    $html .= '<div style="margin-bottom:8px;">
+                    <strong>Reden:</strong> ' . htmlspecialchars($it['hiddenReason']) . '
+                    </div>';
+                }
 
-            if ($canUnhide) {
-                $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2);">
-                Je mag deze post zelf weer zichtbaar maken via de "Hide/Show" knop.
-                </div>';
-            } else {
-                $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2); color:#ffb0b0;">
-                <em>Je kunt deze post niet zelf weer zichtbaar maken. Alleen justitie kan de freeze opheffen.</em>
-                </div>';
-            }
+                if (!empty($it['hiddenAtStr'])) {
+                    $html .= '<div style="opacity:0.85; font-size:0.9em; margin-bottom:8px;">
+                    Bevroren op: ' . htmlspecialchars($it['hiddenAtStr']) . '
+                    </div>';
+                }
 
-            $html .= '</div>';
+                if ($canUnhide) {
+                    $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2);">
+                    Je mag deze post zelf weer zichtbaar maken via de "Hide/Show" knop.
+                    </div>';
+                } else {
+                    $html .= '<div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.2); color:#ffb0b0;">
+                    <em>Je kunt deze post niet zelf weer zichtbaar maken. Alleen justitie kan de freeze opheffen.</em>
+                    </div>';
+                }
+
+                $html .= '</div>';
             } else {
                 $mh = $it['msgHTML'];
                 $mh = str_replace('<iframe', '<iframe loading="lazy" defer=""', $mh);
@@ -1367,34 +1379,34 @@ class class_naComments {
                 $html .= '</div>';
             }
 
+            $html .= "\t".'<div class="naComment_subComments">';
+            $html .= "\t".'</div>'.PHP_EOL;
+            $html .=
+            "\t".$naWebOS->html_vividButton (
+                1001, 'margin-left:30px;',
+
+                'btnAddSubComment',
+                'vividButton_icon_50x50 vbAddSubComment', '_50x50', 'vbAddSubComment',
+                '',
+                'na.c.onclick_btnAddComment(event);',
+                                             '',
+                                             '',
+
+                                             1001, 'Add reply',
+
+                                             'btnCssVividButton_outerBorder.png',
+                                             'btnCssVividButton.png',
+                                             $t->themes[$t->theme]['btnAddReply'],
+                                             'btnDocument2.png',
+
+                                             '',
+
+                                             'Add reply',
+                                             '', ''
+            ).PHP_EOL;
+            $html .= '</div>'.PHP_EOL;
         };
-        $html .= "\t".'<div class="naComment_subComments">';
-        $html .= "\t".'</div>'.PHP_EOL;
-        $html .=
-        "\t".$naWebOS->html_vividButton (
-            1001, 'margin-left:30px;',
-
-            'btnAddSubComment',
-            'vividButton_icon_50x50 vbAddSubComment', '_50x50', 'vbAddSubComment',
-            '',
-            'na.c.onclick_btnAddComment(event);',
-                                         '',
-                                         '',
-
-                                         1001, 'Add reply',
-
-                                         'btnCssVividButton_outerBorder.png',
-                                         'btnCssVividButton.png',
-                                         $t->themes[$t->theme]['btnAddReply'],
-                                         'btnDocument2.png',
-
-                                         '',
-
-                                         'Add reply',
-                                         '', ''
-        ).PHP_EOL;
-        $html .= '</div>'.PHP_EOL;
-        return $html;
+        return $html??'';
     }
 
 
@@ -2269,6 +2281,13 @@ class class_naComments {
             global $naWebOS;
             $uDB2 = $naWebOS->dbsAdmin->findConnection('couchdb'); // adjust as needed
             $screenshots = new naScreenshots($uDB2);
+            $screenshots->processQueue([
+                'maxJobs'      => 4, // keep this low for now (page load speed greatly affected, as is server CPU speed)
+                'sleepSeconds' => 0,
+                'verbose'      => false,
+                'releaseStale' => true
+            ]);
+
 
             $html = '<div class="naComment_linkedScreenshots" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">';
             $count = 0;
