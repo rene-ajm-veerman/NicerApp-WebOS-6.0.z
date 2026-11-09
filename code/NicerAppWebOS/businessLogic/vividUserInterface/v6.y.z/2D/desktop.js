@@ -15,6 +15,7 @@ na.desktop = na.d = {
             divs : [ '#siteTaskbar', '#siteDateTime', '#siteErrors', '#btnOptions', '#btnLoginLogout', '#btnChangeBackground', '#siteContent', '#siteYoutubePlayer', '#siteYoutubeSearch', '#siteComments', '#siteStatusbar', '#siteToolbarThemeEditor', '#siteToolbarLeft', '#siteToolbarRight', '#siteToolbarTop' ],
             originalDivs : [ '#siteStatusbar', '#siteTaskbar', '#siteContent' ],
             visibleDivs : [ '#siteStatusbar', '#siteTaskbar', '#siteContent' ],
+            activeDiv : '#siteContent',
             configs : {
                 'background' : [ ],
                 'all' : [ '#siteContent', '#siteYoutubePlayer', '#siteYoutubeSearch', '#siteStatusbar' ],
@@ -120,7 +121,8 @@ na.desktop = na.d = {
             masterCallbacks : [],
             callbacks : [],
             callbacksProgress : [],
-            cmds : []
+            cmds : [],
+            activeDiv : na.desktop.globals.activeDiv
         }, settings);
 
         //$(window).resize(t.resize);
