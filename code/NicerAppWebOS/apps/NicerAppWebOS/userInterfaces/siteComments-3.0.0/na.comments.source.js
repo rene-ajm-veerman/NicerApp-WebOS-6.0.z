@@ -795,8 +795,6 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
                 try {
                     var json = (typeof raw === 'string') ? JSON.parse(raw) : raw;
 
-                    debugger;
-
                     if (json.ok) {
                         na.comments.onreload();
                         // Visual feedback

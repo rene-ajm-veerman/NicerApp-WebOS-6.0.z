@@ -1124,6 +1124,8 @@ na.site = {
 
         //na.desktop.setConfig ('content');
 
+        debugger;
+
         var
         dateObj = new Date(),
         timeInMilliseconds = dateObj.getTime(),
@@ -1178,6 +1180,8 @@ na.site = {
         } else if (url.indexOf('/')===-1) {
             var msg = 'na.site.loadContent() : url='+document.location.origin+'/view/'+url;
             History.pushState (null, '', document.location.origin+'/view/'+url);
+        } else if (url.indexOf('https://')===0) {
+            window.open (url, '_blank');
         } else debugger;
 
         if (event && typeof event.preventDefault=='function') event.preventDefault();
