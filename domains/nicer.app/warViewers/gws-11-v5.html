@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Global War Simulator v11.5 – Country Borders + Multi-Domain + Air + Diplomacy</title>
+<style>
+:root{color-scheme:dark}
+body{margin:0;background:#050b14;color:#00ffcc;font-family:'Courier New',monospace;overflow:hidden;user-select:none}
+#cc{width:100vw;height:100vh;position:absolute;top:0;left:0;z-index:1}
+.p{position:absolute;z-index:10;background:rgba(5,11,20,.9);padding:14px;border:1px solid #00ffcc;border-radius:4px;box-shadow:0 0 15px rgba(0,255,204,.2);box-sizing:border-box}
+#hud{top:calc(12px + env(safe-area-inset-top,0px));left:12px;width:min(335px,92vw)}
+#reg{top:calc(328px + env(safe-area-inset-top,0px));left:12px;width:min(335px,92vw);max-height:calc(100vh - 528px);overflow:auto;font-size:10px}
+#logp{top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:min(350px,92vw);height:320px;display:flex;flex-direction:column}
+#log{flex-grow:1;overflow-y:auto;border:1px solid rgba(0,255,204,.3);background:#02060d;padding:8px;font-size:10px;color:#88ffcc;white-space:pre-wrap}
+h1,h2{font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #00ffcc;padding-bottom:4px}
+.d{font-size:11px;margin-bottom:5px;display:flex;justify-content:space-between;gap:8px}
+.v{color:#fff;font-weight:bold;text-align:right}.N{color:#4da6ff}.B{color:#ff4d4d}
+#ctl{bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;width:max-content;max-width:95vw}
+.r{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sl-grid{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:6px 14px;width:100%}
+.sl{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px}
+.sl input[type=range]{width:95px}
+button,select{background:transparent;border:1px solid #00ffcc;color:#00ffcc;padding:6px 10px;font:11px 'Courier New',monospace;cursor:pointer;text-transform:uppercase}
+select{background:#050b14}button:hover:not(:disabled){background:#00ffcc;color:#050b14}button:disabled{opacity:.4;cursor:not-allowed}
+.filters{display:flex;gap:6px;margin-bottom:6px}
+.filters select{flex:1;padding:4px}
+.row{display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid rgba(0,255,204,.15);cursor:pointer}
+.row:hover{background:rgba(0,255,204,.08)}
+.row small{color:#6aa;display:block}
+.badge{font-size:9px;padding:1px 4px;border:1px solid currentColor;border-radius:2px}
+@media(max-width:800px){#logp{display:none}#reg{display:none}.sl-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="cc"></div>
+
+<div id="hud" class="p">
+  <h1>Strategic Status Matrix</h1>
+  <div class="d"><span>SIM ENGINE:</span><span class="v" id="hs" style="color:#ffaa00">STANDBY</span></div>
+  <div class="d"><span>NATO BASES / FLEET / ARMY:</span><span class="v N" id="hn">100% | 100% | 100%</span></div>
+  <div class="d"><span>BRICS BASES / FLEET / ARMY:</span><span class="v B" id="hb">100% | 100% | 100%</span></div>
+  <div class="d"><span>AIR WINGS N / B:</span><span class="v"><span class="N" id="han">100%</span> | <span class="B" id="hab">100%</span></span></div>
+  <div class="d"><span>ACTIVE MISSILES / UNITS:</span><span class="v" id="hv">0 / 52</span></div>
+  <div class="d"><span>HITS / INTERCEPTS:</span><span class="v" id="hh">0 / 0</span></div>
+  <div class="d"><span>GROUND / NAVAL CLASHES:</span><span class="v" id="hc">0</span></div>
+  <div class="d" id="vf" style="display:none;border-top:1px dashed #ffaa00;padding-top:6px"><span>OUTCOME:</span><span class="v" id="vl" style="color:#ffaa00">NO WINNER</span></div>
+  <div class="d" style="color:#6aa;margin:4px 0 0;min-height:26px" id="info">Hover a base, fleet (oval), ground unit (octagon), or air wing (diamond).</div>
+</div>
+
+<div id="reg" class="p">
+  <h2>Order of Battle (<span id="cnt"></span>)</h2>
+  <div class="filters">
+    <select id="fs">
+      <option value="">Both Sides</option>
+      <option value="N">NATO / Allied</option>
+      <option value="B">BRICS+</option>
+    </select>
+    <select id="ft">
+      <option value="">All Domains</option>
+      <option value="BASE">Bases</option>
+      <option value="SEA">Naval Fleets</option>
+      <option value="LAND">Land Forces</option>
+      <option value="AIR">Air Wings</option>
+    </select>
+  </div>
+  <div id="rl"></div>
+</div>
+
+<div id="logp" class="p">
+  <h2>Live Operation Logs</h2>
+  <div id="log">-- COUNTRY BORDERS, AIR WINGS & MULTI-DOMAIN GRID READY --</div>
+</div>
+
+<div id="ctl" class="p">
+  <div class="r">
+    <button id="bN">First Strike – NATO</button>
+    <button id="bB">First Strike – BRICS</button>
+    <button id="bM">Mobilize All Domains</button>
+    <button id="bR">Reset Grid</button>
+  </div>
+  <div class="sl-grid">
+    <div class="sl"><span>SIM SPEED:</span><input type="range" id="simSpd" min="0.2" max="3.0" step="0.2" value="1.0"><span id="ssv">1.0X</span></div>
+    <div class="sl"><span>MISSILE MACH SPEED:</span><input type="range" id="mach" min="5" max="20" step="1" value="8"><span id="mv">X8</span></div>
+    <div class="sl"><span>NATO DIPLOMACY WILLINGNESS:</span><input type="range" id="dipN" min="0" max="100" step="5" value="25"><span id="dnv">25%</span></div>
+    <div class="sl"><span>BRICS DIPLOMACY WILLINGNESS:</span><input type="range" id="dipB" min="0" max="100" step="5" value="25"><span id="dbv">25%</span></div>
+    <div class="sl"><span>EW JAMMING:</span><input type="range" id="ew" min="0" max="60" step="5" value="20"><span id="ev">20%</span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script>
+const $=i=>document.getElementById(i), ER=40;
+const REG={EU:"Europe",ME:"Middle East",PAC:"Indo-Pacific",ARC:"Arctic",IND:"Indian Ocean",AF:"Africa",AM:"Americas"};
+
+const BASES=[
+  ["Ramstein AB, DE",49.44,7.60,"N","EU","air","USAFE-AFAFRICA HQ; 86th Airlift Wing"],
+  ["RAF Lakenheath, UK",52.41,0.56,"N","EU","air","48th Fighter Wing (F-35A, F-15E)"],
+  ["Aviano AB, IT",46.03,12.60,"N","EU","air","31st Fighter Wing (F-16)"],
+  ["Spangdahlem AB, DE",49.97,6.69,"N","EU","air","52nd Fighter Wing"],
+  ["Naval Station Rota, ES",36.64,-6.35,"N","EU","naval","Forward-deployed Aegis destroyers"],
+  ["NSA Souda Bay, GR",35.53,24.15,"N","EU","naval","US/NATO Eastern Med naval support"],
+  ["Redzikowo, PL",54.48,17.10,"N","EU","land","Aegis Ashore missile defense site"],
+  ["Deveselu, RO",43.90,24.38,"N","EU","land","Aegis Ashore BMD complex"],
+  ["HMNB Clyde (Faslane), UK",56.07,-4.82,"N","EU","naval","Royal Navy SSBN/SSN flotilla"],
+  ["Île Longue, FR",48.30,-4.52,"N","EU","naval","French Strategic Oceanic Force (SSBN)"],
+  ["Grafenwöhr, DE",49.69,11.94,"N","EU","land","7th Army Training Command / Armored hub"],
+  ["Camp Tapa, EE",59.26,25.96,"N","EU","land","NATO Enhanced Forward Presence Battlegroup"],
+  ["Haakonsvern, NO",60.34,5.23,"N","EU","naval","Royal Norwegian Navy main base"],
+  ["Keflavik AB, IS",63.98,-22.60,"N","ARC","air","GIUK Gap maritime patrol & air policing"],
+  ["Incirlik AB, TR",37.00,35.43,"N","ME","air","39th Air Base Wing"],
+  ["Al Udeid AB, QA",25.12,51.31,"N","ME","air","CENTCOM Forward HQ; 379th AEW"],
+  ["NSA Bahrain",26.21,50.60,"N","ME","naval","US 5th Fleet HQ"],
+  ["Al Dhafra AB, AE",24.25,54.55,"N","ME","air","380th Air Expeditionary Wing"],
+  ["Camp Arifjan, KW",28.88,48.16,"N","ME","land","ARCENT forward logistics & armor"],
+  ["Camp Lemonnier, DJ",11.55,43.15,"N","AF","joint","CJTF-Horn of Africa"],
+  ["Diego Garcia",-7.31,72.41,"N","IND","joint","Naval Support Facility; bomber & SSGN hub"],
+  ["Pituffik SB, GL",76.53,-68.70,"N","ARC","air","821st Space Base Group (missile warning)"],
+  ["JBER Elmendorf, AK",61.25,-149.80,"N","ARC","joint","Alaskan Command; F-22 Raptor wing"],
+  ["Kadena AB, JP",26.35,127.77,"N","PAC","air","18th Wing (Okinawa)"],
+  ["Misawa AB, JP",40.70,141.37,"N","PAC","air","35th Fighter Wing"],
+  ["Yokosuka, JP",35.29,139.67,"N","PAC","naval","US 7th Fleet HQ; Carrier Strike Group 5"],
+  ["Sasebo, JP",33.16,129.72,"N","PAC","naval","Amphibious Ready Group forward port"],
+  ["Osan AB, KR",37.09,127.03,"N","PAC","air","51st Fighter Wing"],
+  ["Camp Humphreys, KR",36.96,127.03,"N","PAC","land","Eighth Army / USFK HQ"],
+  ["Andersen AFB, Guam",13.58,144.93,"N","PAC","air","36th Wing; strategic bomber rotations"],
+  ["Naval Base Guam",13.44,144.65,"N","PAC","naval","Submarine Squadron 15"],
+  ["RAAF Tindal, AU",-14.52,132.38,"N","PAC","air","B-52 / B-2 forward deployment base"],
+  ["HMAS Stirling, AU",-32.24,115.68,"N","IND","naval","AUKUS submarine rotational force"],
+  ["Subic Bay / Basa, PH",14.98,120.49,"N","PAC","joint","EDCA South China Sea access hub"],
+  ["Changi Naval Base, SG",1.32,104.02,"N","PAC","naval","Malacca Strait logistics & carrier pier"],
+  ["Whiteman AFB, US",38.73,-93.55,"N","AM","air","509th Bomb Wing (B-2 Spirit)"],
+  ["Barksdale AFB, US",32.50,-93.66,"N","AM","air","2nd Bomb Wing (B-52H)"],
+  ["Minot AFB, US",48.42,-101.36,"N","AM","joint","5th Bomb Wing; 91st Missile Wing"],
+  ["Malmstrom AFB, US",47.51,-111.18,"N","AM","land","341st Missile Wing (Minuteman III)"],
+  ["F.E. Warren AFB, US",41.15,-104.86,"N","AM","land","90th Missile Wing"],
+  ["Kings Bay, US",30.80,-81.52,"N","AM","naval","Atlantic Ohio-class SSBN base"],
+  ["Naval Base Kitsap, US",47.56,-122.71,"N","AM","naval","Pacific Ohio-class SSBN base"],
+  ["Naval Station Norfolk, US",36.95,-76.33,"N","AM","naval","US Fleet Forces Command; Second Fleet"],
+  ["Pearl Harbor, HI",21.35,-157.95,"N","PAC","naval","USINDOPACOM & Pacific Fleet HQ"],
+  ["Fort Cavazos, US",31.13,-97.78,"N","AM","land","III Armored Corps HQ"],
+  ["CFB Halifax, CA",44.66,-63.58,"N","AM","naval","Royal Canadian Navy Atlantic Fleet"],
+
+  ["Engels-2, RU",51.48,46.21,"B","EU","air","121st Heavy Bomber Regiment (Tu-95MS, Tu-160)"],
+  ["Kozelsk, RU",54.03,35.78,"B","EU","land","28th Guards Missile Division (RS-24 Yars)"],
+  ["Tatishchevo, RU",51.67,45.60,"B","EU","land","60th Missile Division (RS-24, Topol-M)"],
+  ["Baltiysk, RU",54.65,19.90,"B","EU","naval","Baltic Fleet HQ (Kaliningrad)"],
+  ["Sevastopol, Crimea",44.62,33.53,"B","EU","naval","Black Sea Fleet HQ"],
+  ["Novorossiysk, RU",44.72,37.78,"B","EU","naval","Black Sea Fleet eastern naval base"],
+  ["Severomorsk, RU",69.07,33.42,"B","ARC","naval","Northern Fleet HQ"],
+  ["Gadzhiyevo, RU",69.25,33.32,"B","ARC","naval","Northern Fleet Borei-class SSBN base"],
+  ["Olenya, RU",68.15,33.46,"B","ARC","air","Arctic long-range aviation base"],
+  ["Nagurskoye, RU",80.80,47.65,"B","ARC","air","Franz Josef Land Arctic air defense"],
+  ["Tiksi, RU",71.64,128.87,"B","ARC","land","Northern Sea Route radar & S-400 hub"],
+  ["Tartus, SY",34.89,35.87,"B","ME","naval","Mediterranean naval logistics facility"],
+  ["Hmeimim, SY",35.40,35.95,"B","ME","air","Aerospace Forces forward base"],
+  ["Bandar Abbas, IR",27.18,56.27,"B","ME","naval","IRGC Navy / Iranian Navy HQ (Strait of Hormuz)"],
+  ["Chabahar, IR",25.29,60.62,"B","IND","naval","Gulf of Oman naval & missile base"],
+  ["Isfahan Missile Complex, IR",32.65,51.68,"B","ME","land","IRGC Aerospace ballistic missile hub"],
+  ["PLA Support Base, DJ",11.59,43.07,"B","AF","naval","PLA overseas logistics & pier"],
+  ["Simon's Town, ZA",-34.19,18.43,"B","AF","naval","South African Navy HQ (Cape route)"],
+  ["Vilyuchinsk, RU",52.93,158.40,"B","PAC","naval","Pacific Fleet SSBN base (Kamchatka)"],
+  ["Vladivostok, RU",43.12,131.87,"B","PAC","naval","Pacific Fleet HQ"],
+  ["Yulin, Hainan, CN",18.22,109.70,"B","PAC","naval","PLAN South Sea Fleet SSBN/SSN base"],
+  ["Zhanjiang, CN",21.20,110.40,"B","PAC","naval","PLAN South Sea Fleet HQ"],
+  ["Ningbo / Zhoushan, CN",29.95,121.72,"B","PAC","naval","PLAN East Sea Fleet HQ"],
+  ["Qingdao, CN",36.07,120.38,"B","PAC","naval","PLAN North Sea Fleet & carrier base"],
+  ["Korla, Xinjiang, CN",41.76,86.15,"B","PAC","land","PLA Rocket Force & ABM test/deployment hub"],
+  ["Golmud, Qinghai, CN",36.40,94.90,"B","PAC","land","Western Theater Command logistics & armor"],
+  ["Fiery Cross Reef",9.55,112.89,"B","PAC","air","PLA Spratly airstrip & SAM sites"],
+  ["Subi Reef",10.92,114.08,"B","PAC","air","PLA Spratly radar & air base"],
+  ["Mischief Reef",9.90,115.53,"B","PAC","air","PLA Spratly missile & naval outpost"],
+  ["Ream, KH",10.51,103.64,"B","PAC","naval","Gulf of Thailand naval facility"],
+  ["Karwar, IN",14.80,74.13,"B","IND","naval","INS Kadamba (Western Fleet & carrier base)"],
+  ["Visakhapatnam, IN",17.69,83.30,"B","IND","naval","Eastern Naval Command; Arihant SSBN"],
+  ["Port Blair, IN",11.62,92.73,"B","IND","joint","Andaman & Nicobar Tri-Service Command"],
+  ["Ambala AFS, IN",30.37,76.81,"B","IND","air","Western Air Command Rafale strike wing"],
+  ["Ilha das Cobras, BR",-22.89,-43.17,"B","AM","naval","Brazilian Navy Fleet HQ (Rio de Janeiro)"],
+  ["Itaguaí, BR",-22.93,-43.83,"B","AM","naval","PROSUB submarine base"],
+  ["Lourdes SIGINT / Mariel, CU",23.00,-82.75,"B","AM","joint","Caribbean maritime & electronic outpost"]
+];
+
+const INITIAL_UNITS=[
+  ["CSG-2 (USS Eisenhower)","SEA","Carrier Strike Group","N",35.5,18.0,34.5,33.5],
+  ["CSG-5 (USS Reagan)","SEA","Carrier Strike Group","N",24.0,130.0,21.5,118.5],
+  ["CSG-12 (USS Ford)","SEA","Carrier Strike Group","N",58.0,-15.0,66.0,5.0],
+  ["DESRON-60 Aegis","SEA","Destroyer Squadron","N",36.0,-5.5,36.5,14.0],
+  ["TF-74 SSN Wolfpack","SEA","Attack Submarines","N",15.0,115.0,18.0,111.0],
+  ["CTF-50 Strike Group","SEA","Amphibious Ready Group","N",24.5,58.5,26.5,55.5],
+  ["TF-137 Arctic Fleet","SEA","Frigate Task Group","N",71.0,15.0,70.5,31.0],
+  ["RAN Indo-Pac TF","SEA","Surface Action Group","N",-10.0,125.0,-4.0,108.0],
+  ["PLAN Carrier Grp 17","SEA","Carrier Strike Group","B",17.0,113.0,22.0,122.0],
+  ["PLAN East Sea Flotilla","SEA","Destroyer Flotilla","B",27.5,124.0,26.5,127.0],
+  ["RU Northern Fleet SAG","SEA","Cruiser Task Group","B",71.5,36.0,72.0,18.0],
+  ["RU Pacific Fleet SAG","SEA","Missile Cruiser Group","B",45.0,145.0,42.0,142.0],
+  ["IRGC Fast Attack Grp","SEA","Missile Boat Flotilla","B",26.8,56.0,25.5,54.5],
+  ["IN Western Carrier Grp","SEA","Carrier Task Force","B",15.5,68.0,12.0,62.0],
+  ["RU Baltic Flotilla","SEA","Corvette Strike Group","B",55.5,18.5,55.0,15.0],
+  ["PLAN Indian Ocean TF","SEA","Expeditionary Fleet","B",2.0,85.0,-5.0,74.0],
+  ["US V Corps (Armor)","LAND","Armored Corps","N",51.8,19.5,54.2,20.5],
+  ["NATO eFP Baltic Div","LAND","Mechanized Division","N",56.5,24.5,58.5,27.5],
+  ["1st Armored Div (FWD)","LAND","Heavy Armor Brigade","N",45.5,26.0,46.5,30.0],
+  ["USFK 2nd Infantry Div","LAND","Combined Mech Div","N",37.8,127.1,38.8,126.5],
+  ["III MEF Okinawa/Luzon","LAND","Littoral Combat Team","N",18.2,121.8,16.5,120.5],
+  ["CENTCOM Patriot/THAAD","LAND","Air Defense Division","N",26.0,49.5,28.5,48.0],
+  ["USAREUR-AF Fires Cmd","LAND","Long-Range Fires","N",50.5,10.5,52.5,16.5],
+  ["Nordic Arctic Brigade","LAND","Arctic Mountain Div","N",68.5,22.0,69.0,31.0],
+  ["4th Infantry Div","LAND","Mechanized Infantry","N",48.0,17.0,49.5,22.5],
+  ["101st Airborne (AA)","LAND","Air Assault Division","N",44.5,27.5,45.8,31.5],
+  ["RU 1st Guards Tank Army","LAND","Heavy Tank Army","B",53.5,31.0,52.5,24.5],
+  ["RU 20th Combined Arms","LAND","Mechanized Army","B",50.5,36.5,49.5,31.0],
+  ["RU 11th Army Corps","LAND","Kaliningrad Garrison","B",54.7,21.0,54.2,19.5],
+  ["PLA 73rd Group Army","LAND","Amphibious Corps","B",25.5,119.2,24.8,120.8],
+  ["PLA 76th Group Army","LAND","High-Altitude Mech","B",35.0,82.0,34.2,78.5],
+  ["IRGC Ground Aerospace","LAND","Mobile Missile Corps","B",31.0,49.0,29.5,48.0],
+  ["RU 6th Air Defense Div","LAND","S-400/S-500 SAM Grid","B",67.5,34.0,68.8,33.0],
+  ["IN XIV Fire & Fury Corps","LAND","Mountain Strike Corps","B",34.1,77.6,35.2,78.8],
+  ["PLA 79th Group Army","LAND","Heavy Combined Arms","B",41.8,123.4,40.2,124.5],
+  ["RU Southern Tank Div","LAND","Armored Breakthrough","B",47.2,39.7,46.8,35.5],
+
+  ["USAFE Fighter Wing","AIR","Multirole Fighter Wing","N",50.2,8.5,54.5,23.0,"FIGHTER"],
+  ["Baltic Air Policing","AIR","Quick Reaction Alert","N",56.5,24.0,58.2,26.8,"FIGHTER"],
+  ["Aviano Strike Wing","AIR","Fighter-Bomber Wing","N",45.8,12.6,35.5,30.0,"BOMBER"],
+  ["RAF North Sea QRA","AIR","Air Superiority Wing","N",54.5,-1.2,56.5,18.0,"FIGHTER"],
+  ["CENTAF Expeditionary","AIR","Strike Package","N",25.5,51.5,27.2,56.5,"BOMBER"],
+  ["Kadena Fighter Wing","AIR","Air Superiority Wing","N",26.8,128.2,31.0,132.0,"FIGHTER"],
+  ["Guam Bomber Task Force","AIR","Long-Range Bomber Det","N",14.5,145.0,12.0,115.0,"BOMBER"],
+  ["Elmendorf Arctic Wing","AIR","Air Defense Wing","N",62.0,-150.0,71.0,25.0,"FIGHTER"],
+  ["VKS Western Fighters","AIR","Air Superiority Wing","B",54.0,38.0,54.8,27.5,"FIGHTER"],
+  ["VKS Long-Range Aviation","AIR","Strategic Bomber Wing","B",52.0,46.0,56.0,24.0,"BOMBER"],
+  ["VKS Pacific Aviation","AIR","Maritime Strike Wing","B",43.4,132.2,34.0,134.5,"BOMBER"],
+  ["PLA Eastern Theater AF","AIR","Fighter-Bomber Wing","B",28.0,118.0,25.8,123.0,"FIGHTER"],
+  ["PLA Southern Theater AF","AIR","Air Superiority Wing","B",23.0,113.0,16.5,114.5,"FIGHTER"],
+  ["PLAN Naval Aviation","AIR","Carrier Air Wing","B",18.5,110.0,15.2,116.0,"FIGHTER"],
+  ["IRGC Combat Air Wing","AIR","Fighter Wing","B",32.5,52.0,27.0,55.8,"FIGHTER"],
+  ["IAF Western Air Cmd","AIR","Multirole Strike Wing","B",30.5,76.8,27.0,56.5,"FIGHTER"]
+];
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1000);
+camera.position.set(0,38,98);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+$("cc").appendChild(renderer.domElement);
+
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.minDistance=52;
+controls.maxDistance=220;
+
+scene.add(new THREE.AmbientLight(0x99bbdd,0.85));
+const dirLight=new THREE.DirectionalLight(0xffffff,1.05);
+dirLight.position.set(80,50,80);
+scene.add(dirLight);
+
+// High-res 2048x1024 Earth Canvas for Crisp Country Borders + Land/Sea Collision Mask
+const W=2048, H=1024;
+const texCanvas=document.createElement("canvas");
+texCanvas.width=W; texCanvas.height=H;
+const ctx=texCanvas.getContext("2d");
+
+// Fallback continent polygons in case offline
+const FALLBACK_CONTINENTS=[
+  [[-168,71],[-140,70],[-110,75],[-80,72],[-60,60],[-55,48],[-75,35],[-81,25],[-97,26],[-90,16],[-78,8],[-84,10],[-105,20],[-115,32],[-125,49],[-140,60],[-165,61]],
+  [[-55,82],[-20,82],[-18,70],[-43,60],[-52,68]],
+  [[-78,9],[-62,10],[-50,0],[-35,-7],[-39,-18],[-53,-33],[-68,-54],[-74,-45],[-71,-18],[-81,-5]],
+  [[-10,36],[-5,48],[10,55],[25,70],[40,68],[55,55],[40,42],[25,38],[12,44],[2,43],[-5,36]],
+  [[-17,15],[-5,35],[10,37],[32,31],[43,12],[51,11],[40,-5],[35,-24],[20,-34],[12,-17],[9,4],[-5,5],[-16,11]],
+  [[28,41],[42,42],[55,55],[70,72],[110,76],[150,70],[175,66],[160,52],[140,50],[130,35],[120,22],[105,10],[98,18],[88,22],[78,8],[68,24],[56,26],[48,30],[36,36]],
+  [[114,-22],[130,-12],[142,-11],[153,-28],[146,-38],[130,-32],[115,-34]],
+  [[96,5],[105,-5],[118,-8],[126,-5],[118,5],[108,2]],
+  [[130,31],[141,38],[145,44],[140,42],[132,34]]
+];
+
+// Major country & regional labels overlayed directly onto the globe texture
+const COUNTRY_LABELS=[
+  ["USA",39,-98],["CANADA",56,-106],["BRAZIL",-10,-52],["ARGENTINA",-34,-64],
+  ["UK",54,-2],["FRANCE",46,2],["GERMANY",51,10],["POLAND",52,19],["UKRAINE",49,32],
+  ["NORWAY",64,11],["SWEDEN",62,15],["TURKEY",39,35],["ITALY",42,12],["SPAIN",40,-4],
+  ["RUSSIA",61,95],["CHINA",35,103],["INDIA",22,79],["JAPAN",36,138],["S. KOREA",36,128],
+  ["IRAN",32,53],["SAUDI ARABIA",24,45],["EGYPT",26,30],["SOUTH AFRICA",-29,24],
+  ["AUSTRALIA",-25,134],["INDONESIA",-2,118],["GREENLAND",72,-42],["ALASKA",64,-152]
+];
+
+let mapData=null;
+const earthTex=new THREE.CanvasTexture(texCanvas);
+earthTex.anisotropy=8;
+
+function drawBaseGrid(){
+  ctx.fillStyle="#051324";
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="rgba(0,255,204,0.07)";
+  ctx.lineWidth=1;
+  for(let x=0;x<=W;x+=W/12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<=H;y+=H/6){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function drawLabels(){
+  ctx.font="bold 13px 'Courier New', monospace";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  COUNTRY_LABELS.forEach(([name,lat,lon])=>{
+    const x=(lon+180)/360*W;
+    const y=(90-lat)/180*H;
+    ctx.fillStyle="rgba(0,0,0,0.65)";
+    ctx.fillText(name,x+1,y+1);
+    ctx.fillStyle="rgba(170,255,235,0.72)";
+    ctx.fillText(name,x,y);
+  });
+}
+
+function drawPolygonRing(ring){
+  ctx.beginPath();
+  let prevLon=null;
+  ring.forEach(([lon,lat],idx)=>{
+    const x=(lon+180)/360*W;
+    const y=(90-lat)/180*H;
+    // Prevent anti-meridian horizontal wrap streaks
+    if(idx===0 || (prevLon!==null && Math.abs(lon-prevLon)>180)){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+    prevLon=lon;
+  });
+  ctx.closePath();
+}
+
+function renderFallbackMap(){
+  drawBaseGrid();
+  ctx.fillStyle="#0f342b";
+  ctx.strokeStyle="#00ffcc";
+  ctx.lineWidth=1.8;
+  FALLBACK_CONTINENTS.forEach(poly=>{
+    drawPolygonRing(poly);
+    ctx.fill();
+    ctx.stroke();
+  });
+  drawLabels();
+  mapData=ctx.getImageData(0,0,W,H).data;
+  earthTex.needsUpdate=true;
+}
+
+// Render immediate fallback, then upgrade seamlessly with real world-atlas 110m country borders
+renderFallbackMap();
+
+const borderGroup=new THREE.Group();
+scene.add(borderGroup);
+
+function build3DCountryBorders(geoFeatures){
+  while(borderGroup.children.length) borderGroup.remove(borderGroup.children[0]);
+  const positions=[];
+  const addRing=(ring)=>{
+    for(let i=0;i<ring.length-1;i++){
+      const [lon1,lat1]=ring[i];
+      const [lon2,lat2]=ring[i+1];
+      if(Math.abs(lon1-lon2)>180) continue;
+      const v1=ll2v(lat1,lon1,0.08);
+      const v2=ll2v(lat2,lon2,0.08);
+      positions.push(v1.x,v1.y,v1.z, v2.x,v2.y,v2.z);
+    }
+  };
+  geoFeatures.forEach(f=>{
+    const g=f.geometry;
+    if(!g) return;
+    if(g.type==="Polygon") g.coordinates.forEach(addRing);
+    else if(g.type==="MultiPolygon") g.coordinates.forEach(poly=>poly.forEach(addRing));
+  });
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+  const mat=new THREE.LineBasicMaterial({color:0x00ffcc,transparent:true,opacity:0.45});
+  borderGroup.add(new THREE.LineSegments(geo,mat));
+}
+
+fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+  .then(r=>r.json())
+  .then(world=>{
+    const countries=topojson.feature(world, world.objects.countries);
+    drawBaseGrid();
+    ctx.fillStyle="#10382e";
+    ctx.strokeStyle="rgba(0, 255, 204, 0.85)";
+    ctx.lineWidth=1.4;
+
+    countries.features.forEach(f=>{
+      const g=f.geometry;
+      if(!g) return;
+      if(g.type==="Polygon"){
+        g.coordinates.forEach(ring=>{ drawPolygonRing(ring); ctx.fill(); ctx.stroke(); });
+      }else if(g.type==="MultiPolygon"){
+        g.coordinates.forEach(poly=>poly.forEach(ring=>{ drawPolygonRing(ring); ctx.fill(); ctx.stroke(); }));
+      }
+    });
+
+    drawLabels();
+    mapData=ctx.getImageData(0,0,W,H).data;
+    earthTex.needsUpdate=true;
+    build3DCountryBorders(countries.features);
+    logMsg("GEO-INTEL: High-precision world country borders & labels loaded.");
+  })
+  .catch(()=>{
+    logMsg("GEO-INTEL: Offline fallback continent borders active.");
+  });
+
+function isLand(lat,lon){
+  if(!mapData) return true;
+  const normLon=((lon+540)%360)-180;
+  const x=Math.max(0,Math.min(W-1,Math.floor((normLon+180)/360*W)));
+  const y=Math.max(0,Math.min(H-1,Math.floor((90-lat)/180*H)));
+  return mapData[(y*W+x)*4+1] > 32;
+}
+
+const earthMesh=new THREE.Mesh(
+  new THREE.SphereGeometry(ER,64,48),
+  new THREE.MeshPhongMaterial({map:earthTex,shininess:16,specular:0x114466})
+);
+scene.add(earthMesh);
+
+scene.add(new THREE.Mesh(
+  new THREE.SphereGeometry(ER*1.025,48,32),
+  new THREE.MeshBasicMaterial({color:0x00ffcc,transparent:true,opacity:0.06,side:THREE.BackSide})
+));
+
+function ll2v(lat,lon,alt=0){
+  const phi=(90-lat)*Math.PI/180;
+  const theta=(lon+180)*Math.PI/180;
+  const r=ER+alt;
+  return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+}
+
+function greatCircleDist(lat1,lon1,lat2,lon2){
+  const p1=lat1*Math.PI/180, p2=lat2*Math.PI/180;
+  const dp=(lat2-lat1)*Math.PI/180, dl=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*180/Math.PI;
+}
+
+// Surface frame comes only from ll2v: local +Z becomes the outward normal.
+// Air noses use local +X, because local +Z is already that normal.
+// Yaw is a rotation around the same normal (qYaw * qAlign).
+const _airUp=new THREE.Vector3(0,0,1);
+const _airNormal=new THREE.Vector3();
+const _airFwd=new THREE.Vector3();
+const _airLocalX=new THREE.Vector3();
+const _airTarget=new THREE.Vector3();
+const _airCross=new THREE.Vector3();
+const _airAlign=new THREE.Quaternion();
+const _airYaw=new THREE.Quaternion();
+
+function placeTangent(mesh, lat, lon, alt=0.35, aimLat=null, aimLon=null){
+  const pos = ll2v(lat, lon, alt);
+  mesh.position.copy(pos);
+  _airNormal.copy(pos).normalize();
+  _airAlign.setFromUnitVectors(_airUp, _airNormal);
+  if(aimLat===null || aimLon===null){
+    mesh.quaternion.copy(_airAlign);
+    return;
+  }
+  _airTarget.copy(ll2v(aimLat, aimLon, alt));
+  _airFwd.copy(_airTarget).sub(pos);
+  _airFwd.addScaledVector(_airNormal, -_airFwd.dot(_airNormal));
+  if(_airFwd.lengthSq()<1e-8){
+    mesh.quaternion.copy(_airAlign);
+    return;
+  }
+  _airFwd.normalize();
+  _airLocalX.set(1,0,0).applyQuaternion(_airAlign);
+  let yaw=Math.acos(Math.max(-1, Math.min(1, _airLocalX.dot(_airFwd))));
+  _airCross.crossVectors(_airLocalX, _airFwd);
+  if(_airCross.dot(_airNormal)<0) yaw=-yaw;
+  _airYaw.setFromAxisAngle(_airNormal, yaw);
+  mesh.quaternion.copy(_airYaw.multiply(_airAlign));
+}
+
+// Oracle is a ll2v finite difference, not the quaternion. Cue is a child at local +X.
+function selfTestAirHeading(){
+  const cases=[[0,0,0,25],[0,0,25,0],[45,90,45,130],[-35,150,-15,150]];
+  const mesh=new THREE.Object3D();
+  const nose=new THREE.Object3D();
+  nose.position.set(1,0,0);
+  mesh.add(nose);
+  const got=new THREE.Vector3();
+  let worst=1;
+  for(const [lat,lon,aLat,aLon] of cases){
+    placeTangent(mesh,lat,lon,1.15,aLat,aLon);
+    mesh.updateMatrixWorld(true);
+    nose.getWorldPosition(got);
+    got.sub(mesh.position);
+    const radial=mesh.position.clone().normalize();
+    got.addScaledVector(radial, -got.dot(radial));
+    if(got.lengthSq()<1e-8) return -1;
+    got.normalize();
+    const p=ll2v(lat,lon,0);
+    const ahead=ll2v(aLat,aLon,0).sub(p);
+    const n=p.clone().normalize();
+    ahead.addScaledVector(n, -ahead.dot(n));
+    if(ahead.lengthSq()<1e-8) return -1;
+    ahead.normalize();
+    worst=Math.min(worst, got.dot(ahead));
+  }
+  return worst;
+}
+
+let state="STANDBY", bases=[], units=[], missiles=[], explosions=[], hitCount=0, intCount=0, clashCount=0, dipTimer=0;
+const simGroup=new THREE.Group();
+scene.add(simGroup);
+
+function logMsg(txt){
+  const el=$("log");
+  const ts=new Date().toISOString().substr(11,8);
+  el.textContent="["+ts+"] "+txt+"\n"+el.textContent.slice(0,4000);
+}
+
+function initGrid(){
+  while(simGroup.children.length) simGroup.remove(simGroup.children[0]);
+  bases=[]; units=[]; missiles=[]; explosions=[];
+  hitCount=0; intCount=0; clashCount=0; dipTimer=0;
+  state="STANDBY";
+  $("hs").textContent="STANDBY"; $("hs").style.color="#ffaa00";
+  $("vf").style.display="none";
+  $("bN").disabled=false; $("bB").disabled=false;
+
+  const baseGeo=new THREE.ConeGeometry(0.42,0.85,4);
+  baseGeo.rotateX(Math.PI/2);
+
+  BASES.forEach((b,idx)=>{
+    const [name,lat,lon,side,reg,dom,desc]=b;
+    const mat=new THREE.MeshBasicMaterial({color:side==="N"?0x4da6ff:0xff4d4d});
+    const mesh=new THREE.Mesh(baseGeo,mat);
+    placeTangent(mesh, lat, lon, 0.35);
+    const obj={id:idx,kind:"BASE",name,lat,lon,side,reg,dom,desc,hp:100,mesh};
+    mesh.userData=obj;
+    simGroup.add(mesh);
+    bases.push(obj);
+  });
+
+  // Sea Forces: Ovals
+  const seaGeo=new THREE.SphereGeometry(0.55,16,12);
+  seaGeo.scale(1.55, 0.75, 0.35);
+
+  // Land Forces: Octagons
+  const landGeo=new THREE.CylinderGeometry(0.62,0.62,0.28,8);
+  landGeo.rotateX(Math.PI/2);
+
+  // Air wings: flat diamonds. Long local +X is the nose; local +Z is radial up.
+  const airGeo=new THREE.OctahedronGeometry(0.5,0);
+  airGeo.scale(2.05, 1.05, 0.28);
+  const noseGeo=new THREE.SphereGeometry(0.12,6,6);
+
+  INITIAL_UNITS.forEach((u,idx)=>{
+    const [name,dom,type,side,lat,lon,tLat,tLon,role]=u;
+    let color;
+    if(dom==="AIR") color=side==="N"?0x9fd4ff:0xff7aa2;
+    else if(dom==="SEA") color=side==="N"?0x00e5ff:0xff9933;
+    else color=side==="N"?0x3388ff:0xff3355;
+    const geo=dom==="SEA"?seaGeo:dom==="AIR"?airGeo:landGeo;
+    const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color}));
+    const alt=dom==="AIR"?1.15:0.45;
+    if(dom==="AIR"){
+      const nose=new THREE.Mesh(noseGeo,new THREE.MeshBasicMaterial({color:0xffffff}));
+      nose.position.set(1.05,0,0);
+      nose.name="nose";
+      mesh.add(nose);
+    }
+    placeTangent(mesh, lat, lon, alt, dom==="AIR"?tLat:null, dom==="AIR"?tLon:null);
+    const obj={
+      id:idx,kind:dom,name,dom,type,side,
+      role:role||(dom==="AIR"?"FIGHTER":"SURFACE"),
+      lat,lon,tLat,tLon,hp:100,cd:Math.random()*3,
+      speed:dom==="AIR"?0.08:dom==="SEA"?0.045:0.025,
+      mesh
+    };
+    mesh.userData=obj;
+    simGroup.add(mesh);
+    units.push(obj);
+  });
+
+  renderRegistry();
+  updateHUD();
+}
+
+function renderRegistry(){
+  const sFilter=$("fs").value;
+  const tFilter=$("ft").value;
+  const list=$("rl");
+  list.innerHTML="";
+  let count=0;
+
+  const items=[...bases,...units].filter(o=>{
+    if(sFilter && o.side!==sFilter) return false;
+    if(tFilter && o.kind!==tFilter) return false;
+    return true;
+  });
+
+  items.forEach(o=>{
+    count++;
+    const div=document.createElement("div");
+    div.className="row";
+    const col=o.side==="N"?"N":"B";
+    const tag=o.kind==="BASE"?o.dom.toUpperCase():(o.kind==="SEA"?"OVAL-SEA":o.kind==="AIR"?"DIA-AIR":"OCT-LAND");
+    div.innerHTML='<div><span class="'+col+'">'+o.name+'</span><small>'+(o.kind==="BASE"?o.desc:o.type)+' ('+Math.round(o.hp)+'%)</small></div><span class="badge '+col+'">'+tag+'</span>';
+    div.onclick=()=>{
+      const targetPos=ll2v(o.lat,o.lon,65);
+      camera.position.copy(targetPos);
+      controls.target.set(0,0,0);
+      $("info").textContent="LOCKED: "+o.name+" | HP: "+Math.round(o.hp)+"%";
+    };
+    list.appendChild(div);
+  });
+  $("cnt").textContent=count;
+}
+$("fs").onchange=renderRegistry;
+$("ft").onchange=renderRegistry;
+
+const arrowGeo=new THREE.ConeGeometry(0.45, 1.35, 8);
+arrowGeo.rotateX(Math.PI/2);
+
+function launchMissile(fromObj,toObj,isTactical=false){
+  if(fromObj.hp<=0 || toObj.hp<=0) return;
+  const startAlt=fromObj.dom==="AIR"?1.15:(fromObj.kind==="BASE"?0.4:0.5);
+  const endAlt=toObj.dom==="AIR"?1.15:(toObj.kind==="BASE"?0.4:0.5);
+  const start=ll2v(fromObj.lat,fromObj.lon,startAlt);
+  const end=ll2v(toObj.lat,toObj.lon,endAlt);
+  const dist=start.distanceTo(end);
+  const peak=ER + (isTactical ? dist*0.18 : Math.min(26, dist*0.35));
+  const mid=start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(peak);
+
+  const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
+  const pts=curve.getPoints(48);
+  const colorHex=fromObj.side==="N"?0x4da6ff:0xff4d4d;
+
+  const guideGeo=new THREE.BufferGeometry().setFromPoints(pts);
+  const guideMat=new THREE.LineBasicMaterial({
+    color:colorHex,
+    transparent:true,
+    opacity:0.28
+  });
+  const guideLine=new THREE.Line(guideGeo,guideMat);
+  simGroup.add(guideLine);
+
+  const trailGeo=new THREE.BufferGeometry().setFromPoints([start, start.clone()]);
+  const trailMat=new THREE.LineBasicMaterial({
+    color:fromObj.side==="N"?0x80d4ff:0xff8080,
+    transparent:true,
+    opacity:0.95
+  });
+  const trailLine=new THREE.Line(trailGeo,trailMat);
+  simGroup.add(trailLine);
+
+  const arrowMat=new THREE.MeshBasicMaterial({color:fromObj.side==="N"?0x99e6ff:0xff9999});
+  const arrow=new THREE.Mesh(arrowGeo,arrowMat);
+  arrow.position.copy(start);
+  arrow.lookAt(curve.getPoint(0.05));
+  simGroup.add(arrow);
+
+  missiles.push({
+    from:fromObj,to:toObj,side:fromObj.side,
+    curve,pts,t:0,
+    baseSpeed:(isTactical?0.0085:0.0048),
+    dmg:isTactical?18:34,
+    guideLine,trailLine,arrow
+  });
+}
+
+function cleanupMissile(m){
+  simGroup.remove(m.guideLine);
+  simGroup.remove(m.trailLine);
+  simGroup.remove(m.arrow);
+  m.guideLine.geometry.dispose();
+  m.trailLine.geometry.dispose();
+}
+
+function spawnExplosion(lat,lon,color=0xffaa00,alt=0.5){
+  const mesh=new THREE.Mesh(
+    new THREE.SphereGeometry(0.45,10,10),
+    new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.9})
+  );
+  mesh.position.copy(ll2v(lat,lon,alt));
+  simGroup.add(mesh);
+  explosions.push({mesh,age:0});
+}
+
+function triggerStrike(attackerSide){
+  if(state==="FINISHED") initGrid();
+  state="ENGAGED";
+  $("hs").textContent="ACTIVE COMBAT"; $("hs").style.color="#ff4d4d";
+  $("bN").disabled=true; $("bB").disabled=true;
+
+  const atkBases=bases.filter(b=>b.side===attackerSide && b.hp>0);
+  const defTargets=[...bases,...units].filter(o=>o.side!==attackerSide && o.hp>0);
+
+  logMsg("ALERT: "+(attackerSide==="N"?"NATO":"BRICS+")+" initiated multi-domain first strike!");
+  atkBases.slice(0,18).forEach(b=>{
+    const tgt=defTargets[Math.floor(Math.random()*defTargets.length)];
+    if(tgt) launchMissile(b,tgt,false);
+  });
+  const atkAir=units.filter(u=>u.side===attackerSide && u.dom==="AIR" && u.hp>0);
+  if(atkAir.length){
+    logMsg("AIR: "+(attackerSide==="N"?"NATO":"BRICS+")+" fighter and bomber wings joining the opening strike.");
+    atkAir.forEach(u=>{
+      const airTgts=defTargets.filter(t=>t.dom==="AIR");
+      const pool=(u.role==="BOMBER" || !airTgts.length)?defTargets:airTgts;
+      const tgt=pool[Math.floor(Math.random()*pool.length)];
+      if(tgt) launchMissile(u,tgt,true);
+    });
+  }
+
+  setTimeout(()=>{
+    if(state!=="ENGAGED") return;
+    const retSide=attackerSide==="N"?"B":"N";
+    const retBases=bases.filter(b=>b.side===retSide && b.hp>0);
+    const retUnits=units.filter(u=>u.side===retSide && u.hp>0);
+    const retAir=retUnits.filter(u=>u.dom==="AIR");
+    const oppTargets=[...bases,...units].filter(o=>o.side===attackerSide && o.hp>0);
+    logMsg("RETALIATION: "+(retSide==="N"?"NATO":"BRICS+")+" counter-salvo from silos, fleets, and air wings!");
+    [...retBases.slice(0,14),...retUnits.filter(u=>u.dom!=="AIR").slice(0,8),...retAir].forEach(src=>{
+      let pool=oppTargets;
+      if(src.dom==="AIR" && src.role!=="BOMBER"){
+        const airTgts=oppTargets.filter(o=>o.dom==="AIR");
+        if(airTgts.length) pool=airTgts;
+      }
+      const tgt=pool[Math.floor(Math.random()*pool.length)];
+      if(tgt) launchMissile(src,tgt,src.kind!=="BASE");
+    });
+  },2600);
+}
+
+$("bN").onclick=()=>triggerStrike("N");
+$("bB").onclick=()=>triggerStrike("B");
+$("bM").onclick=()=>{
+  if(state==="STANDBY"){
+    state="ENGAGED";
+    $("hs").textContent="THEATER MANEUVERS"; $("hs").style.color="#00ffcc";
+  }
+  logMsg("ORDERS: Naval ovals, ground octagons, and air diamonds advancing to contested zones.");
+  units.forEach(u=>{ u.speed*=1.5; });
+};
+$("bR").onclick=()=>{
+  missiles.forEach(cleanupMissile);
+  $("log").textContent="-- GRID RESET. STANDBY BUFFER READY --\n";
+  initGrid();
+};
+
+$("simSpd").oninput=e=>$("ssv").textContent=Number(e.target.value).toFixed(1)+"X";
+$("mach").oninput=e=>$("mv").textContent="X"+e.target.value;
+$("dipN").oninput=e=>$("dnv").textContent=e.target.value+"%";
+$("dipB").oninput=e=>$("dbv").textContent=e.target.value+"%";
+$("ew").oninput=e=>$("ev").textContent=e.target.value+"%";
+
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+addEventListener("pointermove",e=>{
+  mouse.x=(e.clientX/innerWidth)*2-1;
+  mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects(simGroup.children);
+  if(hits.length && hits[0].object.userData && hits[0].object.userData.name){
+    const d=hits[0].object.userData;
+    const shapeInfo=d.kind==="SEA"?"Naval Oval":d.kind==="LAND"?"Land Octagon":d.kind==="AIR"?"Air Diamond":d.dom;
+    $("info").innerHTML='<b class="'+d.side+'">'+d.name+'</b> ('+shapeInfo+') — HP: '+Math.round(d.hp)+'%';
+  }
+});
+
+function updateHUD(){
+  const calcAvg=(arr,side)=>{
+    const sub=arr.filter(x=>x.side===side);
+    return sub.length?Math.round(sub.reduce((a,b)=>a+b.hp,0)/sub.length):0;
+  };
+  const nBases=bases.filter(b=>b.side==="N"), bBases=bases.filter(b=>b.side==="B");
+  const nSea=units.filter(u=>u.side==="N"&&u.dom==="SEA"), bSea=units.filter(u=>u.side==="B"&&u.dom==="SEA");
+  const nLand=units.filter(u=>u.side==="N"&&u.dom==="LAND"), bLand=units.filter(u=>u.side==="B"&&u.dom==="LAND");
+  const nAir=units.filter(u=>u.side==="N"&&u.dom==="AIR"), bAir=units.filter(u=>u.side==="B"&&u.dom==="AIR");
+
+  const nB=calcAvg(nBases,"N"), nS=calcAvg(nSea,"N"), nL=calcAvg(nLand,"N"), nA=calcAvg(nAir,"N");
+  const bB=calcAvg(bBases,"B"), bS=calcAvg(bSea,"B"), bL=calcAvg(bLand,"B"), bA=calcAvg(bAir,"B");
+
+  $("hn").textContent=nB+"% | "+nS+"% | "+nL+"%";
+  $("hb").textContent=bB+"% | "+bS+"% | "+bL+"%";
+  $("han").textContent=nA+"%";
+  $("hab").textContent=bA+"%";
+  $("hv").textContent=missiles.length+" / "+units.filter(u=>u.hp>0).length;
+  $("hh").textContent=hitCount+" / "+intCount;
+  $("hc").textContent=clashCount;
+
+  if(state==="ENGAGED"){
+    const nTotal=(nB+nS+nL+nA)/4, bTotal=(bB+bS+bL+bA)/4;
+    if(nTotal<18 || bTotal<18){
+      state="FINISHED";
+      $("hs").textContent="SIMULATION COMPLETE"; $("hs").style.color="#00ffcc";
+      $("vf").style.display="flex";
+      const winner=nTotal>bTotal?"NATO / ALLIED COALITION":"BRICS+ COALITION";
+      $("vl").textContent=winner;
+      logMsg("ENDEX: Strategic dominance achieved by "+winner+".");
+    }
+  }
+}
+
+let lastUI=0;
+function animate(now){
+  requestAnimationFrame(animate);
+  controls.update();
+
+  const simSpd = Number($("simSpd").value);
+  const machMult = Number($("mach").value) / 8;
+
+  if(state==="ENGAGED"){
+    const ewChance=Number($("ew").value)/100;
+    const dipN=Number($("dipN").value);
+    const dipB=Number($("dipB").value);
+
+    dipTimer += 0.016 * simSpd;
+    if(dipTimer >= 6.0){
+      dipTimer = 0;
+      const jointDip = (dipN * dipB) / 10000;
+      if(jointDip > 0.12 && Math.random() < jointDip * 0.55){
+        state="FINISHED";
+        missiles.forEach(cleanupMissile);
+        missiles=[];
+        $("hs").textContent="CEASEFIRE SIGNED"; $("hs").style.color="#00ffcc";
+        $("vf").style.display="flex";
+        $("vl").textContent="NEGOTIATED ARMISTICE";
+        logMsg("DIPLOMACY: Backchannel talks succeeded (NATO "+dipN+"% / BRICS "+dipB+"%). Immediate ceasefire!");
+        updateHUD();
+        renderRegistry();
+      } else if (dipN >= 70 || dipB >= 70) {
+        if(Math.random() < 0.35) {
+          logMsg("DIPLOMACY: Envoys from "+(dipN>=dipB?"NATO":"BRICS+")+" proposing de-escalation corridor...");
+        }
+      }
+    }
+
+    for(let i=missiles.length-1;i>=0;i--){
+      const m=missiles[i];
+      m.t += m.baseSpeed * machMult * simSpd;
+      const clampedT = Math.min(1, m.t);
+
+      const pos = m.curve.getPoint(clampedT);
+      m.arrow.position.copy(pos);
+      if(clampedT < 0.99){
+        const nextPos = m.curve.getPoint(Math.min(1, clampedT + 0.02));
+        m.arrow.lookAt(nextPos);
+      }
+
+      const sliceCount = Math.max(2, Math.floor(clampedT * m.pts.length));
+      const trailPts = m.pts.slice(0, sliceCount);
+      trailPts.push(pos);
+      m.trailLine.geometry.dispose();
+      m.trailLine.geometry = new THREE.BufferGeometry().setFromPoints(trailPts);
+
+      if(m.t>=1){
+        cleanupMissile(m);
+        missiles.splice(i,1);
+
+        const defenders=units.filter(u=>u.hp>0 && u.side!==m.side && greatCircleDist(u.lat,u.lon,m.to.lat,m.to.lon)<14);
+        const interceptProb=Math.min(0.85, ewChance + defenders.length*0.14);
+
+        if(Math.random()<interceptProb){
+          intCount++;
+          spawnExplosion(m.to.lat,m.to.lon,0x00ffcc);
+          if(Math.random()<0.25) logMsg("INTERCEPT: "+(defenders.length?defenders[0].name:"EW Grid")+" neutralized warhead near "+m.to.name+".");
+        }else{
+          hitCount++;
+          m.to.hp=Math.max(0,m.to.hp-m.dmg);
+          spawnExplosion(m.to.lat,m.to.lon,0xff4400);
+          if(m.to.hp===0){
+            m.to.mesh.visible=false;
+            logMsg("DESTROYED: "+m.to.name+" neutralized!");
+          }
+        }
+      }
+    }
+
+    units.forEach(u=>{
+      if(u.hp<=0) return;
+      const sideDip = u.side==="N" ? dipN : dipB;
+      const aggressionFactor = Math.max(0.2, 1 - (sideDip / 130));
+      u.cd -= 0.016 * simSpd * aggressionFactor;
+
+      const dLat=u.tLat-u.lat, dLon=u.tLon-u.lon;
+      const dist=Math.hypot(dLat,dLon);
+      if(dist>0.8){
+        const stepLat=u.lat+(dLat/dist)*u.speed*simSpd;
+        const stepLon=u.lon+(dLon/dist)*u.speed*simSpd;
+        const terrainOk=(u.dom==="LAND") ? isLand(stepLat,stepLon) : !isLand(stepLat,stepLon);
+        if(terrainOk){
+          u.lat=stepLat; u.lon=stepLon;
+        }else{
+          u.tLat+=(Math.random()-0.5)*8;
+          u.tLon+=(Math.random()-0.5)*8;
+        }
+        placeTangent(u.mesh, u.lat, u.lon, 0.45);
+      }else{
+        const enemies=[...bases,...units].filter(e=>e.hp>0 && e.side!==u.side);
+        if(enemies.length){
+          const next=enemies[Math.floor(Math.random()*enemies.length)];
+          u.tLat=next.lat; u.tLon=next.lon;
+        }
+      }
+
+      if(u.cd<=0){
+        u.cd=3.5+Math.random()*3;
+        const nearbyEnemies=[...units,...bases].filter(e=>e.hp>0 && e.side!==u.side && greatCircleDist(u.lat,u.lon,e.lat,e.lon)<16);
+        if(nearbyEnemies.length){
+          const target=nearbyEnemies[0];
+          const range=greatCircleDist(u.lat,u.lon,target.lat,target.lon);
+          if(range<6.5){
+            clashCount++;
+            const dmg=12+Math.random()*14;
+            target.hp=Math.max(0,target.hp-dmg);
+            spawnExplosion(target.lat,target.lon,0xffff00);
+            logMsg(u.dom+" CLASH: "+u.name+" engaged "+target.name+" (-"+Math.round(dmg)+"% HP).");
+            if(target.hp===0){
+              target.mesh.visible=false;
+              logMsg("OVERRUN/SUNK: "+target.name+" eliminated by "+u.name+"!");
+            }
+          }else{
+            launchMissile(u,target,true);
+          }
+        }
+      }
+    });
+  }
+
+  for(let i=explosions.length-1;i>=0;i--){
+    const ex=explosions[i];
+    ex.age += 0.04 * simSpd;
+    ex.mesh.scale.setScalar(1+ex.age*4);
+    ex.mesh.material.opacity=Math.max(0,1-ex.age);
+    if(ex.age>=1){
+      simGroup.remove(ex.mesh);
+      explosions.splice(i,1);
+    }
+  }
+
+  if(now-lastUI>400){
+    updateHUD();
+    if(state==="ENGAGED") renderRegistry();
+    lastUI=now;
+  }
+
+  renderer.render(scene,camera);
+}
+
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+initGrid();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
