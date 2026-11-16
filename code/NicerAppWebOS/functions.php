@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/boot.php');
+//require_once(dirname(__FILE__).'/boot.php');
 //require_once(dirname(__FILE__).'/3rd-party/vendor/autoload.php');
 //use Birke\Rememberme\Authenticator;
 //use Birke\Rememberme\Storage\FileStorage;

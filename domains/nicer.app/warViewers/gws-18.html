@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Global War Simulator v18 – High-Res Free Earth Textures</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  color-scheme:dark;
+  --bg:#03070e;
+  --panel:rgba(6,12,22,0.72);
+  --panel-border:rgba(120,200,220,0.18);
+  --accent:#5eead4;
+  --accent-dim:rgba(94,234,212,0.45);
+  --text:#e2f7f4;
+  --muted:#8aabb8;
+  --nato:#60a5fa;
+  --brics:#f87171;
+  --green-dot:#34d399;
+  --mil-dot:#fbbf24;
+  --shadow:0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  overflow:hidden;user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+#cc{width:100vw;height:100vh;position:absolute;top:0;left:0;z-index:1}
+.p{
+  position:absolute;z-index:10;
+  background:var(--panel);
+  backdrop-filter:blur(18px) saturate(1.6);
+  -webkit-backdrop-filter:blur(18px) saturate(1.6);
+  padding:16px 18px;
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  box-sizing:border-box;
+}
+.p::before{
+  content:"";
+  position:absolute;inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(145deg, rgba(94,234,212,0.22), transparent 40%, transparent 60%, rgba(96,165,250,0.12));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+#hud{
+  top:calc(12px + env(safe-area-inset-top,0px));
+  left:12px;right:auto;
+  width:min(340px,92vw);
+  max-height:min(420px, 48vh);
+  overflow-y:auto;
+}
+#reg{
+  top:calc(440px + env(safe-area-inset-top,0px));
+  left:12px;right:auto;
+  width:min(340px,92vw);
+  max-height:calc(100vh - 560px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  overflow:auto;
+  font-size:11px;
+}
+#logp{
+  top:calc(12px + env(safe-area-inset-top,0px));
+  bottom:calc(12px + env(safe-area-inset-bottom,0px));
+  right:12px;
+  left:auto;
+  width:min(400px, 34vw);
+  height:auto;
+  display:flex;
+  flex-direction:column;
+}
+#log{
+  flex-grow:1;overflow-y:auto;
+  border:1px solid rgba(0,230,200,0.18);
+  background:rgba(2,8,16,0.7);
+  padding:10px;font-size:11px;color:#9dffd8;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  white-space:pre-wrap;border-radius:8px;line-height:1.45;
+}
+h1,h2{
+  font-size:11px;margin:0 0 12px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1.8px;
+  border-bottom:1px solid rgba(94,234,212,0.2);padding-bottom:8px;
+  color:var(--accent);
+}
+.d{font-size:11.5px;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px;color:var(--muted)}
+.v{color:#fff;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.N{color:var(--nato)}.B{color:var(--brics)}
+#ctl{
+  bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:10px;align-items:center;
+  width:max-content;max-width:96vw;padding:12px 16px;
+}
+.r{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sl-grid{display:grid;grid-template-columns:repeat(2,minmax(230px,1fr));gap:8px 16px;width:100%}
+.sl{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}
+.sl span:last-child{color:var(--accent);font-weight:600;min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
+.sl input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:110px;height:6px;border-radius:3px;
+  background:linear-gradient(90deg,rgba(0,230,200,0.15),rgba(0,230,200,0.35));
+  outline:none;
+}
+.sl input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+  box-shadow:0 0 8px rgba(0,230,200,0.6);
+  border:2px solid #041018;
+}
+.sl input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:2px solid #041018;
+}
+button,select{
+  background:rgba(94,234,212,0.06);
+  border:1px solid rgba(94,234,212,0.22);
+  color:var(--accent);
+  padding:8px 14px;font:500 11px 'Inter',system-ui,sans-serif;
+  cursor:pointer;text-transform:uppercase;letter-spacing:0.7px;
+  border-radius:9px;transition:background .18s,border-color .18s,transform .12s,box-shadow .18s;
+}
+button:hover:not(:disabled){
+  background:rgba(94,234,212,0.14);
+  border-color:rgba(94,234,212,0.45);
+  box-shadow:0 0 20px rgba(94,234,212,0.12);
+  transform:translateY(-1px);
+}
+select{background:rgba(5,12,22,0.9);color:var(--text)}
+
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.filters{display:flex;gap:6px;margin-bottom:8px}
+.filters select{flex:1;padding:6px 8px;font-size:11px}
+.row{display:flex;justify-content:space-between;gap:6px;padding:5px 4px;border-bottom:1px solid rgba(0,230,200,0.1);cursor:pointer;border-radius:4px}
+.row:hover{background:rgba(0,230,200,0.08)}
+.row .nm{font-weight:500;font-size:11px}
+.row .meta{font-size:10px;color:var(--muted)}
+#hs{font-size:13px;font-weight:600}
+#vf{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+#vc{background:var(--panel);border:1px solid var(--panel-border);border-radius:16px;padding:28px 36px;text-align:center;box-shadow:var(--shadow);max-width:90vw}
+#vl{font-size:18px;font-weight:600;margin:12px 0 20px;letter-spacing:1px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--green-dot);margin-left:8px}
+.live-badge::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green-dot);box-shadow:0 0 6px var(--green-dot);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%}
+.legend .g{background:var(--green-dot)}.legend .m{background:var(--mil-dot)}.legend .n{background:var(--nato)}.legend .b{background:var(--brics)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,230,200,0.25);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="cc"></div>
+
+<div id="hud" class="p">
+  <h1>Strategic Status Matrix</h1>
+  <div class="d"><span>SIM ENGINE:</span><span class="v" id="hs" style="color:#ffaa00">STANDBY</span></div>
+  <div class="d"><span>NATO BASES / FLEET / ARMY:</span><span class="v N" id="hn">100% | 100% | 100%</span></div>
+  <div class="d"><span>BRICS BASES / FLEET / ARMY:</span><span class="v B" id="hb">100% | 100% | 100%</span></div>
+  <div class="d"><span>AIR WINGS N / B:</span><span class="v"><span class="N" id="han">100%</span> | <span class="B" id="hab">100%</span></span></div>
+  <div class="d"><span>ACTIVE MISSILES / UNITS:</span><span class="v" id="hv">0 / 52</span></div>
+  <div class="d"><span>HITS / INTERCEPTS:</span><span class="v" id="hh">0 / 0</span></div>
+  <div class="d"><span>GROUND / NAVAL CLASHES:</span><span class="v" id="hc">0</span></div>
+  <div class="d"><span>MEDIA DEMO PRESSURE:</span><span class="v" id="mp" style="color:var(--accent)">scanning…</span></div>
+  <div class="d"><span>SEASON / WEATHER:</span><span class="v" id="wx" style="color:var(--muted);font-size:10px">initialising…</span></div>
+  <div class="d"><span>INGENUITY / CYBER:</span><span class="v" id="ing" style="color:var(--accent);font-size:10px">standing by</span></div>
+  <div class="d" id="vf" style="display:none;border-top:1px dashed #ffaa00;padding-top:6px"><span>OUTCOME:</span><span class="v" id="vl" style="color:#ffaa00">NO WINNER</span></div>
+  <div class="d" style="color:var(--muted);margin:4px 0 0;min-height:26px;font-size:11px;line-height:1.4" id="info">
+    Hover a base, fleet (oval), ground unit (octagon), or air wing (diamond).<br>
+    <span style="color:var(--green-dot)">●</span> Live commercial &nbsp; <span style="color:var(--mil-dot)">●</span> Military ADS-B &nbsp; <span style="color:#c084fc">●</span> Satellites
+  </div>
+</div>
+
+<div id="reg" class="p">
+  <h2>Order of Battle (<span id="cnt"></span>)</h2>
+  <div class="filters">
+    <select id="fs">
+      <option value="">Both Sides</option>
+      <option value="N">NATO / Allied</option>
+      <option value="B">BRICS+</option>
+    </select>
+    <select id="ft">
+      <option value="">All Domains</option>
+      <option value="BASE">Bases</option>
+      <option value="SEA">Naval Fleets</option>
+      <option value="LAND">Land Forces</option>
+      <option value="AIR">Air Wings</option>
+    </select>
+  </div>
+  <div id="rl"></div>
+</div>
+
+<div id="logp" class="p">
+  <h2>Live Operation Logs</h2>
+  <div id="log">-- v18 READY: 4K free Earth textures · Human ingenuity · Satellites · Live air · Weather · Media --</div>
+</div>
+
+<div id="ctl" class="p">
+  <div class="r">
+    <button id="bN">First Strike – NATO</button>
+    <button id="bB">First Strike – BRICS</button>
+    <button id="bM">Mobilize All Domains</button>
+    <button id="bR">Reset Grid</button>
+    <button id="bLive" title="Toggle live commercial + military ADS-B">Live Air ON</button>
+  </div>
+  <div class="sl-grid">
+    <div class="sl"><span>SIM SPEED:</span><input type="range" id="simSpd" min="0.2" max="3.0" step="0.2" value="1.0"><span id="ssv">1.0X</span></div>
+    <div class="sl"><span>MISSILE MACH SPEED:</span><input type="range" id="mach" min="5" max="20" step="1" value="8"><span id="mv">X8</span></div>
+    <div class="sl"><span>NATO DIPLOMACY (media):</span><input type="range" id="dipN" min="0" max="100" step="5" value="28"><span id="dnv">28%</span></div>
+    <div class="sl"><span>BRICS DIPLOMACY (media):</span><input type="range" id="dipB" min="0" max="100" step="5" value="22"><span id="dbv">22%</span></div>
+    <div class="sl"><span>EW JAMMING:</span><input type="range" id="ew" min="0" max="60" step="5" value="20"><span id="ev">20%</span></div>
+    <div class="sl"><span>LIVE AIR DENSITY:</span><input type="range" id="airDens" min="10" max="100" step="10" value="40"><span id="adv">40%</span></div>
+  </div>
+  <div class="legend">
+    <span><i class="g"></i> Live commercial</span>
+    <span><i class="m"></i> Military ADS-B</span>
+    <span><i class="n"></i> NATO</span>
+    <span><i class="b"></i> BRICS+</span>
+  </div>
+  <div class="legend" style="margin-top:4px;opacity:0.9">
+    <span style="color:#fbbf24">● ISR</span>
+    <span style="color:#60a5fa">● Comms</span>
+    <span style="color:#34d399">● Nav</span>
+    <span style="color:#f87171">● Early Warning</span>
+    <span style="color:#c084fc">● SIGINT</span>
+    <span style="color:#e2e8f0">● Commercial EO</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script>
+const $=i=>document.getElementById(i), ER=40;
+const REG={EU:"Europe",ME:"Middle East",PAC:"Indo-Pacific",ARC:"Arctic",IND:"Indian Ocean",AF:"Africa",AM:"Americas"};
+
+const BASES=[
+  ["Ramstein AB, DE",49.44,7.60,"N","EU","air","USAFE-AFAFRICA HQ; 86th Airlift Wing"],
+  ["RAF Lakenheath, UK",52.41,0.56,"N","EU","air","48th Fighter Wing (F-35A, F-15E)"],
+  ["Aviano AB, IT",46.03,12.60,"N","EU","air","31st Fighter Wing (F-16)"],
+  ["Spangdahlem AB, DE",49.97,6.69,"N","EU","air","52nd Fighter Wing"],
+  ["Naval Station Rota, ES",36.64,-6.35,"N","EU","naval","Forward-deployed Aegis destroyers"],
+  ["NSA Souda Bay, GR",35.53,24.15,"N","EU","naval","US/NATO Eastern Med naval support"],
+  ["Redzikowo, PL",54.48,17.10,"N","EU","land","Aegis Ashore missile defense site"],
+  ["Deveselu, RO",43.90,24.38,"N","EU","land","Aegis Ashore BMD complex"],
+  ["HMNB Clyde (Faslane), UK",56.07,-4.82,"N","EU","naval","Royal Navy SSBN/SSN flotilla"],
+  ["Île Longue, FR",48.30,-4.52,"N","EU","naval","French Strategic Oceanic Force (SSBN)"],
+  ["Grafenwöhr, DE",49.69,11.94,"N","EU","land","7th Army Training Command / Armored hub"],
+  ["Camp Tapa, EE",59.26,25.96,"N","EU","land","NATO Enhanced Forward Presence Battlegroup"],
+  ["Haakonsvern, NO",60.34,5.23,"N","EU","naval","Royal Norwegian Navy main base"],
+  ["Keflavik AB, IS",63.98,-22.60,"N","ARC","air","GIUK Gap maritime patrol & air policing"],
+  ["Incirlik AB, TR",37.00,35.43,"N","ME","air","39th Air Base Wing"],
+  ["Al Udeid AB, QA",25.12,51.31,"N","ME","air","CENTCOM Forward HQ; 379th AEW"],
+  ["NSA Bahrain",26.21,50.60,"N","ME","naval","US 5th Fleet HQ"],
+  ["Al Dhafra AB, AE",24.25,54.55,"N","ME","air","380th Air Expeditionary Wing"],
+  ["Camp Arifjan, KW",28.88,48.16,"N","ME","land","ARCENT forward logistics & armor"],
+  ["Camp Lemonnier, DJ",11.55,43.15,"N","AF","joint","CJTF-Horn of Africa"],
+  ["Diego Garcia",-7.31,72.41,"N","IND","joint","Naval Support Facility; bomber & SSGN hub"],
+  ["Pituffik SB, GL",76.53,-68.70,"N","ARC","air","821st Space Base Group (missile warning)"],
+  ["JBER Elmendorf, AK",61.25,-149.80,"N","ARC","joint","Alaskan Command; F-22 Raptor wing"],
+  ["Kadena AB, JP",26.35,127.77,"N","PAC","air","18th Wing (Okinawa)"],
+  ["Misawa AB, JP",40.70,141.37,"N","PAC","air","35th Fighter Wing"],
+  ["Yokosuka, JP",35.29,139.67,"N","PAC","naval","US 7th Fleet HQ; Carrier Strike Group 5"],
+  ["Sasebo, JP",33.16,129.72,"N","PAC","naval","Amphibious Ready Group forward port"],
+  ["Osan AB, KR",37.09,127.03,"N","PAC","air","51st Fighter Wing"],
+  ["Camp Humphreys, KR",36.96,127.03,"N","PAC","land","Eighth Army / USFK HQ"],
+  ["Andersen AFB, Guam",13.58,144.93,"N","PAC","air","36th Wing; strategic bomber rotations"],
+  ["Naval Base Guam",13.44,144.65,"N","PAC","naval","Submarine Squadron 15"],
+  ["RAAF Tindal, AU",-14.52,132.38,"N","PAC","air","B-52 / B-2 forward deployment base"],
+  ["HMAS Stirling, AU",-32.24,115.68,"N","IND","naval","AUKUS submarine rotational force"],
+  ["Subic Bay / Basa, PH",14.98,120.49,"N","PAC","joint","EDCA South China Sea access hub"],
+  ["Changi Naval Base, SG",1.32,104.02,"N","PAC","naval","Malacca Strait logistics & carrier pier"],
+  ["Whiteman AFB, US",38.73,-93.55,"N","AM","air","509th Bomb Wing (B-2 Spirit)"],
+  ["Barksdale AFB, US",32.50,-93.66,"N","AM","air","2nd Bomb Wing (B-52H)"],
+  ["Minot AFB, US",48.42,-101.36,"N","AM","joint","5th Bomb Wing; 91st Missile Wing"],
+  ["Malmstrom AFB, US",47.51,-111.18,"N","AM","land","341st Missile Wing (Minuteman III)"],
+  ["F.E. Warren AFB, US",41.15,-104.86,"N","AM","land","90th Missile Wing"],
+  ["Kings Bay, US",30.80,-81.52,"N","AM","naval","Atlantic Ohio-class SSBN base"],
+  ["Naval Base Kitsap, US",47.56,-122.71,"N","AM","naval","Pacific Ohio-class SSBN base"],
+  ["Naval Station Norfolk, US",36.95,-76.33,"N","AM","naval","US Fleet Forces Command; Second Fleet"],
+  ["Pearl Harbor, HI",21.35,-157.95,"N","PAC","naval","USINDOPACOM & Pacific Fleet HQ"],
+  ["Fort Cavazos, US",31.13,-97.78,"N","AM","land","III Armored Corps HQ"],
+  ["CFB Halifax, CA",44.66,-63.58,"N","AM","naval","Royal Canadian Navy Atlantic Fleet"],
+
+  ["Engels-2, RU",51.48,46.21,"B","EU","air","121st Heavy Bomber Regiment (Tu-95MS, Tu-160)"],
+  ["Kozelsk, RU",54.03,35.78,"B","EU","land","28th Guards Missile Division (RS-24 Yars)"],
+  ["Tatishchevo, RU",51.67,45.60,"B","EU","land","60th Missile Division (RS-24, Topol-M)"],
+  ["Baltiysk, RU",54.65,19.90,"B","EU","naval","Baltic Fleet HQ (Kaliningrad)"],
+  ["Sevastopol, Crimea",44.62,33.53,"B","EU","naval","Black Sea Fleet HQ"],
+  ["Novorossiysk, RU",44.72,37.78,"B","EU","naval","Black Sea Fleet eastern naval base"],
+  ["Severomorsk, RU",69.07,33.42,"B","ARC","naval","Northern Fleet HQ"],
+  ["Gadzhiyevo, RU",69.25,33.32,"B","ARC","naval","Northern Fleet Borei-class SSBN base"],
+  ["Olenya, RU",68.15,33.46,"B","ARC","air","Arctic long-range aviation base"],
+  ["Nagurskoye, RU",80.80,47.65,"B","ARC","air","Franz Josef Land Arctic air defense"],
+  ["Tiksi, RU",71.64,128.87,"B","ARC","land","Northern Sea Route radar & S-400 hub"],
+  ["Tartus, SY",34.89,35.87,"B","ME","naval","Mediterranean naval logistics facility"],
+  ["Hmeimim, SY",35.40,35.95,"B","ME","air","Aerospace Forces forward base"],
+  ["Bandar Abbas, IR",27.18,56.27,"B","ME","naval","IRGC Navy / Iranian Navy HQ (Strait of Hormuz)"],
+  ["Chabahar, IR",25.29,60.62,"B","IND","naval","Gulf of Oman naval & missile base"],
+  ["Isfahan Missile Complex, IR",32.65,51.68,"B","ME","land","IRGC Aerospace ballistic missile hub"],
+  ["PLA Support Base, DJ",11.59,43.07,"B","AF","naval","PLA overseas logistics & pier"],
+  ["Simon's Town, ZA",-34.19,18.43,"B","AF","naval","South African Navy HQ (Cape route)"],
+  ["Vilyuchinsk, RU",52.93,158.40,"B","PAC","naval","Pacific Fleet SSBN base (Kamchatka)"],
+  ["Vladivostok, RU",43.12,131.87,"B","PAC","naval","Pacific Fleet HQ"],
+  ["Yulin, Hainan, CN",18.22,109.70,"B","PAC","naval","PLAN South Sea Fleet SSBN/SSN base"],
+  ["Zhanjiang, CN",21.20,110.40,"B","PAC","naval","PLAN South Sea Fleet HQ"],
+  ["Ningbo / Zhoushan, CN",29.95,121.72,"B","PAC","naval","PLAN East Sea Fleet HQ"],
+  ["Qingdao, CN",36.07,120.38,"B","PAC","naval","PLAN North Sea Fleet & carrier base"],
+  ["Korla, Xinjiang, CN",41.76,86.15,"B","PAC","land","PLA Rocket Force & ABM test/deployment hub"],
+  ["Golmud, Qinghai, CN",36.40,94.90,"B","PAC","land","Western Theater Command logistics & armor"],
+  ["Fiery Cross Reef",9.55,112.89,"B","PAC","air","PLA Spratly airstrip & SAM sites"],
+  ["Subi Reef",10.92,114.08,"B","PAC","air","PLA Spratly radar & air base"],
+  ["Mischief Reef",9.90,115.53,"B","PAC","air","PLA Spratly missile & naval outpost"],
+  ["Ream, KH",10.51,103.64,"B","PAC","naval","Gulf of Thailand naval facility"],
+  ["Karwar, IN",14.80,74.13,"B","IND","naval","INS Kadamba (Western Fleet & carrier base)"],
+  ["Visakhapatnam, IN",17.69,83.30,"B","IND","naval","Eastern Naval Command; Arihant SSBN"],
+  ["Port Blair, IN",11.62,92.73,"B","IND","joint","Andaman & Nicobar Tri-Service Command"],
+  ["Ambala AFS, IN",30.37,76.81,"B","IND","air","Western Air Command Rafale strike wing"],
+  ["Ilha das Cobras, BR",-22.89,-43.17,"B","AM","naval","Brazilian Navy Fleet HQ (Rio de Janeiro)"],
+  ["Itaguaí, BR",-22.93,-43.83,"B","AM","naval","PROSUB submarine base"],
+  ["Lourdes SIGINT / Mariel, CU",23.00,-82.75,"B","AM","joint","Caribbean maritime & electronic outpost"]
+];
+
+const INITIAL_UNITS=[
+  ["CSG-2 (USS Eisenhower)","SEA","Carrier Strike Group","N",35.5,18.0,34.5,33.5],
+  ["CSG-5 (USS Reagan)","SEA","Carrier Strike Group","N",24.0,130.0,21.5,118.5],
+  ["CSG-12 (USS Ford)","SEA","Carrier Strike Group","N",58.0,-15.0,66.0,5.0],
+  ["DESRON-60 Aegis","SEA","Destroyer Squadron","N",36.0,-5.5,36.5,14.0],
+  ["TF-74 SSN Wolfpack","SEA","Attack Submarines","N",15.0,115.0,18.0,111.0],
+  ["CTF-50 Strike Group","SEA","Amphibious Ready Group","N",24.5,58.5,26.5,55.5],
+  ["TF-137 Arctic Fleet","SEA","Frigate Task Group","N",71.0,15.0,70.5,31.0],
+  ["RAN Indo-Pac TF","SEA","Surface Action Group","N",-10.0,125.0,-4.0,108.0],
+  ["PLAN Carrier Grp 17","SEA","Carrier Strike Group","B",17.0,113.0,22.0,122.0],
+  ["PLAN East Sea Flotilla","SEA","Destroyer Flotilla","B",27.5,124.0,26.5,127.0],
+  ["RU Northern Fleet SAG","SEA","Cruiser Task Group","B",71.5,36.0,72.0,18.0],
+  ["RU Pacific Fleet SAG","SEA","Missile Cruiser Group","B",45.0,145.0,42.0,142.0],
+  ["IRGC Fast Attack Grp","SEA","Missile Boat Flotilla","B",26.8,56.0,25.5,54.5],
+  ["IN Western Carrier Grp","SEA","Carrier Task Force","B",15.5,68.0,12.0,62.0],
+  ["RU Baltic Flotilla","SEA","Corvette Strike Group","B",55.5,18.5,55.0,15.0],
+  ["PLAN Indian Ocean TF","SEA","Expeditionary Fleet","B",2.0,85.0,-5.0,74.0],
+  ["US V Corps (Armor)","LAND","Armored Corps","N",51.8,19.5,54.2,20.5],
+  ["NATO eFP Baltic Div","LAND","Mechanized Division","N",56.5,24.5,58.5,27.5],
+  ["1st Armored Div (FWD)","LAND","Heavy Armor Brigade","N",45.5,26.0,46.5,30.0],
+  ["USFK 2nd Infantry Div","LAND","Combined Mech Div","N",37.8,127.1,38.8,126.5],
+  ["III MEF Okinawa/Luzon","LAND","Littoral Combat Team","N",18.2,121.8,16.5,120.5],
+  ["CENTCOM Patriot/THAAD","LAND","Air Defense Division","N",26.0,49.5,28.5,48.0],
+  ["USAREUR-AF Fires Cmd","LAND","Long-Range Fires","N",50.5,10.5,52.5,16.5],
+  ["Nordic Arctic Brigade","LAND","Arctic Mountain Div","N",68.5,22.0,69.0,31.0],
+  ["4th Infantry Div","LAND","Mechanized Infantry","N",48.0,17.0,49.5,22.5],
+  ["101st Airborne (AA)","LAND","Air Assault Division","N",44.5,27.5,45.8,31.5],
+  ["RU 1st Guards Tank Army","LAND","Heavy Tank Army","B",53.5,31.0,52.5,24.5],
+  ["RU 20th Combined Arms","LAND","Mechanized Army","B",50.5,36.5,49.5,31.0],
+  ["RU 11th Army Corps","LAND","Kaliningrad Garrison","B",54.7,21.0,54.2,19.5],
+  ["PLA 73rd Group Army","LAND","Amphibious Corps","B",25.5,119.2,24.8,120.8],
+  ["PLA 76th Group Army","LAND","High-Altitude Mech","B",35.0,82.0,34.2,78.5],
+  ["IRGC Ground Aerospace","LAND","Mobile Missile Corps","B",31.0,49.0,29.5,48.0],
+  ["RU 6th Air Defense Div","LAND","S-400/S-500 SAM Grid","B",67.5,34.0,68.8,33.0],
+  ["IN XIV Fire & Fury Corps","LAND","Mountain Strike Corps","B",34.1,77.6,35.2,78.8],
+  ["PLA 79th Group Army","LAND","Heavy Combined Arms","B",41.8,123.4,40.2,124.5],
+  ["RU Southern Tank Div","LAND","Armored Breakthrough","B",47.2,39.7,46.8,35.5],
+
+  ["USAFE Fighter Wing","AIR","Multirole Fighter Wing","N",50.2,8.5,54.5,23.0,"FIGHTER"],
+  ["Baltic Air Policing","AIR","Quick Reaction Alert","N",56.5,24.0,58.2,26.8,"FIGHTER"],
+  ["Aviano Strike Wing","AIR","Fighter-Bomber Wing","N",45.8,12.6,35.5,30.0,"BOMBER"],
+  ["RAF North Sea QRA","AIR","Air Superiority Wing","N",54.5,-1.2,56.5,18.0,"FIGHTER"],
+  ["CENTAF Expeditionary","AIR","Strike Package","N",25.5,51.5,27.2,56.5,"BOMBER"],
+  ["Kadena Fighter Wing","AIR","Air Superiority Wing","N",26.8,128.2,31.0,132.0,"FIGHTER"],
+  ["Guam Bomber Task Force","AIR","Long-Range Bomber Det","N",14.5,145.0,12.0,115.0,"BOMBER"],
+  ["Elmendorf Arctic Wing","AIR","Air Defense Wing","N",62.0,-150.0,71.0,25.0,"FIGHTER"],
+  ["VKS Western Fighters","AIR","Air Superiority Wing","B",54.0,38.0,54.8,27.5,"FIGHTER"],
+  ["VKS Long-Range Aviation","AIR","Strategic Bomber Wing","B",52.0,46.0,56.0,24.0,"BOMBER"],
+  ["VKS Pacific Aviation","AIR","Maritime Strike Wing","B",43.4,132.2,34.0,134.5,"BOMBER"],
+  ["PLA Eastern Theater AF","AIR","Fighter-Bomber Wing","B",28.0,118.0,25.8,123.0,"FIGHTER"],
+  ["PLA Southern Theater AF","AIR","Air Superiority Wing","B",23.0,113.0,16.5,114.5,"FIGHTER"],
+  ["PLAN Naval Aviation","AIR","Carrier Air Wing","B",18.5,110.0,15.2,116.0,"FIGHTER"],
+  ["IRGC Combat Air Wing","AIR","Fighter Wing","B",32.5,52.0,27.0,55.8,"FIGHTER"],
+  ["IAF Western Air Cmd","AIR","Multirole Strike Wing","B",30.5,76.8,27.0,56.5,"FIGHTER"]
+];
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,1000);
+camera.position.set(0,38,98);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+$("cc").appendChild(renderer.domElement);
+
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.minDistance=52;
+controls.maxDistance=220;
+
+scene.add(new THREE.AmbientLight(0x6688aa, 0.45));
+const dirLight=new THREE.DirectionalLight(0xfff5e6, 1.35);
+dirLight.position.set(60, 40, 50);
+scene.add(dirLight);
+
+// High-res 2048x1024 Earth Canvas for Crisp Country Borders + Land/Sea Collision Mask
+const W=2048, H=1024;
+const texCanvas=document.createElement("canvas");
+texCanvas.width=W; texCanvas.height=H;
+const ctx=texCanvas.getContext("2d");
+
+// Fallback continent polygons in case offline
+const FALLBACK_CONTINENTS=[
+  [[-168,71],[-140,70],[-110,75],[-80,72],[-60,60],[-55,48],[-75,35],[-81,25],[-97,26],[-90,16],[-78,8],[-84,10],[-105,20],[-115,32],[-125,49],[-140,60],[-165,61]],
+  [[-55,82],[-20,82],[-18,70],[-43,60],[-52,68]],
+  [[-78,9],[-62,10],[-50,0],[-35,-7],[-39,-18],[-53,-33],[-68,-54],[-74,-45],[-71,-18],[-81,-5]],
+  [[-10,36],[-5,48],[10,55],[25,70],[40,68],[55,55],[40,42],[25,38],[12,44],[2,43],[-5,36]],
+  [[-17,15],[-5,35],[10,37],[32,31],[43,12],[51,11],[40,-5],[35,-24],[20,-34],[12,-17],[9,4],[-5,5],[-16,11]],
+  [[28,41],[42,42],[55,55],[70,72],[110,76],[150,70],[175,66],[160,52],[140,50],[130,35],[120,22],[105,10],[98,18],[88,22],[78,8],[68,24],[56,26],[48,30],[36,36]],
+  [[114,-22],[130,-12],[142,-11],[153,-28],[146,-38],[130,-32],[115,-34]],
+  [[96,5],[105,-5],[118,-8],[126,-5],[118,5],[108,2]],
+  [[130,31],[141,38],[145,44],[140,42],[132,34]]
+];
+
+// Major country & regional labels overlayed directly onto the globe texture
+const COUNTRY_LABELS=[
+  ["USA",39.5,-98],["CANADA",56,-106],["MEXICO",24,-102],["BRAZIL",-10,-52],["ARGENTINA",-34,-64],
+  ["COLOMBIA",4,-73],["PERU",-10,-75],["CHILE",-33,-71],["VENEZUELA",8,-66],
+  ["UK",54.5,-2],["FRANCE",46.5,2.5],["GERMANY",51.2,10.5],["POLAND",52,19.5],["UKRAINE",49,32],
+  ["NORWAY",64,11],["SWEDEN",62,15],["FINLAND",64,26],["DENMARK",56,10],["NETHERLANDS",52.2,5.3],
+  ["BELGIUM",50.5,4.5],["ITALY",42.5,12.5],["SPAIN",40,-3.5],["PORTUGAL",39.5,-8],["GREECE",39.5,22],
+  ["TURKEY",39,35],["ROMANIA",46,25],["HUNGARY",47,19.5],["CZECHIA",49.8,15.5],
+  ["RUSSIA",61,95],["CHINA",35,103],["INDIA",22,79],["JAPAN",36,138],["S. KOREA",36,128],
+  ["N. KOREA",40,127],["TAIWAN",23.7,121],["PHILIPPINES",12,122],["VIETNAM",16,108],
+  ["THAILAND",15,101],["MALAYSIA",4,102],["INDONESIA",-2,118],["SINGAPORE",1.3,103.8],
+  ["AUSTRALIA",-25,134],["NEW ZEALAND",-41,174],["PAPUA N.G.",-6,147],
+  ["IRAN",32,53],["IRAQ",33,44],["SAUDI ARABIA",24,45],["UAE",24,54],["QATAR",25.3,51.2],
+  ["ISRAEL",31.5,35],["EGYPT",26,30],["LIBYA",27,17],["ALGERIA",28,3],["MOROCCO",32,-6],
+  ["SOUTH AFRICA",-29,24],["NIGERIA",9,8],["ETHIOPIA",9,39],["KENYA",0,38],["DRC",-3,24],
+  ["PAKISTAN",30,70],["AFGHANISTAN",33.5,65],["KAZAKHSTAN",48,67],["UZBEKISTAN",41.5,64],
+  ["GREENLAND",72,-42],["ALASKA",64,-152],["ICELAND",65,-18],["CUBA",22,-79]
+];
+
+let mapData=null;
+const earthTex=new THREE.CanvasTexture(texCanvas);
+earthTex.anisotropy=8;
+
+function drawBaseGrid(){
+  ctx.fillStyle="#051324";
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="rgba(0,255,204,0.07)";
+  ctx.lineWidth=1;
+  for(let x=0;x<=W;x+=W/12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<=H;y+=H/6){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function drawLabels(){
+  ctx.font="600 12px Inter, system-ui, sans-serif";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  COUNTRY_LABELS.forEach(([name,lat,lon])=>{
+    const x=(lon+180)/360*W;
+    const y=(90-lat)/180*H;
+    // soft halo
+    ctx.fillStyle="rgba(0,0,0,0.55)";
+    ctx.fillText(name,x+1.2,y+1.2);
+    ctx.fillStyle="rgba(180,255,240,0.88)";
+    ctx.fillText(name,x,y);
+  });
+}
+
+function drawPolygonRing(ring){
+  ctx.beginPath();
+  let prevLon=null;
+  ring.forEach(([lon,lat],idx)=>{
+    const x=(lon+180)/360*W;
+    const y=(90-lat)/180*H;
+    // Prevent anti-meridian horizontal wrap streaks
+    if(idx===0 || (prevLon!==null && Math.abs(lon-prevLon)>180)){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+    prevLon=lon;
+  });
+  ctx.closePath();
+}
+
+function renderFallbackMap(){
+  drawBaseGrid();
+  ctx.fillStyle="#0f342b";
+  ctx.strokeStyle="#00ffcc";
+  ctx.lineWidth=1.8;
+  FALLBACK_CONTINENTS.forEach(poly=>{
+    drawPolygonRing(poly);
+    ctx.fill();
+    ctx.stroke();
+  });
+  drawLabels();
+  mapData=ctx.getImageData(0,0,W,H).data;
+  earthTex.needsUpdate=true;
+}
+
+// Render immediate fallback, then upgrade seamlessly with real world-atlas 110m country borders
+renderFallbackMap();
+
+const borderGroup=new THREE.Group();
+scene.add(borderGroup);
+
+function build3DCountryBorders(geoFeatures){
+  while(borderGroup.children.length) borderGroup.remove(borderGroup.children[0]);
+  const positions=[];
+  const addRing=(ring)=>{
+    for(let i=0;i<ring.length-1;i++){
+      const [lon1,lat1]=ring[i];
+      const [lon2,lat2]=ring[i+1];
+      if(Math.abs(lon1-lon2)>180) continue;
+      const v1=ll2v(lat1,lon1,0.14);
+      const v2=ll2v(lat2,lon2,0.14);
+      positions.push(v1.x,v1.y,v1.z, v2.x,v2.y,v2.z);
+    }
+  };
+  geoFeatures.forEach(f=>{
+    const g=f.geometry;
+    if(!g) return;
+    if(g.type==="Polygon") g.coordinates.forEach(addRing);
+    else if(g.type==="MultiPolygon") g.coordinates.forEach(poly=>poly.forEach(addRing));
+  });
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+  const mat=new THREE.LineBasicMaterial({
+    color:0x7ee8d8,
+    transparent:true,
+    opacity:0.72,
+    depthWrite:false
+  });
+  // Slightly elevated second pass for dark-side readability
+  const matGlow=new THREE.LineBasicMaterial({
+    color:0xa5f3e8,
+    transparent:true,
+    opacity:0.28,
+    depthWrite:false
+  });
+  const lines = new THREE.LineSegments(geo, mat);
+  borderGroup.add(lines);
+  const glow = new THREE.LineSegments(geo, matGlow); // shared geometry is fine
+  borderGroup.add(glow);
+}
+
+fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+  .then(r=>r.json())
+  .then(world=>{
+    const countries=topojson.feature(world, world.objects.countries);
+    drawBaseGrid();
+    ctx.fillStyle="#10382e";
+    ctx.strokeStyle="rgba(0, 255, 204, 0.85)";
+    ctx.lineWidth=1.4;
+
+    countries.features.forEach(f=>{
+      const g=f.geometry;
+      if(!g) return;
+      if(g.type==="Polygon"){
+        g.coordinates.forEach(ring=>{ drawPolygonRing(ring); ctx.fill(); ctx.stroke(); });
+      }else if(g.type==="MultiPolygon"){
+        g.coordinates.forEach(poly=>poly.forEach(ring=>{ drawPolygonRing(ring); ctx.fill(); ctx.stroke(); }));
+      }
+    });
+
+    drawLabels();
+    mapData=ctx.getImageData(0,0,W,H).data;
+    earthTex.needsUpdate=true;
+    build3DCountryBorders(countries.features);
+    logMsg("GEO-INTEL: High-precision world country borders & labels loaded.");
+  })
+  .catch(()=>{
+    logMsg("GEO-INTEL: Offline fallback continent borders active.");
+  });
+
+function isLand(lat,lon){
+  if(!mapData) return true;
+  const normLon=((lon+540)%360)-180;
+  const x=Math.max(0,Math.min(W-1,Math.floor((normLon+180)/360*W)));
+  const y=Math.max(0,Math.min(H-1,Math.floor((90-lat)/180*H)));
+  return mapData[(y*W+x)*4+1] > 32;
+}
+
+// High-res free Earth textures (three.js official 4K day/night + normal + specular + topology)
+const texLoader = new THREE.TextureLoader();
+const dayMap = texLoader.load(
+  "https://threejs.org/examples/textures/planets/earth_day_4096.jpg",
+  () => { earthMat.needsUpdate = true; logMsg("GEO: 4K Earth day texture loaded (free / NASA-derived)."); }
+);
+dayMap.anisotropy = 8;
+const nightMap = texLoader.load(
+  "https://threejs.org/examples/textures/planets/earth_night_4096.jpg",
+  () => { earthMat.needsUpdate = true; logMsg("GEO: 4K night-side city lights loaded."); }
+);
+nightMap.anisotropy = 8;
+const normalMap = texLoader.load(
+  "https://threejs.org/examples/textures/planets/earth_normal_2048.jpg",
+  () => { earthMat.needsUpdate = true; }
+);
+normalMap.anisotropy = 8;
+const specularMap = texLoader.load(
+  "https://threejs.org/examples/textures/planets/earth_specular_2048.jpg",
+  () => { earthMat.needsUpdate = true; }
+);
+specularMap.anisotropy = 8;
+const topoMap = texLoader.load(
+  "https://unpkg.com/three-globe/example/img/earth-topology.png",
+  () => { earthMat.needsUpdate = true; logMsg("GEO: World height / topology map applied."); }
+);
+topoMap.anisotropy = 8;
+
+const earthMat = new THREE.MeshPhongMaterial({
+  map: dayMap,
+  emissiveMap: nightMap,
+  emissive: new THREE.Color(0x334455),
+  emissiveIntensity: 0.65,
+  normalMap: normalMap,
+  normalScale: new THREE.Vector2(0.85, 0.85),
+  specularMap: specularMap,
+  specular: new THREE.Color(0x333333),
+  shininess: 18,
+  bumpMap: topoMap,
+  bumpScale: 0.9,
+  displacementMap: topoMap,
+  displacementScale: 0.48,
+  displacementBias: -0.1
+});
+// Soften the procedural overlay influence – we still use earthTex for isLand()
+const earthMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(ER, 96, 64),  // higher segment count for high-res look
+  earthMat
+);
+scene.add(earthMesh);
+
+// Subtle atmosphere glow
+scene.add(new THREE.Mesh(
+  new THREE.SphereGeometry(ER * 1.018, 48, 32),
+  new THREE.MeshBasicMaterial({
+    color: 0x4db8ff,
+    transparent: true,
+    opacity: 0.07,
+    side: THREE.BackSide
+  })
+));
+
+function ll2v(lat,lon,alt=0){
+  const phi=(90-lat)*Math.PI/180;
+  const theta=(lon+180)*Math.PI/180;
+  const r=ER+alt;
+  return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+}
+
+function greatCircleDist(lat1,lon1,lat2,lon2){
+  const p1=lat1*Math.PI/180, p2=lat2*Math.PI/180;
+  const dp=(lat2-lat1)*Math.PI/180, dl=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*180/Math.PI;
+}
+
+// Surface frame comes only from ll2v: local +Z becomes the outward normal.
+// Air noses use local +X, because local +Z is already that normal.
+// Yaw is a rotation around the same normal (qYaw * qAlign).
+const _airUp=new THREE.Vector3(0,0,1);
+const _airNormal=new THREE.Vector3();
+const _airFwd=new THREE.Vector3();
+const _airLocalX=new THREE.Vector3();
+const _airTarget=new THREE.Vector3();
+const _airCross=new THREE.Vector3();
+const _airAlign=new THREE.Quaternion();
+const _airYaw=new THREE.Quaternion();
+
+function placeTangent(mesh, lat, lon, alt=0.35, aimLat=null, aimLon=null){
+  const pos = ll2v(lat, lon, alt);
+  mesh.position.copy(pos);
+  _airNormal.copy(pos).normalize();
+  _airAlign.setFromUnitVectors(_airUp, _airNormal);
+  if(aimLat===null || aimLon===null){
+    mesh.quaternion.copy(_airAlign);
+    return;
+  }
+  _airTarget.copy(ll2v(aimLat, aimLon, alt));
+  _airFwd.copy(_airTarget).sub(pos);
+  _airFwd.addScaledVector(_airNormal, -_airFwd.dot(_airNormal));
+  if(_airFwd.lengthSq()<1e-8){
+    mesh.quaternion.copy(_airAlign);
+    return;
+  }
+  _airFwd.normalize();
+  _airLocalX.set(1,0,0).applyQuaternion(_airAlign);
+  let yaw=Math.acos(Math.max(-1, Math.min(1, _airLocalX.dot(_airFwd))));
+  _airCross.crossVectors(_airLocalX, _airFwd);
+  if(_airCross.dot(_airNormal)<0) yaw=-yaw;
+  _airYaw.setFromAxisAngle(_airNormal, yaw);
+  mesh.quaternion.copy(_airYaw.multiply(_airAlign));
+}
+
+// Oracle is a ll2v finite difference, not the quaternion. Cue is a child at local +X.
+function selfTestAirHeading(){
+  const cases=[[0,0,0,25],[0,0,25,0],[45,90,45,130],[-35,150,-15,150]];
+  const mesh=new THREE.Object3D();
+  const nose=new THREE.Object3D();
+  nose.position.set(1,0,0);
+  mesh.add(nose);
+  const got=new THREE.Vector3();
+  let worst=1;
+  for(const [lat,lon,aLat,aLon] of cases){
+    placeTangent(mesh,lat,lon,1.15,aLat,aLon);
+    mesh.updateMatrixWorld(true);
+    nose.getWorldPosition(got);
+    got.sub(mesh.position);
+    const radial=mesh.position.clone().normalize();
+    got.addScaledVector(radial, -got.dot(radial));
+    if(got.lengthSq()<1e-8) return -1;
+    got.normalize();
+    const p=ll2v(lat,lon,0);
+    const ahead=ll2v(aLat,aLon,0).sub(p);
+    const n=p.clone().normalize();
+    ahead.addScaledVector(n, -ahead.dot(n));
+    if(ahead.lengthSq()<1e-8) return -1;
+    ahead.normalize();
+    worst=Math.min(worst, got.dot(ahead));
+  }
+  return worst;
+}
+
+let state="STANDBY", bases=[], units=[], missiles=[], explosions=[], hitCount=0, intCount=0, clashCount=0, dipTimer=0;
+const simGroup=new THREE.Group();
+scene.add(simGroup);
+
+function logMsg(txt){
+  const el=$("log");
+  const ts=new Date().toISOString().substr(11,8);
+  el.textContent="["+ts+"] "+txt+"\n"+el.textContent.slice(0,4000);
+}
+
+function initGrid(){
+  while(simGroup.children.length) simGroup.remove(simGroup.children[0]);
+  bases=[]; units=[]; missiles=[]; explosions=[];
+  hitCount=0; intCount=0; clashCount=0; dipTimer=0;
+  state="STANDBY";
+  $("hs").textContent="STANDBY"; $("hs").style.color="#ffaa00";
+  $("vf").style.display="none";
+  $("bN").disabled=false; $("bB").disabled=false;
+
+  const baseGeo=new THREE.ConeGeometry(0.42,0.85,4);
+  baseGeo.rotateX(Math.PI/2);
+
+  BASES.forEach((b,idx)=>{
+    const [name,lat,lon,side,reg,dom,desc]=b;
+    const mat=new THREE.MeshBasicMaterial({color:side==="N"?0x4da6ff:0xff4d4d});
+    const mesh=new THREE.Mesh(baseGeo,mat);
+    placeTangent(mesh, lat, lon, 0.35);
+    const obj={id:idx,kind:"BASE",name,lat,lon,side,reg,dom,desc,hp:100,mesh};
+    mesh.userData=obj;
+    simGroup.add(mesh);
+    bases.push(obj);
+  });
+
+  // Sea Forces: Ovals
+  const seaGeo=new THREE.SphereGeometry(0.55,16,12);
+  seaGeo.scale(1.55, 0.75, 0.35);
+
+  // Land Forces: Octagons
+  const landGeo=new THREE.CylinderGeometry(0.62,0.62,0.28,8);
+  landGeo.rotateX(Math.PI/2);
+
+  // Air wings: flat diamonds. Long local +X is the nose; local +Z is radial up.
+  const airGeo=new THREE.OctahedronGeometry(0.5,0);
+  airGeo.scale(2.05, 1.05, 0.28);
+  const noseGeo=new THREE.SphereGeometry(0.12,6,6);
+
+  INITIAL_UNITS.forEach((u,idx)=>{
+    const [name,dom,type,side,lat,lon,tLat,tLon,role]=u;
+    let color;
+    if(dom==="AIR") color=side==="N"?0x9fd4ff:0xff7aa2;
+    else if(dom==="SEA") color=side==="N"?0x00e5ff:0xff9933;
+    else color=side==="N"?0x3388ff:0xff3355;
+    const geo=dom==="SEA"?seaGeo:dom==="AIR"?airGeo:landGeo;
+    const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color}));
+    const alt=dom==="AIR"?1.15:0.45;
+    if(dom==="AIR"){
+      const nose=new THREE.Mesh(noseGeo,new THREE.MeshBasicMaterial({color:0xffffff}));
+      nose.position.set(1.05,0,0);
+      nose.name="nose";
+      mesh.add(nose);
+    }
+    placeTangent(mesh, lat, lon, alt, dom==="AIR"?tLat:null, dom==="AIR"?tLon:null);
+    const obj={
+      id:idx,kind:dom,name,dom,type,side,
+      role:role||(dom==="AIR"?"FIGHTER":"SURFACE"),
+      lat,lon,tLat,tLon,hp:100,cd:Math.random()*3,
+      speed:dom==="AIR"?0.08:dom==="SEA"?0.045:0.025,
+      mesh
+    };
+    mesh.userData=obj;
+    simGroup.add(mesh);
+    units.push(obj);
+  });
+
+  renderRegistry();
+  updateHUD();
+}
+
+function renderRegistry(){
+  const sFilter=$("fs").value;
+  const tFilter=$("ft").value;
+  const list=$("rl");
+  list.innerHTML="";
+  let count=0;
+
+  const items=[...bases,...units].filter(o=>{
+    if(sFilter && o.side!==sFilter) return false;
+    if(tFilter && o.kind!==tFilter) return false;
+    return true;
+  });
+
+  items.forEach(o=>{
+    count++;
+    const div=document.createElement("div");
+    div.className="row";
+    const col=o.side==="N"?"N":"B";
+    const tag=o.kind==="BASE"?o.dom.toUpperCase():(o.kind==="SEA"?"OVAL-SEA":o.kind==="AIR"?"DIA-AIR":"OCT-LAND");
+    div.innerHTML='<div><span class="'+col+'">'+o.name+'</span><small>'+(o.kind==="BASE"?o.desc:o.type)+' ('+Math.round(o.hp)+'%)</small></div><span class="badge '+col+'">'+tag+'</span>';
+    div.onclick=()=>{
+      const targetPos=ll2v(o.lat,o.lon,65);
+      camera.position.copy(targetPos);
+      controls.target.set(0,0,0);
+      $("info").textContent="LOCKED: "+o.name+" | HP: "+Math.round(o.hp)+"%";
+    };
+    list.appendChild(div);
+  });
+  $("cnt").textContent=count;
+}
+$("fs").onchange=renderRegistry;
+$("ft").onchange=renderRegistry;
+
+const arrowGeo=new THREE.ConeGeometry(0.45, 1.35, 8);
+arrowGeo.rotateX(Math.PI/2);
+
+function launchMissile(fromObj,toObj,isTactical=false){
+  if(fromObj.hp<=0 || toObj.hp<=0) return;
+  const startAlt=fromObj.dom==="AIR"?1.15:(fromObj.kind==="BASE"?0.4:0.5);
+  const endAlt=toObj.dom==="AIR"?1.15:(toObj.kind==="BASE"?0.4:0.5);
+  const start=ll2v(fromObj.lat,fromObj.lon,startAlt);
+  const end=ll2v(toObj.lat,toObj.lon,endAlt);
+  const dist=start.distanceTo(end);
+  const peak=ER + (isTactical ? dist*0.18 : Math.min(26, dist*0.35));
+  const mid=start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(peak);
+
+  const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
+  const pts=curve.getPoints(48);
+  const colorHex=fromObj.side==="N"?0x4da6ff:0xff4d4d;
+
+  const guideGeo=new THREE.BufferGeometry().setFromPoints(pts);
+  const guideMat=new THREE.LineBasicMaterial({
+    color:colorHex,
+    transparent:true,
+    opacity:0.28
+  });
+  const guideLine=new THREE.Line(guideGeo,guideMat);
+  simGroup.add(guideLine);
+
+  const trailGeo=new THREE.BufferGeometry().setFromPoints([start, start.clone()]);
+  const trailMat=new THREE.LineBasicMaterial({
+    color:fromObj.side==="N"?0x80d4ff:0xff8080,
+    transparent:true,
+    opacity:0.95
+  });
+  const trailLine=new THREE.Line(trailGeo,trailMat);
+  simGroup.add(trailLine);
+
+  const arrowMat=new THREE.MeshBasicMaterial({color:fromObj.side==="N"?0x99e6ff:0xff9999});
+  const arrow=new THREE.Mesh(arrowGeo,arrowMat);
+  arrow.position.copy(start);
+  arrow.lookAt(curve.getPoint(0.05));
+  simGroup.add(arrow);
+
+  missiles.push({
+    from:fromObj,to:toObj,side:fromObj.side,
+    curve,pts,t:0,
+    baseSpeed:(isTactical?0.0085:0.0048),
+    dmg:isTactical?18:34,
+    guideLine,trailLine,arrow
+  });
+}
+
+function cleanupMissile(m){
+  simGroup.remove(m.guideLine);
+  simGroup.remove(m.trailLine);
+  simGroup.remove(m.arrow);
+  m.guideLine.geometry.dispose();
+  m.trailLine.geometry.dispose();
+}
+
+function spawnExplosion(lat,lon,color=0xffaa00,alt=0.5){
+  const mesh=new THREE.Mesh(
+    new THREE.SphereGeometry(0.45,10,10),
+    new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.9})
+  );
+  mesh.position.copy(ll2v(lat,lon,alt));
+  simGroup.add(mesh);
+  explosions.push({mesh,age:0});
+}
+
+function triggerStrike(attackerSide){
+  if(state==="FINISHED") initGrid();
+  state="ENGAGED";
+  $("hs").textContent="ACTIVE COMBAT"; $("hs").style.color="#ff4d4d";
+  $("bN").disabled=true; $("bB").disabled=true;
+
+  const atkBases=bases.filter(b=>b.side===attackerSide && b.hp>0);
+  const defTargets=[...bases,...units].filter(o=>o.side!==attackerSide && o.hp>0);
+
+  logMsg("ALERT: "+(attackerSide==="N"?"NATO":"BRICS+")+" initiated multi-domain first strike!");
+  atkBases.slice(0,18).forEach(b=>{
+    const tgt=defTargets[Math.floor(Math.random()*defTargets.length)];
+    if(tgt) launchMissile(b,tgt,false);
+  });
+  const atkAir=units.filter(u=>u.side===attackerSide && u.dom==="AIR" && u.hp>0);
+  if(atkAir.length){
+    logMsg("AIR: "+(attackerSide==="N"?"NATO":"BRICS+")+" fighter and bomber wings joining the opening strike.");
+    atkAir.forEach(u=>{
+      const airTgts=defTargets.filter(t=>t.dom==="AIR");
+      const pool=(u.role==="BOMBER" || !airTgts.length)?defTargets:airTgts;
+      const tgt=pool[Math.floor(Math.random()*pool.length)];
+      if(tgt) launchMissile(u,tgt,true);
+    });
+  }
+
+  setTimeout(()=>{
+    if(state!=="ENGAGED") return;
+    const retSide=attackerSide==="N"?"B":"N";
+    const retBases=bases.filter(b=>b.side===retSide && b.hp>0);
+    const retUnits=units.filter(u=>u.side===retSide && u.hp>0);
+    const retAir=retUnits.filter(u=>u.dom==="AIR");
+    const oppTargets=[...bases,...units].filter(o=>o.side===attackerSide && o.hp>0);
+    logMsg("RETALIATION: "+(retSide==="N"?"NATO":"BRICS+")+" counter-salvo from silos, fleets, and air wings!");
+    [...retBases.slice(0,14),...retUnits.filter(u=>u.dom!=="AIR").slice(0,8),...retAir].forEach(src=>{
+      let pool=oppTargets;
+      if(src.dom==="AIR" && src.role!=="BOMBER"){
+        const airTgts=oppTargets.filter(o=>o.dom==="AIR");
+        if(airTgts.length) pool=airTgts;
+      }
+      const tgt=pool[Math.floor(Math.random()*pool.length)];
+      if(tgt) launchMissile(src,tgt,src.kind!=="BASE");
+    });
+  },2600);
+}
+
+$("bN").onclick=()=>triggerStrike("N");
+$("bB").onclick=()=>triggerStrike("B");
+$("bM").onclick=()=>{
+  if(state==="STANDBY"){
+    state="ENGAGED";
+    $("hs").textContent="THEATER MANEUVERS"; $("hs").style.color="#00ffcc";
+  }
+  logMsg("ORDERS: Naval ovals, ground octagons, and air diamonds advancing to contested zones.");
+  units.forEach(u=>{ u.speed*=1.5; });
+};
+$("bR").onclick=()=>{
+  missiles.forEach(cleanupMissile);
+  $("log").textContent="-- GRID RESET. STANDBY BUFFER READY --\n";
+  initGrid();
+  if(typeof liveEnabled !== "undefined" && liveEnabled) setTimeout(fetchLiveTraffic, 1200);
+};
+
+$("simSpd").oninput=e=>$("ssv").textContent=Number(e.target.value).toFixed(1)+"X";
+$("mach").oninput=e=>$("mv").textContent="X"+e.target.value;
+$("dipN").oninput=e=>$("dnv").textContent=e.target.value+"%";
+$("dipB").oninput=e=>$("dbv").textContent=e.target.value+"%";
+$("ew").oninput=e=>$("ev").textContent=e.target.value+"%";
+
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+addEventListener("pointermove",e=>{
+  mouse.x=(e.clientX/innerWidth)*2-1;
+  mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects(simGroup.children);
+  if(hits.length && hits[0].object.userData && hits[0].object.userData.name){
+    const d=hits[0].object.userData;
+    const shapeInfo=d.kind==="SEA"?"Naval Oval":d.kind==="LAND"?"Land Octagon":d.kind==="AIR"?"Air Diamond":d.dom;
+    $("info").innerHTML='<b class="'+d.side+'">'+d.name+'</b> ('+shapeInfo+') — HP: '+Math.round(d.hp)+'%';
+  }
+});
+
+function updateHUD(){
+  const calcAvg=(arr,side)=>{
+    const sub=arr.filter(x=>x.side===side);
+    return sub.length?Math.round(sub.reduce((a,b)=>a+b.hp,0)/sub.length):0;
+  };
+  const nBases=bases.filter(b=>b.side==="N"), bBases=bases.filter(b=>b.side==="B");
+  const nSea=units.filter(u=>u.side==="N"&&u.dom==="SEA"), bSea=units.filter(u=>u.side==="B"&&u.dom==="SEA");
+  const nLand=units.filter(u=>u.side==="N"&&u.dom==="LAND"), bLand=units.filter(u=>u.side==="B"&&u.dom==="LAND");
+  const nAir=units.filter(u=>u.side==="N"&&u.dom==="AIR"), bAir=units.filter(u=>u.side==="B"&&u.dom==="AIR");
+
+  const nB=calcAvg(nBases,"N"), nS=calcAvg(nSea,"N"), nL=calcAvg(nLand,"N"), nA=calcAvg(nAir,"N");
+  const bB=calcAvg(bBases,"B"), bS=calcAvg(bSea,"B"), bL=calcAvg(bLand,"B"), bA=calcAvg(bAir,"B");
+
+  $("hn").textContent=nB+"% | "+nS+"% | "+nL+"%";
+  $("hb").textContent=bB+"% | "+bS+"% | "+bL+"%";
+  $("han").textContent=nA+"%";
+  $("hab").textContent=bA+"%";
+  $("hv").textContent=missiles.length+" / "+units.filter(u=>u.hp>0).length;
+  $("hh").textContent=hitCount+" / "+intCount;
+  $("hc").textContent=clashCount;
+
+  if(state==="ENGAGED"){
+    const nTotal=(nB+nS+nL+nA)/4, bTotal=(bB+bS+bL+bA)/4;
+    if(nTotal<18 || bTotal<18){
+      state="FINISHED";
+      $("hs").textContent="SIMULATION COMPLETE"; $("hs").style.color="#00ffcc";
+      $("vf").style.display="flex";
+      const winner=nTotal>bTotal?"NATO / ALLIED COALITION":"BRICS+ COALITION";
+      $("vl").textContent=winner;
+      logMsg("ENDEX: Strategic dominance achieved by "+winner+".");
+    }
+  }
+}
+
+let lastUI=0;
+
+
+
+
+
+// ===== HUMAN INGENUITY + CYBERWARFARE DYNAMICS =====
+// Emergent adaptations, improvisation, and cyber effects.
+// All events are written to the war-log; some apply temporary modifiers.
+
+const INGENUITY_EVENTS = [
+  // Tactical improvisation
+  { side: "N", weight: 1.4, msg: "NATO field engineers jury-rig mobile decoy emitters – incoming seekers momentarily confused.", effect: "decoy", dur: 50000 },
+  { side: "B", weight: 1.4, msg: "BRICS units repurpose commercial drones into low-cost loitering munitions at scale.", effect: "swarm", dur: 55000 },
+  { side: "N", weight: 1.2, msg: "NATO logistics officers invent rapid runway-repair kits from civilian materials – airfields recover faster.", effect: "repair", dur: 60000 },
+  { side: "B", weight: 1.2, msg: "BRICS artillery crews develop novel shoot-and-scoot timings that evade counter-battery radars.", effect: "mobility", dur: 45000 },
+  { side: "N", weight: 1.3, msg: "Ad-hoc NATO mesh networks restore C2 after fiber cuts – command latency drops.", effect: "c2", dur: 48000 },
+  { side: "B", weight: 1.3, msg: "BRICS forces exploit commercial satellite imagery gaps with rapid ground truthing teams.", effect: "isr", dur: 52000 },
+  { side: "BOTH", weight: 1.1, msg: "Both sides accelerate drone-swarm doctrine iteration under fire – learning curves steepen.", effect: "learning", dur: 70000 },
+  { side: "N", weight: 1.0, msg: "NATO special forces demonstrate a new low-signature insertion technique using civilian traffic patterns.", effect: "infil", dur: 40000 },
+  { side: "B", weight: 1.0, msg: "BRICS coastal units convert fishing vessels into distributed sensor pickets.", effect: "naval_sens", dur: 50000 },
+  { side: "BOTH", weight: 0.9, msg: "Open-source intelligence communities on both sides identify and publicize previously hidden logistics nodes.", effect: "osint", dur: 55000 },
+  { side: "N", weight: 1.1, msg: "NATO aircrews invent a cooperative jamming tactic that multiplies EW effectiveness.", effect: "ew_boost", dur: 42000 },
+  { side: "B", weight: 1.1, msg: "BRICS engineers field an improvised GPS-denied navigation method for cruise missiles.", effect: "gps_denial", dur: 48000 }
+];
+
+const CYBER_EVENTS = [
+  { side: "N", weight: 1.5, msg: "NATO cyber cell disrupts a BRICS logistics scheduling system – resupply windows slip.", effect: "logistics", dur: 60000 },
+  { side: "B", weight: 1.5, msg: "BRICS operators inject false telemetry into a NATO AWACS data link.", effect: "spoof", dur: 45000 },
+  { side: "N", weight: 1.3, msg: "NATO red-team exploits a zero-day in BRICS naval fire-control software.", effect: "fc_hack", dur: 50000 },
+  { side: "B", weight: 1.3, msg: "BRICS campaign of GPS spoofing shifts several guided munitions off intended aim points.", effect: "gps_spoof", dur: 55000 },
+  { side: "N", weight: 1.2, msg: "NATO defends critical ground stations against a coordinated ransomware-style assault.", effect: "defend", dur: 40000 },
+  { side: "B", weight: 1.2, msg: "BRICS electronic warfare units pair cyber probing with spectrum denial – temporary blackout in a sector.", effect: "blackout", dur: 38000 },
+  { side: "BOTH", weight: 1.0, msg: "Mutual cyber probing escalates; both sides burn previously unexposed tooling.", effect: "burn", dur: 30000 },
+  { side: "N", weight: 1.1, msg: "NATO isolates a compromised update channel before it reaches frontline air-defence batteries.", effect: "contain", dur: 35000 },
+  { side: "B", weight: 1.1, msg: "BRICS social-engineering campaign briefly degrades trust in a NATO early-warning feed.", effect: "trust", dur: 42000 },
+  { side: "N", weight: 1.4, msg: "NATO cyber-electromagnetic team achieves a brief window of dominance over a BRICS SAM network.", effect: "sam_down", dur: 32000 },
+  { side: "B", weight: 1.4, msg: "BRICS operators corrupt targeting libraries for a wave of NATO standoff weapons.", effect: "lib_corrupt", dur: 48000 },
+  { side: "BOTH", weight: 0.8, msg: "Civilian infrastructure becomes contested cyber terrain – both sides exercise restraint and escalation control.", effect: "restraint", dur: 50000 }
+];
+
+// Active modifiers produced by ingenuity / cyber events
+let ingenuityMods = {
+  natoAcc: 1, bricsAcc: 1,
+  natoSpeed: 1, bricsSpeed: 1,
+  natoEw: 1, bricsEw: 1,
+  interceptBias: 0,
+  until: {}
+};
+
+function applyIngenuityEffect(effect, side, dur) {
+  const now = performance.now();
+  const until = now + dur;
+  const set = (key, val) => { ingenuityMods[key] = val; ingenuityMods.until[key] = until; };
+
+  switch (effect) {
+    case "decoy": case "spoof": case "lib_corrupt": case "gps_spoof":
+      if (side === "N" || side === "BOTH") set("bricsAcc", 0.78);
+      if (side === "B" || side === "BOTH") set("natoAcc", 0.78);
+      break;
+    case "swarm": case "mobility": case "infil":
+      if (side === "N" || side === "BOTH") set("natoSpeed", 1.18);
+      if (side === "B" || side === "BOTH") set("bricsSpeed", 1.18);
+      break;
+    case "ew_boost": case "blackout": case "sam_down":
+      if (side === "N" || side === "BOTH") set("natoEw", 1.25);
+      if (side === "B" || side === "BOTH") set("bricsEw", 1.25);
+      break;
+    case "gps_denial": case "fc_hack":
+      ingenuityMods.interceptBias = (side === "N") ? 0.12 : -0.08;
+      ingenuityMods.until.interceptBias = until;
+      break;
+    case "learning": case "osint": case "c2": case "isr":
+      // soft global learning – slight accuracy up for both after a delay is simplified to mild boost
+      set("natoAcc", 1.08); set("bricsAcc", 1.08);
+      break;
+    default:
+      break;
+  }
+}
+
+function expireIngenuityMods(now) {
+  ["natoAcc","bricsAcc","natoSpeed","bricsSpeed","natoEw","bricsEw","interceptBias"].forEach(k => {
+    if (ingenuityMods.until[k] && now > ingenuityMods.until[k]) {
+      if (k === "interceptBias") ingenuityMods.interceptBias = 0;
+      else ingenuityMods[k] = 1;
+      delete ingenuityMods.until[k];
+    }
+  });
+}
+
+let lastIngenuityTick = 0;
+const INGENUITY_INTERVAL = 28000; // ~28s average cadence when engaged
+
+function pickWeighted(list) {
+  const total = list.reduce((s, e) => s + e.weight, 0);
+  let r = Math.random() * total;
+  for (const e of list) {
+    r -= e.weight;
+    if (r <= 0) return e;
+  }
+  return list[list.length - 1];
+}
+
+function tickIngenuity(now) {
+  expireIngenuityMods(now);
+  if (state !== "ENGAGED" && state !== "THEATER MANEUVERS") return;
+  if (now - lastIngenuityTick < INGENUITY_INTERVAL) return;
+  lastIngenuityTick = now;
+
+  // Higher intensity when more missiles / clashes are active
+  const intensity = Math.min(1.8, 0.7 + (missiles.length * 0.08) + (clashCount * 0.02));
+  if (Math.random() > 0.45 * intensity) return;
+
+  // Alternate flavour between pure ingenuity and cyber
+  const pool = Math.random() < 0.52 ? INGENUITY_EVENTS : CYBER_EVENTS;
+  const ev = pickWeighted(pool);
+  const tag = (ev.side === "BOTH" ? "INGENUITY" : (ev.side === "N" ? "NATO INGENUITY" : "BRICS INGENUITY")) +
+              (pool === CYBER_EVENTS ? " / CYBER" : "");
+  logMsg(tag + ": " + ev.msg);
+  applyIngenuityEffect(ev.effect, ev.side, ev.dur);
+  const ingEl = $("ing");
+  if (ingEl) {
+    ingEl.textContent = (pool === CYBER_EVENTS ? "Cyber" : "Tactical") + " · " + (ev.side === "BOTH" ? "Both" : ev.side);
+    ingEl.style.color = pool === CYBER_EVENTS ? "#c084fc" : "var(--accent)";
+  }
+}
+
+
+// ===== ORBITAL SATELLITES =====
+// Types with distinct colors + projected orbital paths (ground-track style arcs)
+
+const SAT_TYPES = {
+  ISR:     { color: 0xfbbf24, name: "ISR / Recon",     alt: 1.8 },   // gold
+  COMMS:   { color: 0x60a5fa, name: "Comms Relay",    alt: 2.6 },   // blue
+  NAV:     { color: 0x34d399, name: "Navigation",     alt: 3.4 },   // green (MEO-ish)
+  EW:      { color: 0xf87171, name: "Early Warning",  alt: 4.2 },   // red
+  SIGINT:  { color: 0xc084fc, name: "SIGINT/ELINT",   alt: 2.1 },   // purple
+  COMMERCIAL: { color: 0xe2e8f0, name: "Commercial EO", alt: 1.5 } // light
+};
+
+const SAT_CATALOG = [
+  // ISR
+  { id: "KH-12", type: "ISR", incl: 97.5, raan: 40, phase: 0.1 },
+  { id: "Lacrosse", type: "ISR", incl: 68, raan: 120, phase: 0.4 },
+  { id: "OFEQ", type: "ISR", incl: 142, raan: 200, phase: 0.7 },
+  // COMMS
+  { id: "WGS-10", type: "COMMS", incl: 0.1, raan: 0, phase: 0.0, geo: true },
+  { id: "AEHF-6", type: "COMMS", incl: 0.2, raan: 90, phase: 0.3, geo: true },
+  { id: "Starlink-mil", type: "COMMS", incl: 53, raan: 15, phase: 0.2 },
+  { id: "Skynet", type: "COMMS", incl: 0.1, raan: 180, phase: 0.6, geo: true },
+  // NAV
+  { id: "GPS-III", type: "NAV", incl: 55, raan: 30, phase: 0.0 },
+  { id: "GPS-IIF", type: "NAV", incl: 55, raan: 150, phase: 0.5 },
+  { id: "Galileo", type: "NAV", incl: 56, raan: 80, phase: 0.25 },
+  { id: "GLONASS", type: "NAV", incl: 64.8, raan: 210, phase: 0.8 },
+  // Early Warning
+  { id: "SBIRS-GEO", type: "EW", incl: 0.5, raan: 45, phase: 0.1, geo: true },
+  { id: "SBIRS-HEO", type: "EW", incl: 63.4, raan: 100, phase: 0.4 },
+  { id: "Tundra", type: "EW", incl: 63, raan: 250, phase: 0.6 },
+  // SIGINT
+  { id: "Mentor", type: "SIGINT", incl: 3, raan: 20, phase: 0.2, geo: true },
+  { id: "Orion", type: "SIGINT", incl: 7, raan: 160, phase: 0.5, geo: true },
+  { id: "Mercury", type: "SIGINT", incl: 63, raan: 300, phase: 0.1 },
+  // Commercial
+  { id: "WorldView", type: "COMMERCIAL", incl: 97.8, raan: 70, phase: 0.3 },
+  { id: "Planet-Flock", type: "COMMERCIAL", incl: 97.5, raan: 110, phase: 0.6 },
+  { id: "Maxar", type: "COMMERCIAL", incl: 98, raan: 190, phase: 0.9 }
+];
+
+const satGroup = new THREE.Group();
+scene.add(satGroup);
+const satPathGroup = new THREE.Group();
+scene.add(satPathGroup);
+let satellites = []; // runtime objects
+
+function createSatellite(def) {
+  const t = SAT_TYPES[def.type];
+  const geo = new THREE.SphereGeometry(0.11, 8, 6);
+  const mat = new THREE.MeshBasicMaterial({
+    color: t.color,
+    transparent: true,
+    opacity: 0.95
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  // subtle glow sprite-like second sphere
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 6, 4),
+    new THREE.MeshBasicMaterial({ color: t.color, transparent: true, opacity: 0.22 })
+  );
+  mesh.add(glow);
+
+  // orbital path (approx 64 segments)
+  const pathPts = [];
+  const segments = def.geo ? 48 : 72;
+  const alt = t.alt;
+  for (let i = 0; i <= segments; i++) {
+    const ang = (i / segments) * Math.PI * 2;
+    // simple inclined circular orbit in inertial frame, then we rotate by RAAN + phase later
+    const x = Math.cos(ang);
+    const z = Math.sin(ang) * Math.cos(def.incl * Math.PI / 180);
+    const y = Math.sin(ang) * Math.sin(def.incl * Math.PI / 180);
+    // temporary local; real position computed in update
+    pathPts.push(new THREE.Vector3(x, y, z).multiplyScalar(ER + alt));
+  }
+  const pathGeo = new THREE.BufferGeometry().setFromPoints(pathPts);
+  const pathMat = new THREE.LineBasicMaterial({
+    color: t.color,
+    transparent: true,
+    opacity: 0.32,
+    depthWrite: false
+  });
+  const pathLine = new THREE.Line(pathGeo, pathMat);
+  satPathGroup.add(pathLine);
+
+  return {
+    def, mesh, pathLine, pathPts,
+    type: def.type,
+    alt: t.alt,
+    color: t.color,
+    meanAnomaly: def.phase * Math.PI * 2,
+    period: def.geo ? 86400 : (def.type === "NAV" ? 43000 : 5600 + Math.random() * 2000) // rough seconds visual
+  };
+}
+
+function initSatellites() {
+  SAT_CATALOG.forEach(def => {
+    const s = createSatellite(def);
+    satGroup.add(s.mesh);
+    satellites.push(s);
+  });
+  logMsg("SPACE: " + satellites.length + " orbital assets on station (ISR / Comms / Nav / EW / SIGINT / Commercial).");
+}
+
+function updateSatellites(dt) {
+  // dt in seconds (approx)
+  const now = performance.now() / 1000;
+  satellites.forEach(s => {
+    // advance mean anomaly
+    const n = (Math.PI * 2) / (s.period / 60); // visual speed-up
+    s.meanAnomaly = (s.def.phase * Math.PI * 2 + now * n * 0.15) % (Math.PI * 2);
+
+    const incl = s.def.incl * Math.PI / 180;
+    const raan = s.def.raan * Math.PI / 180;
+    const M = s.meanAnomaly;
+
+    // position in orbital plane
+    let x = Math.cos(M);
+    let y = Math.sin(M) * Math.sin(incl);
+    let z = Math.sin(M) * Math.cos(incl);
+
+    // rotate by RAAN around Y (simplified)
+    const cosR = Math.cos(raan), sinR = Math.sin(raan);
+    const x2 = x * cosR - z * sinR;
+    const z2 = x * sinR + z * cosR;
+
+    const r = ER + s.alt;
+    s.mesh.position.set(x2 * r, y * r, z2 * r);
+
+    // update path line to current orbital plane orientation (static shape, rotated)
+    // For performance we leave the path as a fixed inclined circle and only move the sat.
+    // Path is already created in a reference frame; for better fidelity we could rebuild,
+    // but shared static paths per inclination family is acceptable for this viz.
+  });
+}
+
+
+// ===== REGIONAL SEASONS + WEATHER EVENTS =====
+// Affects land movement, air ops, naval risk and missile accuracy.
+// Seasons follow real calendar; weather events are stochastic but region-aware.
+
+const SEASON_NAMES = ["Winter", "Spring", "Summer", "Autumn"];
+
+// Hemisphere + regional climate profiles
+const REGION_CLIMATE = {
+  EU:  { hemi: "N", type: "temperate" },
+  ME:  { hemi: "N", type: "arid" },
+  PAC: { hemi: "N", type: "monsoon" },   // East / SE Asia focus
+  ARC: { hemi: "N", type: "arctic" },
+  IND: { hemi: "N", type: "monsoon" },
+  AF:  { hemi: "mixed", type: "tropical" },
+  AM:  { hemi: "mixed", type: "temperate" }
+};
+
+function currentMonth() {
+  return new Date().getMonth(); // 0-11
+}
+
+function seasonForHemi(hemi) {
+  const m = currentMonth();
+  // Meteorological seasons
+  if (hemi === "N") {
+    if (m <= 1 || m === 11) return "Winter";
+    if (m <= 4) return "Spring";
+    if (m <= 7) return "Summer";
+    return "Autumn";
+  }
+  // Southern hemisphere inverted
+  if (m <= 1 || m === 11) return "Summer";
+  if (m <= 4) return "Autumn";
+  if (m <= 7) return "Winter";
+  return "Spring";
+}
+
+function seasonForRegion(reg) {
+  const c = REGION_CLIMATE[reg] || { hemi: "N", type: "temperate" };
+  if (c.hemi === "mixed") {
+    // rough split: use Northern for display simplicity
+    return seasonForHemi("N");
+  }
+  return seasonForHemi(c.hemi);
+}
+
+// Active weather modifiers per region
+// { landSpeed, airEff, navalRisk, missileAcc, label, until }
+let weatherState = {};
+
+function defaultWeather(reg) {
+  return { landSpeed: 1, airEff: 1, navalRisk: 1, missileAcc: 1, label: "Clear", until: 0 };
+}
+
+function ensureWeather(reg) {
+  if (!weatherState[reg]) weatherState[reg] = defaultWeather(reg);
+  return weatherState[reg];
+}
+
+// Event catalogue – weighted by climate type + season
+const WEATHER_EVENTS = [
+  // Temperate / Europe
+  { id: "rasputitsa", label: "Rasputitsa (mud season)", climates: ["temperate"], seasons: ["Spring", "Autumn"],
+    landSpeed: 0.45, airEff: 0.85, navalRisk: 1, missileAcc: 0.9, weight: 2.2,
+    msg: "Mud season grips the theatre – heavy vehicles slowed dramatically." },
+  { id: "winter_freeze", label: "Deep freeze", climates: ["temperate", "arctic"], seasons: ["Winter"],
+    landSpeed: 0.7, airEff: 0.75, navalRisk: 1.15, missileAcc: 0.95, weight: 2.0,
+    msg: "Severe cold reduces air sortie rates and freezes rivers/roads." },
+  { id: "storm_front", label: "Atlantic storm system", climates: ["temperate"], seasons: ["Autumn", "Winter", "Spring"],
+    landSpeed: 0.85, airEff: 0.55, navalRisk: 1.4, missileAcc: 0.8, weight: 1.8,
+    msg: "Storm front grounding many air missions and raising sea state." },
+
+  // Arid / ME
+  { id: "sandstorm", label: "Sandstorm / shamal", climates: ["arid"], seasons: ["Spring", "Summer", "Autumn"],
+    landSpeed: 0.6, airEff: 0.35, navalRisk: 1.1, missileAcc: 0.65, weight: 2.5,
+    msg: "Sandstorm sharply degrades air and optical targeting." },
+  { id: "heat_wave", label: "Extreme heat", climates: ["arid", "tropical"], seasons: ["Summer"],
+    landSpeed: 0.8, airEff: 0.9, navalRisk: 1, missileAcc: 0.95, weight: 1.6,
+    msg: "Extreme heat stresses personnel and reduces sustained ops tempo." },
+
+  // Monsoon / Indo-Pacific
+  { id: "monsoon", label: "Monsoon rains", climates: ["monsoon", "tropical"], seasons: ["Summer", "Autumn"],
+    landSpeed: 0.5, airEff: 0.6, navalRisk: 1.25, missileAcc: 0.85, weight: 2.4,
+    msg: "Monsoon conditions flood lowlands and limit air/naval windows." },
+  { id: "typhoon", label: "Typhoon / cyclone threat", climates: ["monsoon"], seasons: ["Summer", "Autumn"],
+    landSpeed: 0.7, airEff: 0.3, navalRisk: 1.7, missileAcc: 0.7, weight: 1.5,
+    msg: "Major tropical system forcing naval dispersal and air stand-down." },
+
+  // Arctic
+  { id: "polar_night", label: "Polar night / extreme cold", climates: ["arctic"], seasons: ["Winter"],
+    landSpeed: 0.55, airEff: 0.5, navalRisk: 1.3, missileAcc: 0.9, weight: 2.2,
+    msg: "Polar night and extreme cold severely constrain operations." },
+  { id: "ice_melt", label: "Rapid ice melt / fog", climates: ["arctic"], seasons: ["Spring", "Summer"],
+    landSpeed: 0.75, airEff: 0.7, navalRisk: 1.2, missileAcc: 0.88, weight: 1.4,
+    msg: "Ice conditions and fog complicating Arctic mobility." },
+
+  // Positive / enhancing events
+  { id: "clear_window", label: "Clear operational window", climates: ["temperate", "arid", "monsoon", "tropical", "arctic"], seasons: ["Spring", "Summer", "Autumn", "Winter"],
+    landSpeed: 1.15, airEff: 1.2, navalRisk: 0.85, missileAcc: 1.1, weight: 1.3,
+    msg: "Favourable weather window improving mobility and strike accuracy." },
+  { id: "high_pressure", label: "Stable high pressure", climates: ["temperate", "arid"], seasons: ["Summer", "Autumn"],
+    landSpeed: 1.1, airEff: 1.25, navalRisk: 0.9, missileAcc: 1.15, weight: 1.4,
+    msg: "Stable high-pressure system – excellent flying and targeting conditions." }
+];
+
+function pickWeatherEvent(reg) {
+  const climate = (REGION_CLIMATE[reg] || {}).type || "temperate";
+  const season = seasonForRegion(reg);
+  const candidates = WEATHER_EVENTS.filter(e =>
+    e.climates.includes(climate) && e.seasons.includes(season)
+  );
+  if (!candidates.length) return null;
+  const total = candidates.reduce((s, e) => s + e.weight, 0);
+  let r = Math.random() * total;
+  for (const e of candidates) {
+    r -= e.weight;
+    if (r <= 0) return e;
+  }
+  return candidates[candidates.length - 1];
+}
+
+let lastWeatherTick = 0;
+const WEATHER_TICK_MS = 75000; // check / possibly change every ~75s
+
+function tickWeather(now) {
+  if (now - lastWeatherTick < WEATHER_TICK_MS) return;
+  lastWeatherTick = now;
+
+  const regions = Object.keys(REGION_CLIMATE);
+  regions.forEach(reg => {
+    const w = ensureWeather(reg);
+    // Expire old event
+    if (w.until && now > w.until) {
+      weatherState[reg] = defaultWeather(reg);
+      logMsg(`WEATHER [${reg}]: Conditions returning to seasonal baseline (${seasonForRegion(reg)}).`);
+    }
+    // Chance to spawn new event if currently clear
+    if (!w.until || now > w.until) {
+      if (Math.random() < 0.38) {
+        const ev = pickWeatherEvent(reg);
+        if (ev) {
+          const duration = 45000 + Math.random() * 90000; // 45–135 s of sim influence
+          weatherState[reg] = {
+            landSpeed: ev.landSpeed,
+            airEff: ev.airEff,
+            navalRisk: ev.navalRisk,
+            missileAcc: ev.missileAcc,
+            label: ev.label,
+            until: now + duration
+          };
+          logMsg(`WEATHER [${reg}] ${seasonForRegion(reg)}: ${ev.msg}`);
+        }
+      }
+    }
+  });
+  updateWeatherHUD();
+}
+
+function weatherForLatLon(lat, lon) {
+  // Map rough lat/lon to a REG key used by bases/units
+  if (lat > 60) return "ARC";
+  if (lat > 30 && lon > -15 && lon < 45) return "EU";
+  if (lat > 12 && lat < 42 && lon > 30 && lon < 65) return "ME";
+  if (lat > -10 && lat < 45 && lon > 65 && lon < 150) return "PAC";
+  if (lat > -40 && lat < 30 && lon > 40 && lon < 100) return "IND";
+  if (lat < 20 && lon > -20 && lon < 55) return "AF";
+  return "AM";
+}
+
+function getWeatherMods(lat, lon) {
+  const reg = weatherForLatLon(lat, lon);
+  return ensureWeather(reg);
+}
+
+function updateWeatherHUD() {
+  const el = $("wx");
+  if (!el) return;
+  // Show a compact summary of the most active theatres
+  const parts = ["EU", "ME", "PAC", "ARC"].map(r => {
+    const w = ensureWeather(r);
+    const season = seasonForRegion(r).slice(0, 3);
+    return `${r}:${season}/${w.label.split(" ")[0]}`;
+  });
+  el.textContent = parts.join(" · ");
+}
+
+
+// ===== MEDIA-DRIVEN DIPLOMACY (anti-war demonstration RSS signals) =====
+// Reasoned, non-over-generalizing algorithm:
+// - Only counts reports that clearly describe demonstrations / protests against continuation of wars.
+// - Weights by size language and assigns pressure mainly to the side whose public is mobilizing.
+// - Smooths changes; does not swing wildly from a single headline.
+// - Falls back gracefully when feeds are blocked.
+
+const MEDIA_FEEDS = [
+  // --- Anti-war / protest focused ---
+  "https://original.antiwar.com/feed/",
+  "https://news.antiwar.com/feed/",
+
+  // --- Google News targeted searches (high signal for demos) ---
+  "https://news.google.com/rss/search?q=%22anti-war%22+OR+%22antiwar%22+demonstration+OR+protest+ceasefire+OR+%22end+the+war%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=protest+OR+demonstration+%22against+the+war%22+OR+%22stop+the+war%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=manifestation+OR+protestation+guerre+OR+cessez-le-feu&hl=fr&gl=FR&ceid=FR:fr",
+  "https://news.google.com/rss/search?q=Demonstration+OR+Protest+Krieg+OR+Waffenstillstand&hl=de&gl=DE&ceid=DE:de",
+
+  // --- Major English world / international (from sources-list) ---
+  "http://feeds.bbci.co.uk/news/world/rss.xml",
+  "http://feeds.bbci.co.uk/news/rss.xml",
+  "https://www.aljazeera.com/xml/rss/all.xml",
+  "http://www.aljazeera.com/xml/rss/all.xml",
+  "https://www.theguardian.com/world/rss",
+  "http://feeds.washingtonpost.com/rss/world",
+  "https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/section/world/rss.xml",
+  "http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+  "https://www.france24.com/en/rss",
+  "http://feeds.skynews.com/feeds/rss/world.xml",
+  "https://www.independent.co.uk/news/world/rss",
+  "https://www.euronews.com/rss?level=theme&name=news",
+  "https://www.rt.com/rss/news/",
+  "https://www.rt.com/rss/",
+  "http://tass.com/rss/v2.xml",
+  "https://www.themoscowtimes.com/rss/news",
+  "https://themoscowtimes.com/feeds/main.xml",
+  "https://www.globaltimes.cn/rss/outbrain.xml",
+  "https://www.japantimes.co.jp/news/world/feed/",
+  "https://www.scmp.com/rss/91/feed",
+  "https://www.channelnewsasia.com/rssfeeds/8395884",
+
+  // --- European major (FR / DE / NL) ---
+  "https://www.lemonde.fr/international/rss_full.xml",
+  "https://www.lemonde.fr/europe/rss_full.xml",
+  "https://www.lemonde.fr/proche-orient/rss_full.xml",
+  "https://www.tagesschau.de/xml/rss2",
+  "https://www.n-tv.de/politik/rss",
+  "http://feeds.nos.nl/nosnieuwsbuitenland?format=xml",
+  "http://feeds.nos.nl/nosnieuwsalgemeen?format=xml",
+  "https://www.nu.nl/rss",
+  "https://www.politico.eu/feed",
+
+  // --- Middle East / additional balance ---
+  "http://www.arabnews.com/rss.xml",
+  "https://www.middleeasteye.net/rss",
+  "https://www.timesofisrael.com/feed/"
+];
+
+// CORS proxies to try (order matters; some are more reliable)
+const CORS_PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://proxy.cors.dev/${u}`
+];
+
+let mediaNatoPressure = 0;   // 0–40 additive
+let mediaBricsPressure = 0;
+let lastMediaFetch = 0;
+const MEDIA_INTERVAL = 110000; // ~110s – more feeds
+let mediaStatus = "idle";
+
+function parseRssItems(xmlText) {
+  const items = [];
+  try {
+    const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+    const nodes = [...doc.querySelectorAll("item")];
+    for (const n of nodes.slice(0, 25)) {
+      const title = (n.querySelector("title")?.textContent || "").trim();
+      const desc = (n.querySelector("description")?.textContent || "").replace(/<[^>]+>/g, " ").trim();
+      const pub = n.querySelector("pubDate")?.textContent || "";
+      const link = n.querySelector("link")?.textContent || "";
+      if (title) items.push({ title, desc, pub, link, text: (title + " " + desc).toLowerCase() });
+    }
+  } catch (e) {}
+  return items;
+}
+
+function isRelevantDemo(item) {
+  const t = item.text;
+  // Must have demonstration/protest language
+  const hasDemo = /\b(protest|demonstration|rally|march|mobiliz|demonstrators|protesters|sit-in|vigil)\b/.test(t);
+  // And war / ceasefire / anti-war context (avoid pure domestic non-war protests)
+  const hasWarCtx = /\b(war|wars|ceasefire|anti-?war|antiwar|end the war|stop the war|against the war|military budget|bombing|invasion|escalation)\b/.test(t);
+  return hasDemo && hasWarCtx;
+}
+
+function scoreSize(text) {
+  if (/\b(hundreds of thousands|half a million|million)\b/.test(text)) return 4.5;
+  if (/\b(tens of thousands|50,000|100,000|massive)\b/.test(text)) return 3.2;
+  if (/\b(thousands|several thousand|large crowd)\b/.test(text)) return 2.0;
+  if (/\b(hundreds|dozens)\b/.test(text)) return 1.0;
+  return 0.7; // baseline for a relevant report
+}
+
+function assignSide(text) {
+  // NATO / Western public pressure
+  const natoLoc = /\b(united states|u\.?s\.?a?\.?|washington|new york|london|uk|britain|germany|berlin|france|paris|italy|rome|spain|madrid|netherlands|amsterdam|canada|toronto|australia|sydney|brussels|nato|europe)\b/.test(text);
+  // BRICS / aligned public pressure (or protests against those governments' war policies)
+  const bricsLoc = /\b(russia|moscow|china|beijing|iran|tehran|india|delhi|brazil|sao paulo|south africa|brics)\b/.test(text);
+  // Global / multi-city / generic
+  const global = /\b(global|worldwide|international|cities around the world|multiple cities)\b/.test(text);
+
+  let nato = 0, brics = 0;
+  if (natoLoc && !bricsLoc) { nato = 1; brics = 0.15; }
+  else if (bricsLoc && !natoLoc) { brics = 1; nato = 0.2; }
+  else if (natoLoc && bricsLoc) { nato = 0.7; brics = 0.7; }
+  else if (global) { nato = 0.55; brics = 0.45; }
+  else { // ambiguous location – mild shared pressure
+    nato = 0.4; brics = 0.35;
+  }
+  return { nato, brics };
+}
+
+async function fetchOneFeed(url) {
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const res = await fetch(proxy(url), { cache: "no-store", signal: AbortSignal.timeout(12000) });
+      if (!res.ok) continue;
+      const txt = await res.text();
+      if (txt.length < 200 || txt.includes("<html") && !txt.includes("<item")) continue;
+      return parseRssItems(txt);
+    } catch (e) { /* try next proxy */ }
+  }
+  return [];
+}
+
+async function updateMediaDiplomacy() {
+  if (Date.now() - lastMediaFetch < MEDIA_INTERVAL - 5000) return;
+  lastMediaFetch = Date.now();
+  mediaStatus = "fetching";
+
+  let natoScore = 0, bricsScore = 0;
+  let relevantCount = 0;
+  const seenTitles = new Set();
+
+  for (const feed of MEDIA_FEEDS) {
+    const items = await fetchOneFeed(feed);
+    for (const item of items) {
+      if (!isRelevantDemo(item)) continue;
+      const key = item.title.slice(0, 80);
+      if (seenTitles.has(key)) continue;
+      seenTitles.add(key);
+
+      const size = scoreSize(item.text);
+      const side = assignSide(item.text);
+      natoScore += size * side.nato;
+      bricsScore += size * side.brics;
+      relevantCount++;
+    }
+  }
+
+  // Soft caps and smoothing – never let media alone dominate the 0–100 range
+  const targetNato = Math.min(38, natoScore * 1.8);
+  const targetBrics = Math.min(36, bricsScore * 1.8);
+
+  // Exponential moving average so values change gradually
+  mediaNatoPressure = mediaNatoPressure * 0.55 + targetNato * 0.45;
+  mediaBricsPressure = mediaBricsPressure * 0.55 + targetBrics * 0.45;
+
+  // Base willingness + media pressure (bases kept modest so sim stays playable)
+  const baseN = 22, baseB = 18;
+  let newN = Math.round(Math.min(85, Math.max(8, baseN + mediaNatoPressure)));
+  let newB = Math.round(Math.min(80, Math.max(8, baseB + mediaBricsPressure)));
+
+  // Apply to UI + underlying values the sim already reads
+  const elN = $("dipN"), elB = $("dipB");
+  if (elN) {
+    elN.value = newN;
+    if ($("dnv")) $("dnv").textContent = newN + "%";
+  }
+  if (elB) {
+    elB.value = newB;
+    if ($("dbv")) $("dbv").textContent = newB + "%";
+  }
+
+  mediaStatus = relevantCount ? "live" : "fallback";
+  const mp = $("mp");
+  if (mp) {
+    mp.textContent = mediaStatus === "live"
+      ? `N+${Math.round(mediaNatoPressure)} · B+${Math.round(mediaBricsPressure)}`
+      : `smoothed · N+${Math.round(mediaNatoPressure)} B+${Math.round(mediaBricsPressure)}`;
+    mp.style.color = mediaStatus === "live" ? "var(--green-dot)" : "var(--muted)";
+  }
+  if (relevantCount > 0) {
+    logMsg(`MEDIA PRESSURE: ${relevantCount} relevant demo/protest reports (from expanded source list) → NATO ${newN}% · BRICS ${newB}%`);
+  } else {
+    // Gentle fallback so the numbers still feel alive
+    mediaNatoPressure = Math.max(4, mediaNatoPressure * 0.92 + (Math.random() * 3 - 0.5));
+    mediaBricsPressure = Math.max(3, mediaBricsPressure * 0.92 + (Math.random() * 2.5 - 0.4));
+    logMsg("MEDIA: Feeds limited / CORS – using smoothed pressure model (NATO " + newN + "% / BRICS " + newB + "%).");
+  }
+}
+
+
+// ===== LIVE AIR TRAFFIC (commercial green dots + military ADS-B) =====
+const liveGroup = new THREE.Group();
+scene.add(liveGroup);
+let liveEnabled = true;
+let liveAircraft = []; // {mesh, lat, lon, mil, callsign, last}
+let lastLiveFetch = 0;
+const LIVE_INTERVAL = 45000; // ms
+
+// Small sphere markers (green commercial / amber military)
+function makeAirDot(isMil){
+  const geo = new THREE.SphereGeometry(0.18, 8, 6);
+  const mat = new THREE.MeshBasicMaterial({
+    color: isMil ? 0xffb020 : 0x22ff88,
+    transparent: true,
+    opacity: isMil ? 0.95 : 0.82
+  });
+  const m = new THREE.Mesh(geo, mat);
+  return m;
+}
+
+function clearLiveMarkers(){
+  while(liveGroup.children.length){
+    const c = liveGroup.children[0];
+    liveGroup.remove(c);
+    if(c.geometry) c.geometry.dispose();
+    if(c.material) c.material.dispose();
+  }
+  liveAircraft = [];
+}
+
+function placeLiveDot(ac){
+  const mesh = makeAirDot(!!ac.mil);
+  const alt = ac.mil ? 0.55 : 0.42;
+  placeTangent(mesh, ac.lat, ac.lon, alt);
+  liveGroup.add(mesh);
+  liveAircraft.push({mesh, lat:ac.lat, lon:ac.lon, mil:!!ac.mil, callsign:ac.callsign||"", last:Date.now()});
+}
+
+// Simulated commercial + military when live APIs are blocked (CORS / offline)
+function spawnSimulatedTraffic(density=0.4){
+  clearLiveMarkers();
+  const nComm = Math.floor(180 * density);
+  const nMil = Math.floor(45 * density);
+  // commercial corridors roughly following major routes
+  const routes = [
+    [40,-74, 51,0], [51,0, 48,2], [35,139, 22,114], [22,114, 1,104],
+    [34,-118, 41,-74], [-33,151, 1,104], [55,37, 52,13], [25,55, 28,77],
+    [19,72, 25,55], [41,29, 40,-3], [60,25, 59,18], [-23,-46, 40,-74]
+  ];
+  for(let i=0;i<nComm;i++){
+    const r = routes[i % routes.length];
+    const t = Math.random();
+    const lat = r[0] + (r[2]-r[0])*t + (Math.random()-0.5)*8;
+    const lon = r[1] + (r[3]-r[1])*t + (Math.random()-0.5)*12;
+    placeLiveDot({lat, lon, mil:false, callsign:"SIM"+i});
+  }
+  // military clusters near known bases / conflict-adjacent
+  const milZones = [
+    [50,10],[56,24],[36,128],[25,55],[34,70],[48,35],[14,145],[45,140],[55,20],[32,48]
+  ];
+  for(let i=0;i<nMil;i++){
+    const z = milZones[i % milZones.length];
+    const lat = z[0] + (Math.random()-0.5)*6;
+    const lon = z[1] + (Math.random()-0.5)*8;
+    placeLiveDot({lat, lon, mil:true, callsign:"MIL"+i});
+  }
+  logMsg("LIVE AIR: Simulated commercial (green) + military (amber) traffic loaded ("+nComm+"/"+nMil+").");
+}
+
+async function fetchLiveTraffic(){
+  if(!liveEnabled) return;
+  const density = Number($("airDens")?.value || 40) / 100;
+  let milList = [];
+  let commList = [];
+  try{
+    // Military from adsb.lol (unfiltered)
+    const milRes = await fetch("https://api.adsb.lol/v2/mil", {cache:"no-store"});
+    if(milRes.ok){
+      const milData = await milRes.json();
+      const acs = milData.ac || milData.aircraft || [];
+      milList = acs.filter(a => a.lat != null && a.lon != null).map(a => ({
+        lat: a.lat, lon: a.lon, mil: true,
+        callsign: (a.flight || a.r || a.hex || "").trim()
+      }));
+    }
+  }catch(e){ /* CORS or network */ }
+
+  // Sample commercial via a few point queries (Europe, US East, East Asia, Middle East)
+  const points = [
+    [50,10,250],[40,-74,200],[35,139,200],[25,55,180],[1,104,180],[-33,151,150]
+  ];
+  for(const [lat,lon,rad] of points){
+    try{
+      const r = await fetch(`https://api.adsb.lol/v2/point/${lat}/${lon}/${rad}`, {cache:"no-store"});
+      if(r.ok){
+        const d = await r.json();
+        const acs = d.ac || [];
+        for(const a of acs){
+          if(a.lat == null || a.lon == null) continue;
+          const isMil = !!(a.dbFlags & 1) || (a.category && String(a.category).startsWith("A"));
+          if(!isMil){
+            commList.push({lat:a.lat, lon:a.lon, mil:false, callsign:(a.flight||"").trim()});
+          }
+        }
+      }
+    }catch(e){}
+  }
+
+  // Dedup by rough position
+  const seen = new Set();
+  const unique = (list) => list.filter(a => {
+    const k = a.lat.toFixed(2)+","+a.lon.toFixed(2);
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  milList = unique(milList);
+  commList = unique(commList);
+
+  // Strict policy for commercial: only real ADS-B reports while they are in the sky.
+  // Simulated commercial corridors are used ONLY when virtually no live data arrives.
+  const hasReal = (milList.length + commList.length) >= 3;
+
+  clearLiveMarkers();
+
+  if (!hasReal) {
+    // last-resort simulated (military + commercial) so the layer is never completely empty
+    spawnSimulatedTraffic(density * 0.55);
+    logMsg("LIVE AIR: No usable ADS-B this cycle – temporary simulated traffic (will replace on next successful fetch).");
+    return;
+  }
+
+  const maxMil = Math.floor(90 * density);
+  const maxComm = Math.floor(260 * density);
+  milList.slice(0, maxMil).forEach(placeLiveDot);
+  // Commercial: only the real reports we just received
+  commList.slice(0, maxComm).forEach(placeLiveDot);
+  logMsg("LIVE AIR: "+Math.min(commList.length, maxComm)+" real commercial (green) + "+Math.min(milList.length, maxMil)+" military (amber) – live ADS-B only.");
+}
+
+function toggleLiveAir(){
+  liveEnabled = !liveEnabled;
+  const btn = $("bLive");
+  if(btn){
+    btn.textContent = liveEnabled ? "Live Air ON" : "Live Air OFF";
+    btn.style.borderColor = liveEnabled ? "var(--green-dot)" : "var(--panel-border)";
+    btn.style.color = liveEnabled ? "var(--green-dot)" : "var(--accent)";
+  }
+  if(liveEnabled){
+    fetchLiveTraffic();
+  }else{
+    clearLiveMarkers();
+    logMsg("LIVE AIR: Layer disabled.");
+  }
+}
+
+
+function animate(now){
+  requestAnimationFrame(animate);
+  controls.update();
+  tickWeather(now);
+  tickIngenuity(now);
+  updateSatellites(0.016);
+
+  const simSpd = Number($("simSpd").value);
+  const machMult = Number($("mach").value) / 8;
+
+  if(state==="ENGAGED"){
+    const ewChance=Number($("ew").value)/100;
+    const dipN=Number($("dipN").value);
+    const dipB=Number($("dipB").value);
+
+    dipTimer += 0.016 * simSpd;
+    if(dipTimer >= 6.0){
+      dipTimer = 0;
+      const jointDip = (dipN * dipB) / 10000;
+      if(jointDip > 0.12 && Math.random() < jointDip * 0.55){
+        state="FINISHED";
+        missiles.forEach(cleanupMissile);
+        missiles=[];
+        $("hs").textContent="CEASEFIRE SIGNED"; $("hs").style.color="#00ffcc";
+        $("vf").style.display="flex";
+        $("vl").textContent="NEGOTIATED ARMISTICE";
+        logMsg("DIPLOMACY: Backchannel talks succeeded (NATO "+dipN+"% / BRICS "+dipB+"%). Immediate ceasefire!");
+        updateHUD();
+        renderRegistry();
+      } else if (dipN >= 70 || dipB >= 70) {
+        if(Math.random() < 0.35) {
+          logMsg("DIPLOMACY: Envoys from "+(dipN>=dipB?"NATO":"BRICS+")+" proposing de-escalation corridor...");
+        }
+      }
+    }
+
+    for(let i=missiles.length-1;i>=0;i--){
+      const m=missiles[i];
+      m.t += m.baseSpeed * machMult * simSpd;
+      const clampedT = Math.min(1, m.t);
+
+      const pos = m.curve.getPoint(clampedT);
+      m.arrow.position.copy(pos);
+      if(clampedT < 0.99){
+        const nextPos = m.curve.getPoint(Math.min(1, clampedT + 0.02));
+        m.arrow.lookAt(nextPos);
+      }
+
+      const sliceCount = Math.max(2, Math.floor(clampedT * m.pts.length));
+      const trailPts = m.pts.slice(0, sliceCount);
+      trailPts.push(pos);
+      m.trailLine.geometry.dispose();
+      m.trailLine.geometry = new THREE.BufferGeometry().setFromPoints(trailPts);
+
+      if(m.t>=1){
+        cleanupMissile(m);
+        missiles.splice(i,1);
+
+        const defenders=units.filter(u=>u.hp>0 && u.side!==m.side && greatCircleDist(u.lat,u.lon,m.to.lat,m.to.lon)<14);
+        const wxT = getWeatherMods(m.to.lat, m.to.lon);
+      let sideAcc = (m.side === "N") ? (ingenuityMods.natoAcc || 1) : (ingenuityMods.bricsAcc || 1);
+      const interceptProb=Math.min(0.90, ewChance + defenders.length*0.14 + (1 - wxT.missileAcc) * 0.25 + (ingenuityMods.interceptBias || 0) + (1 - sideAcc) * 0.15);
+
+        if(Math.random()<interceptProb){
+          intCount++;
+          spawnExplosion(m.to.lat,m.to.lon,0x00ffcc);
+          if(Math.random()<0.25) logMsg("INTERCEPT: "+(defenders.length?defenders[0].name:"EW Grid")+" neutralized warhead near "+m.to.name+".");
+        }else{
+          hitCount++;
+          m.to.hp=Math.max(0,m.to.hp-m.dmg);
+          spawnExplosion(m.to.lat,m.to.lon,0xff4400);
+          if(m.to.hp===0){
+            m.to.mesh.visible=false;
+            logMsg("DESTROYED: "+m.to.name+" neutralized!");
+          }
+        }
+      }
+    }
+
+    units.forEach(u=>{
+      if(u.hp<=0) return;
+      const sideDip = u.side==="N" ? dipN : dipB;
+      const aggressionFactor = Math.max(0.2, 1 - (sideDip / 130));
+      u.cd -= 0.016 * simSpd * aggressionFactor;
+
+      const dLat=u.tLat-u.lat, dLon=u.tLon-u.lon;
+      const dist=Math.hypot(dLat,dLon);
+      if(dist>0.8){
+        const wx = getWeatherMods(u.lat, u.lon);
+        let speedMul = 1;
+        if (u.dom === "LAND") speedMul = wx.landSpeed;
+        else if (u.dom === "AIR") speedMul = wx.airEff;
+        else if (u.dom === "SEA") speedMul = 1 / Math.max(0.5, wx.navalRisk);
+        // Human ingenuity / cyber side modifiers
+        if (u.side === "N") speedMul *= (ingenuityMods.natoSpeed || 1);
+        else speedMul *= (ingenuityMods.bricsSpeed || 1);
+        const stepLat=u.lat+(dLat/dist)*u.speed*simSpd*speedMul;
+        const stepLon=u.lon+(dLon/dist)*u.speed*simSpd*speedMul;
+        const terrainOk=(u.dom==="LAND") ? isLand(stepLat,stepLon) : !isLand(stepLat,stepLon);
+        if(terrainOk){
+          u.lat=stepLat; u.lon=stepLon;
+        }else{
+          u.tLat+=(Math.random()-0.5)*8;
+          u.tLon+=(Math.random()-0.5)*8;
+        }
+        placeTangent(u.mesh, u.lat, u.lon, 0.45);
+      }else{
+        const enemies=[...bases,...units].filter(e=>e.hp>0 && e.side!==u.side);
+        if(enemies.length){
+          const next=enemies[Math.floor(Math.random()*enemies.length)];
+          u.tLat=next.lat; u.tLon=next.lon;
+        }
+      }
+
+      if(u.cd<=0){
+        u.cd=3.5+Math.random()*3;
+        const nearbyEnemies=[...units,...bases].filter(e=>e.hp>0 && e.side!==u.side && greatCircleDist(u.lat,u.lon,e.lat,e.lon)<16);
+        if(nearbyEnemies.length){
+          const target=nearbyEnemies[0];
+          const range=greatCircleDist(u.lat,u.lon,target.lat,target.lon);
+          if(range<6.5){
+            clashCount++;
+            const dmg=12+Math.random()*14;
+            target.hp=Math.max(0,target.hp-dmg);
+            spawnExplosion(target.lat,target.lon,0xffff00);
+            logMsg(u.dom+" CLASH: "+u.name+" engaged "+target.name+" (-"+Math.round(dmg)+"% HP).");
+            if(target.hp===0){
+              target.mesh.visible=false;
+              logMsg("OVERRUN/SUNK: "+target.name+" eliminated by "+u.name+"!");
+            }
+          }else{
+            launchMissile(u,target,true);
+          }
+        }
+      }
+    });
+  }
+
+  for(let i=explosions.length-1;i>=0;i--){
+    const ex=explosions[i];
+    ex.age += 0.04 * simSpd;
+    ex.mesh.scale.setScalar(1+ex.age*4);
+    ex.mesh.material.opacity=Math.max(0,1-ex.age);
+    if(ex.age>=1){
+      simGroup.remove(ex.mesh);
+      explosions.splice(i,1);
+    }
+  }
+
+  if(now-lastUI>400){
+    updateHUD();
+    if(state==="ENGAGED") renderRegistry();
+    lastUI=now;
+  }
+
+  renderer.render(scene,camera);
+}
+
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+// Live air controls
+if($("bLive")) $("bLive").addEventListener("click", toggleLiveAir);
+if($("airDens")){
+  $("airDens").addEventListener("input", e=>{
+    $("adv").textContent = e.target.value + "%";
+  });
+}
+// Existing slider value displays (keep original handlers if present)
+initGrid();
+initSatellites();
+// Kick off live traffic + media diplomacy
+setTimeout(()=>{ if(liveEnabled) fetchLiveTraffic(); }, 1800);
+setInterval(()=>{ if(liveEnabled) fetchLiveTraffic(); }, LIVE_INTERVAL);
+setTimeout(()=>{ updateMediaDiplomacy(); }, 2500);
+setTimeout(()=>{ updateWeatherHUD(); }, 800);
+setInterval(()=>{ updateMediaDiplomacy(); }, MEDIA_INTERVAL);
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

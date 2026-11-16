@@ -99,6 +99,9 @@ Account : NL30INGB0007689155
 
     <h1 class="contentSectionTitle1">Free apps offered :</h1>
 
+    <p class="backdropped"><a href="https://nicer.app/warViewers" class="nomod noPushState" target="naWS">War Simulator</a>.<br/>
+    <a href="https://grok.com/share/c2hhcmQtMw_7b338c5a-f1af-4b4f-bc8c-f5a732f37fb8" class="nomod noPushState" target="grokWarSimulatorChat">Functional specifications</a>.
+    </p>
     <p class="backdropped"><a href="https://zoned.at/vs" class="nomod noPushState" target="naVS">Voices Synthesizer</a>.<br/>
     See also <a href="https://github.com/debpalash/VoiceStudio/discussions/2760" class="nomod noPushState" target="naVSgh">here (github)</a>, <a href="https://grok.com/share/c2hhcmQtMw_aff8e0df-065c-4186-ab4e-18bf992450e4" class="nomod noPushState" target="naVSgrok">here (Grok)</a>, and <a href="https://x.com/ReneVeerman1977/status/2109419966298554811" class="nomod noPushState" target="naVSx">here (X)</a>.
     </p>
