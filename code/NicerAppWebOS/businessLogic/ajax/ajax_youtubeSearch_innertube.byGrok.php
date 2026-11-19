@@ -187,6 +187,8 @@ if ($raw === false || $httpCode !== 200) {
     exit;
 }
 
+
+
 $data = json_decode($raw, true);
 if (!is_array($data)) {
     http_response_code(502);
@@ -203,8 +205,8 @@ $nextContinuation = null;
 /**
  * Walk any nested array looking for videoRenderer + continuationItemRenderer
  */
-function na_yt_walk($node, &$items, &$nextContinuation, $maxResults) {
-    if (!is_array($node) || count($items) >= $maxResults) return;
+function na_yt_walk($node, &$items, &$nextContinuation) {
+    if (!is_array($node)) return;
 
     // Video card
     if (isset($node['videoRenderer'])) {
@@ -242,14 +244,11 @@ function na_yt_walk($node, &$items, &$nextContinuation, $maxResults) {
         if ($token) $nextContinuation = $token;
         return;
     }
-
     // Recurse
     foreach ($node as $child) {
-        if (is_array($child)) {
-            na_yt_walk($child, $items, $nextContinuation, $maxResults);
-            if (count($items) >= $maxResults) return;
-        }
+        if (is_array($child)) na_yt_walk($child, $items, $nextContinuation);
     }
+
 }
 
 // First-page path

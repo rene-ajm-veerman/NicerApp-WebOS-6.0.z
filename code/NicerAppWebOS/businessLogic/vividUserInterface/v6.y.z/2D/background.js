@@ -214,7 +214,7 @@ na.backgrounds = na.background = na.bg = {
     // ------------------------------------------------------------------
     // 2.  New helpers
     // ------------------------------------------------------------------
-    doYouTubeSearch : function () {
+    /* doYouTubeSearch : function () {
         const q = $('#ytSearchInput').val().trim();
         if (!q) return;
 
@@ -223,7 +223,7 @@ na.backgrounds = na.background = na.bg = {
         // Prefer the server proxy
         const url = '/NicerAppWebOS/businessLogic/ajax/ajax_youtubeSearch_innertube.byGrok.php?' + $.param({
             q          : q,
-            maxResults : 24
+            maxResults : 100
         });
         $.getJSON(url)
         .done(data => {
@@ -249,6 +249,45 @@ na.backgrounds = na.background = na.bg = {
             try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e){}
             $results.html(`<div style="color:#f66; padding:20px;">${msg}</div>`);
         });
+    },*/
+
+    doYouTubeSearch : function (more) {
+        const t = na.background;
+        if (!more) {
+            const q = $('#ytSearchInput').val().trim();
+            if (!q) return;
+            t._yt = { q, page: 0, continuation: null, seen: new Set() };
+            $('#ytResults').html('<div style="padding:20px;color:#aaa;">Searching…</div>');
+        }
+        const s = t._yt, nextPage = s.page + 1;
+
+        $.getJSON('/NicerAppWebOS/businessLogic/ajax/ajax_youtubeSearch_innertube.byClaude.php?' +
+        $.param({ q: s.q, page: nextPage, continuation: s.continuation || '' }))
+        .done(data => {
+            if (data.error) { $('#ytResults').html(`<div style="color:#f66;padding:20px;">${data.error}</div>`); return; }
+            s.page = nextPage;
+            s.continuation = data.continuation || null;
+            const fresh = (data.items || []).filter(i => {
+                const id = i.id.videoId;
+                if (s.seen.has(id)) return false;
+                s.seen.add(id);
+                return true;
+            });
+            t.renderYouTubeResults(fresh, !!more);
+            $('#ytMore').remove();
+            if (data.hasMore) {
+                $('#ytResults').append('<button id="ytMore" class="vividButton" style="display:block;margin:12px auto;">Load more</button>');
+                $('#ytMore').on('click', () => t.doYouTubeSearch(true));
+                if ($('.ytResultCard').length<59) setTimeout (function() {
+                    t.doYouTubeSearch(true);
+                }, 1000);
+            }
+        })
+        .fail(xhr => {
+            let msg = 'Search failed';
+            try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
+            $('#ytResults').html(`<div style="color:#f66;padding:20px;">${msg}</div>`);
+        });
     },
 
     extractYouTubeId : function (str) {
@@ -259,7 +298,7 @@ na.backgrounds = na.background = na.bg = {
     },
 
     renderYouTubeResults : function (items) {
-        const $results = $('#ytResults').empty();
+        const $results = $('#ytResults');
         if (!items.length) {
             $results.html('<div style="padding:20px; color:#aaa;">No videos found</div>');
             return;
@@ -823,97 +862,106 @@ na.backgrounds = na.background = na.bg = {
                 bgDiv = $(div+'_bg')[0],
                 bgDiv2 = $(div+'_bg2')[0];
                 if (!bgl) debugger;
-                $('#siteBackground_iframe_js').html ('');
+                var p = $('#siteBackground_iframe').parent();
+                $('#siteBackground_iframe').fadeOut('normal', function () {
+                    $(bgf).css({display:'block'});
+                    $('#siteBackground_iframe').remove();
+                    p.append ('<iframe id="siteBackground_iframe"></iframe>');
 
-               //debugger;
+                    if (url.match(/tiled/i)) {
+                        if (na.bg.settings.useFading) {
+                            $(bgf).add(bgl).fadeOut('slow');
+                            $(bgDiv2).css ({
+                                width: jQuery(window).width() * na.site.settings.current.scale,
+                                           height: jQuery(window).height() * na.site.settings.current.scale,
+                                           background : 'url("'+url+'") repeat'
+                            });
+                            setTimeout(function() {
+                                $(bgDiv2).stop().fadeIn(na.bg.globals.fadingSpeed, 'swing', function () {
+                                    $(bgDiv).css ({
+                                        display : 'block',
+                                        width: jQuery(window).width() * na.site.settings.current.scale,
+                                                  height: jQuery(window).height() * na.site.settings.current.scale,
+                                                  background : 'url("'+url+'") repeat'
+                                    });
+                                    setTimeout(function(){
+                                        $(bgDiv2).css ({display:'none'});
+                                    }, 50);
 
-                if (url.match(/tiled/i)) {
-                    if (na.bg.settings.useFading) {
-                        $(bgf).add(bgl).fadeOut('slow');
-                        $(bgDiv2).css ({
-                            width: jQuery(window).width() * na.site.settings.current.scale,
-                            height: jQuery(window).height() * na.site.settings.current.scale,
-                            background : 'url("'+url+'") repeat'
-                        });
-                        setTimeout(function() {
-                            $(bgDiv2).stop().fadeIn(na.bg.globals.fadingSpeed, 'swing', function () {
-                                $(bgDiv).css ({
-                                    display : 'block',
-                                    width: jQuery(window).width() * na.site.settings.current.scale,
-                                    height: jQuery(window).height() * na.site.settings.current.scale,
-                                    background : 'url("'+url+'") repeat'
-                                });
-                                setTimeout(function(){
-                                    $(bgDiv2).css ({display:'none'});
-                                }, 50);
+                                    if (typeof callback == 'function') callback();
+                                })
+                            }, 50);
+                        } else {
+                            //$(bgf).add(bgl).hide();
+                            $(bgDiv).css ({
+                                display : 'block',
+                                width: jQuery(window).width() * na.site.settings.current.scale,
+                                          height: jQuery(window).height() * na.site.settings.current.scale,
+                                          background : 'url("'+url+'") repeat'
+                            });
+                            if (typeof callback == 'function') callback();
+                        }
 
-                                if (typeof callback == 'function') callback();
-                            })
-                        }, 50);
+                    } else if (url.match('youtube.com/')) {
+                        $(bgDiv).add(bgDiv2).css({display:'none'});
+                        $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
+
+                        na.bg.loadYoutubeBackground (url, callback);
+
+                    } else if (url.match('youtube')) {
+                        $(bgDiv).add(bgDiv2).css({display:'none'});
+                        $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
+
+
+                        var ac = {
+                            type : 'GET',
+                            url : url,
+                            success : function (data, ts, xhr) {
+                                na.bg.loadYoutubeBackground (data, callback);
+                            },
+                            error : function (xhr, textStatus, errorThrown) {
+                                na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+                            }
+                        };
+                        $.ajax(ac);
+
                     } else {
-                        //$(bgf).add(bgl).hide();
-                        $(bgDiv).css ({
-                            display : 'block',
-                            width: jQuery(window).width() * na.site.settings.current.scale,
-                            height: jQuery(window).height() * na.site.settings.current.scale,
-                            background : 'url("'+url+'") repeat'
-                        });
-                        if (typeof callback == 'function') callback();
-                    }
+                        if (na.bg.settings.useFading) {
+                            bgf.src = bgl.src;
+                            $(bgl).css({display:'none'});
+                            bgl.onload = function (evt) {
+                                $('img.bg_last').fadeIn(na.bg.globals.fadingSpeed, 'swing', function () {
+                                    $('img.bg_first',$(this).parent())[0].src = $('img.bg_last',$(this).parent())[0].src;
+                                    $('img.bg_last',$(this).parent()).css({display:'none'});
+                                })
 
-                } else if (url.match('youtube.com/')) {
-                    $(bgDiv).add(bgDiv2).css({display:'none'});
-                    $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
-
-                    na.bg.loadYoutubeBackground (url, callback);
-
-                } else if (url.match('youtube')) {
-                    $(bgDiv).add(bgDiv2).css({display:'none'});
-                    $(bgf).add(bgl).stop().fadeOut(na.bg.globals.fadingSpeed);
-
-
-                    var ac = {
-                        type : 'GET',
-                        url : url,
-                        success : function (data, ts, xhr) {
-                            na.bg.loadYoutubeBackground (data, callback);
-                        },
-                        error : function (xhr, textStatus, errorThrown) {
-                            na.site.ajaxFail(fncn, url, xhr, textStatus, errorThrown);
+                            };
+                            bgl.src = url;
+                        } else {
+                            bgl.src = url;
+                            if (typeof callback == 'function') callback();
                         }
                     };
-                    $.ajax(ac);
 
-                } else {
-                    if (na.bg.settings.useFading) {
-                        bgf.src = bgl.src;
-                        $(bgl).css({display:'none'});
-                        bgl.onload = function (evt) {
-                            $('img.bg_last').fadeIn(na.bg.globals.fadingSpeed, 'swing', function () {
-                                $('img.bg_first',$(this).parent())[0].src = $('img.bg_last',$(this).parent())[0].src;
-                                $('img.bg_last',$(this).parent()).css({display:'none'});
-                            })
 
-                        };
-                        bgl.src = url;
-                    } else {
-                        bgl.src = url;
-                        if (typeof callback == 'function') callback();
+                    na.site.globals.backgroundSearchKey = search;
+                    na.site.globals.background = url;
+                    if (na.site.globals.debug_backgroundChanges) debugger;
+                    if (!$.cookie('cdb_loginName') || $.cookie('cdb_loginName')==naGlobals.domain.replace('.','_')+'___Guest') {
+                        $.cookie('siteBackground_search', search, na.m.cookieOptions());
+                        $.cookie('siteBackground_url', url, na.m.cookieOptions());
                     }
-                };
+                    if (!url.match(/cracked-surface/)) {
+                        na.m.addLogEntry ('Background set to "'+na.site.globals.backgroundSearchKey+'"; '+url, 'naStatus_backgroundChange');
+                        if (saveTheme) na.site.saveTheme();
+                    };
+                });
+
+                debugger;
 
 
-                na.site.globals.backgroundSearchKey = search;
-                na.site.globals.background = url;
-                if (na.site.globals.debug_backgroundChanges) debugger;
-                if (!$.cookie('cdb_loginName') || $.cookie('cdb_loginName')==naGlobals.domain.replace('.','_')+'___Guest') {
-                    $.cookie('siteBackground_search', search, na.m.cookieOptions());
-                    $.cookie('siteBackground_url', url, na.m.cookieOptions());
-                }
-                if (!url.match(/cracked-surface/)) {
-                    na.m.addLogEntry ('Background set to "'+na.site.globals.backgroundSearchKey+'"; '+url, 'naStatus_backgroundChange');
-                    if (saveTheme) na.site.saveTheme();
-                };
+                    //debugger;
+
 /*
             },
             error : function (xhr, textStatus, errorThrown) {
