@@ -194,6 +194,33 @@ border-bottom-color: #1a1a1a;
 .ytResultCard:hover {
   border-color: #6af !important;
 }
+#siteBackgrounds_tab_images{
+display: flex;
+flex-wrap: wrap;
+align-content: flex-start;
+gap: 4px 6px;          /* modern equivalent of the old margins */
+padding: 8px;
+overflow: auto;
+line-height: 1.2em;    /* keep the value you already use */
+}
+
+#siteBackgrounds_tab_images .kw.token {
+float: none;           /* kill the old float */
+display: inline-block; /* or just let flex handle it */
+line-height: 1.2em;
+padding: 2px 8px;
+margin: 0;             /* gap handles spacing now */
+white-space: nowrap;
+background: rgba(0, 80, 0, 0.55);   /* or whatever green you were using */
+border-radius: 4px;
+cursor: pointer;
+user-select: none;
+}
+
+#siteBackgrounds_tab_images .kw.token.kwSel {
+background: rgba(0, 140, 0, 0.85);
+outline: 1px solid #8f8;
+}
 
 .mainTooltipTheme {
   border:1px solid navy;

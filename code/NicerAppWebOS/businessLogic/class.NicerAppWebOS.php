@@ -2500,6 +2500,7 @@ class NicerAppWebOS {
                     'write' => [
                         //'users' => [ $username101 ]
                         'roles' => [
+                            $db->translate_plainGroupName_to_couchdbGroupName('Guests'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Owners'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Chief Officers'),
                             $db->translate_plainGroupName_to_couchdbGroupName('Moderators')

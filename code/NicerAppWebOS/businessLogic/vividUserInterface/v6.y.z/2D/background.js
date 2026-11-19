@@ -97,7 +97,41 @@ na.backgrounds = na.background = na.bg = {
         <button class="bgTab" data-tab="youtube">YouTube Videos</button>
         </div>
 
-        <div id="siteBackgrounds_tab_images" class="bgTabContent" style="flex:1; min-height:0; display:flex;"> … </div>
+        <div id="siteBackgrounds_tab_images" class="bgTabContent"
+        style="flex:1; min-height:0; display:flex; flex-direction:row; gap:0;">
+
+        <!-- LEFT PANE : filter + keyword tags -->
+        <div id="siteBackgrounds_tab_images_left"
+        style="width:25%; min-width:220px; max-width:320px;
+        flex-shrink:0; display:flex; flex-direction:column;
+        border-right:1px solid rgba(255,255,255,0.12);
+        overflow-x:hidden;height:100%;">
+
+        <div style="padding:10px 12px 6px; flex-shrink:0;">
+        <input type="search" id="siteBackgrounds_filter"
+        placeholder="Filter tags…"
+        style="width:100%; padding:7px 10px; border-radius:6px;
+        border:1px solid #555; background:#1a1a1a; color:#eee;">
+        </div>
+
+        <div id="siteBackgrounds_tags" class="vividScrollpane"
+        style="flex:1; min-height:0; overflow:auto; padding:6px 10px 12px;">
+        <!-- tags are injected here by renderKeywordsIncrementally() -->
+        </div>
+        </div>
+
+        <!-- RIGHT PANE : image grid -->
+        <div id="siteBackgrounds_tab_images_right"
+        style="flex:1; min-width:0; display:flex; flex-direction:column;
+        overflow:hidden;height:100%;">
+
+        <div id="siteBackgrounds_images" class="vividScrollpane"
+        style="flex:1; min-height:0; overflow:auto; padding:12px;">
+        <!-- images are injected here by showImagesForToken() -->
+        </div>
+        </div>
+        </div>
+
 
         <div id="siteBackgrounds_tab_youtube" class="bgTabContent"
         style="display:none; flex:1; min-height:0; flex-direction:column;">
@@ -120,6 +154,8 @@ na.backgrounds = na.background = na.bg = {
             minHeight: 0
         })
         .html(html);
+
+        na.site.startUIvisuals();
 
         $('#siteBackgrounds').css({
             position : 'absolute',
@@ -550,7 +586,7 @@ na.backgrounds = na.background = na.bg = {
 
 
     showImagesForToken : function (token) {
-        const panel = $('#siteBackgrounds_rightPanel').empty();
+        const panel = $('#siteBackgrounds_images').empty();
         const files = [...na.background.tokenIndex[token].files]; // copy array
 
         // Optional: sort files somehow (name, date, random, ...)

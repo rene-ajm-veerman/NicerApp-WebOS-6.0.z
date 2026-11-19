@@ -21,7 +21,7 @@ else
 fi
 
 cd /var/www
-if [ ! -d $ROOT_PATH ]; then
+if [ ! -d $ROOT_PATHwh ]; then
   sudo mkdir -p $ROOT_PATH
   sudo chown www-data:www-data $ROOT_PATH
   sudo chmod 750 $ROOT_PATH

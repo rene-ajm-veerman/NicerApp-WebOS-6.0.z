@@ -735,15 +735,15 @@ function mainErrorHandler ($errno, $errstr, $errfile, $errline) {
             'errline' => $errline
         ];
         {
-            echo '<pre style="color:white;background:rgba(255,0,0,0.8);border-radius:10px;padding:8px;box-shadow:inset 1px 1px 3px 2px rgba(0,0,0,0.7), 2px 2px 2px 1px rgba(0,0,0,0.8);">'; echo json_encode($dbg, JSON_PRETTY_PRINT);
+            echo '<div style="color:white;background:rgba(255,0,0,0.8);border-radius:10px;padding:8px;box-shadow:inset 1px 1px 3px 2px rgba(0,0,0,0.7), 2px 2px 2px 1px rgba(0,0,0,0.8);">'; echo json_encode($dbg, JSON_PRETTY_PRINT);
             // Get a clean, memory-friendly backtrace
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
             // Remove the error-handler frame itself
             array_shift($trace);
 
-            echo '<pre style="white-space:pre-wrap;word-break:break-all;font-size:small;color:white;background:rgba(50,0,0,0.5);border-radius:10px;padding:8px;box-shadow:inset 1px 1px 3px 2px rgba(0,0,0,0.7), 2px 2px 2px 1px rgba(0,0,0,0.8);">'; echo json_encode($trace, JSON_PRETTY_PRINT); echo '</pre>';
-            echo '</pre>';
+            echo '<div style="white-space:pre-wrap;word-break:break-all;font-size:small;color:white;background:rgba(50,0,0,0.5);border-radius:10px;padding:8px;box-shadow:inset 1px 1px 3px 2px rgba(0,0,0,0.7), 2px 2px 2px 1px rgba(0,0,0,0.8);">'; echo json_encode($trace, JSON_PRETTY_PRINT); echo '</div>';
+            echo '</div>';
         }
     }
 

@@ -235,11 +235,76 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
 
         onkeyup : function (evt) {
             //debugger;
-            if (
-                (evt.altKey)
-                && (evt.key=='n')
-            ) na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].gotoNextPage();
-            if (evt.key==' ') na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].toggleLock();
+            var
+            na1 = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'],
+            k = typeof evt.key=='string' ? evt.key : '',
+            // On macOS, Option+N is a dead key (evt.key is 'Dead' or '˜', not 'n'), so fall back to the
+            // physical key code in that case only (keeps Dvorak etc. working: a real letter in evt.key wins).
+            isN = k.toLowerCase()==='n' || (evt.code==='KeyN' && (k==='Dead' || k==='Unidentified' || (k.length===1 && k.charCodeAt(0) > 127)));
+            if (evt.altKey && isN) na1.gotoNextPage();
+            // 'Spacebar' is what legacy browsers (old Firefox/Edge) report instead of ' '
+            if (k===' ' || k==='Spacebar') na1.toggleLock();
+        },
+
+        // Copies one news item (as rich HTML + plain text) to the clipboard, with a 'Found via' attribution appended.
+        // Replaces an inline onclick that appended a <textarea> to the *document node* (throws HierarchyRequestError
+        // in every browser), selected text in this window but ran execCommand on window.top.document, and leaked
+        // el_html as an implicit global. Uses the async Clipboard API where available (needs a secure context and a
+        // user gesture) and falls back to execCommand('copy') (older Firefox, non-HTTPS, some embedded webviews).
+        copyItemToClipboard : function (btn) {
+            var
+            idx = btn.getAttribute('data-idx'),
+            seov = btn.getAttribute('data-seov') || '',
+            el = document.getElementById('newsApp__item__' + idx);
+            if (!el) return false;
+
+            var clone = el.cloneNode(true);
+            $('.newsApp__item__copy, .btn_copyAndPaste', clone).remove(); // don't copy the copy-button itself
+            clone.removeAttribute('id');
+            clone.style.opacity = '1';
+
+            var url = 'https://nicer.app/' + seov, attribution = document.createElement('div');
+            attribution.appendChild(document.createTextNode('Found via '));
+            var a = document.createElement('a');
+            a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = url;
+            attribution.appendChild(a);
+            clone.appendChild(attribution);
+
+            var html = clone.outerHTML, text = (clone.innerText || clone.textContent || '').trim();
+
+            function fallback () {
+                // execCommand needs a *rendered*, selectable node in the current document (display:none won't work in Safari).
+                var holder = document.createElement('div'), ok = false, sel = window.getSelection(), range = document.createRange();
+                holder.style.cssText = 'position:fixed;top:0;left:-99999px;width:600px;opacity:0;pointer-events:none;user-select:text;-webkit-user-select:text;';
+                holder.setAttribute('aria-hidden', 'true');
+                holder.innerHTML = html;
+                document.body.appendChild(holder);
+                try {
+                    range.selectNodeContents(holder);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    ok = document.execCommand('copy');
+                } catch (err) {
+                    ok = false;
+                }
+                sel.removeAllRanges();
+                document.body.removeChild(holder);
+                return ok;
+            }
+
+            if (navigator.clipboard && typeof navigator.clipboard.write=='function' && typeof window.ClipboardItem=='function') {
+                try {
+                    navigator.clipboard.write([ new ClipboardItem({
+                        'text/html' : new Blob([html], { type : 'text/html' }),
+                        'text/plain' : new Blob([text + '\n\nFound via ' + url], { type : 'text/plain' })
+                    }) ]).catch(fallback);
+                } catch (err) {
+                    fallback();
+                }
+            } else {
+                fallback();
+            }
+            return false;
         },
 
         viewSearchbar : function (evt) {
@@ -741,7 +806,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                                            //na.m.log (2, 'loadNews_get_forDateTimeRange() : data=' + data);
 
                                            if (typeof data=='string') {
-                                               var dat = JSON.parse(data,null,4);
+                                               var dat = JSON.parse(data);
                                            } else {
                                                var dat = data;
                                            }
@@ -1339,7 +1404,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
                         if (searchQueryLookArounds!=='') searchQueryLookArounds += '|';
                         searchQueryLookArounds += '.*('+searchQueryPart+').*';
                     } else {
-                        searchQueryPartCorrected = searchQueryPart.substr(1, searchQueryPart.length-1);
+                        searchQueryPartCorrected = searchQueryPart.slice(1);
                         if (searchQueryLookAheads!=='') searchQueryLookAheads += '|';
                         searchQueryLookAheads += '((?!'+searchQueryPartCorrected+').)';
                     }
@@ -1732,7 +1797,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
 
              html += '<div class="newsApp__item__footer"><table class="newsApp__item__date"><tr><td><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it.u+'">' + na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it)+'</a></span></td>';
 
-             html += '<td class="newsApp__item__copy"><div id="newsApp__copyAndPaste__'+it.idx+'" class="vividButton4 btn_copyAndPaste" buttonType="btn_copyAndPaste" style="float:right" target="newsAppItem_'+it.idx+'" onclick="var el = $(\'#newsApp__item__'+it.idx+'\')[0], textarea = $(\'#siteContent__textareaCopy\')[0]; if (!textarea) { var el2=document.createElement(\'textarea\'); window.top.document.append(el2); textarea=el2 }; el_html = el.innerHTML; el.innerHTML = el.innerHTML.replace(\/<span class..newsApp__item__copy.>Copy to clipboard<.a><.span>>\/,\'\') + \'Found via <a href=\\\'https://nicer.app/'+seov+'\\\' target=\\\'_new\\\'>https://nicer.app/'+seov+'</a>\'; var selection = window.getSelection(); var range = document.createRange(); range.selectNodeContents(el); selection.removeAllRanges(); selection.addRange(range); window.top.document.execCommand(\'copy\');setTimeout(function(){selection.removeAllRanges(); el.innerHTML=el_html;},1000);"></div></td></tr></table> ';
+             html += '<td class="newsApp__item__copy"><div id="newsApp__copyAndPaste__'+it.idx+'" class="vividButton4 btn_copyAndPaste" buttonType="btn_copyAndPaste" style="float:right" target="newsAppItem_'+it.idx+'" data-idx="'+it.idx+'" data-seov="'+String(seov).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')+'" onclick="na.apps.loaded[\'/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news\'].copyItemToClipboard(this)"></div></td></tr></table> ';
              html+= '</div>';
 
 
@@ -1741,7 +1806,7 @@ if (!na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'])
              html2+= '<span class="newsApp__item__url"><a class="nomod" target="newsAppItem_'+it.idx+'" href="' + it._id+'">Article</a> discovered via ';
              html2+= '<a class="nomod" target="newsAppItem_'+it.idx+'_rssURL" href="' + it.rssURL+'">'+na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].urlToDomainName(it.rssURL)+'</a></span>';
              html2+= '<br/>';
-             html2+= '<span class="newsApp__item__category"><span class="newsApp__item__categoryTitle">Category</span> <span class="newsApp__item__categoryColon">:</span> <span class="newsApp__item__categoryValue">'+it.path.substr(0, it.path.length)+'</span></span><br/>';
+             html2+= '<span class="newsApp__item__category"><span class="newsApp__item__categoryTitle">Category</span> <span class="newsApp__item__categoryColon">:</span> <span class="newsApp__item__categoryValue">'+it.path+'</span></span><br/>';
              var pd = na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/news'].formatDate(it);
              html2 += '<span class="newsApp__item__date">' + pd + '</span><br/>';
 

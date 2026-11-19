@@ -1,19 +1,13 @@
-//na.m.waitForCondition ( 'na.m.desktopInitialized()', na.m.WebOSidle, function () {
-        
-//na.analytics.logMetaEvent ('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer : init-stage-1');
-
 delete na.mp;
 na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D'] = na.musicPlayer = na.mp = {
 	about : {
 		whatsThis : 'Complete application code for the music playback-and-download site on http://nicer.app/musicPlayer',
 		copyright : 'Copyrighted (c) 2011-2025 by Rene AJM Veerman - rene.veerman.netherlands@gmail.com',
 		license : 'https://opensource.org/license/mit',
-		version : '5.0.0',
+		version : '5.0.1',
 		firstReleased : '2011',   
-		lastUpdated : '2025-04-18(Friday) 01:23am Central European Summer Time - AMS https://Amsterdam.nl',
-		knownBugs : [
-			"None at the moment, i think. Please report any bugs you find.."
-		]
+		lastUpdated : '2025-04-18',
+		knownBugs : []
 	},
     globals : {
         url : '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/'
@@ -32,355 +26,352 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         loadedIn : {
             '#siteContent' : {
                 onload : function (settings) {
+                    debugger;
                     na.site.settings.app = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D';
-                    if (typeof na.site.globals.app=='string') na.site.globals.app = JSON.parse(na.site.globals.app);
-                    //na.analytics.logMetaEvent ("na.musicPlayer.onload() called.");
+                    if (typeof na.site.globals.app === 'string') {
+                        na.site.globals.app = JSON.parse(na.site.globals.app);
+                    }
 
-                    $('#siteContent > .vividDialogContent').css({ overflow : 'hidden'/*, direction:'ltr'*/});
+                    $('#siteContent > .vividDialogContent').css({ overflow : 'hidden' });
                     $('.audioSeekBar_setting').css({
-                        position:'revert-layer', height : $('.audioSeekBar').height() - 4, top : 0, left : 4, borderRadius:5
+                        position: 'revert-layer',
+                        height : Math.max(0, $('.audioSeekBar').height() - 4),
+                        top : 0,
+                        left : 4,
+                        borderRadius: 5
                     });
                     $('.audioVolumeBar_setting').css({
-                        position:'revert-layer', height : $('.audioVolumeBar').height() - 4, top : 0, left : 4, borderRadius:5
+                        position: 'revert-layer',
+                        height : Math.max(0, $('.audioVolumeBar').height() - 4),
+                        top : 0,
+                        left : 4,
+                        borderRadius: 5
                     });
                     
-                    $('#siteContent .vividDialog').each(function(idx,el){
-                        if (!na.site.c.dialogs['#'+el.id])
-                            na.site.c.dialogs['#'+el.id] = new vividUserInterface_2D_dialog(el);
-                    });
-                    $('.audioPlayerUI .vividButton4').each(function(idx,el){
-                        if (!na.site.c.buttons['#'+el.id]) {
-                            var btn = new vividUserInterface_2D_button({ naSite : na.site, el : el });
-                            na.site.c.buttons['#'+el.id] = btn;
-                            if (el.id=='btnPlayPause') $(el).addClass('disabled');
-                            if (el.id=='btnMuteUnmute') btn.el.onclick({currentTarget:el});
+                    $('#siteContent .vividDialog').each(function(idx, el) {
+                        if (!na.site.c.dialogs['#' + el.id]) {
+                            na.site.c.dialogs['#' + el.id] = new vividUserInterface_2D_dialog(el);
                         }
-
+                    });
+                    $('.audioPlayerUI .vividButton4').each(function(idx, el) {
+                        if (!na.site.c.buttons['#' + el.id]) {
+                            var btn = new vividUserInterface_2D_button({ naSite : na.site, el : el });
+                            na.site.c.buttons['#' + el.id] = btn;
+                            if (el.id === 'btnPlayPause') $(el).addClass('disabled');
+                            if (el.id === 'btnMuteUnmute' && btn.el.onclick) btn.el.onclick({ currentTarget: el });
+                        }
                     });
 
                     $('.lds-facebook').fadeOut('normal');
-                    
-                    /*TOXIC!
-                     * na.desktop.registerProgress ('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D', function() {
-                        var div = $('#siteContent')[0];
-                        na.mp.onresize(div);
-                    });*/
-
-                    // na.desktop.registerCallback ('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D', '#siteContent', function (cb, div, calculationResults, sectionIdx, section, divOrderIdx) {
-                    //     debugger;
-                    //     if (div.id=='siteContent') na.mp.onresize(div);
-                    //     na.mp.settings.onResizeReposition = false;
-                    // });
                     na.desktop.resize(na.mp.onresize);
                 },
                 ondestroy : function (settings) {
-                    //na.desktop.deleteProgress ('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D');
-                    na.desktop.deleteCallback ('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D');
-                    clearInterval (na.mp.settings.timeDisplayInterval);
+                    na.desktop.deleteCallback('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D');
+                    clearInterval(na.mp.settings.timeDisplayInterval);
                 }
             }
         }
 	},
 	
-	queueMP3 : function (id, file) {
+	queueMP3 : function (id, file, label) {
 		var pl = document.getElementById('playlist');
+		if (!pl || !file) return false;
+
 		var pc = na.mp.playlistCount++;
+		var displayLabel = label || file;
 		
-		var newPlaylistItem = npi = document.createElement('div');
-		npi.setAttribute ('file', file);
+		var npi = document.createElement('div');
+		npi.setAttribute('file', file);
 		npi.id = 'playlist_' + pc;
         npi.file = file;
-        //npi.style.padding = '2px';
-        //npi.style.height = '25px';
 		npi.className = 'mp3 vividButton';
-        $(npi).attr('theme','dark');
+        $(npi).attr('theme', 'dark');
 
-
-		npi.innerHTML = 
-			'<a href="javascript:na.apps.loaded["NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer"].selectMP3(\'' + npi.id + '\', \'' + file + '\');">'
-			+ label
-			+ '</a>';
+        var link = document.createElement('a');
+        link.href = '#';
+        link.textContent = displayLabel;
+        $(npi).on('click', function(e) {
+            e.preventDefault();
+            na.mp.selectMP3(npi.id, npi.getAttribute('file'));
+        });
+        npi.appendChild(link);
 		
-        if ($('#textCheck')[0]) var span = $('body').append('<div id="textCheck" class="vividButton vividButton_text" style="width:'+($('#mp3s').width()-50)+'px;opacity:0.0001">'+label+'</div>'); else var span = $('#textCheck');
-        try {
-            var h = span.height();
-        } catch (e) {
-            var h = e;
+        var $span = $('<div id="textCheck" class="vividButton vividButton_text" style="width:' + ($('#mp3s').width() - 50) + 'px;opacity:0.0001"></div>').text(displayLabel);
+        $('body').append($span);
+        var h = $span.height() || 25;
+        $span.remove();                
+        $(npi).css({ height: h + 30 });    
             
-        }
-        console.log ('#textCheck4 h=',h, label);
-        $('#textCheck').remove();                
-        var html = '<div id="'+t.el.id+'_'+idx+'" class="vividButton" theme="'+t.t+'" style="opacity:0.0001;height:'+(h+30)+'px">'+$(li).children('a')[0].outerHTML+'</div>';
-        $(npi).css({height:h+100});    
-            
-		pl.appendChild (npi);
+		pl.appendChild(npi);
+        na.mp.reorderPlaylist();
         na.mp.onresize();
         if (na.mp.settings.stopped) {
-            na.mp.selectMP3 (npi.id, file);
+            na.mp.selectMP3(npi.id, file);
         }
 	},
 	
 	selectMP3 : function (id, file) {
-        if (na.mp.settings.ignoreClick) { na.mp.settings.ignoreClick = false; return false; }
+        if (na.mp.settings.ignoreClick) {
+            na.mp.settings.ignoreClick = false;
+            return false;
+        }
+        if (!file) return false;
         
-        clearInterval (na.mp.settings.timeDisplayInterval);
+        clearInterval(na.mp.settings.timeDisplayInterval);
         
-        var firstRun = na.mp.settings.firstRun;
-        if (firstRun) na.mp.settings.firstRun = false;
-        
+        if (na.mp.settings.firstRun) na.mp.settings.firstRun = false;
 		na.mp.settings.activeID = id;
-		
         na.mp.settings.playingIndex = false;
-        delete na.mp.settings.stopped;
+        na.mp.settings.stopped = false;
+        na.mp.settings.paused = false;
+
 		var pl = $('#playlist')[0];
-		for (var i=0; i<pl.children.length; i++) {
-            if (pl.children[i].id==id || (pl.children[i].children[0] && pl.children[i].children[0].id==id)) na.mp.settings.playingIndex = i;
-		};
-        if (!file) debugger;
+		if (pl) {
+            for (var i = 0; i < pl.children.length; i++) {
+                if (pl.children[i].id === id || (pl.children[i].children[0] && pl.children[i].children[0].id === id)) {
+                    na.mp.settings.playingIndex = i;
+                    break;
+                }
+            }
+        }
         
-        $('.mp3').removeClass('selected').removeClass('vividButtonSelected').addClass('vividButton');
-        $('#'+id).addClass('selected').removeClass('vividButton').addClass('vividButtonSelected');
+        $('.mp3').removeClass('selected vividButtonSelected').addClass('vividButton');
+        $('#' + id).addClass('selected vividButtonSelected').removeClass('vividButton');
         $('#btnPlayPause').addClass('selected');
         $('#line2').addClass('atPlay');
-        $('#from_pause_to_play')[0].beginElement();
+        if ($('#from_pause_to_play')[0] && $('#from_pause_to_play')[0].beginElement) {
+            $('#from_pause_to_play')[0].beginElement();
+        }
+
+        var encodedFile = encodeURIComponent(file);
+        var baseUrl = na.mp.globals.url;
 
         var ajaxCommand = {
 			type : 'GET',
-			//url : '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer/music/'+na.site.globals.app['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D']['set']+'/' + file + '.json',
-            url : '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer/music/'+ file + '.json',
-            error: function(l0_jqXHR, l0_textStatus, l0_errorThrown) {
+            url : baseUrl + 'music/' + encodedFile + '.json',
+            error: function() {
 				var html = '';
                 html += '<div style="height:15px;">&nbsp;</div>';
                 html += '<table>';
-				html += '<tr><td colspan="2" style="text-align:center"><a href="' + na.site.globals.url + '/download_mp3.php?file='+file+'">download</a></td></tr>';
-				html += '<tr><td><span class="mp3_info_label mp3_title_label">title</span></td><td><span class="mp3_title">'+file+'</span></td></tr>';
+				html += '<tr><td colspan="2" style="text-align:center"><a href="' + baseUrl + 'download_mp3.php?file=' + encodedFile + '">download</a></td></tr>';
+				html += '<tr><td><span class="mp3_info_label mp3_title_label">title</span></td><td><span class="mp3_title">' + $('<div>').text(file).html() + '</span></td></tr>';
                 html += '</table>';
                 na.mp.updateDescriptionDiv(id, file, html);
             },
-			success : function (json, ts) {
-				if (typeof json!=='object') json = eval ('('+json+') ');
+			success : function (json) {
+				if (typeof json !== 'object') {
+                    try {
+                        json = JSON.parse(json);
+                    } catch (e) {
+                        json = {};
+                    }
+                }
+                var html = '';
                 if (json.description) {
-                    var html = '';
                     html += '<div style="height:15px;">&nbsp;</div>';
-                    html += '<div style="margin-bottom:10px;font-size:inherit;text-align:center;"><a href="' + na.mp.globals.url + '/download_mp3.php?file='+file+'">download</a></div>';
-                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_title_label hasOwnProps">title</span> <span class="mp3_title hasOwnProps">'+json.title+'</span></div>';
-                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_album_label hasOwnProps">album</span> <span class="mp3_album hasOwnProps">' + json.album + '</span></div>';
-                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_length_label hasOwnProps">length</span> <span class="mp3_length hasOwnProps">' + json.length + '</span></div>';
-                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_year_label hasOwnProps">year</span> <span class="mp3_year hasOwnProps">'+json.year+'</span></div>';
+                    html += '<div style="margin-bottom:10px;font-size:inherit;text-align:center;"><a href="' + baseUrl + 'download_mp3.php?file=' + encodedFile + '">download</a></div>';
+                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_title_label hasOwnProps">title</span> <span class="mp3_title hasOwnProps">' + (json.title || file) + '</span></div>';
+                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_album_label hasOwnProps">album</span> <span class="mp3_album hasOwnProps">' + (json.album || '') + '</span></div>';
+                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_length_label hasOwnProps">length</span> <span class="mp3_length hasOwnProps">' + (json.length || '') + '</span></div>';
+                    html += '<div style="margin-bottom:10px;font-size:inherit;"><span class="mp3_info_label mp3_year_label hasOwnProps">year</span> <span class="mp3_year hasOwnProps">' + (json.year || '') + '</span></div>';
                     html += '<div style="font-size:inherit;"><span class="mp3_description hasOwnProps">' + json.description + '</span></div>';
                 } else {
-                    var html = '';
                     html += '<table>';
-                    html += '<tr><td colspan="2" style="text-align:center"><a href="' + na.mp.globals.url + '/download_mp3.php?file='+file+'">download</a></td></tr>';
-                    html += '<tr><td colspan="2" style="text-align:center"><a href="https://youtube.com/watch?v='+json.youtubeID+'" target="_new">youtube link</a></td></tr>';
+                    html += '<tr><td colspan="2" style="text-align:center"><a href="' + baseUrl + 'download_mp3.php?file=' + encodedFile + '">download</a></td></tr>';
+                    if (json.youtubeID) {
+                        html += '<tr><td colspan="2" style="text-align:center"><a href="https://youtube.com/watch?v=' + encodeURIComponent(json.youtubeID) + '" target="_blank" rel="noopener">youtube link</a></td></tr>';
+                    }
                     html += '</table>';
                 }
                 na.mp.updateDescriptionDiv(id, file, html);
 			}
 		};
 		$.ajax(ajaxCommand);
-        //na.analytics.logMetaEvent ('appEvent : musicPlayer : selectMP3() file='+file);
 	},
     
     updateDescriptionDiv : function (id, file, html) {
-        $('#siteIntroText').fadeOut (500, function () {
+        $('#siteIntroText').fadeOut(500, function () {
+            var audio = $('#audioTag')[0];
+            var mp3 = na.mp.globals.url + 'music/' + encodeURIComponent(file);
 
-            var 
-            //mp3 = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer/music/'+na.site.globals.app['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D']['set']+'/' + file;
-            mp3 = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/music/'+ file;
-
-            $('#audioTag')[0].src = mp3;
-            $('#audioTag')[0].play();
-            $('.audioVolumeBarLabel').html ( 'Volume : '+ Math.round($('#audioTag')[0].volume*100) );
+            audio.src = mp3;
+            audio.play().catch(function(err) {
+                console.warn('Audio playback prevented or failed:', err);
+            });
+            $('.audioVolumeBarLabel').html('Volume : ' + Math.round(audio.volume * 100));
             na.mp.settings.stopped = false;
+            na.mp.settings.paused = false;
 
-            if (
-                $('#btnPlayPause').is('.disabled') 
-            ) {
+            if ($('#btnPlayPause').is('.disabled')) {
                 $('#btnPlayPause').removeClass('disabled');
-                na.ui.vividButton.onclick({currentTarget:$('#btnPlayPause')[0]});
+                if (na.ui && na.ui.vividButton) {
+                    na.ui.vividButton.onclick({ currentTarget: $('#btnPlayPause')[0] });
+                }
             }
             
-            $('.mp3').each (function (index,element) {
-                if (this.id=='') return false;
-                if (this.id==id) var state = 'selected'; else var state='normal';
-            });
-                $('#mp3descText').fadeOut('fast', function() {
-                    $('#mp3descText').html (html).delay(100).fadeIn(1000);
-                    $('#mp3descText a').each(function(idx,aEl) {
-                        if (!aEl.el) {
-                            aEl.vividTextCmd = {
-                                el : aEl,
-                                theme : na.cg.themes.naColorgradientSchemeGreenVividText2,
-                                animationType : na.vividText.globals.animationTypes[0],
-                                animationSpeed : 4 * 1000
-                            };
-                            na.vividText.initElement (aEl.vividTextCmd);
-                        }
-
-                    });
-
-
+            $('#mp3descText').fadeOut('fast', function() {
+                $('#mp3descText').html(html).delay(100).fadeIn(1000);
+                $('#mp3descText a').each(function(idx, aEl) {
+                    if (!aEl.el && na.vividText && na.cg) {
+                        aEl.vividTextCmd = {
+                            el : aEl,
+                            theme : na.cg.themes.naColorgradientSchemeGreenVividText2,
+                            animationType : na.vividText.globals.animationTypes,
+                            animationSpeed : 4 * 1000
+                        };
+                        na.vividText.initElement(aEl.vividTextCmd);
+                    }
                 });
+            });
 
-                setTimeout(na.mp.setTimeDisplayInterval,1000);
+            setTimeout(na.mp.setTimeDisplayInterval, 500);
         });
-
     },
     
     setTimeDisplayInterval : function () {
-        clearInterval (na.mp.settings.timeDisplayInterval);
-        //if (!na.mp.settings.timeDisplayInterval)
-            na.mp.settings.timeDisplayInterval = setInterval (function() {
-                var 
-                length = $('#audioTag')[0].duration, // in seconds
-                strLength = na.mp.convertSecondsToTimeString(length),
-                currentTime = $('#audioTag')[0].currentTime, // in seconds
-                strCurrentTime = na.mp.convertSecondsToTimeString(currentTime);
+        clearInterval(na.mp.settings.timeDisplayInterval);
+        na.mp.settings.timeDisplayInterval = setInterval(function() {
+            var audio = $('#audioTag')[0];
+            if (!audio) return;
+
+            var length = audio.duration;
+            var currentTime = audio.currentTime;
+
+            if (!isFinite(length) || length <= 0) {
+                $('.audioSeekBarLabel_length').html('00:00:00');
+                $('.audioSeekBarLabel_currentTime').html(na.mp.convertSecondsToTimeString(currentTime || 0));
+                return;
+            }
+            
+            if (audio.ended || (length - currentTime) <= 0.25) {
+                clearInterval(na.mp.settings.timeDisplayInterval);
+                na.mp.next();
+            } else {
+                $('.audioSeekBarLabel_length').html(na.mp.convertSecondsToTimeString(length));
+                $('.audioSeekBarLabel_currentTime').html(na.mp.convertSecondsToTimeString(currentTime));
                 
-                if (currentTime==length) {
-                    debugger;
-                    clearInterval (na.mp.settings.timeDisplayInterval);
-                    na.mp.next();
-                } else {
-                    
-                    $('.audioSeekBarLabel_length').html(strLength);
-                    $('.audioSeekBarLabel_currentTime').html(strCurrentTime);
-                    
-                    var 
-                    widthSeekBar = $('.audioSeekBar').width(),
-                    widthPlayBar = Math.floor((widthSeekBar * currentTime)/length);
-                    
-                    if (!na.mp.settings.maxPlayBarWidth) na.mp.settings.maxPlayBarWidth = widthSeekBar;
-                    $('.audioSeekBar_setting')[0].style.width = (widthPlayBar <= na.mp.settings.maxPlayBarWidth ? widthPlayBar : na.mp.settings.maxPlayBarWidth)+'px';
-                }
+                var widthSeekBar = $('.audioSeekBar').width();
+                var widthPlayBar = Math.floor((widthSeekBar * currentTime) / length);
                 
-            }, 1000);
+                if (!na.mp.settings.maxPlayBarWidth) na.mp.settings.maxPlayBarWidth = widthSeekBar;
+                $('.audioSeekBar_setting')[0].style.width = Math.min(widthPlayBar, widthSeekBar) + 'px';
+            }
+        }, 500);
     },
     
     convertSecondsToTimeString : function (seconds) {
-        var 
-        hours = Math.floor(seconds/3600),
-        minutes = Math.floor( (seconds-(hours * 3600)) / 60 ),
-        secs = Math.floor(seconds - (hours * 3600) - (minutes * 60));
+        if (!isFinite(seconds) || seconds < 0) seconds = 0;
+        var hours = Math.floor(seconds / 3600);
+        var minutes = Math.floor((seconds - (hours * 3600)) / 60);
+        var secs = Math.floor(seconds - (hours * 3600) - (minutes * 60));
         
-        if (hours<10) hours = '0'+hours;
-        if (minutes<10) minutes = '0'+minutes;
-        if (secs<10) secs = '0'+secs;
+        if (hours < 10) hours = '0' + hours;
+        if (minutes < 10) minutes = '0' + minutes;
+        if (secs < 10) secs = '0' + secs;
         
-        return hours+':'+minutes+':'+secs;
+        return hours + ':' + minutes + ':' + secs;
     },
 	
 	playpause : function () {
+        var audio = $('#audioTag')[0];
+        if (!audio || $('#btnPlayPause').is('.disabled')) return;
+
 		if (na.mp.settings.stopped || na.mp.settings.paused) {
-			$('#audioTag')[0].play();
+			audio.play();
 			na.mp.settings.paused = false;
 			na.mp.settings.stopped = false;
-            //$('#from_play_to_pause')[0].beginElement();
-            //$('#btnPlayPause').addClass('selected');
-            //na.ui.vb.hoverOver(na.ui.vb.settings.buttons['btnPlayPause']);
+            $('#btnPlayPause').addClass('selected');
+            if ($('#from_pause_to_play')[0] && $('#from_pause_to_play')[0].beginElement) {
+                $('#from_pause_to_play')[0].beginElement();
+            }
 		} else {
-			$('#audioTag')[0].pause();
+			audio.pause();
 			na.mp.settings.paused = true;
 			na.mp.settings.stopped = false;
-            //$('#from_pause_to_play')[0].beginElement();
-            //$('#btnPlayPause').removeClass('selected');
-            //na.ui.vb.hoverOut(na.ui.vb.settings.buttons['btnPlayPause']);
+            $('#btnPlayPause').removeClass('selected');
+            if ($('#from_play_to_pause')[0] && $('#from_play_to_pause')[0].beginElement) {
+                $('#from_play_to_pause')[0].beginElement();
+            }
 		}
 	},
 	
 	stop : function () {
-        na.ui.vividButton.onclick({currentTarget:$('#btnPlayPause')[0]});
-        $('#btnPlayPause').addClass('disabled');
-		$('#audioTag')[0].pause();
+        var audio = $('#audioTag')[0];
+        if (na.ui && na.ui.vividButton) {
+            na.ui.vividButton.onclick({ currentTarget: $('#btnPlayPause')[0] });
+        }
+        $('#btnPlayPause').addClass('disabled').removeClass('selected');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
 		na.mp.settings.stopped = true;
+        na.mp.settings.paused = false;
+        clearInterval(na.mp.settings.timeDisplayInterval);
 
-        $('.mp3').each (function (index,element) {
-			if (this.id=='') return false;
-		});
-		$('#mp3descText').fadeOut (1000);
-		setTimeout (function () {
-			$('#siteIntroText').fadeIn (1000);
+        $('.audioSeekBar_setting').css({ width: 0 });
+        $('.audioSeekBarLabel_currentTime').html('00:00:00');
+
+		$('#mp3descText').fadeOut(1000);
+		setTimeout(function () {
+			$('#siteIntroText').fadeIn(1000);
 		}, 1010);
 	},
     
     next : function () {
-        if (na.mp.settings.playingIndex===false) {
+        var pl = $('#playlist')[0];
+        if (!pl || pl.children.length === 0 || na.mp.settings.playingIndex === false) {
             return false;
-        } else if (na.mp.settings.shuffle) {
-            var found2 = true;
-            while (found2) {
-                var pl = $('#playlist')[0];
-                if (!na.mp.settings.shuffleList) {
-                    na.mp.settings.shuffleList = pl.children;
-                    for (var i=0; i<pl.children.length; i++) {
-                        pl.children[i].shufflePlayed = i === na.mp.settings.playingIndex;
-                    }
+        }
+
+        var items = Array.from(pl.children).filter(function(el) {
+            return $(el).hasClass('mp3');
+        });
+        if (items.length === 0) return false;
+
+        if (na.mp.settings.shuffle) {
+            var unplayed = items.filter(function(el, idx) {
+                return !el.shufflePlayed && idx !== na.mp.settings.playingIndex;
+            });
+
+            if (unplayed.length === 0) {
+                if (!na.mp.settings.repeating) {
+                    na.mp.stop();
+                    return false;
                 }
-                var found = false, i = 0;
-                while (!found && i < 100) {
-                    var newIndex = Math.floor(Math.random() * (pl.children.length - 1));
-                    found = pl.children[newIndex] && !pl.children[newIndex].shufflePlayed;
-                    i++;
-                    if (found) {
-                        i = 0;
-                        found2 = false;
-                    };
-                }
-                if (i == 99) {
-                    found2 = !found && na.mp.settings.repeating;
-                    if (found2) delete na.mp.settings.shuffleList;
-                }
-            }
-            for (var i=0; i<pl.children.length; i++) {
-                var newIndex2 = 'playlist_' + newIndex;
-                if (pl.children[i].id == newIndex2) {
-                    na.mp.selectMP3 (newIndex2, $(pl.children[i]).attr('file'), false);
-                    return true;
-                }
-                if (pl.children[i].children[0] && pl.children[i].children[0].id== newIndex2) {
-                    na.mp.selectMP3 (newIndex2, $(pl.children[i].children[0]).attr('file'), false);
-                    return true;
-                }
+                items.forEach(function(el) { el.shufflePlayed = false; });
+                unplayed = items.filter(function(el, idx) {
+                    return items.length === 1 || idx !== na.mp.settings.playingIndex;
+                });
             }
 
+            var nextEl = unplayed[Math.floor(Math.random() * unplayed.length)];
+            nextEl.shufflePlayed = true;
+            var file = $(nextEl).attr('file') || $(nextEl.children[0]).attr('file');
+            na.mp.selectMP3(nextEl.id, file);
+            return true;
         } else {
-            var pl = $('#playlist')[0];
-            for (var i=0; i<pl.children.length; i++) {
-                var newIndex = 'playlist_' + (na.mp.settings.playingIndex + 1);
-                if (pl.children[i].id == newIndex) {
-                    na.mp.selectMP3 (newIndex, $(pl.children[i]).attr('file'), false);
-                    return true;
-                }
-                if (pl.children[i].children[0] && pl.children[i].children[0].id== newIndex) {
-                    na.mp.selectMP3 (newIndex, $(pl.children[i].children[0]).attr('file'), false);
-                    return true;
+            var nextIdx = na.mp.settings.playingIndex + 1;
+            if (nextIdx >= items.length) {
+                if (na.mp.settings.repeating) {
+                    nextIdx = 0;
+                } else {
+                    na.mp.stop();
+                    return false;
                 }
             }
-            if (na.mp.settings.repeating) {
-                debugger;
-                var newIndex = 'playlist_0';
-                i = 0;
-                if (pl.children[i].id == newIndex) {
-                    na.mp.selectMP3 (newIndex, $(pl.children[i]).attr('file'), false);
-                    return true;
-                }
-                if (pl.children[i].children[0] && pl.children[i].children[0].id== newIndex) {
-                    na.mp.selectMP3 (newIndex, $(pl.children[i].children[0]).attr('file'), false);
-                    return true;
-                }
-            }
-        };            
+            var targetEl = items[nextIdx];
+            var targetFile = $(targetEl).attr('file') || $(targetEl.children[0]).attr('file');
+            na.mp.selectMP3(targetEl.id, targetFile);
+            return true;
+        }
     },
 	
 	mute : function () {
-		if (na.mp.settings.muted) {
-			$('#audioTag')[0].muted = false;
-			na.mp.settings.muted = false;
-		} else {
-			$('#audioTag')[0].muted = true;
-			na.mp.settings.muted = true;
-		}
+        var audio = $('#audioTag')[0];
+        if (!audio) return;
+		na.mp.settings.muted = !na.mp.settings.muted;
+		audio.muted = na.mp.settings.muted;
 	},
 
 	toggleShuffle : function () {
@@ -392,232 +383,160 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 	},
     
     seek : function (evt) {
-        var 
-        length = $('#audioTag')[0].duration, // in seconds
-        strLength = na.mp.convertSecondsToTimeString(length),
-        currentTime = $('#audioTag')[0].currentTime;
-        
-        $('.audioSeekBarLabel_length').html(strLength);
-        $('.audioSeekBarLabel_currentTime').html(currentTime);
-        
-        var 
-        widthSeekBar = $('.audioSeekBar').width(),
-        widthPlayBar = evt.offsetX;//Math.round((widthSeekBar * evt.offsetX)/length),
-        newCurrentTime = Math.round((widthPlayBar * length)/widthSeekBar);
+        var audio = $('#audioTag')[0];
+        if (!audio || !isFinite(audio.duration) || audio.duration <= 0) return;
 
-        $('.audioSeekBar_setting')[0].style.width = widthPlayBar+'px';
-        $('#audioTag')[0].currentTime = newCurrentTime;
+        var length = audio.duration;
+        var widthSeekBar = $('.audioSeekBar').width();
+        var widthPlayBar = Math.max(0, Math.min(evt.offsetX, widthSeekBar));
+        var newCurrentTime = (widthPlayBar * length) / widthSeekBar;
+
+        $('.audioSeekBarLabel_length').html(na.mp.convertSecondsToTimeString(length));
+        $('.audioSeekBarLabel_currentTime').html(na.mp.convertSecondsToTimeString(newCurrentTime));
+        $('.audioSeekBar_setting')[0].style.width = widthPlayBar + 'px';
+        audio.currentTime = newCurrentTime;
     },
     
     setVolume : function (evt) {
-        var 
-        widthVolumeBar = $('.audioVolumeBar').width();
-        $('#audioTag')[0].volume = evt.offsetX / widthVolumeBar;
-        $('.audioVolumeBarLabel').html ( 'Volume : ' + Math.round($('#audioTag')[0].volume * 100) );
-        $('.audioVolumeBar_setting').css ({ width : evt.offsetX });
+        var audio = $('#audioTag')[0];
+        if (!audio) return;
+        var widthVolumeBar = $('.audioVolumeBar').width();
+        var clampedX = Math.max(0, Math.min(evt.offsetX, widthVolumeBar));
+        audio.volume = clampedX / widthVolumeBar;
+        $('.audioVolumeBarLabel').html('Volume : ' + Math.round(audio.volume * 100));
+        $('.audioVolumeBar_setting').css({ width : clampedX });
     },
     
     mp3drag : {
         containment : 'window',
         connectToSortable : '#playlist',
         refreshPositions : true,
-        drag : function (evt, ui) {
-            //debugger;
-            //$(ui.helper[0]).css({opacity:0.0001});
-        },
         helper : function (evt, ui) {
-            if (this.id.indexOf('playlist_')!==-1) return false;
-            if (this.id===na.mp.settings.resortedItem) return false;
+            if (this.id.indexOf('playlist_') !== -1) return false;
+            if (this.id === na.mp.settings.resortedItem) return false;
 
-                var
-                div = document.createElement('div'),
-                div2 = document.createElement('div'),
-                scale = $('#siteContent > .vividDialogContent').css('scale');
-                if (scale.indexOf(' ')!==-1) {
-                    var
-                    sp = scale.split(' '),
-                    scaleX = parseFloat(sp[0]),
-                    scaleY = parseFloat(sp[1]);
+            var div = document.createElement('div');
+            var div2 = document.createElement('div');
+            var scale = $('#siteContent > .vividDialogContent').css('scale') || '1';
+            var scaleX = 1, scaleY = 1;
+
+            if (scale && scale !== 'none') {
+                if (scale.indexOf(' ') !== -1) {
+                    var sp = scale.split(' ');
+                    scaleX = parseFloat(sp[0]) || 1;
+                    scaleY = parseFloat(sp[1]) || 1;
                 } else {
-                    var
-                    scaleX = scale;
-                    scaleY = scale;
+                    scaleX = scaleY = parseFloat(scale) || 1;
                 }
-                $(this).add(div).add(div2).css({ position : 'absolute', zIndex : 110000 });
+            }
 
-                $(document.body).append(div);
-                $(div).append(div2);
-                $(div2).css({
-                    top : $(evt.currentTarget).offset().top,
-                    left : $(evt.currentTarget).offset().left
-                });
-                na.mp.globals.mp3evt = $.extend({},evt);
-                na.mp.globals.mp3div2 = div2;
-                na.mp.globals.mp3sItem = this;
-                na.mp.globals.mp3scale = scale;
-                na.mp.globals.mp3scaleX = scaleX;
-                na.mp.globals.mp3scaleY = scaleY;
+            $(this).add(div).add(div2).css({ position : 'absolute', zIndex : 110000 });
+            $(document.body).append(div);
+            $(div).append(div2);
+            $(div2).css({
+                top : $(evt.currentTarget).offset().top,
+                left : $(evt.currentTarget).offset().left
+            });
 
+            na.mp.globals.mp3evt = $.extend({}, evt);
+            na.mp.globals.mp3div2 = div2;
+            na.mp.globals.mp3sItem = this;
+            na.mp.globals.mp3scale = scale;
+            na.mp.globals.mp3scaleX = scaleX;
+            na.mp.globals.mp3scaleY = scaleY;
 
-            //debugger;
-            var nt = $(this).clone(true,true).appendTo(na.mp.globals.mp3div2);
-            $(nt[0]).css({
+            var nt = $(this).clone(true, true).appendTo(na.mp.globals.mp3div2)[0];
+            $(nt).css({
                 position : 'relative',
                 zIndex : 110000,
-                marginLeft : ($('#playlist').width() - $(this).width())/2,
+                marginLeft : ($('#playlist').width() - $(this).width()) / 2,
                 width : $(this).width(),
                 height : $(this).height(),
-                scale: scale,
+                scale: scale !== 'none' ? scale : 1,
                 display : 'block'
             });
-            nt[0].id = nt[0].id.replace('mp3','dragging');
-            na.mp.globals.mp3dragged = nt[0];//this
-            //$(document.body).append(div);
-            //$(this).remove();
-            return nt[0];
+            nt.id = nt.id.replace('mp3', 'dragging');
+            na.mp.globals.mp3dragged = nt;
+            return nt;
         }
     },
     
     mp3sortable : {
-            //items : '> div',
-            //tolerance : 'pointer',
-			revert : true,
-			start : function (evt, ui) {
-                //var x = evt.originalEvent.path[0];
-                //if (x.id.match('playlist')) na.mp.settings.ignoreDrop = true;
-                na.mp.settings.ignoreClick = (evt.detail===1);
-			},
-			stop : function (evt, ui) {
-                setTimeout(na.mp.reorderPlaylist, 500);
-			},
-            update : function (evt, ui) {
-                na.mp.reorderPlaylist();
-            }
+		revert : true,
+		start : function (evt, ui) {
+            na.mp.settings.ignoreClick = (evt.detail === 1);
+		},
+		stop : function (evt, ui) {
+            setTimeout(na.mp.reorderPlaylist, 100);
+		},
+        update : function (evt, ui) {
+            na.mp.reorderPlaylist();
+        }
     },
     
 	setupDragNDrop : function () {
 		var mp3s = $('#mp3s > .mp3');
-		mp3s.draggable (na.mp.mp3drag);
+		mp3s.draggable(na.mp.mp3drag);
 		$('#playlist').sortable(na.mp.mp3sortable);
-		$('#playlist').droppable ({
+		$('#playlist').droppable({
             tolerance : 'pointer',
             activate : function (evt, ui) {
-                /*
-                debugger;
-                var
-                pl = $('#playlist')[0],
-                dragged = $(ui.helper[0]).clone(true,true).detach().appendTo(pl)[0],//na.mp.globals.mp3dragged,
-                x = na.mp.globals.mp3sItem;
-                debugger;
-                $(dragged).css({
-                    position:'relative',
-                    background : '',
-                    color : '',
-                    marginLeft : ($('#playlist').width() - $(x).width())/2,
-                    left : $(x).offset().left,
-                    top : 'auto',
-                    display : 'block',
-                    width : $(x).width(),
-                    height : $(x).height(),
-                    scale : 1
-                });
-                $(x).css({position:'relative'});
-                //$(na.mp.globals.mp3dragged).remove();
-                na.mp.globals.mp3dragged = dragged;
-                //debugger;
-                */
-                na.mp.globals.mp3dragged = ui.helper[0];
-
-            },
-            over : function (evt, ui) {
-                $(na.mp.globals.mp3dragged).remove();
+                na.mp.globals.mp3dragged = ui.helper;
             },
 			drop : function (evt, ui) {
-                if (!ui.helper[0]) return false;
+                if (!ui.helper || !ui.helper[0]) return false;
+                var oldID = ui.helper[0].id;
+                if (oldID.indexOf('playlist_') !== -1) return false;
                                   
-                if (na.mp.settings.ignoreDrop) {
-                    na.mp.settings.ignoreDrop = false;
-                    return false;
-                } else na.mp.settings.ignoreDrop = true;
-                                  
-                var 
-                pl = $('#playlist')[0],
-                dragged = $(ui.helper[0]).clone(true,true).detach().appendTo(pl)[0],
-                o = ui.helper[0],
-                pc = na.mp.playlistCount;
+                var pl = $('#playlist');
+                var pc = na.mp.playlistCount++;
+                var newID = 'playlist_' + pc;
+                var original = $(na.mp.globals.mp3sItem || '#' + oldID.replace('dragging', 'mp3'));
+                var file = original.attr('file');
+                var dragged = $(ui.helper).clone(false).detach().appendTo(pl)[0];
 
-                let 
-                oldID = ui.helper[0].id,
-                newID = 'playlist_'+pc;
-                
-                if (oldID.match('playlist_')) return false;
                 $(dragged).attr('id', newID);
-                var
-                scale = 'scale:'+(na.mp.globals.zfw+' '+na.mp.globals.zfh),
-                original = $('#'+oldID);
-
                 dragged.evt = evt;
-                dragged.file = original.attr('file');
+                dragged.file = file;
                 dragged.oldID = oldID;
 
-                var
-                x = na.mp.globals.mp3sItem;
+                var x = na.mp.globals.mp3sItem;
                 $(dragged).css({
-                    position:'relative',
+                    position: 'relative',
                     background : '',
                     color : '',
                     marginLeft : 0,
-                    left : na.d.g.margin/2,
+                    left : na.d.g.margin / 2,
                     display : 'block',
                     top : 'auto',
                     width : $(x).width(),
                     height : $(x).height(),
                     verticalAlign : 'middle',
-                    scale : scale
+                    scale : (na.mp.globals.zfw && na.mp.globals.zfh) ? (na.mp.globals.zfw + ' ' + na.mp.globals.zfh) : '1'
                 });
-                $(dragged).attr('class', 'mp3 vividButton');// ui-draggable ui-draggable-handle');
-                $(dragged).attr('file', original.attr('file'));
+                $(dragged).attr('class', 'mp3 vividButton');
+                $(dragged).attr('file', file);
+                $(dragged).removeAttr('onclick');
+                $(dragged).find('a').removeAttr('href').removeAttr('onclick');
 
-                $(dragged).attr(
-                    'onclick',
-                    ''+na.mp.globals.mp3dragged.onclick
-                        .toString()
-                        .replace("'"+oldID+"'", "'"+newID+"'")
-                        .replace('function onclick(event) {', '')
-                        .replace('\n}','')
-                        .replace (new RegExp(oldID), dragged.id)
-                );
-                $(ui.helper[0]).remove();
+                $(dragged).on('click', function(e) {
+                    e.preventDefault();
+                    na.mp.selectMP3(this.id, $(this).attr('file'));
+                });
+
+                $(ui.helper).remove();
                 na.mp.reorderPlaylist();
                 
-                if (na.mp.settings.stopped)
-                    na.mp.selectMP3 (newID, $(dragged).attr('file'));
+                if (na.mp.settings.stopped) {
+                    na.mp.selectMP3(newID, file);
+                }
                                 
                 na.mp.onresize($('#siteContent')[0]);
-                na.mp.playlistCount++;
-                
                 evt.preventDefault();
 
-                // vital for the 're-ordering' functionality of the #playlist itself :
-                $(dragged).draggable({
-                    containment : '#playlist',
-                    connectToSortable : '#playlist',
-                    stack : '.mp3',
-                    helper : function (evt, ui) {
-                        na.mp.settings.resortedItem = dragged.oldID;
-                        var x = $('#'+newID).parent()[0];
-                        var div = document.createElement('div');
-                        $(div).css({width:'100%'});
-                        $(this).clone(true,true).appendTo(div).css({zIndex:1100, color:'yellow', paddingLeft:30}).attr('id',newID);
-                        $('#playlist').append(div);
-                        return div;
-                    },
-                    drag : function (evt, ui) {
-                        return true;
-                    }
-                });
-
-                na.site.loadTheme_applySettings(na.site.globals.themes[na.site.globals.themeName], null, false);
+                if (na.site.loadTheme_applySettings && na.site.globals.themes) {
+                    na.site.loadTheme_applySettings(na.site.globals.themes[na.site.globals.themeName], null, false);
+                }
 
                 return dragged;
 			}
@@ -626,244 +545,209 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
     
     reorderPlaylist : function () {
         $('.ui-sortable-placeholder', $('#playlist')).removeClass('mp3').addClass('mp3-disabled');
-        $('.mp3', $('#playlist')[0]).each(function(idx,el){
-            let 
-            x = $(el).attr('onclick').toString().replace(new RegExp(el.id),'playlist_'+idx),
-            x1 = x.replace('javascript:','').trim();
-            $(el).attr('onclick','javascript:'+x1);
-            el.id = 'playlist_'+idx;
+        $('.mp3', $('#playlist')).each(function(idx, el) {
+            var newId = 'playlist_' + idx;
+            el.id = newId;
+            if (el.classList.contains('selected')) {
+                na.mp.settings.activeID = newId;
+                na.mp.settings.playingIndex = idx;
+            }
         });
     },
     
 	playlistCount : 0,
 
 	onresize : function (div) {
-		var 
-		contentMargin = 20,
-		myWidth = $('#siteContent > .vividDialogContent').width() - (contentMargin*2),
-		myHeight = (
+		var contentMargin = 20;
+		var myWidth = $('#siteContent > .vividDialogContent').width() - (contentMargin * 2);
+		var myHeight = (
             $('#siteContent').height()
             - $('#horizontalMover__containmentBox2').height()
-            - $('#horizontalMover__containmentBox2')[0].offsetTop
-            - (contentMargin*2) - (na.d.g.margin*2) -$('#app__musicPlayer__header').height()
+            - ($('#horizontalMover__containmentBox2')[0] ? $('#horizontalMover__containmentBox2')[0].offsetTop : 0)
+            - (contentMargin * 2) - (na.d.g.margin * 2) - $('#app__musicPlayer__header').height()
         );
 
-        if ($('#siteTaskbar').css('display')!=='none') {
-        //if (na.desktop.globals.divs.includes('#siteStatusbar')) {
+        if ($('#siteTaskbar').css('display') !== 'none') {
             myHeight = myHeight - contentMargin;
         }
-        var columnWidth = ($(window).width()/2)-30;
-        if (columnWidth>450) columnWidth = 450;
+        var columnWidth = ($(window).width() / 2) - 30;
+        if (columnWidth > 450) columnWidth = 450;
 
-        var
-        contentWidth = columnWidth*2 + 10,
-        contentInnerWidth = columnWidth*2 + 20,
-        zfh = (
-                $('#siteContent').height() /
-                ( $('#siteContent').height() - (contentMargin*2) )
-        ),
-        zfw = (
-            (
-                ( $('#siteContent').width() )
-                / ( (contentWidth * 2) + 30 + (na.d.g.margin*3)  )
-            )
-        );
+        var contentWidth = columnWidth * 2 + 10;
+        var contentInnerWidth = columnWidth * 2 + 20;
+        var zfh = $('#siteContent').height() / Math.max(1, ($('#siteContent').height() - (contentMargin * 2)));
+        var zfw = $('#siteContent').width() / ((contentWidth * 2) + 30 + (na.d.g.margin * 3));
+
         na.mp.globals.zfh = zfh;
         na.mp.globals.zfw = zfw;
 
-        var
-        sc_scrollpane = $('#siteContent', window.top.document.body),
-		sc_scrollpaneContainer = $('#siteContent', window.top.document.body),
-		sc_siteContent = $('#siteContent', window.top.document.body);
         if (!na.site.settings.scaleApp) {
-            na.site.settings.scaleApp = zfw+' '+zfh;
-        };
+            na.site.settings.scaleApp = zfw + ' ' + zfh;
+        }
 
-		if (typeof na.mp.settings.masterLeftOffset == 'number' && !na.mp.settings.onResizeReposition) {
-			var masterLeftOffset = na.mp.settings.masterLeftOffset;
-			if (masterLeftOffset<0) masterLeftOffset=0;
+        var masterLeftOffset;
+		if (typeof na.mp.settings.masterLeftOffset === 'number' && !na.mp.settings.onResizeReposition) {
+			masterLeftOffset = Math.max(0, na.mp.settings.masterLeftOffset);
 		} else {
-			var masterLeftOffset = ((myWidth - contentWidth) / 2);
-			if (masterLeftOffset<0) masterLeftOffset=0;
+			masterLeftOffset = Math.max(0, (myWidth - contentWidth) / 2);
 			na.mp.settings.masterLeftOffset = masterLeftOffset;
 		}
 		
 		var dialogMP3sList = '#mp3s';
-		if ($('#app__musicPlayer__description').length>0) var dialogMP3desc = '#app__musicPlayer__description';
-			else var dialogMP3desc = '#app__musicPlayer__description';
-		if ($('#app__musicPlayer__playlist').length>0) var dialogPlaylist = '#app__musicPlayer__playlist, #app__musicPlayer__playlist';
-			else var dialogPlaylist = '#app__musicPlayer__playlist';
-		if ($('#app__musicPlayer__player').length>0) var dialogPlayer = '#app__musicPlayer__player, #app__musicPlayer__player, #app__musicPlayer__player__CSS3';
-			else var dialogPlayer = '#app__musicPlayer__player, #app__musicPlayer__player__CSS3';
+		var dialogMP3desc = '#app__musicPlayer__description';
+		var dialogPlaylist = '#app__musicPlayer__playlist';
+		var dialogPlayer = '#app__musicPlayer__player, #app__musicPlayer__player__CSS3';
             
-        var 
-        leftOffset = masterLeftOffset + 0,
-        playerLeft = (leftOffset + columnWidth + na.d.g.margin),
-		dialogsLeft = Math.round (leftOffset);
-        $('#app__musicPlayer__header').animate ({
+        var leftOffset = masterLeftOffset;
+        var playerLeft = leftOffset + columnWidth + na.d.g.margin;
+		var dialogsLeft = Math.round(leftOffset);
+
+        $('#app__musicPlayer__header').animate({
             width : contentInnerWidth,
             left : dialogsLeft,
-            top : (na.d.g.margin*2)
+            top : (na.d.g.margin * 2)
         });
-        $('#app__musicPlayer__header .vividDialogContent').css ({
+        $('#app__musicPlayer__header .vividDialogContent').css({
             overflow : 'hidden'
         });
         
-		var 
-		timeDelay = 10,
-		timeIncrease = 50,
-		$dialogHeading = $('#heading_wrapper'),
-		$dialogMP3sList = $(dialogMP3sList),
-		$dialogMP3desc = $(dialogMP3desc),
-		$dialogPlaylist = $(dialogPlaylist),
-		$dialogPlayer = $(dialogPlayer),
-		centerDialogsWidth = $(dialogMP3sList).width() + $dialogPlaylist.width() + $dialogPlayer.width(),
-		dialogsTop = contentMargin + (na.d.g.margin*2) + $('#app__musicPlayer__header').position().top + $('#app__musicPlayer__header').height() + na.d.g.margin,
-		dialogsTop = contentMargin + (na.d.g.margin*2) + $('#app__musicPlayer__header').height() + na.d.g.margin,
-		dialogsHeight = (myHeight - dialogsTop - contentMargin);
+		var $dialogMP3desc = $(dialogMP3desc);
+		var $dialogPlaylist = $(dialogPlaylist);
+		var dialogsTop = contentMargin + (na.d.g.margin * 2) + $('#app__musicPlayer__header').height() + na.d.g.margin;
+		var playerHeight = 150;
+        var descTop = dialogsTop + playerHeight + 30;
+        var descHeight = Math.max(80, (myHeight - 20 - playerHeight) / 3);
+        var playlistTop = descTop + descHeight + 30;
+        var playlistHeight = Math.max(100, (myHeight - 170 - $('#app__musicPlayer__header').height()) / (3 / 2));
         
-		$('#horizontalMover__containmentBox2').stop(true,true).animate({
+		$('#horizontalMover__containmentBox2').stop(true, true).animate({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
 			opacity : 0.001,
 			display : 'block'
-		}).animate ({opacity:(0.3)},1000);
-		$('#horizontalMover__containmentBox1').stop(true,true).animate({
+		}).animate({ opacity: 0.3 }, 1000);
+
+		$('#horizontalMover__containmentBox1').stop(true, true).animate({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
 			opacity : 0.001,
 			display : 'block'
-		}).animate ({opacity:(0.2)},1300);
+		}).animate({ opacity: 0.2 }, 1300);
 		
-        $('#app__musicPlayer__player').css({ opacity : 1, height : 150 });
-        $('#app__musicPlayer__player, #app__musicPlayer__player__CSS3').css ({
+        $('#app__musicPlayer__player').css({ opacity : 1, height : playerHeight });
+        $('#app__musicPlayer__player, #app__musicPlayer__player__CSS3').css({
             left : playerLeft,
             width : columnWidth,
             top : dialogsTop,
             opacity : 1
         });
-        $('#app__musicPlayer__player__CSS3').css ({ left : '', top : '', opacity : 0.5 });
+        $('#app__musicPlayer__player__CSS3').css({ left : '', top : '', opacity : 0.5 });
         
-        $('#app__musicPlayer__description, #app__musicPlayer__description__CSS3, #app__musicPlayer__description__item__0, #app__musicPlayer__description__item__0__img1, app__musicPlayer__desc__item__0__img2, #app__musicPlayer__description, #app__musicPlayer__description').css({
+        $('#app__musicPlayer__description, #app__musicPlayer__description__CSS3, #app__musicPlayer__description__item__0, #app__musicPlayer__description__item__0__img1, #app__musicPlayer__desc__item__0__img2').css({
             position : 'absolute'
-        }).stop(true,true).animate({
+        }).stop(true, true).animate({
             width : columnWidth,
-            height : (myHeight - 20 - 150) /3
+            height : descHeight
         });
-        $('#app__musicPlayer__description').stop(true,true).animate({
+        $('#app__musicPlayer__description').stop(true, true).animate({
             left : playerLeft,
-            top : dialogsTop + $('#app__musicPlayer__player')[0].offsetHeight + 30,
+            top : descTop,
             width : columnWidth,
-            height : ((myHeight - 20 - 150) /3)
-        });
-        $('#app__musicPlayer__description__CSS3').stop(true,true).animate({
-            width : columnWidth,
-            height : (myHeight - 20 - 150) /3
+            height : descHeight
         });
         $('#app__musicPlayer__description > table').css({
             width : ''
-        }).stop(true,true).animate({
-            height : ((myHeight - 20 - 150) /3)
+        }).stop(true, true).animate({
+            height : descHeight
         });
+
         $('#horizontalMover').css({
-            background : 'rgba(243, 245, 39, 0.55)', // yellow, semi-translucent
+            background : 'rgba(243, 245, 39, 0.55)',
             boxShadow : '2px 2px 2px rgba(0,0,0,0.7)'
-		}).stop(true,true).animate({
+		}).stop(true, true).animate({
             left : masterLeftOffset + 10,
-            width : $('#app__musicPlayer__header').width()-20,
+            width : contentInnerWidth - 20,
             top : 2
         });
-        $('#mp3s').css ({
+
+        $('#mp3s').css({
             width : columnWidth - 50,
             visibility : 'visible',
             position : 'absolute'
-        }).stop(true,true).animate({
+        }).stop(true, true).animate({
             left : dialogsLeft,
-            height : myHeight ,
+            height : myHeight,
             top : dialogsTop
         });
 
-        $dialogPlaylist.animate ({
+        $dialogPlaylist.stop(true, true).animate({
             left : playerLeft,
             width : columnWidth,
-            height : (myHeight - 170 - $('#app__musicPlayer__header').height()) / (3/2),
-            top : ($dialogMP3desc[0].offsetTop + $dialogMP3desc.height() + 30) + 'px'
+            height : playlistHeight,
+            top : playlistTop + 'px'
         });
-        $('ul', $dialogPlaylist).animate ({
-            height : 'calc(100% - '+$('h2', $dialogPlaylist).outerHeight()+'px - 10px - '+$('h2', $dialogPlaylist).css('marginBottom')+' - '+$('h2', $dialogPlaylist).css('marginBottom')+')'
+
+        var h2Height = $('h2', $dialogPlaylist).outerHeight() || 0;
+        var h2Margin = parseFloat($('h2', $dialogPlaylist).css('marginBottom')) || 0;
+        $('ul', $dialogPlaylist).stop(true, true).animate({
+            height : 'calc(100% - ' + (h2Height + 10 + (h2Margin * 2)) + 'px)'
         });
         
 		if (!na.mp.settings.afterInitializing) {
             na.mp.settings.afterInitializing = true;
 
-
-            $('#mp3s .vividButton').css({position:'relative'});
-            var w = ($('#mp3s').width()-50);
-            debugger;
-            na.m.waitForCondition (
-                'na.site.settings.HTMLidle for resizing of playlist .vividButton elements (not in a .vividMenu btw)',
+            $('#mp3s .vividButton').css({ position: 'relative' });
+            var w = $('#mp3s').width() - 50;
+            na.m.waitForCondition(
+                'na.site.settings.HTMLidle for resizing of playlist .vividButton elements',
                 function () { return na.m.HTMLidle(); },
                 function () {
                     var c = na.site.components;
-                    $('.vividButton, .vividButton4, .vividButton_icon_50x50, .vividButton_icon_100x100', $('#mp3s')).each(function(idx,el) {
-                        $(el).stop(true,true).css({width:w});
-                        c.buttons['#'+el.id] = new vividUserInterface_2D_button ({ naSite : na.site, el : el });
+                    $('.vividButton, .vividButton4, .vividButton_icon_50x50, .vividButton_icon_100x100', $('#mp3s')).each(function(idx, el) {
+                        $(el).stop(true, true).css({ width: w });
+                        c.buttons['#' + el.id] = new vividUserInterface_2D_button({ naSite : na.site, el : el });
                     });
 
                     na.mp.setupDragNDrop();
-                }, 150); // milliseconds delay number (milliseconds between check of 2nd parameter function call)
+                }, 150
+            );
 
-
-            setTimeout (function() {
+            setTimeout(function() {
                 $('#horizontalMover').css({
                     opacity : 0.001,
                     display : 'block'
-                }).animate ({opacity : (1)}, 700);
+                }).animate({ opacity : 1 }, 700);
             }, 150);
         
 			$('.vividDialog, .vividScrollpane, #heading_wrapper, #siteIntroText, #mp3s, #app__musicPlayer__player, #app__musicPlayer__player_table, #app__musicPlayer__playlist, #infoWindow_help')
-				.not ('#siteLoginSuccessful, #siteLoginFailed, #siteLogin, #siteRegistration, #siteDateTime, #infoWindow_info, #infoWindow_tools')
-				.animate ({opacity:1}, 'normal');
+				.not('#siteLoginSuccessful, #siteLoginFailed, #siteLogin, #siteRegistration, #siteDateTime, #infoWindow_info, #infoWindow_tools')
+				.animate({ opacity: 1 }, 'normal');
         }
         na.site.settings.running_loadContent = false;
     }
-
 };
-//}, 100); // na.m.waitForCondition() (see top of this file)
 
-                na.m.waitForCondition ('DOM ready', function() {
-                    return na && na.desktop && na.desktop.g && na.apps && typeof na.musicPlayer =='object' /*&& $.ui && $.ui.draggable*/ && $('#mp3s')[0] && $('#app__musicPlayer__player')[0];
-                }, function() {
+na.m.waitForCondition('DOM ready', function() {
+    return na && na.desktop && na.desktop.g && na.apps && typeof na.musicPlayer === 'object' && $('#mp3s')[0] && $('#app__musicPlayer__player')[0];
+}, function() {
+    $('#app__musicPlayer__header .vividDialogContent').fadeIn('fast');
 
-                    /*
-                    jQuery('#horizontalMover').draggable ({
-                        containment : '#horizontalMover__containmentBox1',
-                        axis : 'x',
-                        drag : function () {
-                            na.musicPlayer.settings.masterLeftOffset = jQuery('#horizontalMover')[0].offsetLeft;
-                            //debugger;
-                            na.musicPlayer.onresize();
-                        }
-                    });
-                    */
-                    $('#app__musicPlayer__header .vividDialogContent').fadeIn('fast');
+    var divsToRegister = [
+        '#app__musicPlayer__header',
+        '#mp3s',
+        '#app__musicPlayer__player',
+        '#app__musicPlayer__playlist',
+        '#app__musicPlayer__description'
+    ];
 
-                    //na.desktop.setConfig('content');
-                    if (!na.desktop.g.originalDivs.includes('#app__musicPlayer__header')) na.desktop.g.originalDivs.push ('#app__musicPlayer__header');
-                    if (!na.desktop.g.originalDivs.includes('#mp3s')) na.desktop.g.originalDivs.push ('#mp3s');
-                    if (!na.desktop.g.originalDivs.includes('#app__musicPlayer__player')) na.desktop.g.originalDivs.push ('#app__musicPlayer__player');
-                    if (!na.desktop.g.originalDivs.includes('#app__musicPlayer__playlist')) na.desktop.g.originalDivs.push ('#app__musicPlayer__playlist');
-                    if (!na.desktop.g.originalDivs.includes('#app__musicPlayer__description')) na.desktop.g.originalDivs.push ('#app__musicPlayer__description');
+    divsToRegister.forEach(function(selector) {
+        if (!na.desktop.g.originalDivs.includes(selector)) na.desktop.g.originalDivs.push(selector);
+        if (!na.desktop.g.visibleDivs.includes(selector)) na.desktop.g.visibleDivs.push(selector);
+    });
 
-                    if (!na.desktop.g.visibleDivs.includes('#app__musicPlayer__header')) na.desktop.g.visibleDivs.push ('#app__musicPlayer__header');
-                    if (!na.desktop.g.visibleDivs.includes('#mp3s')) na.desktop.g.visibleDivs.push ('#mp3s');
-                    if (!na.desktop.g.visibleDivs.includes('#app__musicPlayer__player')) na.desktop.g.visibleDivs.push ('#app__musicPlayer__player');
-                    if (!na.desktop.g.visibleDivs.includes('#app__musicPlayer__playlist')) na.desktop.g.visibleDivs.push ('#app__musicPlayer__playlist');
-                    if (!na.desktop.g.visibleDivs.includes('#app__musicPlayer__description')) na.desktop.g.visibleDivs.push ('#app__musicPlayer__description');
-
-                    na.musicPlayer.settings.loadedIn['#siteContent'].onload( {} );
-                    na.site.settings.loadingApps = false;
-                    na.site.settings.startingApps = false;
-                }, 100);
+    na.musicPlayer.settings.loadedIn['#siteContent'].onload({});
+    na.site.settings.loadingApps = false;
+    na.site.settings.startingApps = false;
+}, 100);
