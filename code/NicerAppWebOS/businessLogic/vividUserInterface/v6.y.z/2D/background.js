@@ -138,7 +138,7 @@ na.backgrounds = na.background = na.bg = {
 
         <!-- this row must stay display:flex -->
         <div style="padding:12px; display:flex; gap:8px; align-items:center; flex-shrink:0;">
-            <button id="ytSearchBtn" style="display:block;position:relative;flex-shrink:0;">Search</button>
+            <button id="ytSearchBtn" class="vividButton" style="display:block;position:relative;flex-shrink:0;">Search</button>
             <input type="search" id="ytSearchInput" placeholder="Search YouTube or paste video URL / ID…" style="flex:1; min-width:180px; padding:8px 12px; border-radius:6px;border:1px solid #666; background:#222; color:#eee;">
         </div>
 
