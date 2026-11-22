@@ -3588,13 +3588,11 @@ na.site = {
         // Fetch dialogs properly
         //themeData = $.extend(themeData,na.site.loadTheme_fetchDialogs(themeData));
         themeData = na.m.deepMerge(themeData,{themeSettings:na.te.transform_jsTree_to_siteGlobalsThemes()});
-        debugger;
         if (
             !themeData.themeSettings
             || !themeData.themeSettings.Elements
             || !themeData.themeSettings.Elements['#siteContent']
         ) themeData = na.m.deepMerge(themeData,na.site.loadTheme_fetchDialogs(themeData));
-        debugger;
 
         na.site.globals.themes[na.site.globals.themeName] = na.m.deepMerge(
             na.site.globals.themes[na.site.globals.themeName],

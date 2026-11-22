@@ -956,12 +956,6 @@ na.backgrounds = na.background = na.bg = {
                         if (saveTheme) na.site.saveTheme();
                     };
                 });
-
-                debugger;
-
-
-                    //debugger;
-
 /*
             },
             error : function (xhr, textStatus, errorThrown) {

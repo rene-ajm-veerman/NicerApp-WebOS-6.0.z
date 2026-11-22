@@ -1,5 +1,6 @@
 <?php
-// MIT licensed (C) 2026 rene.veerman.netherlands@gmail.com + grok.com
+// (C) 2026 rene.veerman.netherlands@gmail.com + grok.com
+// License : https://opensource.org/license/mit
 
 class class_naComments {
     public $cn = 'class_naComments';
@@ -84,6 +85,7 @@ class class_naComments {
         global $naUsername;
         $user = $username ?: ($naUsername ?: 'anonymous');
         $user = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $user);
+        $user = na_couchdbUsername_from_plainUsername($naUsername);
         $ts   = $ts ?: time();
         $dt   = date('Y-m-d_H-i-s', $ts);
         return 'commentsMedia/' . $user . '/' . $dt;
