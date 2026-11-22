@@ -378,8 +378,8 @@ na.desktop = na.d = {
                     )
                     switch (section[sectionIdx][divID].growTo) {
                         case 'max':
-                            divs[divID].width = $(window).width() - divs[divID].left - na.d.g.margin;
-                            divs[divID].height = $(window).height() - divs[divID].top - na.d.g.margin;
+                            divs[divID].width = $(window).width() - divs[divID].left;// - na.d.g.margin;
+                            divs[divID].height = $(window).height() - divs[divID].top;// - na.d.g.margin;
                                 break;
                         case 'maxX':
                             divs[divID].width = $(window).width() - divs[divID].left - na.d.g.margin;
@@ -438,7 +438,7 @@ na.desktop = na.d = {
                         }
                     }
                     if (maxTop!==0) {
-                        divs[divID].height = maxTop.top - divs[divID].top - na.d.g.margin;
+                        divs[divID].height = maxTop.top - divs[divID].top - (divID=='#siteContent'?0:na.d.g.margin);
                     }
                     if (minBottom!==minCheck) {
                         divs[divID].height -= minBottom.top + na.d.g.margin;

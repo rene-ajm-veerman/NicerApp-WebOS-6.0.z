@@ -26,7 +26,6 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         loadedIn : {
             '#siteContent' : {
                 onload : function (settings) {
-                    debugger;
                     na.site.settings.app = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D';
                     if (typeof na.site.globals.app === 'string') {
                         na.site.globals.app = JSON.parse(na.site.globals.app);
@@ -63,7 +62,10 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
                     });
 
                     $('.lds-facebook').fadeOut('normal');
-                    na.desktop.resize(na.mp.onresize);
+                    setTimeout (function() {
+                        na.desktop.resize({callback:na.mp.onresize});
+                    }, 1000);
+
                 },
                 ondestroy : function (settings) {
                     na.desktop.deleteCallback('/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D');
@@ -148,13 +150,13 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 
         var ajaxCommand = {
 			type : 'GET',
-            url : baseUrl + 'music/' + encodedFile + '.json',
+            url : /*baseUrl + 'music/' + */encodedFile + '.json',
             error: function() {
 				var html = '';
                 html += '<div style="height:15px;">&nbsp;</div>';
                 html += '<table>';
 				html += '<tr><td colspan="2" style="text-align:center"><a href="' + baseUrl + 'download_mp3.php?file=' + encodedFile + '">download</a></td></tr>';
-				html += '<tr><td><span class="mp3_info_label mp3_title_label">title</span></td><td><span class="mp3_title">' + $('<div>').text(file).html() + '</span></td></tr>';
+				html += '<tr><td><span class="mp3_info_label mp3_title_label">title</span></td><td><span class="mp3_title">' + $('<div>').text(na.m.basename(file)).html() + '</span></td></tr>';
                 html += '</table>';
                 na.mp.updateDescriptionDiv(id, file, html);
             },
@@ -188,13 +190,13 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 		};
 		$.ajax(ajaxCommand);
 	},
-    
+
     updateDescriptionDiv : function (id, file, html) {
         $('#siteIntroText').fadeOut(500, function () {
             var audio = $('#audioTag')[0];
-            var mp3 = na.mp.globals.url + 'music/' + encodeURIComponent(file);
+            file = file.replace('musicPlayer.fancy.latest.2D/','musicPlayer.fancy.latest.2D/music/');
 
-            audio.src = mp3;
+            var mp3 = audio.src = file;///*na.mp.globals.url + 'music/' +*/ encodeURIComponent(file);
             audio.play().catch(function(err) {
                 console.warn('Audio playback prevented or failed:', err);
             });
@@ -475,7 +477,16 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
     },
     
 	setupDragNDrop : function () {
-		var mp3s = $('#mp3s > .mp3');
+        $('#horizontalMover').draggable({
+            axis: 'x',
+            containment: '#horizontalMover__containmentBox1',
+            drag: function(event, ui) {
+                $('#horizontalMover').css({left:ui.position.left});
+                na.mp.onresize();
+            }
+        });
+
+        var mp3s = $('#mp3s > .mp3');
 		mp3s.draggable(na.mp.mp3drag);
 		$('#playlist').sortable(na.mp.mp3sortable);
 		$('#playlist').droppable({
@@ -586,12 +597,8 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         }
 
         var masterLeftOffset;
-		if (typeof na.mp.settings.masterLeftOffset === 'number' && !na.mp.settings.onResizeReposition) {
-			masterLeftOffset = Math.max(0, na.mp.settings.masterLeftOffset);
-		} else {
-			masterLeftOffset = Math.max(0, (myWidth - contentWidth) / 2);
+			masterLeftOffset = $('#horizontalMover').offset().left - $('#siteContent').offset().left;//Math.max(0, ((myWidth - contentWidth) / 2) - ($('#horizontalMover').width()/2));
 			na.mp.settings.masterLeftOffset = masterLeftOffset;
-		}
 		
 		var dialogMP3sList = '#mp3s';
 		var dialogMP3desc = '#app__musicPlayer__description';
@@ -602,7 +609,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         var playerLeft = leftOffset + columnWidth + na.d.g.margin;
 		var dialogsLeft = Math.round(leftOffset);
 
-        $('#app__musicPlayer__header').animate({
+        $('#app__musicPlayer__header').css({
             width : contentInnerWidth,
             left : dialogsLeft,
             top : (na.d.g.margin * 2)
@@ -620,7 +627,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
         var playlistTop = descTop + descHeight + 30;
         var playlistHeight = Math.max(100, (myHeight - 170 - $('#app__musicPlayer__header').height()) / (3 / 2));
         
-		$('#horizontalMover__containmentBox2').stop(true, true).animate({
+		$('#horizontalMover__containmentBox2').css({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
@@ -628,7 +635,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 			display : 'block'
 		}).animate({ opacity: 0.3 }, 1000);
 
-		$('#horizontalMover__containmentBox1').stop(true, true).animate({
+		$('#horizontalMover__containmentBox1').css({
 			left : contentMargin,
             top : 0,
 			width : myWidth,
@@ -665,8 +672,7 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 
         $('#horizontalMover').css({
             background : 'rgba(243, 245, 39, 0.55)',
-            boxShadow : '2px 2px 2px rgba(0,0,0,0.7)'
-		}).stop(true, true).animate({
+            boxShadow : '2px 2px 2px rgba(0,0,0,0.7)',
             left : masterLeftOffset + 10,
             width : contentInnerWidth - 20,
             top : 2
@@ -732,6 +738,9 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fa
 na.m.waitForCondition('DOM ready', function() {
     return na && na.desktop && na.desktop.g && na.apps && typeof na.musicPlayer === 'object' && $('#mp3s')[0] && $('#app__musicPlayer__player')[0];
 }, function() {
+
+
+
     $('#app__musicPlayer__header .vividDialogContent').fadeIn('fast');
 
     var divsToRegister = [
@@ -751,3 +760,5 @@ na.m.waitForCondition('DOM ready', function() {
     na.site.settings.loadingApps = false;
     na.site.settings.startingApps = false;
 }, 100);
+
+na.mp.settings.dialogResizing = false;

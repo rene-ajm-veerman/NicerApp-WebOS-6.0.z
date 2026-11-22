@@ -10,17 +10,11 @@ $view = $naWebOS->view;
 //$spacer = "\n\t\t\t\t";
     $appFolder = '/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D';
     $rf = dirname(__FILE__).'/music';
+    //var_dump ($view[$appFolder]); exit();
+
+    if (array_key_exists('webRelPath',$view[$appFolder])) {
 
         $setPath = $rf.$view[$appFolder]['webRelPath'];
-        //var_dump ($setPath); exit();
-        /*
-        if (file_exists($setPath.'/regex_filenameFilter.js-regexps.json')) {
-            $res = json_decode(file_get_contents($setPath.'/regex_filenameFilter.js-regexps.json'),true);
-            //var_dump(file_get_contents($setPath.'/regex_filenameFilter.js-regexps.json'));        var_dump($res);die();
-        } else {
-            $res = [];
-        }
-        */
 
         //var_dump (FILE_FORMATS_mp3s); exit();
         $files = getFilePathList ($setPath, false, FILE_FORMATS_mp3s, null, array('file'), 1, 1, false);
@@ -29,20 +23,32 @@ $view = $naWebOS->view;
             $files[$idx] = str_replace(realpath(dirname(__FILE__.'/../..')), '', $files[$idx]);
             $files[$idx] = str_replace('\\\\', '/', $files[$idx]);
             $files[$idx] = str_replace('\\', '/', $files[$idx]);
-            /*
-            for ($i=0; $i < count($res); $i++) {
-                //for ($j=0; $j < count($res[$i]); $j++) {
-                    $it = $res[$i];//[$j];
-                    $itRegExps = $it[0];
-                    $itReplaceString = $it[1];
-                    for ($k=0; $k < count($itRegExps); $k++) {
-                        $files[$idx] = preg_replace($itRegExps[$k], $itReplaceString, $files[$idx]);
-                    }
-                //}
-            }
-            */
         }
-        //echo '<pre>'; var_dump ($files); exit();
+
+    } else if (array_key_exists('rp',$_GET)) {
+        $setPath = $rf.$_GET['rp'];
+        $files1 = getFilePathList ($setPath, false, '/.*/', null, array('dir'), 1, 1, false);
+        $files2 = getFilePathList ($setPath, false, FILE_FORMATS_mp3s, null, array('file'), 1, 1, false);
+        $files = [];
+        foreach ($files1 as $idx => $f) {
+            $files[] = $f;
+        }
+        foreach ($files2 as $idx => $f) {
+            $files[] = $f;
+        }
+
+
+        foreach ($files as $idx => $filepath) {
+            $files[$idx] = str_replace(realpath(dirname(__FILE__.'/../..')), '', $files[$idx]);
+            $files[$idx] = str_replace('\\\\', '/', $files[$idx]);
+            $files[$idx] = str_replace('\\', '/', $files[$idx]);
+        }
+
+    } else {
+        $setPath = $rf;
+        $files = getFilePathList ($rf, false, '/.*/', null, array('dir'), 1, 1, false);
+    }
+ //   echo '<pre>'; var_dump ($files); exit();
 
     $authorEmail = 'rene.veerman.netherlands@gmail.com';
     $spacer = "\n\t\t\t\t";
@@ -54,6 +60,12 @@ $view = $naWebOS->view;
         <meta http-equiv="content-language" content="english">
         <link type="text/css" rel="StyleSheet" media="screen" href="/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/index.css?changed=<?php echo date('Ymd-His', filemtime(dirname(__FILE__).'/index.css'));?>"/>
         <link type="text/css" rel="StyleSheet" media="screen" href="/NicerAppWebOS/3rd-party/jQuery/jPlayer-2.9.1/jplayer.vivid.css"/>
+        <style>
+            .dir {
+                background : rgba(0,0,100,0.5);
+
+            }
+        </style>
 
         <!--<script src="/NicerAppWebOS/3rd-party/jQuery/jquery-ui-1.12.1/jquery-ui.js"></script>-->
         <script type="text/javascript" src="/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/app.musicPlayer_siteContent.source.js?changed=<?php echo date('Ymd-His', filemtime(dirname(__FILE__).'/app.musicPlayer_siteContent.source.js'));?>"></script>
@@ -77,7 +89,7 @@ $view = $naWebOS->view;
             </div>
         </div>
 
-        <div id="mp3s" class="vividMenu vividScrollpane noFlex naNoComments" type="vertical" theme="dark" style="overflow:hidden;overflow-y:auto;opacity:0.001;position:absolute;text-align:center;width:100%;">
+        <div id="mp3s" class="vividMenu vividScrollpane noFlex naNoComments" type="vertical" theme="dark" style="overflow:hidden;overflow-y:auto;opacity:1;position:absolute;text-align:center;width:100%;">
     <?php
 
                 $filez = $filez2 = array();
@@ -87,47 +99,71 @@ $view = $naWebOS->view;
 
                 $idx = 0;
                 foreach ($files as $file=>$fp) {
-                    $fn = basename($fp['realPath']);
+                    $fn = $fp['webPath'];
+                    $fileLabel = $fp['webPath'];
     //echo '<pre>'; var_dump($fn);die();
-                    $fileLabel = $fn;//$filez[$idx];
-                    $filez2[$idx] = $fileLabel;
+                    $fn = basename($fn);//$filez[$idx];
 
                     foreach ($ff as $i => $it) {
                         //foreach ($ffIt as $j => $it) {
                             //note: $it === $ff[$i][$j];
                             $itRegExps = $it[0];
-                            //echo '<pre>';var_dump ($itRegExps); die();
+                      //      echo '<pre>';var_dump ($itRegExps); die();
                             $itReplaceString = $it[1];
                             foreach ($itRegExps as $k => $regExp) {
-                                //echo '1:'.$fileLabel.'<br/>';
+                    //            echo '1:'.$fileLabel.'<br/>';
                                 $fileLabel = preg_replace ($regExp, $itReplaceString, $fileLabel);
-                                //echo '2:'.$fileLabel.'<br/>';
+                  //              echo '2:'.$fileLabel.'<br/>';
                             }
                         //}
                     }
                     $fileLabel = preg_replace('/\.mp3$/','',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
+                    $fileLabel = str_replace('//','/',$fileLabel);
                     $filez[$idx] = $fileLabel;
+                    $filez2[$idx] = $fileLabel;
 
                     $idx++;
                 }
                 asort ($filez);
-                //echo '<pre>'; var_dump($filez); die();
+                //echo '<h1>t</h1><pre>'; var_dump([$files, $naWebOS->path]); die();
                 $idx = 0;
-                foreach ($filez as $idx=>$fn) {
+                foreach ($files as $idx=>$fp) {
+                    $fn = $filez[$idx];
+                    if (array_key_exists('rp',$_GET)) $fn = str_replace($_GET['rp'],'',$fn);
                     $id = 'mp3_'.$idx;
-                    echo "\t\t".'<div id="'.$id.'" file="'.$filez2[$idx].'" class="mp3 vividButton" theme="dark" style="" onclick="na.mp.selectMP3(\''.$id.'\', \''.str_replace("'", "\\'", $view[$appFolder]['webRelPath'].$filez2[$idx]).'\');" style="width:220px"><span style="opacity:1">'.$fn.'</span></div>'.PHP_EOL;
+                    $fn2 = substr(basename($fn),5);
+                    $class = '';
+//var_dump($naWebOS->path); die;
+                    $rp = str_replace($naWebOS->path.'/code','',$fp['path']);
+                    $rp = str_replace('music/','',$rp);
+                    $fn3 = $rp;
+                    $fn3 = str_replace('//','/',$fn3);
+                    //var_dump ([$rp, $fn3,is_dir($fn3)]);
+                    if (is_dir(__DIR__.'/music'.$fn3)) {
+                        $class .= 'dir ';
+                        echo "\t\t".'<div id="'.$id.'" file="music/'.$fn3.'" class="'.$class.' vividButton" theme="dark" style="" onclick="na.site.loadContent(event, \'/music-2D-fancy?rp='.str_replace("'", "\\'", 'music/'.$fn3).'\');" style="width:220px"><span style="opacity:1">'.$fn2.'</span></div>'.PHP_EOL;
+                    } else {
+                        if (strpos($fn,'.mp3')!==false) $class .= 'mp3 ';
+                        echo "\t\t".'<div id="'.$id.'" file="music/'.$fn3.'" class="'.$class.' vividButton" theme="dark" style="" onclick="na.mp.selectMP3(\''.$id.'\', \''.str_replace("'", "\\'music/", $fn3).'\');" style="width:220px"><span style="opacity:1">'.$fn2.'</span></div>'.PHP_EOL;
+                    }
+
                     $idx++;
                 }
-    ?>
+                ?>
         </div>
 
-        <div id="app__musicPlayer__player" class="vividDialog naNoComments" style="overflow:visible;position:absolute;opacity:0.0001;">
+        <div id="app__musicPlayer__player" class="vividDialog naNoComments" style="overflow:visible;position:absolute;opacity:1;">
             <audio id="audioTag">
                 <?php
                 foreach ($filez2 as $idx=>$fn) {
                     $id = 'mp3Source_'.$idx;
                     echo PHP_EOL;
-                    echo "\t\t\t".'<source id="'.$id.'" src="/NicerAppWebOS/apps/NicerAppWebOS/applications/2D/musicPlayer.fancy.latest.2D/music'.$view[$appFolder]['webRelPath'].$fn.'" type="audio/mpeg">'.PHP_EOL;
+                    echo "\t\t\t".'<source id="'.$id.'" src="'.$fn.'.mp3" type="audio/mpeg">'.PHP_EOL;
                 }
                 ?>
             </audio>
@@ -269,12 +305,12 @@ $view = $naWebOS->view;
 
 
 
-        <div id="app__musicPlayer__playlist" class="vividDialog naNoComments" theme="dark" style="text-align:center;opacity:0.001;overflow:visible;position:absolute;">
+        <div id="app__musicPlayer__playlist" class="vividDialog naNoComments" theme="dark" style="text-align:center;opacity:1;overflow:visible;position:absolute;">
             <h2 class="vt backdropped" style="padding:0px !important; margin:20px !important;display:flex;justify-content:center;align-items:center;width:auto;height:50px;font-size:10px;background:rgba(0,0,255,0.25);color:white;border-radius:10px;box-shadow:2px 2px 3px 2px rgba(0,0,0,0.7);">Playlist<br/>(drag and drop items onto this window)</h2>
             <ul id="playlist" class="vividScrollpane" style="width:100%;height:calc(100% - 50px);"></ul>
         </div>
 
-        <div id="app__musicPlayer__description" class="vividDialog naNoComments" theme="dark" style="opacity:0.001;overflow:visible;position:absolute;">
+        <div id="app__musicPlayer__description" class="vividDialog naNoComments" theme="dark" style="opacity:1;overflow:visible;position:absolute;">
             <div class="vividDialogContent" style="font-size:inherit">
                 <div id="mp3descText" style="font-size:inherit"></div>
                 <div id="siteIntroText"></div>

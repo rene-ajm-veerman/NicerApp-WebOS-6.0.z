@@ -75,7 +75,6 @@
             $urls[$viewName] = '/view/'.encode_base64_url($json[$viewName]);
         }
     };
-
 //var_dump($urls); die();
 
     /*

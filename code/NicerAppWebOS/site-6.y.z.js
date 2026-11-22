@@ -1595,6 +1595,9 @@ na.site = {
             'naStatus_pageChanged'
         );
 
+        delete na.site.settings.running_loadContent;
+        delete na.site.settings.running_loadTheme;
+
         na.m.runFunctions (lcc.ec, na.m.updateEvent (dt, {
             loadContent_displayContent : {
                 labels : { marker : { whatsThis : fncn+'::na.m.runFunctions() called' } },
@@ -1681,6 +1684,7 @@ na.site = {
                                 na.site.globals.themes[na.site.globals.themeName].themeSettings = na.te.transform_jsTree_to_siteGlobalsThemes();
 
                             //na.site.globals.themes.default = na.site.loadTheme_fetchDialogs();
+                            delete na.site.settings.running_loadContent;
                         }, null);
                     })] },
 
@@ -1724,9 +1728,15 @@ na.site = {
                 na.site.c.buttons['#'+el.id] = new vividUserInterface_2D_button(el);
             };
         });
+        $('#siteContent .vividDialog').each(function(idx,el){
+            if (na.site.c.dialogs['#'+el.id]) delete na.site.c.dialogs['#'+el.id];
+            if (!na.site.c.dialogs['#'+el.id]) {
+                na.site.c.dialogs['#'+el.id] = new vividUserInterface_2D_dialog(el);
+            }
+        });
 
         $('#btnShowStartMenu')[0].naInitializedAlreadyHere = true;
-        if ( !$('#btnShowStartMenu')[0].naInitializedAlreadyHere ) {
+        if (!$('#btnShowStartMenu')[0].naInitializedAlreadyHere ) {
             $('#btnShowStartMenu')[0].naInitializedAlreadyHere = true;
             $('#btnShowStartMenu, #btnShowStartMenu_container').off('click').on('click', function (e) {
                 if ($(this).is('.disabled')) return;
@@ -1788,7 +1798,6 @@ na.site = {
 
                     const themeName = na.site.globals.themeName;
                     const themes = na.site.globals.themes;
-                    debugger;
                     if (themes && themeName && themes[themeName]) {
                         na.site.loadTheme_applySettings(themes[themeName]);
                     } else {
@@ -1893,8 +1902,13 @@ na.site = {
                 };
 
                 $('#'+divID+' .vividDialogContent').hide();
-                setTimeout (function () { // setTimeout() vitally needed here!
-                    var $el = $('#'+divID+' .vividDialogContent').parents('.vividDialog');
+                setTimeout (function (divID) { // setTimeout() vitally needed here!
+                    console.log ('t321:'+divID);
+                    if ($('#'+divID+' .vividDialogContent')[0]) {
+                        var $el = $($('#'+divID+' .vividDialogContent')[0].parentNode);
+                    } else {
+                        var $el = $('#'+divID);
+                    }
                     if (!$el || !$el[0]) return false;
                     var divID2 = $el[0].id;
                     if (!divID2 || divID2==='') debugger;
@@ -1965,7 +1979,7 @@ na.site = {
                         }
                     }
 
-                }, 50);
+                }, 50, divID);
 
             };
         };

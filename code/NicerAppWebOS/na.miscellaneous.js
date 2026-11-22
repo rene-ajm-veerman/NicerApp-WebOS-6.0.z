@@ -36,6 +36,15 @@ na.m = {
 		}
     },
 
+    basename(path, suffix = '') {
+        // Remove trailing slashes, then take the last segment
+        const base = path.replace(/\/+$/, '').split(/[\\/]/).pop() || '';
+        // Optionally strip a suffix (like PHP’s second argument)
+        return suffix && base.endsWith(suffix)
+        ? base.slice(0, -suffix.length)
+        : base;
+    },
+
     camelToKebab(str) {
         return str
         .replace(/([a-z0-9])([A-Z])/g, '$1-$2')  // insert hyphen between lower/number and upper
