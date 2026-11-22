@@ -739,7 +739,55 @@ na.m.waitForCondition('DOM ready', function() {
     return na && na.desktop && na.desktop.g && na.apps && typeof na.musicPlayer === 'object' && $('#mp3s')[0] && $('#app__musicPlayer__player')[0];
 }, function() {
 
+    /*
+    // in app.musicPlayer_siteContent.source.js, inside the 'DOM ready' callback
+    (function () {
+        const mp = na.mp;
+        mp.settings.dialogResizing = false;
+        mp.settings.playlistUser = null;               // {width, height, top, leftDelta}
 
+        const $pl = () => $('#app__musicPlayer__playlist');
+        const cssNum = (sel, p) => parseFloat($(sel).css(p)) || 0;
+
+        // a resize drag started on one of the playlist's own handles?
+        document.addEventListener('pointerdown', e => {
+            const h = e.target.closest && e.target.closest('.na-resize-handle');
+            if (h && h.parentElement && h.parentElement.id === 'app__musicPlayer__playlist')
+                mp.settings.dialogResizing = true;
+        }, true);
+
+        // after the drag: store the result, relative to the player column
+        document.addEventListener('pointerup', () => {
+            if (!mp.settings.dialogResizing) return;
+            setTimeout(() => {                           // let desktop.js finish its own pointerup first
+                mp.settings.dialogResizing = false;
+                const p = $pl();
+                mp.settings.playlistUser = {
+                    width:     p.width(),
+                       height:    p.height(),
+                       top:       cssNum('#app__musicPlayer__playlist', 'top'),
+                       leftDelta: cssNum('#app__musicPlayer__playlist', 'left')
+                       - cssNum('#app__musicPlayer__player', 'left')
+                };
+            }, 0);
+        }, true);
+
+        const orig = mp.onresize;
+        mp.onresize = function () {
+            if (mp.settings.dialogResizing) return;      // don't fight the live drag
+            const r = orig.apply(this, arguments);
+
+            if (!na.mp.settings.playlistUser) {
+                $dialogPlaylist.css({ left: playerLeft, width: columnWidth});
+            } else {
+                var u = na.mp.settings.playlistUser;
+                $dialogPlaylist.css({ left: playerLeft + u.leftDelta, width: u.width, height: u.height, top: u.top });
+            }
+
+
+            return r;
+        };
+    })();*/
 
     $('#app__musicPlayer__header .vividDialogContent').fadeIn('fast');
 
@@ -762,3 +810,14 @@ na.m.waitForCondition('DOM ready', function() {
 }, 100);
 
 na.mp.settings.dialogResizing = false;
+/*
+document.addEventListener('pointerdown', e => {
+    if (e.target.closest && e.target.closest('.na-resize-handle'))
+        na.mp.settings.dialogResizing = true;
+}, true);
+
+document.addEventListener('pointerup', () => {
+    na.mp.settings.dialogResizing = false;
+}, true);
+
+*/

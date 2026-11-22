@@ -4,6 +4,15 @@
 	margin:0px;
 }
 */
+
+
+
+#siteContent .vividDialog .na-resize-handle {
+display: none !important;
+pointer-events: none !important;
+}
+
+
 #audioPlayerUI {
     display: flex;
     flex-direction: column;        /* or keep row if you prefer */
