@@ -584,7 +584,6 @@ na.apps.loaded['/NicerAppWebOS/apps/NicerAppWebOS/userInterfaces/siteComments'] 
         }
 
         var user = (na.site.globals.clientUsername || 'anonymous').replace(/[^a-zA-Z0-9_\-\.]/g, '_');
-        debugger;
         var now  = new Date();
         var pad  = function (n) { return (n < 10 ? '0' : '') + n; };
         var dt   = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
