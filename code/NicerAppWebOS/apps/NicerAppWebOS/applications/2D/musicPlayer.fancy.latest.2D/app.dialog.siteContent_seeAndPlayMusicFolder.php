@@ -48,6 +48,11 @@ $view = $naWebOS->view;
         $setPath = $rf;
         $files = getFilePathList ($rf, false, '/.*/', null, array('dir'), 1, 1, false);
     }
+
+    usort ($files, function ($a,$b){
+        return strcmp($a['webPath'],$b['webPath']);
+    });
+
  //   echo '<pre>'; var_dump ($files); exit();
 
     $authorEmail = 'rene.veerman.netherlands@gmail.com';
@@ -129,14 +134,13 @@ $view = $naWebOS->view;
 
                     $idx++;
                 }
-                asort ($filez);
                 //echo '<h1>t</h1><pre>'; var_dump([$files, $naWebOS->path]); die();
                 $idx = 0;
                 foreach ($files as $idx=>$fp) {
                     $fn = $filez[$idx];
                     if (array_key_exists('rp',$_GET)) $fn = str_replace($_GET['rp'],'',$fn);
                     $id = 'mp3_'.$idx;
-                    $fn2 = substr(basename($fn),5);
+                    $fn2 = substr(basename($fn),1,5)=='music'?substr(basename($fn),5):basename($fn);
                     $class = '';
 //var_dump($naWebOS->path); die;
                     $rp = str_replace($naWebOS->path.'/code','',$fp['path']);
